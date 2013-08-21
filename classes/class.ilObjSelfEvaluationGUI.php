@@ -23,6 +23,7 @@
 
 
 require_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
+require_once('class.ilSelfEvaluationPlugin.php');
 
 
 /**
@@ -39,10 +40,68 @@ require_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
  *   screens) and ilInfoScreenGUI (handles the info screen).
  *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilSelfEvaluationBlockGUI
  *
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
+
+	const DEBUG = false;
+	/**
+	 * @var ilObjSelfEvaluation
+	 */
+	public $object;
+	/**
+	 * @var ilSelfEvaluationPlugin
+	 */
+	protected $pl;
+	/**
+	 * @var ilCtrl
+	 */
+	protected $ctrl;
+
+
+	/**
+	 * @return bool|void
+	 */
+	public function executeCommand() {
+		if (! $this->getCreationMode()) {
+			$cmd = $this->ctrl->getCmd();
+			$next_class = $this->ctrl->getNextClass($this);
+			$this->tpl->getStandardTemplate();
+			$this->setTitleAndDescription();
+			$this->tpl->addCss($this->pl->getStyleSheetLocation("content.css"));
+			$this->setTabs();
+			switch ($next_class) {
+				case '':
+					if (! in_array($cmd, get_class_methods($this))) {
+						$this->{$this->getStandardCmd()}();
+						if (DEBUG) {
+							ilUtil::sendInfo("COMMAND NOT FOUND! Redirecting to standard class in ilObjSelfEvaluationGUI executeCommand()");
+						}
+
+						return true;
+					}
+					switch ($cmd) {
+						default:
+							$this->performCommand($cmd);
+							break;
+					}
+					break;
+				default:
+					require_once($this->ctrl->lookupClassPath($next_class));
+					$gui = new $next_class($this);
+					$this->ctrl->forwardCommand($gui);
+					break;
+			}
+			$this->tpl->show();
+
+			return true;
+		} else {
+			parent::executeCommand();
+		}
+	}
+
+
 	protected function afterConstructor() {
 		global $tpl, $ilCtrl;
 		/**
@@ -51,6 +110,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		 */
 		$this->tpl = $tpl;
 		$this->ctrl = $ilCtrl;
+		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl->updateLanguages();
+		//		$this->pl->update();
 	}
 
 
@@ -104,6 +166,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->addInfoTab();
 		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab('properties', $this->txt('properties'), $this->ctrl->getLinkTarget($this, 'editProperties'));
+			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationAdministrationGUI'));
 		}
 		$this->addPermissionTab();
 	}
@@ -119,7 +182,6 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	public function initPropertiesForm() {
-		global $ilCtrl;
 		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		// title
@@ -130,55 +192,47 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$ta = new ilTextAreaInputGUI($this->txt('description'), 'desc');
 		$this->form->addItem($ta);
 		// online
-		$cb = new ilCheckboxInputGUI($this->lng->txt('online'), 'online');
+		$cb = new ilCheckboxInputGUI($this->txt('online'), 'online');
 		$this->form->addItem($cb);
-		// option 1
-		$ti = new ilTextInputGUI($this->txt('option_one'), 'op1');
-		$ti->setMaxLength(10);
-		$ti->setSize(10);
-		$this->form->addItem($ti);
-		// option 2
-		$ti = new ilTextInputGUI($this->txt('option_two'), 'op2');
-		$ti->setMaxLength(10);
-		$ti->setSize(10);
-		$this->form->addItem($ti);
+		// intro
+		$te = new ilTextAreaInputGUI($this->txt('intro'), 'intro');
+		$te->setUseRte(true);
+		$this->form->addItem($te);
+		// outro
+		$te = new ilTextAreaInputGUI($this->txt('outro'), 'outro');
+		$te->setUseRte(true);
+		$this->form->addItem($te);
+		// Buttons
 		$this->form->addCommandButton('updateProperties', $this->txt('save'));
 		$this->form->setTitle($this->txt('edit_properties'));
-		$this->form->setFormAction($ilCtrl->getFormAction($this));
+		$this->form->setFormAction($this->ctrl->getFormAction($this));
 	}
 
 
-	/**
-	 * Get values for edit properties form
-	 */
 	function getPropertiesValues() {
 		$values['title'] = $this->object->getTitle();
 		$values['desc'] = $this->object->getDescription();
 		$values['online'] = $this->object->getOnline();
-//		$values['op1'] = $this->object->getOptionOne();
-//		$values['op2'] = $this->object->getOptionTwo();
+		$values['intro'] = $this->object->getIntro();
+		$values['outro'] = $this->object->getOutro();
 		$this->form->setValuesByArray($values);
 	}
 
 
-	/**
-	 * Update properties
-	 */
 	public function updateProperties() {
-		global $tpl, $lng, $ilCtrl;
 		$this->initPropertiesForm();
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('desc'));
-			$this->object->setOptionOne($this->form->getInput('op1'));
-			$this->object->setOptionTwo($this->form->getInput('op2'));
 			$this->object->setOnline($this->form->getInput('online'));
+			$this->object->setIntro($this->form->getInput('intro'));
+			$this->object->setOutro($this->form->getInput('outro'));
 			$this->object->update();
-			ilUtil::sendSuccess($lng->txt('msg_obj_modified'), true);
-			$ilCtrl->redirect($this, 'editProperties');
+			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
+			$this->ctrl->redirect($this, 'editProperties');
 		}
 		$this->form->setValuesByPost();
-		$tpl->setContent($this->form->getHtml());
+		$this->tpl->setContent($this->form->getHtml());
 	}
 
 
@@ -186,9 +240,17 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	// Show content
 	//
 	function showContent() {
-		global $tpl, $ilTabs;
-		$ilTabs->activateTab('content');
-		$tpl->setContent('Hello World.');
+		$this->tabs_gui->activateTab('content');
+		$content = $this->pl->getTemplate('tpl.content.html');
+		$content->setVariable('INTRO_HEADER', $this->txt('intro_header'));
+		$content->setVariable('INTRO_BODY', $this->object->getIntro());
+		if ($this->object->isActive()) {
+			$content->setCurrentBlock('button');
+			$content->setVariable('START_BUTTON', $this->txt('start_button'));
+			$content->setVariable('START_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationPresentationGUI'));
+			$content->parseCurrentBlock();
+		}
+		$this->tpl->setContent($content->get());
 	}
 }
 

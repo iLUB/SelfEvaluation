@@ -36,6 +36,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	const TABLE_NAME = 'rep_robj_xsev_data';
 	const TYPE_GROUP = 1;
 	const SORT_MANUALLY = 1;
+	const DISPLAY_TYPE_SINGLE = 1;
+	const DISPLAY_TYPE_MULTIPLE = 2;
 	/**
 	 * @var bool
 	 */
@@ -48,6 +50,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var int
 	 */
 	protected $sort_type = self::SORT_MANUALLY;
+	/**
+	 * @var int
+	 */
+	protected $display_type = self::DISPLAY_TYPE_SINGLE;
 	/**
 	 * @var string
 	 */
@@ -97,12 +103,16 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'integer',
 				$this->getSortType()
 			),
+			'display_type' => array(
+				'integer',
+				$this->getDisplayType()
+			),
 			'intro' => array(
-				'clob',
+				'text',
 				$this->getIntro()
 			),
 			'outro' => array(
-				'clob',
+				'text',
 				$this->getOutro()
 			),
 		);
@@ -121,6 +131,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setOnline($rec->is_online);
 			$this->setEvaluationType($rec->evaluation_type);
 			$this->setSortType($rec->sort_type);
+			$this->setDisplayType($rec->display_type);
 			$this->setIntro($rec->intro);
 			$this->setOutro($rec->outro);
 		}
@@ -128,12 +139,12 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 
 	function doUpdate() {
-		$this->db->update(self::TABLE_NAME, array(
+		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
 				$this->getId()
 			),
-		), $this->getArrayForDb());
+		));
 	}
 
 
@@ -152,9 +163,26 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setOnline($this->getOnline());
 		$new_obj->setEvaluationType($this->getEvaluationType());
 		$new_obj->setSortType($this->getSortType());
+		$new_obj->setDisplayType($this->getDisplayType());
 		$new_obj->setIntro($this->getIntro());
 		$new_obj->setOutro($this->getOutro());
 		$new_obj->update();
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function isActive() {
+		return ($this->getOnline() AND $this->hasBlocks()) ? true : false;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function hasBLocks() {
+		return true; // FSX todo
 	}
 
 
@@ -235,6 +263,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function getEvaluationType() {
 		return $this->evaluation_type;
+	}
+
+
+	/**
+	 * @param int $display_type
+	 */
+	public function setDisplayType($display_type) {
+		$this->display_type = $display_type;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getDisplayType() {
+		return $this->display_type;
 	}
 }
 

@@ -28,6 +28,10 @@ $fields = array(
 		'type' => 'integer',
 		'length' => 1,
 	),
+	'display_type' => array(
+		'type' => 'integer',
+		'length' => 1,
+	),
 	'intro' => array(
 		'type' => 'clob',
 	),
@@ -38,4 +42,10 @@ $fields = array(
 
 $ilDB->createTable(ilObjSelfEvaluation::TABLE_NAME, $fields);
 $ilDB->addPrimaryKey(ilObjSelfEvaluation::TABLE_NAME, array( 'id' ));
+?>
+<#3>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationBlock.php');
+$block = new ilSelfEvaluationBlock();
+$block->initDB();
 ?>

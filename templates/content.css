@@ -1,0 +1,28 @@
+div.new_block, div.block {
+	width: 60%;
+}
+
+div.new_block:hover {
+	background-image: url("images/drop_back_active.png");
+	border-color:     #000000;
+}
+
+div.block {
+	/*background-color: red;*/
+	margin:     0;
+	height:     30px;
+	position:   relative;
+	clear:      both;
+	min-height: 60px;
+}
+
+div.innerBlock {
+	/*background-color: blue;*/
+	float: left;
+}
+
+div.blockActions {
+	margin-top: 15px;
+	position:   relative;
+	float:      right;
+}
