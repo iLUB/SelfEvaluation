@@ -21,9 +21,10 @@
 	+-----------------------------------------------------------------------------+
 */
 
-
+require_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
 require_once('class.ilSelfEvaluationPlugin.php');
+require_once('class.ilSelfEvaluationScaleFormGUI.php');
 
 
 /**
@@ -40,7 +41,7 @@ require_once('class.ilSelfEvaluationPlugin.php');
  *   screens) and ilInfoScreenGUI (handles the info screen).
  *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilSelfEvaluationBlockGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilSelfEvaluationBlockGUI, ilCommonActionDispatcherGUI
  *
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
@@ -58,6 +59,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	 * @var ilCtrl
 	 */
 	protected $ctrl;
+	/**
+	 * @var ilPropertyFormGUI
+	 */
+	protected $form;
 
 
 	/**
@@ -182,7 +187,6 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	public function initPropertiesForm() {
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		// title
 		$ti = new ilTextInputGUI($this->txt('title'), 'title');
@@ -206,10 +210,15 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->form->addCommandButton('updateProperties', $this->txt('save'));
 		$this->form->setTitle($this->txt('edit_properties'));
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
+		// Append
+		$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId());
+		$this->form = $aform->appendToForm($this->form);
 	}
 
 
 	function getPropertiesValues() {
+		$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId());
+		$values = $aform->fillForm();
 		$values['title'] = $this->object->getTitle();
 		$values['desc'] = $this->object->getDescription();
 		$values['online'] = $this->object->getOnline();
@@ -221,7 +230,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 	public function updateProperties() {
 		$this->initPropertiesForm();
+		$this->form->setValuesByPost();
 		if ($this->form->checkInput()) {
+			// Append
+			$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId());
+			$aform->updateObject();
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('desc'));
 			$this->object->setOnline($this->form->getInput('online'));

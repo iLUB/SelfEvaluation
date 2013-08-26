@@ -1,13 +1,15 @@
 <?php
 require_once('class.ilObjSelfEvaluationGUI.php');
+require_once('class.ilSelfEvaluationBlock.php');
+require_once('class.ilSelfEvaluationBlockGUI.php');
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
  *
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * @version           $Id:
  *
- * @ilCtrl_Calls      ilSelfEvaluationPresentationGUI: ilPersonalDesktopGUI, ilObjSelfEvaluationGUI
- * @ilCtrl_IsCalledBy ilSelfEvaluationPresentationGUI: ilPersonalDesktopGUI, ilObjSelfEvaluationGUI
+ * @ilCtrl_Calls      ilSelfEvaluationPresentationGUI: ilObjSelfEvaluationGUI
+ * @ilCtrl_IsCalledBy ilSelfEvaluationPresentationGUI: ilCommonActionDispatcherGUI, ilObjSelfEvaluationGUI
  */
 class ilSelfEvaluationPresentationGUI {
 
@@ -69,6 +71,12 @@ class ilSelfEvaluationPresentationGUI {
 
 	public function showContent() {
 		$this->tabs_gui->setTabActive('content');
+		$html = '';
+		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->parent->object->getId()) as $block) {
+			$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
+			$html .= $block_gui->getBLockHTML();
+		}
+		$this->tpl->setContent($html);
 	}
 }
 

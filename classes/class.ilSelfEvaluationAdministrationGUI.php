@@ -8,8 +8,8 @@ require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvan
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * @version           $Id:
  *
- * @ilCtrl_Calls      ilSelfEvaluationAdministrationGUI: ilPersonalDesktopGUI, ilObjSelfEvaluationGUI
- * @ilCtrl_IsCalledBy ilSelfEvaluationAdministrationGUI: ilPersonalDesktopGUI, ilObjSelfEvaluationGUI
+ * @ilCtrl_Calls      ilSelfEvaluationAdministrationGUI:  ilObjSelfEvaluationGUI
+ * @ilCtrl_IsCalledBy ilSelfEvaluationAdministrationGUI: ilCommonActionDispatcherGUI, ilObjSelfEvaluationGUI
  */
 class ilSelfEvaluationAdministrationGUI {
 
@@ -91,6 +91,9 @@ class ilSelfEvaluationAdministrationGUI {
 			$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', $block->getId());
 			$ac->setId('block_' . $block->getId());
 			$ac->addItem($this->pl->txt('edit_block'), 'edit_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock'));
+			$ac->addItem($this->pl->txt('delete_block'), 'delete_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'deleteBlock'));
+			$ac->addItem($this->pl->txt('edit_questions'), 'edit_questions', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editQuestions'));
+			$ac->addItem($this->pl->txt('edit_feedback'), 'edit_feedback', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editFeedbacks'));
 			$ac->setListTitle($this->pl->txt('actions'));
 			$admin->setVariable('ACTIONS', $ac->getHTML());
 			$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', 0);
@@ -103,7 +106,7 @@ class ilSelfEvaluationAdministrationGUI {
 		}
 		$admin->setCurrentBlock('new_block_bottom');
 		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'position', $pos);
-		$admin->setVariable('NEW_BLOCK_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addNew'));
+		$admin->setVariable('NEW_BLOCK_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addBlock'));
 		$admin->parseCurrentBlock();
 		$this->tpl->setContent($admin->get());
 	}

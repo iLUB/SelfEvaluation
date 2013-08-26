@@ -1,0 +1,24 @@
+<script>
+	$(document).ready(function () {
+		$('img.add_button').click(function (e) {
+			$("div.multipleinput_new").last().clone().appendTo("div#input_colletion").show();
+		});
+	});
+</script>
+<div id='input_colletion'>
+<!-- BEGIN input -->
+<div class='multipleinput' style="clear: both;">
+	<input style='float: left' type='text' name='{VALUE_N}' value='{VALUE_V}'>
+	<input style='float: left' type='text' name='{TITLE_N}' value='{TITLE_V}'>
+
+</div>
+<img class='add_button' src='{ADD_BUTTON}'><br>
+<!-- END input -->
+
+<div class='multipleinput_new' style="clear: both; ">
+	<input style='float: left' type='text' name='{VALUE_N_NEW}' value='' placeholder="Key">
+	<input style='float: left' type='text' name='{TITLE_N_NEW}' value='' placeholder="Value">
+</div>
+<img class='add_button' src='{ADD_BUTTON}'><br>
+
+</div>

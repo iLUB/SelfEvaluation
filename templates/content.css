@@ -1,5 +1,6 @@
 div.new_block, div.block {
-	width: 60%;
+	/*width: 60%;*/
+	clear: both;
 }
 
 div.new_block:hover {
@@ -25,4 +26,8 @@ div.blockActions {
 	margin-top: 15px;
 	position:   relative;
 	float:      right;
+}
+
+div.multipleinput {
+
 }

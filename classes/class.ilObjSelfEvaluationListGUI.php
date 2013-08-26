@@ -32,7 +32,7 @@ include_once('./Services/Repository/classes/class.ilObjectPluginListGUI.php');
  * ...Access class to get DB data and keep it small.
  *
  * @author        Alex Killing <alex.killing@gmx.de>
- * @author        fabian Schmid <fabian.schmid@ilub.unibe.ch>
+ * @author        Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  */
 class ilObjSelfEvaluationListGUI extends ilObjectPluginListGUI {
 

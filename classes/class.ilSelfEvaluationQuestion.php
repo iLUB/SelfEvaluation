@@ -1,19 +1,19 @@
 <?php
 
 /**
- * ilSelfEvaluationBlock
+ * ilSelfEvaluationQuestion
  *
  * @author  Fabian Schmid <fs@studer-raimann.ch>
  *
  * @version
  */
-class ilSelfEvaluationBlock {
+class ilSelfEvaluationQuestion {
 
-	const TABLE_NAME = 'rep_robj_xsev_block';
+	const TABLE_NAME = 'rep_robj_xsev_qst';
 	/**
 	 * @var int
 	 */
-	protected $id = 0;
+	public $id = 0;
 	/**
 	 * @var string
 	 */
@@ -21,11 +21,15 @@ class ilSelfEvaluationBlock {
 	/**
 	 * @var string
 	 */
-	protected $description = '';
+	protected $question_body = '';
 	/**
 	 * @var int
 	 */
 	protected $position = 0;
+	/**
+	 * @var bool
+	 */
+	protected $is_inverse = false;
 	/**
 	 * @var int
 	 */
@@ -42,6 +46,7 @@ class ilSelfEvaluationBlock {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
+		//		$this->initDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -52,11 +57,9 @@ class ilSelfEvaluationBlock {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
-			$this->setId($rec->id);
-			$this->setTitle($rec->title);
-			$this->setDescription($rec->description);
-			$this->setPosition($rec->position);
-			$this->setParentId($rec->parent_id);
+			foreach ($this->getArrayForDb() as $k => $v) {
+				$this->{$k} = $rec->{$k};
+			}
 		}
 	}
 
@@ -65,28 +68,14 @@ class ilSelfEvaluationBlock {
 	 * @return array
 	 */
 	public function getArrayForDb() {
-		return array(
-			'id' => array(
-				'integer',
-				$this->getId()
-			),
-			'title' => array(
-				'text',
-				$this->getTitle()
-			),
-			'description' => array(
-				'text',
-				$this->getDescription()
-			),
-			'position' => array(
-				'integer',
-				$this->getPosition()
-			),
-			'parent_id' => array(
-				'integer',
-				$this->getParentId()
-			),
-		);
+		$e = array();
+		foreach (get_object_vars($this) as $k => $v) {
+			if (! in_array($k, array( 'db' ))) {
+				$e[$k] = array( self::_getType($v), $this->$k );
+			}
+		}
+
+		return $e;
 	}
 
 
@@ -115,10 +104,20 @@ class ilSelfEvaluationBlock {
 	}
 
 
+	final private function resetDB() {
+		$this->db->dropTable(self::TABLE_NAME);
+		$this->initDB();
+	}
+
+
 	public function create() {
+		if ($this->getId() != 0) {
+			$this->update();
+
+			return true;
+		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-		$this->updateOrder();
 	}
 
 
@@ -131,29 +130,13 @@ class ilSelfEvaluationBlock {
 	}
 
 
-	/**
-	 * @param bool $update_order
-	 */
-	public function update($update_order = true) {
+	public function update() {
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
 				$this->getId()
 			),
 		));
-		if ($update_order) {
-			$this->updateOrder();
-		}
-	}
-
-
-	private function updateOrder() {
-		$pos = 10;
-		foreach (self::_getAllInstancesByParentId($this->getParentId()) as $block) {
-			$block->setPosition($pos);
-			$block->update(false);
-			$pos = $pos + 10;
-		}
 	}
 
 
@@ -161,17 +144,24 @@ class ilSelfEvaluationBlock {
 	// Static
 	//
 	/**
-	 * @param $parent_id
+	 * @param      $parent_id
+	 * @param bool $as_array
 	 *
-	 * @return ilSelfEvaluationBlock[]
+	 * @return ilSelfEvaluationQuestion[]
 	 */
-	public static function _getAllInstancesByParentId($parent_id) {
+	public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
 		global $ilDB;
+		$obj = new self();
+		$obj->initDB();
 		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
+		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE parent_id = "
+		. $ilDB->quote($parent_id, "integer"));
 		while ($rec = $ilDB->fetchObject($set)) {
-			$return[] = new self($rec->id);
+			if ($as_array) {
+				$return[] = (array)new self($rec->id);
+			} else {
+				$return[] = new self($rec->id);
+			}
 		}
 
 		return $return;
@@ -195,22 +185,6 @@ class ilSelfEvaluationBlock {
 
 
 	/**
-	 * @param string $description
-	 */
-	public function setDescription($description) {
-		$this->description = $description;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getDescription() {
-		return $this->description;
-	}
-
-
-	/**
 	 * @param int $parent_id
 	 */
 	public function setParentId($parent_id) {
@@ -223,6 +197,54 @@ class ilSelfEvaluationBlock {
 	 */
 	public function getParentId() {
 		return $this->parent_id;
+	}
+
+
+	/**
+	 * @param string $question_body
+	 */
+	public function setQuestionBody($question_body) {
+		$this->question_body = $question_body;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getQuestionBody() {
+		return $this->question_body;
+	}
+
+
+	/**
+	 * @param string $title
+	 */
+	public function setTitle($title) {
+		$this->title = $title;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getTitle() {
+		return $this->title;
+	}
+
+
+	/**
+	 * @param boolean $is_inverse
+	 */
+	public function setIsInverse($is_inverse) {
+		$this->is_inverse = $is_inverse;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getIsInverse() {
+		return $this->is_inverse;
 	}
 
 
@@ -242,19 +264,26 @@ class ilSelfEvaluationBlock {
 	}
 
 
+	//
+	// Helper
+	//
 	/**
-	 * @param string $title
-	 */
-	public function setTitle($title) {
-		$this->title = $title;
-	}
-
-
-	/**
+	 * @param $var
+	 *
 	 * @return string
 	 */
-	public function getTitle() {
-		return $this->title;
+	public static function _getType($var) {
+		switch (gettype($var)) {
+			case 'string':
+			case 'array':
+			case 'object':
+				return 'text';
+			case 'NULL':
+			case 'boolean':
+				return 'integer';
+			default:
+				return gettype($var);
+		}
 	}
 }
 
