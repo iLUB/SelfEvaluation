@@ -91,16 +91,16 @@ class ilSelfEvaluationPresentationGUI {
 	public function start() {
 		//		$identity = new ilSelfEvaluationIdentity();
 		$this->ctrl->redirectByClass('ilObjSelfEvaluationGUI');
-//		exit;
-//		if (! self::_isAnonymous($this->user->getId())) {
-//			 $identity->setTextKey('LX' . rand(100, 999));
-//			ilUtil::sendFailure($this->pl->txt('anonymous_access_failed'));
-//			$this->ctrl->redirect($this->parent, 'showContent');
-//		} else {
-//			$identity->setUserId($this->user->getId());
-//			$identity->create();
-//		}
-//		$this->ctrl->setParameter($this, 'uid', $identity->getId());
+		//		exit;
+		//		if (! self::_isAnonymous($this->user->getId())) {
+		//			 $identity->setTextKey('LX' . rand(100, 999));
+		//			ilUtil::sendFailure($this->pl->txt('anonymous_access_failed'));
+		//			$this->ctrl->redirect($this->parent, 'showContent');
+		//		} else {
+		//			$identity->setUserId($this->user->getId());
+		//			$identity->create();
+		//		}
+		//		$this->ctrl->setParameter($this, 'uid', $identity->getId());
 		//$this->ctrl->redirect($this, 'showContent');
 	}
 
