@@ -3,6 +3,7 @@ require_once('class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationBlock.php');
 require_once('class.ilSelfEvaluationBlockGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
+require_once('class.ilSelfEvaluationIdentity.php');
 require_once('class.ilSelfEvaluationDataset.php');
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
@@ -26,12 +27,14 @@ class ilSelfEvaluationPresentationGUI {
 
 
 	function __construct(ilObjSelfEvaluationGUI $parent) {
-		global $tpl, $ilCtrl;
+		global $tpl, $ilCtrl, $ilUser;
 		/**
 		 * @var $tpl    ilTemplate
 		 * @var $ilCtrl ilCtrl
+		 * @var $ilUser ilObjUser
 		 */
 		$this->tpl = $tpl;
+		$this->user = $ilUser;
 		$this->ctrl = $ilCtrl;
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
@@ -41,6 +44,7 @@ class ilSelfEvaluationPresentationGUI {
 
 	public function executeCommand() {
 		$this->tabs_gui->setTabActive('content');
+		$this->ctrl->saveParameter($this, 'uid');
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
 		switch ($cmd) {
 			default:
@@ -71,10 +75,33 @@ class ilSelfEvaluationPresentationGUI {
 				$this->$cmd();
 				break;
 			case 'showContent':
+			case 'start':
 				//				$this->checkPermission('read'); FSX
 				$this->$cmd();
 				break;
 		}
+	}
+
+
+	public function cancel() {
+		$this->ctrl->redirect($this->parent);
+	}
+
+
+	public function start() {
+		//		$identity = new ilSelfEvaluationIdentity();
+		$this->ctrl->redirectByClass('ilObjSelfEvaluationGUI');
+//		exit;
+//		if (! self::_isAnonymous($this->user->getId())) {
+//			 $identity->setTextKey('LX' . rand(100, 999));
+//			ilUtil::sendFailure($this->pl->txt('anonymous_access_failed'));
+//			$this->ctrl->redirect($this->parent, 'showContent');
+//		} else {
+//			$identity->setUserId($this->user->getId());
+//			$identity->create();
+//		}
+//		$this->ctrl->setParameter($this, 'uid', $identity->getId());
+		//$this->ctrl->redirect($this, 'showContent');
 	}
 
 
@@ -99,10 +126,25 @@ class ilSelfEvaluationPresentationGUI {
 		$this->initPresentationForm();
 		if ($this->form->checkinput()) {
 			$dataset = new ilSelfEvaluationDataset();
-			$dataset->create();
+			//			$dataset->create();
 		}
+		echo '<pre>' . print_r($_POST, 1) . '</pre>';
 		$this->form->setValuesByPost();
 		$this->tpl->setContent($this->form->getHTML());
+	}
+
+
+	//
+	// HELPER
+	//
+	public static function _isAnonymous($user_id) {
+		foreach (ilObjUser::_getUsersForRole(ANONYMOUS_ROLE_ID) as $u) {
+			if ($u['usr_id'] == $user_id) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
 

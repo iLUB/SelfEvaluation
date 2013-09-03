@@ -31,7 +31,7 @@ require_once('class.ilSelfEvaluationScaleFormGUI.php');
  * User Interface class for example repository object.
  *
  * @author            Alex Killing <alex.killing@gmx.de>
- * @author            fabian Schmid <fabian.schmid@ilub.unibe.ch>
+ * @author            fabian Schmid <Fabian.schmid@ilub.unibe.ch>
  *
  * $Id$
  *
@@ -77,6 +77,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
 			$this->tpl->addCss($this->pl->getStyleSheetLocation("content.css"));
 			$this->setTabs();
+//			echo $next_class;
+
 			switch ($next_class) {
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {
@@ -261,7 +263,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		if ($this->object->isActive()) {
 			$content->setCurrentBlock('button');
 			$content->setVariable('START_BUTTON', $this->txt('start_button'));
-			$content->setVariable('START_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationPresentationGUI'));
+			$content->setVariable('START_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationPresentationGUI', 'start'));
 			$content->parseCurrentBlock();
 		}
 		$this->tpl->setContent($content->get());

@@ -64,3 +64,4 @@ msg_question_deleted#:#Frage wurde gelöscht
 msg_obj_modified#:#Änderungen gespeichert
 scale#:#Skala
 send#:#Senden
+anonymous_access_failed#:#Kein Zugriff. Bitte loggen sie sich ein.

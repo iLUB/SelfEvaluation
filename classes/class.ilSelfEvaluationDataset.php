@@ -123,7 +123,13 @@ class ilSelfEvaluationDataset {
 	}
 
 
+	/**
+	 * @param $array
+	 */
 	public function setValuesByArray($array) {
+		if ($this->getId() == 0) {
+			$this->create();
+		}
 		foreach ($array as $k => $v) {
 			$da = new ilSelfEvaluationData();
 			$da->setDatasetId($this->getId());

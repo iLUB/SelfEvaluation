@@ -10,6 +10,8 @@
 class ilSelfEvaluationIdentity {
 
 	const TABLE_NAME = 'rep_robj_xsev_uid';
+	const TYPE_USER = 1;
+	const TYPE_ANONYMOUS = 2;
 	/**
 	 * @var int
 	 */
@@ -30,6 +32,10 @@ class ilSelfEvaluationIdentity {
 	 * @var int
 	 */
 	protected $obj_id = 0;
+	/**
+	 * @var int
+	 */
+	protected $type = self::TYPE_USER;
 
 
 	/**
@@ -42,6 +48,7 @@ class ilSelfEvaluationIdentity {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
+//		$this->resetDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -233,6 +240,22 @@ class ilSelfEvaluationIdentity {
 	 */
 	public function getUserId() {
 		return $this->user_id;
+	}
+
+
+	/**
+	 * @param int $type
+	 */
+	public function setType($type) {
+		$this->type = $type;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getType() {
+		return $this->type;
 	}
 
 
