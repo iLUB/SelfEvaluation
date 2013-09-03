@@ -1,15 +1,15 @@
 <?php
-require_once('class.ilSelfEvaluationScaleUnit.php');
+
 /**
- * ilSelfEvaluationScale
+ * ilSelfEvaluationData
  *
  * @author  Fabian Schmid <fs@studer-raimann.ch>
  *
  * @version
  */
-class ilSelfEvaluationScale {
+class ilSelfEvaluationData {
 
-	const TABLE_NAME = 'rep_robj_xsev_scale';
+	const TABLE_NAME = 'rep_robj_xsev_d';
 	/**
 	 * @var int
 	 */
@@ -17,11 +17,15 @@ class ilSelfEvaluationScale {
 	/**
 	 * @var int
 	 */
-	protected $parent_id = 0;
+	protected $dataset_id = 0;
 	/**
 	 * @var int
 	 */
-	protected $amount = 0;
+	protected $question_id = 0;
+	/**
+	 * @var int
+	 */
+	protected $value = NULL;
 
 
 	/**
@@ -34,24 +38,9 @@ class ilSelfEvaluationScale {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
-		//		$this->initDB();
 		if ($id != 0) {
 			$this->read();
 		}
-		$this->units = ilSelfEvaluationScaleUnit::_getAllInstancesByParentId($this->getId());
-	}
-
-
-	/**
-	 * @return array
-	 */
-	public function getUnitsAsArray() {
-		$return = array();
-		foreach ($this->units as $u) {
-			$return[$u->getValue()] = $u->getTitle();
-		}
-
-		return $return;
 	}
 
 
@@ -72,7 +61,7 @@ class ilSelfEvaluationScale {
 	public function getArrayForDb() {
 		$e = array();
 		foreach (get_object_vars($this) as $k => $v) {
-			if (! in_array($k, array( 'db', 'units' ))) {
+			if (! in_array($k, array( 'db' ))) {
 				$e[$k] = array( self::_getType($v), $this->$k );
 			}
 		}
@@ -112,9 +101,6 @@ class ilSelfEvaluationScale {
 	}
 
 
-	/**
-	 * @return bool
-	 */
 	public function create() {
 		if ($this->getId() != 0) {
 			$this->update();
@@ -123,8 +109,6 @@ class ilSelfEvaluationScale {
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-
-		return true;
 	}
 
 
@@ -132,10 +116,8 @@ class ilSelfEvaluationScale {
 	 * @return int
 	 */
 	public function delete() {
-		$this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
+		return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));
-
-		return true;
 	}
 
 
@@ -153,24 +135,20 @@ class ilSelfEvaluationScale {
 	// Static
 	//
 	/**
-	 * @param $parent_id
+	 * @param int $ref_id
 	 *
-	 * @return ilSelfEvaluationScale
+	 * @return ilSelfEvaluationData
 	 */
-	public static function _getInstanceByRefId($parent_id) {
-		$obj = new self();
-		$obj->initDB();
+	public static function _getInstanceByRefId($ref_id) {
 		global $ilDB;
 		// Existing Object
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE parent_id = "
-		. $ilDB->quote($parent_id, "integer"));
+		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE ref_id = "
+		. $ilDB->quote($ref_id, "integer"));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
-		$obj = new self();
-		$obj->setParentId($parent_id);
 
-		return $obj;
+		return false;
 	}
 
 
@@ -191,34 +169,50 @@ class ilSelfEvaluationScale {
 
 
 	/**
-	 * @param int $amount
+	 * @param int $dataset_id
 	 */
-	public function setAmount($amount) {
-		$this->amount = $amount;
+	public function setDatasetId($dataset_id) {
+		$this->dataset_id = $dataset_id;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getAmount() {
-		return $this->amount;
+	public function getDatasetId() {
+		return $this->dataset_id;
 	}
 
 
 	/**
-	 * @param int $parent_id
+	 * @param int $question_id
 	 */
-	public function setParentId($parent_id) {
-		$this->parent_id = $parent_id;
+	public function setQuestionId($question_id) {
+		$this->question_id = $question_id;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getParentId() {
-		return $this->parent_id;
+	public function getQuestionId() {
+		return $this->question_id;
+	}
+
+
+	/**
+	 * @param int $value
+	 */
+	public function setValue($value) {
+		$this->value = $value;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getValue() {
+		return $this->value;
 	}
 
 

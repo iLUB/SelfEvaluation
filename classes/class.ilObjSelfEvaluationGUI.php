@@ -40,7 +40,7 @@ require_once('class.ilSelfEvaluationScaleFormGUI.php');
  * - GUI classes used by this class are ilPermissionGUI (provides the rbac
  *   screens) and ilInfoScreenGUI (handles the info screen).
  *
- * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilAdministrationGUI, ilObjPluginDispatchGUI
+ * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilSelfEvaluationBlockGUI, ilCommonActionDispatcherGUI
  *
  */
@@ -74,6 +74,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$next_class = $this->ctrl->getNextClass($this);
 			$this->tpl->getStandardTemplate();
 			$this->setTitleAndDescription();
+			$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
 			$this->tpl->addCss($this->pl->getStyleSheetLocation("content.css"));
 			$this->setTabs();
 			switch ($next_class) {
@@ -171,7 +172,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->addInfoTab();
 		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab('properties', $this->txt('properties'), $this->ctrl->getLinkTarget($this, 'editProperties'));
-			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationAdministrationGUI'));
+			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		}
 		$this->addPermissionTab();
 	}

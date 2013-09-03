@@ -36,6 +36,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	const TABLE_NAME = 'rep_robj_xsev_data';
 	const TYPE_GROUP = 1;
 	const SORT_MANUALLY = 1;
+	const SORT_SHUFFLE = 2;
 	const DISPLAY_TYPE_SINGLE = 1;
 	const DISPLAY_TYPE_MULTIPLE = 2;
 	/**

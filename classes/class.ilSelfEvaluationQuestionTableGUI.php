@@ -1,6 +1,7 @@
 <?php
 require_once('./Services/Table/classes/class.ilTable2GUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
+require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 /**
  * TableGUI ilSelfEvaluationQuestionTableGUI
  *
@@ -11,11 +12,11 @@ require_once('class.ilSelfEvaluationQuestion.php');
 class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 
 	/**
-	 * @param ilSelfEvaluationBlockGUI $a_parent_obj
-	 * @param string                   $a_parent_cmd
-	 * @param ilSelfEvaluationBlock    $block
+	 * @param ilSelfEvaluationQuestionGUI $a_parent_obj
+	 * @param string                      $a_parent_cmd
+	 * @param ilSelfEvaluationBlock       $block
 	 */
-	function __construct(ilSelfEvaluationBlockGUI $a_parent_obj, $a_parent_cmd, ilSelfEvaluationBlock $block) {
+	function __construct(ilSelfEvaluationQuestionGUI $a_parent_obj, $a_parent_cmd, ilSelfEvaluationBlock $block) {
 		global $ilCtrl, $ilTabs;
 		/**
 		 * @var $ilCtrl ilCtrl
@@ -26,10 +27,16 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $ilTabs;
 		$this->setId('');
+		$this->block = $block;
 		parent::__construct($a_parent_obj, $a_parent_cmd);
-		$this->setTitle($this->pl->txt('title'));
+		$this->setTitle($this->pl->txt('question_table_title'));
 		//
 		// Columns
+		if ($this->block->isBlockSortable()) {
+			$this->addColumn('', 'position', '20px');
+			$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
+			$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
+		}
 		$this->addColumn($this->pl->txt('title'), 'title', 'auto');
 		$this->addColumn($this->pl->txt('question_body'), 'question_body', 'auto');
 		$this->addColumn($this->pl->txt('actions'), 'actions', 'auto');
@@ -37,15 +44,8 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		// ...
 		// Header
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $block->getId());
-
 		$this->addHeaderCommand($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'addQuestion'), $this->pl->txt('add_new_question'));
-		//$this->addHeaderCommand($this->ctrl->getLinkTarget($a_parent_obj, 'addTemplateForm'), $this->pl->txt('add_new'));
-		//$this->setDefaultOrderField('val_order');
-		//$this->setDefaultOrderDirection('asc');
-		//$this->setEnableHeader(true);
-		//$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
-		//$this->setEnableTitle(true);
-		$this->setRowTemplate('tpl.template_row.html', $this->pl->getDirectory());
+		$this->setRowTemplate('tpl.template_question_row.html', $this->pl->getDirectory());
 		$this->setData(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId(), true));
 	}
 
@@ -55,11 +55,20 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 	 */
 	public function fillRow($a_set) {
 		$obj = new ilSelfEvaluationQuestion($a_set['id']);
+		if ($this->block->isBlockSortable()) {
+			$this->tpl->setVariable('ID', $obj->getId());
+		}
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
-		$this->tpl->setVariable('BODY', $obj->getQuestionBody());
+		$this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
+		// Actions
+		$ac = new ilAdvancedSelectionListGUI();
+		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', $obj->getId());
+		$ac->setId('block_' . $obj->getId());
+		$ac->addItem($this->pl->txt('edit_question'), 'edit_question', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion'));
+		$ac->addItem($this->pl->txt('delete_question'), 'delete_question', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'deleteQuestion'));
+		$ac->setListTitle($this->pl->txt('actions'));
 		//
-		// ...
-//		$this->tpl->touchBlock('row');
+		$this->tpl->setVariable('ACTIONS', $ac->getHTML());
 	}
 }
 

@@ -1,15 +1,15 @@
 <?php
-require_once('class.ilSelfEvaluationScaleUnit.php');
+
 /**
- * ilSelfEvaluationScale
+ * ilSelfEvaluationUserdata
  *
  * @author  Fabian Schmid <fs@studer-raimann.ch>
  *
  * @version
  */
-class ilSelfEvaluationScale {
+class ilSelfEvaluationIdentity {
 
-	const TABLE_NAME = 'rep_robj_xsev_scale';
+	const TABLE_NAME = 'rep_robj_xsev_uid';
 	/**
 	 * @var int
 	 */
@@ -17,11 +17,19 @@ class ilSelfEvaluationScale {
 	/**
 	 * @var int
 	 */
-	protected $parent_id = 0;
+	protected $identifier_type = 0;
 	/**
 	 * @var int
 	 */
-	protected $amount = 0;
+	protected $user_id = 0;
+	/**
+	 * @var string
+	 */
+	protected $text_key = '';
+	/**
+	 * @var int
+	 */
+	protected $obj_id = 0;
 
 
 	/**
@@ -34,24 +42,9 @@ class ilSelfEvaluationScale {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
-		//		$this->initDB();
 		if ($id != 0) {
 			$this->read();
 		}
-		$this->units = ilSelfEvaluationScaleUnit::_getAllInstancesByParentId($this->getId());
-	}
-
-
-	/**
-	 * @return array
-	 */
-	public function getUnitsAsArray() {
-		$return = array();
-		foreach ($this->units as $u) {
-			$return[$u->getValue()] = $u->getTitle();
-		}
-
-		return $return;
 	}
 
 
@@ -72,7 +65,7 @@ class ilSelfEvaluationScale {
 	public function getArrayForDb() {
 		$e = array();
 		foreach (get_object_vars($this) as $k => $v) {
-			if (! in_array($k, array( 'db', 'units' ))) {
+			if (! in_array($k, array( 'db' ))) {
 				$e[$k] = array( self::_getType($v), $this->$k );
 			}
 		}
@@ -112,9 +105,6 @@ class ilSelfEvaluationScale {
 	}
 
 
-	/**
-	 * @return bool
-	 */
 	public function create() {
 		if ($this->getId() != 0) {
 			$this->update();
@@ -123,8 +113,6 @@ class ilSelfEvaluationScale {
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-
-		return true;
 	}
 
 
@@ -132,10 +120,8 @@ class ilSelfEvaluationScale {
 	 * @return int
 	 */
 	public function delete() {
-		$this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
+		return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));
-
-		return true;
 	}
 
 
@@ -153,24 +139,20 @@ class ilSelfEvaluationScale {
 	// Static
 	//
 	/**
-	 * @param $parent_id
+	 * @param int $ref_id
 	 *
-	 * @return ilSelfEvaluationScale
+	 * @return ilSelfEvaluationIdentity
 	 */
-	public static function _getInstanceByRefId($parent_id) {
-		$obj = new self();
-		$obj->initDB();
+	public static function _getInstanceByRefId($ref_id) {
 		global $ilDB;
 		// Existing Object
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE parent_id = "
-		. $ilDB->quote($parent_id, "integer"));
+		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE ref_id = "
+		. $ilDB->quote($ref_id, "integer"));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
-		$obj = new self();
-		$obj->setParentId($parent_id);
 
-		return $obj;
+		return false;
 	}
 
 
@@ -191,34 +173,66 @@ class ilSelfEvaluationScale {
 
 
 	/**
-	 * @param int $amount
+	 * @param int $identifier_type
 	 */
-	public function setAmount($amount) {
-		$this->amount = $amount;
+	public function setIdentifierType($identifier_type) {
+		$this->identifier_type = $identifier_type;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getAmount() {
-		return $this->amount;
+	public function getIdentifierType() {
+		return $this->identifier_type;
 	}
 
 
 	/**
-	 * @param int $parent_id
+	 * @param int $obj_id
 	 */
-	public function setParentId($parent_id) {
-		$this->parent_id = $parent_id;
+	public function setObjId($obj_id) {
+		$this->obj_id = $obj_id;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getParentId() {
-		return $this->parent_id;
+	public function getObjId() {
+		return $this->obj_id;
+	}
+
+
+	/**
+	 * @param string $text_key
+	 */
+	public function setTextKey($text_key) {
+		$this->text_key = $text_key;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getTextKey() {
+		return $this->text_key;
+	}
+
+
+	/**
+	 * @param int $user_id
+	 */
+	public function setUserId($user_id) {
+		$this->user_id = $user_id;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getUserId() {
+		return $this->user_id;
 	}
 
 

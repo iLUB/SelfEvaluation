@@ -28,6 +28,37 @@ div.blockActions {
 	float:      right;
 }
 
-div.multipleinput {
+ul.matrix, ul.matrix li {
+	margin:  0px;
+	display: block;
+	padding: 0px !important;
+	height:  20px;
+}
 
+ul.matrix {
+	border-top: 1px dotted #E8E8E8;
+	border-bottom: 1px dotted #E8E8E8;
+
+}
+
+ul.matrix li {
+	float:      left;
+	width:      100px;
+	list-style: none;
+	text-align: center;
+	vertical-align: middle;
+}
+
+ul.matrix.header {
+	background-color: #E8E8E8;
+	border:           none;
+	font-weight:      bold;
+}
+
+li.col2 {
+	background-color: #E8E8E8;
+}
+
+div.question {
+	margin-top: -7px;
 }

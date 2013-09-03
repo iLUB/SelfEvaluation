@@ -1,8 +1,3 @@
-// 
-// English Language File for SelfEvaluationObject Plugin
-//
-
-<!-- language file start -->
 obj_xsev#:#SelfEvaluation
 objs_xsev#:#SelfEvaluations
 obj_xsev_duplicate#:#Copy
@@ -25,8 +20,6 @@ properties#:#Properties
 edit_properties#:#Edit Properties
 title#:#Titel
 description#:#Beschreibung
-option_one#:#Option One
-option_two#:#Option Two
 save#:#Speichern
 cancel#:#Abbrechen
 edit#:#Bearbeiten
@@ -37,7 +30,7 @@ intro#:#Einleitungstext
 intro_header#:#Einleitung
 outro#:#Abschliessender Text
 start_button#:#Start
-administration#:#Administration
+administration#:#Fragen bearbeiten
 actions#:#Aktionen
 edit_block#:#Bearbeiten
 delete_block#:#Löschen
@@ -56,3 +49,18 @@ create_question#:#Frage erstellen
 create_question_button#:#Frage erstellen
 question_body#:#Fragetext
 add_new_question#:#Frage hinzufügen
+block_table_title#:#Frageblöcke
+add_new_block#:#Frageblock hinzufügen
+edit_question#:#Frage bearbeiten
+delete_question#:#Frage löschen
+sorting_saved#:#Reihenfolge gespeichert
+save_sorting#:#Reihenfolge speichern
+msg_block_updated#:#Änderungen gespeichert
+msg_question_updated#:#Änderungen gespeichert
+question_table_title#:#Fragen bearbeiten
+update_question_button#:#Speichern
+qst_delete_question#:#Möchten Sie die folgende Frage löschen?
+msg_question_deleted#:#Frage wurde gelöscht
+msg_obj_modified#:#Änderungen gespeichert
+scale#:#Skala
+send#:#Senden

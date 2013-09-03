@@ -1,5 +1,5 @@
 <?php
-
+require_once('class.ilSelfEvaluationScale.php');
 /**
  * ilSelfEvaluationBlock
  *
@@ -13,7 +13,7 @@ class ilSelfEvaluationBlock {
 	/**
 	 * @var int
 	 */
-	protected $id = 0;
+	public $id = 0;
 	/**
 	 * @var string
 	 */
@@ -25,11 +25,15 @@ class ilSelfEvaluationBlock {
 	/**
 	 * @var int
 	 */
-	protected $position = 0;
+	protected $position = 99;
 	/**
 	 * @var int
 	 */
 	protected $parent_id = 0;
+	/**
+	 * @var ilSelfEvaluationScale
+	 */
+	protected $scale;
 
 
 	/**
@@ -52,12 +56,11 @@ class ilSelfEvaluationBlock {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
-			$this->setId($rec->id);
-			$this->setTitle($rec->title);
-			$this->setDescription($rec->description);
-			$this->setPosition($rec->position);
-			$this->setParentId($rec->parent_id);
+			foreach ($this->getArrayForDb() as $k => $v) {
+				$this->{$k} = $rec->{$k};
+			}
 		}
+		$this->scale = ilSelfEvaluationScale::_getInstanceByRefId($this->getParentId());
 	}
 
 
@@ -65,28 +68,14 @@ class ilSelfEvaluationBlock {
 	 * @return array
 	 */
 	public function getArrayForDb() {
-		return array(
-			'id' => array(
-				'integer',
-				$this->getId()
-			),
-			'title' => array(
-				'text',
-				$this->getTitle()
-			),
-			'description' => array(
-				'text',
-				$this->getDescription()
-			),
-			'position' => array(
-				'integer',
-				$this->getPosition()
-			),
-			'parent_id' => array(
-				'integer',
-				$this->getParentId()
-			),
-		);
+		$e = array();
+		foreach (get_object_vars($this) as $k => $v) {
+			if (! in_array($k, array( 'db', 'scale' ))) {
+				$e[$k] = array( self::_getType($v), $this->$k );
+			}
+		}
+
+		return $e;
 	}
 
 
@@ -115,10 +104,20 @@ class ilSelfEvaluationBlock {
 	}
 
 
+	final private function resetDB() {
+		$this->db->dropTable(self::TABLE_NAME);
+		$this->initDB();
+	}
+
+
 	public function create() {
+		if ($this->getId() != 0) {
+			$this->update();
+
+			return true;
+		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-		$this->updateOrder();
 	}
 
 
@@ -131,28 +130,29 @@ class ilSelfEvaluationBlock {
 	}
 
 
-	/**
-	 * @param bool $update_order
-	 */
-	public function update($update_order = true) {
+	public function update() {
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
 				$this->getId()
 			),
 		));
-		if ($update_order) {
-			$this->updateOrder();
-		}
 	}
 
 
-	private function updateOrder() {
-		$pos = 10;
-		foreach (self::_getAllInstancesByParentId($this->getParentId()) as $block) {
-			$block->setPosition($pos);
-			$block->update(false);
-			$pos = $pos + 10;
+	/**
+	 * @return bool
+	 */
+	public function isBlockSortable() {
+		/**
+		 * @var $parentObject ilObjSelfEvaluation
+		 */
+		$parentObject = ilObjectFactory::getInstanceByObjId($this->getParentId());
+		switch ($parentObject->getSortType()) {
+			case ilObjSelfEvaluation::SORT_MANUALLY:
+				return true;
+			case ilObjSelfEvaluation::SORT_SHUFFLE:
+				return false;
 		}
 	}
 
@@ -161,17 +161,22 @@ class ilSelfEvaluationBlock {
 	// Static
 	//
 	/**
-	 * @param $parent_id
+	 * @param      $parent_id
+	 * @param bool $as_array
 	 *
-	 * @return ilSelfEvaluationBlock[]
+	 * @return array
 	 */
-	public static function _getAllInstancesByParentId($parent_id) {
+	public static function _getAllInstancesByParentId($parent_id, $as_array = false) {
 		global $ilDB;
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
 		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
-			$return[] = new self($rec->id);
+			if ($as_array) {
+				$return[] = (array)new self($rec->id);
+			} else {
+				$return[] = new self($rec->id);
+			}
 		}
 
 		return $return;
@@ -255,6 +260,44 @@ class ilSelfEvaluationBlock {
 	 */
 	public function getTitle() {
 		return $this->title;
+	}
+
+
+	/**
+	 * @param \ilSelfEvaluationScale $scale
+	 */
+	public function setScale($scale) {
+		$this->scale = $scale;
+	}
+
+
+	/**
+	 * @return \ilSelfEvaluationScale
+	 */
+	public function getScale() {
+		return $this->scale;
+	}
+
+	//
+	// Helper
+	//
+	/**
+	 * @param $var
+	 *
+	 * @return string
+	 */
+	public static function _getType($var) {
+		switch (gettype($var)) {
+			case 'string':
+			case 'array':
+			case 'object':
+				return 'text';
+			case 'NULL':
+			case 'boolean':
+				return 'integer';
+			default:
+				return gettype($var);
+		}
 	}
 }
 

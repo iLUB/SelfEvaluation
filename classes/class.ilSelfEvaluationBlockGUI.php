@@ -3,9 +3,12 @@ require_once('class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationBlock.php');
 require_once('class.ilSelfEvaluationQuestionTableGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
+require_once('class.ilSelfEvaluationQuestionGUI.php');
+require_once('class.ilSelfEvaluationBlockTableGUI.php');
+require_once('class.ilMatrixHeaderGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
-require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
+require_once('./Modules/SurveyQuestionPool/classes/class.ilMatrixRowWizardInputGUI.php');
 /**
  * GUI-Class ilSelfEvaluationBlockGUI
  *
@@ -81,6 +84,8 @@ class ilSelfEvaluationBlockGUI {
 			case 'deleteBlock':
 			case 'deleteObject':
 			case 'editQuestions':
+			case 'showContent':
+			case 'saveSorting':
 				//				$this->parent->checkPermission('write');
 				$this->$cmd();
 				break;
@@ -99,7 +104,7 @@ class ilSelfEvaluationBlockGUI {
 
 
 	public function cancel() {
-		$this->ctrl->redirectByClass('ilSelfEvaluationAdministrationGUI');
+		$this->ctrl->redirectByClass('ilSelfEvaluationBlockGUI', 'showContent');
 	}
 
 
@@ -152,7 +157,7 @@ class ilSelfEvaluationBlockGUI {
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('description'));
 			$this->object->update(false);
-			ilUtil::sendSuccess($this->pl->txt('msg_block_created'));
+			ilUtil::sendSuccess($this->pl->txt('msg_block_updated'));
 			$this->cancel();
 		}
 	}
@@ -176,32 +181,51 @@ class ilSelfEvaluationBlockGUI {
 	}
 
 
-	public function editQuestions() {
-		$table = new ilSelfEvaluationQuestionTableGUI($this, 'editQuestions', $this->object);
+	public function setParentForm() {
+	}
+
+
+	/**
+	 * @param ilPropertyFormGUI $parent_form
+	 *
+	 * @return ilPropertyFormGUI
+	 */
+	public function getBlockForm(ilPropertyFormGUI $parent_form = NULL) {
+		if ($parent_form) {
+			$form = $parent_form;
+		} else {
+			$form = new ilPropertyFormGUI();
+		}
+		$h = new ilFormSectionHeaderGUI();
+		$h->setTitle($this->object->getTitle());
+		$form->addItem($h);
+		$sc = new ilMatrixHeaderGUI();
+		$sc->setScale($this->object->getScale()->getUnitsAsArray());
+		$form->addItem($sc);
+		foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId()) as $qst) {
+			$qst_gui = new ilSelfEvaluationQuestionGUI($this->parent, $qst->getId(), $this->object->getId());
+			$qst_gui->getQuestionForm($form);
+		}
+
+		return $form;
+	}
+
+
+	public function showContent() {
+		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
+		$table = new ilSelfEvaluationBlockTableGUI($this->parent, 'showContent');
 		$this->tpl->setContent($table->getHTML());
 	}
 
-	public function setParentForm() {
 
-}
-
-	public function getBLockHTML() {
-		$block_tpl = $this->pl->getTemplate('tpl.block.html');
-		$block_tpl->setVariable('BLOCK_TITLE', $this->object->getTitle());
-		$block_tpl->setVariable('BLOCK_DESCRIPTION', $this->object->getDescription());
-		//Questions
-		$form = new ilPropertyFormGUI();
-		$qst_gui = new ilRadioMatrixInputGUI($this->object->getTitle(), 'block_' . $this->object->getId());
-		$qst_gui->setOptions(array(array(1=>'lorem', 2=>'ipüsum'), array(1=>'lorem', 2=>'ipüsum')));
-		//foreach(ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId()) as $qst) {
-
-		//}
-
-		$form->addItem($qst_gui);
-
-		return $form->getHTML();
-		//		foreach
-		//		return $block_tpl->get();
+	public function saveSorting() {
+		foreach ($_POST['position'] as $k => $v) {
+			$obj = new ilSelfEvaluationBlock($v);
+			$obj->setPosition($k);
+			$obj->update();
+		}
+		ilUtil::sendSuccess($this->pl->txt('sorting_saved'), true);
+		$this->ctrl->redirect($this, 'showContent');
 	}
 }
 

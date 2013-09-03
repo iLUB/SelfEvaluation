@@ -12,7 +12,6 @@ require_once('./Services/Form/classes/class.ilSubEnabledFormPropertyGUI.php');
  */
 class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 
-	const DELIMITER = '|||';
 	/**
 	 * @var array
 	 */
