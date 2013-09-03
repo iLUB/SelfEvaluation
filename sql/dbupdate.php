@@ -46,6 +46,9 @@ $ilDB->addPrimaryKey(ilObjSelfEvaluation::TABLE_NAME, array( 'id' ));
 <#3>
 <?php
 
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationScaleUnit.php');
+$block = new ilSelfEvaluationScaleUnit();
+$block->initDB();
 
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationScale.php');
 $block = new ilSelfEvaluationScale();
@@ -55,9 +58,7 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
 $block = new ilSelfEvaluationBlock();
 $block->initDB();
 
-require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationScaleUnit.php');
-$block = new ilSelfEvaluationScaleUnit();
-$block->initDB();
+
 
 ?>
 <#4>
