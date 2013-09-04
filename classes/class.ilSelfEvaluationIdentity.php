@@ -19,7 +19,7 @@ class ilSelfEvaluationIdentity {
 	/**
 	 * @var int
 	 */
-	protected $identifier_type = 0;
+	protected $identifier_type = self::TYPE_USER;
 	/**
 	 * @var int
 	 */
@@ -48,7 +48,7 @@ class ilSelfEvaluationIdentity {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
-		//		$this->resetDB();
+		//		$this->initDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -147,21 +147,53 @@ class ilSelfEvaluationIdentity {
 	//
 	/**
 	 * @param $obj_id
+	 * @param $identifier
 	 *
-	 * @return ilSelfEvaluationIdentity
+	 * @return bool|ilSelfEvaluationIdentity
 	 */
-	public static function _getInstanceByForForObjId($obj_id) {
+	public static function _getInstanceByForForObjId($obj_id, $identifier) {
 		global $ilDB;
 		// Existing Object
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE obj_id = "
-		. $ilDB->quote($obj_id, "integer"));
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
+		. $ilDB->quote($obj_id, 'integer') . ' AND (user_id = ' . $ilDB->quote($identifier, 'integer')
+		. ' OR text_key = ' . $ilDB->quote($identifier, 'text') . ')');
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
+
+		return false;
+	}
+
+
+	/**
+	 * @param $obj_id
+	 *
+	 * @return ilSelfEvaluationIdentity
+	 */
+	public static function _getNewInstanceForObjId($obj_id) {
 		$obj = new self();
 		$obj->setObjId($obj_id);
 
 		return $obj;
+	}
+
+
+	/**
+	 * @param $obj_id
+	 * @param $identifier
+	 *
+	 * @return bool
+	 */
+	public static function _identityExists($obj_id, $identifier) {
+		global $ilDB;
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
+		. $ilDB->quote($obj_id, 'integer') . ' AND (user_id = ' . $ilDB->quote($identifier, 'integer')
+		. ' OR text_key = ' . $ilDB->quote($identifier, 'text') . ')');
+		while ($rec = $ilDB->fetchObject($set)) {
+			return true;
+		}
+
+		return false;
 	}
 
 

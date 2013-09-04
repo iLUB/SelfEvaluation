@@ -58,11 +58,20 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
 $block = new ilSelfEvaluationBlock();
 $block->initDB();
 
-
-
-?>
-<#4>
-<?php
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationQuestion.php');
 $block = new ilSelfEvaluationQuestion();
 $block->initDB();
+
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationData.php');
+$data = new ilSelfEvaluationData();
+$data->initDB();
+
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationDataset.php');
+$dataset = new ilSelfEvaluationDataset();
+$dataset->initDB();
+
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationIdentity.php');
+$id = new ilSelfEvaluationIdentity();
+$id->initDB();
+
+?>

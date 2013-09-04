@@ -38,7 +38,6 @@ class ilSelfEvaluationScaleUnit {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
-//		$this->initDB();
 		if ($id != 0) {
 			$this->read();
 		}

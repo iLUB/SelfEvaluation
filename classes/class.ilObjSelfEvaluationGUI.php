@@ -25,6 +25,7 @@ require_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
 require_once('class.ilSelfEvaluationPlugin.php');
 require_once('class.ilSelfEvaluationScaleFormGUI.php');
+require_once('class.ilSelfEvaluationIdentity.php');
 
 
 /**
@@ -254,15 +255,27 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	// Show content
 	//
 	function showContent() {
+		global $ilUser;
 		$this->tabs_gui->activateTab('content');
 		$content = $this->pl->getTemplate('tpl.content.html');
 		$content->setVariable('INTRO_HEADER', $this->txt('intro_header'));
 		$content->setVariable('INTRO_BODY', $this->object->getIntro());
 		if ($this->object->isActive()) {
 			$content->setCurrentBlock('button');
-			$content->setVariable('START_BUTTON', $this->txt('start_button'));
-			$content->setVariable('START_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationPresentationGUI', 'start'));
+			switch (ilSelfEvaluationIdentity::_identityExists($this->object->getId(), $ilUser->getId())) {
+				case true:
+					$content->setVariable('START_BUTTON', $this->txt('resume_button'));
+					$content->setVariable('START_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationPresentationGUI', 'resume'));
+					break;
+				case false;
+					$content->setVariable('START_BUTTON', $this->txt('start_button'));
+					$content->setVariable('START_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationPresentationGUI', 'start'));
+					break;
+			}
 			$content->parseCurrentBlock();
+		}
+		else {
+			ilUtil::sendInfo($this->pl->txt('not_active'));
 		}
 		$this->tpl->setContent($content->get());
 	}

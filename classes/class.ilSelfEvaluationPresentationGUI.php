@@ -5,6 +5,7 @@ require_once('class.ilSelfEvaluationBlockGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('class.ilSelfEvaluationIdentity.php');
 require_once('class.ilSelfEvaluationDataset.php');
+require_once('class.ilSelfEvaluationData.php');
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
  *
@@ -39,6 +40,7 @@ class ilSelfEvaluationPresentationGUI {
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = new ilSelfEvaluationPlugin();
+		$this->identity = new ilSelfEvaluationIdentity($_GET['uid'] ? $_GET['uid'] : 0);
 	}
 
 
@@ -70,12 +72,16 @@ class ilSelfEvaluationPresentationGUI {
 	function performCommand($cmd) {
 		switch ($cmd) {
 			case 'editProperties':
-			case 'saveData':
 				//				$this->checkPermission('write'); FSX
 				$this->$cmd();
 				break;
 			case 'showContent':
+			case 'newData':
 			case 'start':
+			case 'resume':
+			case 'resumeContent':
+			case 'updateData':
+			case 'cancel':
 				//				$this->checkPermission('read'); FSX
 				$this->$cmd();
 				break;
@@ -89,19 +95,24 @@ class ilSelfEvaluationPresentationGUI {
 
 
 	public function start() {
-				$identity = new ilSelfEvaluationIdentity();
-		$this->ctrl->redirect($this->parent);
-		//		exit;
-		//		if (! self::_isAnonymous($this->user->getId())) {
-		//			 $identity->setTextKey('LX' . rand(100, 999));
-		//			ilUtil::sendFailure($this->pl->txt('anonymous_access_failed'));
-		//			$this->ctrl->redirect($this->parent, 'showContent');
-		//		} else {
-		//			$identity->setUserId($this->user->getId());
-		//			$identity->create();
-		//		}
-		//		$this->ctrl->setParameter($this, 'uid', $identity->getId());
-		//$this->ctrl->redirect($this, 'showContent');
+		$identity = ilSelfEvaluationIdentity::_getNewInstanceForObjId($this->parent->object->getId());
+		if (self::_isAnonymous($this->user->getId())) {
+			$identity->setTextKey('LX' . rand(100, 999));
+			ilUtil::sendFailure($this->pl->txt('anonymous_access_failed'), true);
+			$this->ctrl->redirect($this->parent, 'showContent');
+		} else {
+			$identity->setUserId($this->user->getId());
+			$identity->create();
+		}
+		$this->ctrl->setParameter($this, 'uid', $identity->getId());
+		$this->ctrl->redirect($this, 'showContent');
+	}
+
+
+	public function resume() {
+		$identity = ilSelfEvaluationIdentity::_getInstanceByForForObjId($this->parent->object->getId(), $this->user->getId());
+		$this->ctrl->setParameter($this, 'uid', $identity->getId());
+		$this->ctrl->redirect($this, 'resumeContent');
 	}
 
 
@@ -111,24 +122,57 @@ class ilSelfEvaluationPresentationGUI {
 	}
 
 
-	public function initPresentationForm() {
+	public function resumeContent() {
+		$this->initPresentationForm('update');
+		$this->fillForm();
+		$this->tpl->setContent($this->form->getHTML());
+	}
+
+
+	public function initPresentationForm($mode = 'new') {
 		$this->form = new ilPropertyFormGUI();
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->parent->object->getId()) as $block) {
 			$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
 			$this->form = $block_gui->getBlockForm($this->form);
 		}
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
-		$this->form->addCommandButton('saveData', $this->pl->txt('send'));
+		$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
+		$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 	}
 
 
-	public function saveData() {
+	public function fillForm() {
+		$dataset = ilSelfEvaluationDataset::_getInstanceByIdentifierId($this->identity->getId());
+		$data = ilSelfEvaluationData::_getAllInstancesByDatasetId($dataset->getId());
+		$array = array();
+		foreach ($data as $d) {
+			$array[ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX . $d->getQuestionId()] = $d->getValue();
+		}
+		$this->form->setValuesByArray($array);
+	}
+
+
+	public function newData() {
 		$this->initPresentationForm();
 		if ($this->form->checkinput()) {
-			$dataset = new ilSelfEvaluationDataset();
-			//			$dataset->create();
+			$dataset = ilSelfEvaluationDataset::_getNewInstanceForIdentifierId($this->identity->getId());
+			$dataset->saveValuesByPost($_POST);
+			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
+			$this->cancel();
 		}
-		echo '<pre>' . print_r($_POST, 1) . '</pre>';
+		$this->form->setValuesByPost();
+		$this->tpl->setContent($this->form->getHTML());
+	}
+
+
+	public function updateData() {
+		$this->initPresentationForm();
+		if ($this->form->checkinput()) {
+			$dataset = ilSelfEvaluationDataset::_getInstanceByIdentifierId($this->identity->getId());
+			$dataset->updateValuesByPost($_POST);
+			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
+			$this->cancel();
+		}
 		$this->form->setValuesByPost();
 		$this->tpl->setContent($this->form->getHTML());
 	}

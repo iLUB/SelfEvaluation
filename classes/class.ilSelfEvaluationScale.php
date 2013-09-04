@@ -43,12 +43,18 @@ class ilSelfEvaluationScale {
 
 
 	/**
+	 * @param bool $flipped
+	 *
 	 * @return array
 	 */
-	public function getUnitsAsArray() {
+	public function getUnitsAsArray($flipped = false) {
 		$return = array();
-		foreach ($this->units as $u) {
-			$return[$u->getValue()] = $u->getTitle();
+		foreach ($this->units as $k => $u) {
+			if ($flipped) {
+				$return[$this->units[count($this->units) - $k - 1]->getValue()] = $u->getTitle();
+			} else {
+				$return[$u->getValue()] = $u->getTitle();
+			}
 		}
 
 		return $return;
@@ -158,8 +164,6 @@ class ilSelfEvaluationScale {
 	 * @return ilSelfEvaluationScale
 	 */
 	public static function _getInstanceByRefId($parent_id) {
-		$obj = new self();
-		$obj->initDB();
 		global $ilDB;
 		// Existing Object
 		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE parent_id = "

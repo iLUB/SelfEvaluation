@@ -135,20 +135,41 @@ class ilSelfEvaluationData {
 	// Static
 	//
 	/**
-	 * @param int $ref_id
+	 * @param $dataset_id
+	 *
+	 * @return ilSelfEvaluationData[]
+	 */
+	public static function _getAllInstancesByDatasetId($dataset_id) {
+		global $ilDB;
+		$return = array();
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = '
+		. $ilDB->quote($dataset_id, 'integer'));
+		while ($rec = $ilDB->fetchObject($set)) {
+			$return[] = new self($rec->id);
+		}
+
+		return $return;
+	}
+
+
+	/**
+	 * @param $dataset_id
+	 * @param $question_id
 	 *
 	 * @return ilSelfEvaluationData
 	 */
-	public static function _getInstanceByRefId($ref_id) {
+	public static function _getInstanceForQuestionId($dataset_id, $question_id) {
 		global $ilDB;
-		// Existing Object
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE ref_id = "
-		. $ilDB->quote($ref_id, "integer"));
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = '
+		. $ilDB->quote($dataset_id, 'integer') . ' AND question_id = ' . $ilDB->quote($question_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
+		$obj = new self();
+		$obj->setQuestionId($question_id);
+		$obj->setDatasetId($dataset_id);
 
-		return false;
+		return $obj;
 	}
 
 

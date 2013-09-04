@@ -63,5 +63,12 @@ qst_delete_question#:#Möchten Sie die folgende Frage löschen?
 msg_question_deleted#:#Frage wurde gelöscht
 msg_obj_modified#:#Änderungen gespeichert
 scale#:#Skala
-send#:#Senden
+send_new#:#Speichern
 anonymous_access_failed#:#Kein Zugriff. Bitte loggen sie sich ein.
+back_to_blocks#:#Zurück zu den Frageblocks
+is_inverse#:#Skala umkehren
+update_question#:#Frage bearbeiten
+resume_button#:#Fortfahren
+data_saved#:#Daten wurden gespeichert.
+send_update#:#Änderungen speichern
+not_active#:#Die Selbstevaluation kann nicht gestartet werden, da sie noch keine Fragen enthält oder offline ist.

@@ -164,7 +164,7 @@ class ilSelfEvaluationBlock {
 	 * @param      $parent_id
 	 * @param bool $as_array
 	 *
-	 * @return array
+	 * @return ilSelfEvaluationBlock[]
 	 */
 	public static function _getAllInstancesByParentId($parent_id, $as_array = false) {
 		global $ilDB;

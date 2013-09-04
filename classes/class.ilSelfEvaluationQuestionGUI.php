@@ -17,6 +17,7 @@ require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
  */
 class ilSelfEvaluationQuestionGUI {
 
+	const POSTVAR_PREFIX = 'qst_';
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -28,12 +29,14 @@ class ilSelfEvaluationQuestionGUI {
 
 
 	function __construct(ilObjSelfEvaluationGUI $parent, $question_id = 0, $block_id = 0) {
-		global $tpl, $ilCtrl;
+		global $tpl, $ilCtrl, $ilToolbar;
 		/**
-		 * @var $tpl    ilTemplate
-		 * @var $ilCtrl ilCtrl
+		 * @var $tpl       ilTemplate
+		 * @var $ilCtrl    ilCtrl
+		 * @var $ilToolbar ilToolbarGUI
 		 */
 		$this->tpl = $tpl;
+		$this->toolbar = $ilToolbar;
 		$this->ctrl = $ilCtrl;
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
@@ -118,6 +121,9 @@ class ilSelfEvaluationQuestionGUI {
 		$te = new ilTextAreaInputGUI($this->pl->txt('question_body'), 'question_body');
 		$te->setRequired(true);
 		$te->setUseRte(true);
+		$cb = new ilCheckboxInputGUI($this->pl->txt('is_inverse'), 'is_inverse');
+		$cb->setValue(1);
+		$this->form->addItem($cb);
 		$this->form->addItem($te);
 	}
 
@@ -127,6 +133,7 @@ class ilSelfEvaluationQuestionGUI {
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setQuestionBody($this->form->getInput('question_body'));
+			$this->object->setIsInverse($this->form->getInput('is_inverse'));
 			$this->object->setParentId($this->block->getId());
 			$this->object->create();
 			ilUtil::sendSuccess($this->pl->txt('msg_question_created'));
@@ -145,6 +152,7 @@ class ilSelfEvaluationQuestionGUI {
 	public function setObjectValues() {
 		$values['title'] = $this->object->getTitle();
 		$values['question_body'] = $this->object->getQuestionBody();
+		$values['is_inverse'] = $this->object->getIsInverse();
 		$this->form->setValuesByArray($values);
 	}
 
@@ -155,6 +163,7 @@ class ilSelfEvaluationQuestionGUI {
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setQuestionBody($this->form->getInput('question_body'));
+			$this->object->setIsInverse($this->form->getInput('is_inverse'));
 			$this->object->update();
 			ilUtil::sendSuccess($this->pl->txt('msg_question_updated'));
 			$this->cancel();
@@ -184,6 +193,7 @@ class ilSelfEvaluationQuestionGUI {
 		if ($this->block->isBlockSortable()) {
 			$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
 		}
+		$this->toolbar->addButton($this->pl->txt('back_to_blocks'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		$table = new ilSelfEvaluationQuestionTableGUI($this, 'showContent', $this->block);
 		$this->tpl->setContent($table->getHTML());
 	}
@@ -211,8 +221,8 @@ class ilSelfEvaluationQuestionGUI {
 		} else {
 			$form = new ilPropertyFormGUI();
 		}
-		$te = new ilMatrixFieldInputGUI($this->object->getTitle(), 'qst_' . '_' . $this->object->getId());
-		$te->setScale($this->block->getScale()->getUnitsAsArray());
+		$te = new ilMatrixFieldInputGUI($this->object->getTitle(), self::POSTVAR_PREFIX . $this->object->getId());
+		$te->setScale($this->block->getScale()->getUnitsAsArray($this->object->getIsInverse()));
 		$te->setQuestion($this->object->getQuestionBody());
 		$te->setRequired(true);
 		$form->addItem($te);

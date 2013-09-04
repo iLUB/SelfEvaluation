@@ -151,11 +151,9 @@ class ilSelfEvaluationQuestion {
 	 */
 	public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
 		global $ilDB;
-		$obj = new self();
-		$obj->initDB();
 		$return = array();
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE parent_id = "
-		. $ilDB->quote($parent_id, "integer"));
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
+		. $ilDB->quote($parent_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			if ($as_array) {
 				$return[] = (array)new self($rec->id);
@@ -165,6 +163,22 @@ class ilSelfEvaluationQuestion {
 		}
 
 		return $return;
+	}
+
+
+	/**
+	 * @param $id
+	 *
+	 * @return bool
+	 */
+	public static function _isObject($id) {
+		global $ilDB;
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = ' . $ilDB->quote($id, 'integer'));
+		while ($rec = $ilDB->fetchObject($set)) {
+			return true;
+		}
+
+		return false;
 	}
 
 

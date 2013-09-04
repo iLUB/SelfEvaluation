@@ -1,5 +1,7 @@
 <?php
 require_once('class.ilSelfEvaluationData.php');
+require_once('class.ilSelfEvaluationQuestionGUI.php');
+require_once('class.ilSelfEvaluationQuestion.php');
 /**
  * ilSelfEvaluationDataset
  *
@@ -18,6 +20,10 @@ class ilSelfEvaluationDataset {
 	 * @var int
 	 */
 	protected $identifier_id = 0;
+	/**
+	 * @var int
+	 */
+	protected $creation_date = 0;
 
 
 	/**
@@ -30,6 +36,7 @@ class ilSelfEvaluationDataset {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
+		//		$this->resetDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -126,17 +133,59 @@ class ilSelfEvaluationDataset {
 	/**
 	 * @param $array
 	 */
-	public function setValuesByArray($array) {
+	public function saveValuesByArray($array) {
 		if ($this->getId() == 0) {
 			$this->create();
 		}
 		foreach ($array as $k => $v) {
 			$da = new ilSelfEvaluationData();
 			$da->setDatasetId($this->getId());
-			$da->getQuestionId($k);
+			$da->setQuestionId($k);
 			$da->setValue($v);
 			$da->create();
 		}
+	}
+
+
+	/**
+	 * @param $post
+	 */
+	public function saveValuesByPost($post) {
+		$data = array();
+		foreach ($post as $k => $v) {
+			$qid = str_replace(ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX, '', $k);
+			if (ilSelfEvaluationQuestion::_isObject($qid)) {
+				$data[$qid] = $v;
+			}
+		}
+		$this->saveValuesByArray($data);
+	}
+
+
+	/**
+	 * @param $array
+	 */
+	public function updateValuesByArray($array) {
+		foreach ($array as $k => $v) {
+			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $k);
+			$da->setValue($v);
+			$da->update();
+		}
+	}
+
+
+	/**
+	 * @param $post
+	 */
+	public function updateValuesByPost($post) {
+		$data = array();
+		foreach ($post as $k => $v) {
+			$qid = str_replace(ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX, '', $k);
+			if (ilSelfEvaluationQuestion::_isObject($qid)) {
+				$data[$qid] = $v;
+			}
+		}
+		$this->updateValuesByArray($data);
 	}
 
 
@@ -144,20 +193,34 @@ class ilSelfEvaluationDataset {
 	// Static
 	//
 	/**
-	 * @param int $ref_id
+	 * @param $identifier_id
 	 *
-	 * @return ilSelfEvaluationDataset
+	 * @return bool|ilSelfEvaluationDataset
 	 */
-	public static function _getInstanceByRefId($ref_id) {
+	public static function _getInstanceByIdentifierId($identifier_id) {
 		global $ilDB;
 		// Existing Object
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE ref_id = "
-		. $ilDB->quote($ref_id, "integer"));
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+		. $ilDB->quote($identifier_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * @param $identifier_id
+	 *
+	 * @return ilSelfEvaluationDataset
+	 */
+	public static function _getNewInstanceForIdentifierId($identifier_id) {
+		$obj = new self();
+		$obj->setIdentifierId($identifier_id);
+		$obj->setCreationDate(time());
+
+		return $obj;
 	}
 
 
@@ -190,6 +253,22 @@ class ilSelfEvaluationDataset {
 	 */
 	public function getIdentifierId() {
 		return $this->identifier_id;
+	}
+
+
+	/**
+	 * @param int $creation_date
+	 */
+	public function setCreationDate($creation_date) {
+		$this->creation_date = $creation_date;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getCreationDate() {
+		return $this->creation_date;
 	}
 
 

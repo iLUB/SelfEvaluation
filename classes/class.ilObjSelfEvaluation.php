@@ -22,6 +22,8 @@
 */
 
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
+require_once('class.ilSelfEvaluationBlock.php');
+require_once('class.ilSelfEvaluationQuestion.php');
 
 /**
  * Application class for SelfEvaluation repository object.
@@ -183,7 +185,13 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @return bool
 	 */
 	public function hasBLocks() {
-		return true; // FSX todo
+		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 
