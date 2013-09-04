@@ -15,8 +15,8 @@ require_once('./Modules/SurveyQuestionPool/classes/class.ilMatrixRowWizardInputG
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * @version           $Id:
  *
- * @ilCtrl_Calls      ilSelfEvaluationBlockGUI:  ilObjSelfEvaluationGUI
- * @ilCtrl_IsCalledBy ilSelfEvaluationBlockGUI:  ilObjSelfEvaluationGUI
+ * @ilCtrl_Calls      ilSelfEvaluationBlockGUI:
+ * @ilCtrl_IsCalledBy ilSelfEvaluationBlockGUI:
  */
 class ilSelfEvaluationBlockGUI {
 

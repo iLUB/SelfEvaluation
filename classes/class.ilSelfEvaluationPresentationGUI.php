@@ -11,8 +11,8 @@ require_once('class.ilSelfEvaluationDataset.php');
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * @version           $Id:
  *
- * @ilCtrl_Calls      ilSelfEvaluationPresentationGUI: ilObjSelfEvaluationGUI
- * @ilCtrl_IsCalledBy ilSelfEvaluationPresentationGUI: ilCommonActionDispatcherGUI, ilObjSelfEvaluationGUI
+ * @ilCtrl_Calls      ilSelfEvaluationPresentationGUI:
+ * @ilCtrl_IsCalledBy ilSelfEvaluationPresentationGUI:
  */
 class ilSelfEvaluationPresentationGUI {
 
@@ -89,8 +89,8 @@ class ilSelfEvaluationPresentationGUI {
 
 
 	public function start() {
-		//		$identity = new ilSelfEvaluationIdentity();
-		$this->ctrl->redirectByClass('ilObjSelfEvaluationGUI');
+				$identity = new ilSelfEvaluationIdentity();
+		$this->ctrl->redirect($this->parent);
 		//		exit;
 		//		if (! self::_isAnonymous($this->user->getId())) {
 		//			 $identity->setTextKey('LX' . rand(100, 999));

@@ -48,7 +48,7 @@ class ilSelfEvaluationIdentity {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
-//		$this->resetDB();
+		//		$this->resetDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -146,20 +146,22 @@ class ilSelfEvaluationIdentity {
 	// Static
 	//
 	/**
-	 * @param int $ref_id
+	 * @param $obj_id
 	 *
 	 * @return ilSelfEvaluationIdentity
 	 */
-	public static function _getInstanceByRefId($ref_id) {
+	public static function _getInstanceByForForObjId($obj_id) {
 		global $ilDB;
 		// Existing Object
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE ref_id = "
-		. $ilDB->quote($ref_id, "integer"));
+		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE obj_id = "
+		. $ilDB->quote($obj_id, "integer"));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
+		$obj = new self();
+		$obj->setObjId($obj_id);
 
-		return false;
+		return $obj;
 	}
 
 

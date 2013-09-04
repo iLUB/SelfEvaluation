@@ -41,12 +41,13 @@ require_once('class.ilSelfEvaluationScaleFormGUI.php');
  *   screens) and ilInfoScreenGUI (handles the info screen).
  *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilSelfEvaluationBlockGUI, ilCommonActionDispatcherGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationBlockGUI, ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
  *
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
-	const DEBUG = false;
+	const DEBUG = true;
 	/**
 	 * @var ilObjSelfEvaluation
 	 */
@@ -77,17 +78,14 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
 			$this->tpl->addCss($this->pl->getStyleSheetLocation("content.css"));
 			$this->setTabs();
-//			echo $next_class;
-
 			switch ($next_class) {
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {
-						$this->{$this->getStandardCmd()}();
+						$this->performCommand($this->getStandardCmd());
 						if (DEBUG) {
 							ilUtil::sendInfo("COMMAND NOT FOUND! Redirecting to standard class in ilObjSelfEvaluationGUI executeCommand()");
 						}
-
-						return true;
+						break;
 					}
 					switch ($cmd) {
 						default:
@@ -120,7 +118,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
 		$this->pl->updateLanguages();
-		//		$this->pl->update();
+		//				$this->pl->update();
 	}
 
 

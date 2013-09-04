@@ -12,8 +12,8 @@ require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * @version           $Id:
  *
- * @ilCtrl_Calls      ilSelfEvaluationQuestionGUI: ilObjSelfEvaluationGUI
- * @ilCtrl_IsCalledBy ilSelfEvaluationQuestionGUI: ilObjSelfEvaluationGUI
+ * @ilCtrl_Calls      ilSelfEvaluationQuestionGUI:
+ * @ilCtrl_IsCalledBy ilSelfEvaluationQuestionGUI:
  */
 class ilSelfEvaluationQuestionGUI {
 
