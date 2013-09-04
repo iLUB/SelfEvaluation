@@ -201,6 +201,7 @@ class ilSelfEvaluationBlockGUI {
 		$form->addItem($h);
 		$sc = new ilMatrixHeaderGUI();
 		$sc->setScale($this->object->getScale()->getUnitsAsArray());
+		$sc->setBlockInfo($this->object->getDescription());
 		$form->addItem($sc);
 		foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId()) as $qst) {
 			$qst_gui = new ilSelfEvaluationQuestionGUI($this->parent, $qst->getId(), $this->object->getId());
