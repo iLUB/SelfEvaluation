@@ -39,12 +39,14 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 		$tpl = $pl->getTemplate('default/tpl.matrix_input.html');
 		$css = ((count($this->getScale()) % 2) == 1) ? 1 : 2;
 		$tpl->setVariable('QUESTION', $this->getQuestion());
+		$width = round(100 / count($this->getScale()), 0);
 		foreach ($this->getScale() as $value => $title) {
 			$tpl->setCurrentBlock('item');
 			if ($this->getValue() == $value) {
 				$tpl->setVariable('SELECTED', 'checked="checked"');
 			}
 			$tpl->setVariable('CSS', 'col' . $css);
+			$tpl->setVariable('STYLE', $width . '%');
 			$tpl->setVariable('VALUE', $value);
 			$tpl->setVariable('NAME', $this->getPostVar());
 			$css = $css == 1 ? 2 : 1;

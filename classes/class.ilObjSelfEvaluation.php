@@ -24,6 +24,11 @@
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 require_once('class.ilSelfEvaluationBlock.php');
 require_once('class.ilSelfEvaluationQuestion.php');
+require_once('class.ilSelfEvaluationScale.php');
+require_once('class.ilSelfEvaluationScaleUnit.php');
+require_once('class.ilSelfEvaluationDataset.php');
+require_once('class.ilSelfEvaluationData.php');
+require_once('class.ilSelfEvaluationIdentity.php');
 
 /**
  * Application class for SelfEvaluation repository object.
@@ -151,9 +156,31 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	}
 
 
-	function doDelete() {
+	public function doDelete() {
+		$scale = ilSelfEvaluationScale::_getInstanceByRefId($this->getId());
+		foreach (ilSelfEvaluationScaleUnit::_getAllInstancesByParentId($scale->getId()) as $u) {
+			$u->delete();
+		}
+		$scale->delete();
+		foreach (ilSelfEvaluationIdentity::_getAllInstancesByForForObjId($this->getId()) as $id) {
+			foreach (ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId()) as $ds) {
+				foreach (ilSelfEvaluationData::_getAllInstancesByDatasetId($ds->getId()) as $d) {
+					$d->delete();
+				}
+				$ds->delete();
+			}
+			$id->delete();
+		}
+		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
+				$qst->delete();
+			}
+			$block->delete();
+		}
 		$this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . ' id = '
 		. $this->db->quote($this->getId(), 'integer'));
+
+		return true;
 	}
 
 
@@ -178,6 +205,20 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function isActive() {
 		return ($this->getOnline() AND $this->hasBlocks()) ? true : false;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function hasDatasets() {
+		foreach (ilSelfEvaluationIdentity::_getAllInstancesByForForObjId($this->getId()) as $id) {
+			foreach (ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId()) as $ds) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 

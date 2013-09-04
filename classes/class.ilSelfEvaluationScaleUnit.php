@@ -139,7 +139,7 @@ class ilSelfEvaluationScaleUnit {
 		$obj = new self();
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-		. $ilDB->quote($parent_id, 'integer'));
+		. $ilDB->quote($parent_id, 'integer').' ORDER BY value ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
 			$return[] = new self($rec->id);
 		}

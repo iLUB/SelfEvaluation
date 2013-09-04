@@ -195,6 +195,24 @@ class ilSelfEvaluationDataset {
 	/**
 	 * @param $identifier_id
 	 *
+	 * @return ilSelfEvaluationDataset[]
+	 */
+	public static function _getAllInstancesByIdentifierId($identifier_id) {
+		global $ilDB;
+		$return = array();
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+		. $ilDB->quote($identifier_id, 'integer'));
+		while ($rec = $ilDB->fetchObject($set)) {
+			$return[] = new self($rec->id);
+		}
+
+		return $return;
+	}
+
+
+	/**
+	 * @param $identifier_id
+	 *
 	 * @return bool|ilSelfEvaluationDataset
 	 */
 	public static function _getInstanceByIdentifierId($identifier_id) {
@@ -221,6 +239,23 @@ class ilSelfEvaluationDataset {
 		$obj->setCreationDate(time());
 
 		return $obj;
+	}
+
+
+	/**
+	 * @param $identifier_id
+	 *
+	 * @return bool
+	 */
+	public static function _datasetExists($identifier_id) {
+		global $ilDB;
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+		. $ilDB->quote($identifier_id, 'integer'));
+		while ($rec = $ilDB->fetchObject($set)) {
+			return true;
+		}
+
+		return false;
 	}
 
 

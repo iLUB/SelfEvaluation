@@ -147,11 +147,29 @@ class ilSelfEvaluationIdentity {
 	//
 	/**
 	 * @param $obj_id
+	 *
+	 * @return ilSelfEvaluationIdentity[]
+	 */
+	public static function _getAllInstancesByForForObjId($obj_id) {
+		global $ilDB;
+		$return = array();
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
+		. $ilDB->quote($obj_id, 'integer'));
+		while ($rec = $ilDB->fetchObject($set)) {
+			$return[] = new self($rec->id);
+		}
+
+		return $return;
+	}
+
+
+	/**
+	 * @param $obj_id
 	 * @param $identifier
 	 *
-	 * @return bool|ilSelfEvaluationIdentity
+	 * @return ilSelfEvaluationIdentity
 	 */
-	public static function _getInstanceByForForObjId($obj_id, $identifier) {
+	public static function _getInstanceForObjId($obj_id, $identifier) {
 		global $ilDB;
 		// Existing Object
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
@@ -160,8 +178,18 @@ class ilSelfEvaluationIdentity {
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
+		$obj = new self();
+		$obj->setObjId($obj_id);
+		if (self::_getType($identifier) == 'integer') {
+			$obj->setUserId($identifier);
+			$obj->setType(self::TYPE_USER);
+		} else {
+			$obj->setTextKey($identifier);
+			$obj->setType(self::TYPE_ANONYMOUS);
+		}
+		$obj->create();
 
-		return false;
+		return $obj;
 	}
 
 

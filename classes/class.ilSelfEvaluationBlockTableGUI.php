@@ -1,6 +1,7 @@
 <?php
 require_once('./Services/Table/classes/class.ilTable2GUI.php');
 require_once('class.ilSelfEvaluationBlock.php');
+require_once('class.ilSelfEvaluationQuestion.php');
 require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 /**
  * TableGUI ilSelfEvaluationBlockTableGUI
@@ -30,12 +31,13 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->setTitle($this->pl->txt('block_table_title'));
 		//
 		// Columns
-		$this->addColumn('', 'position', '20px');
-		$this->addColumn($this->pl->txt('title'), 'title', 'auto');
-		$this->addColumn($this->pl->txt('description'), 'description', 'auto');
-		$this->addColumn($this->pl->txt('actions'), 'actions', 'auto');
+		$this->addColumn('', '', '20px');
+		$this->addColumn($this->pl->txt('title'), false, 'auto');
+		$this->addColumn($this->pl->txt('description'), false, 'auto');
+		$this->addColumn($this->pl->txt('count_questions'), false, 'auto');
+		$this->addColumn($this->pl->txt('actions'), false, 'auto');
 		$this->addHeaderCommand($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addBlock'), $this->pl->txt('add_new_block'));
-		$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
+		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationBlockGUI'));
 		$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
 		$this->setRowTemplate('tpl.template_block_row.html', $this->pl->getDirectory());
 		$this->setData(ilSelfEvaluationBlock::_getAllInstancesByParentId($a_parent_obj->object->getId(), true));
@@ -47,13 +49,17 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 	 */
 	public function fillRow($a_set) {
 		$obj = new ilSelfEvaluationBlock($a_set['id']);
+		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', $obj->getId());
+		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $obj->getId());
+		// Row
 		$this->tpl->setVariable('ID', $obj->getId());
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
 		$this->tpl->setVariable('DESCRIPTION', $obj->getDescription());
+		$this->tpl->setVariable('QUESTIONS_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent'));
+		$this->tpl->setVariable('COUNT_QUESTIONS', count(ilSelfEvaluationQuestion::_getAllInstancesForParentId($obj->getId())));
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
-		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', $obj->getId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $obj->getId());
+
 		$ac->setId('block_' . $obj->getId());
 		$ac->addItem($this->pl->txt('edit_block'), 'edit_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock'));
 		$ac->addItem($this->pl->txt('delete_block'), 'delete_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'deleteBlock'));

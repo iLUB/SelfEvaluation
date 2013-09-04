@@ -121,7 +121,15 @@ class ilSelfEvaluationData {
 	}
 
 
+	/**
+	 * @return bool
+	 */
 	public function update() {
+		if ($this->getId() == 0) {
+			$this->create();
+
+			return true;
+		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',

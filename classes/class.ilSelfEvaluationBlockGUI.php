@@ -222,7 +222,7 @@ class ilSelfEvaluationBlockGUI {
 	public function saveSorting() {
 		foreach ($_POST['position'] as $k => $v) {
 			$obj = new ilSelfEvaluationBlock($v);
-			$obj->setPosition($k);
+			$obj->setPosition($k + 1);
 			$obj->update();
 		}
 		ilUtil::sendSuccess($this->pl->txt('sorting_saved'), true);

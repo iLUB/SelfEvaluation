@@ -39,7 +39,7 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 
 	private function buildHTML() {
 		$pl = new ilSelfEvaluationPlugin();
-		$tpl = $pl->getTemplate('tpl.multiple_input.html');
+		$tpl = $pl->getTemplate('default/tpl.multiple_input.html');
 		$tpl->setVariable('ADD_BUTTON', $pl->getDirectory() . '/templates/images/edit_add.png');
 		foreach ($this->values as $id => $value) {
 			$tpl->setCurrentBlock('input');
@@ -47,11 +47,13 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 			$tpl->setVariable('VALUE_V', $value['value']);
 			$tpl->setVariable('TITLE_N', $this->placeholder . '_old[title][' . $id . ']');
 			$tpl->setVariable('TITLE_V', $value['title']);
+			$tpl->setVariable('DISABLED', $this->getDisabled() ? 'disabled' : '');
 			$tpl->parseCurrentBlock();
 		}
 		$tpl->setCurrentBlock('new_input');
 		$tpl->setVariable('VALUE_N_NEW', $this->placeholder . '_new[value][]');
 		$tpl->setVariable('TITLE_N_NEW', $this->placeholder . '_new[title][]');
+		$tpl->setVariable('DISABLED_N', $this->getDisabled() ? 'disabled' : '');
 		$tpl->parseCurrentBlock();
 
 		return $tpl->get();

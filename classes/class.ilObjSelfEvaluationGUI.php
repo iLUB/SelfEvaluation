@@ -41,7 +41,7 @@ require_once('class.ilSelfEvaluationIdentity.php');
  * - GUI classes used by this class are ilPermissionGUI (provides the rbac
  *   screens) and ilInfoScreenGUI (handles the info screen).
  *
- * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI
+ * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI, ilAdministrationGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationBlockGUI, ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
  *
@@ -77,14 +77,21 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->tpl->getStandardTemplate();
 			$this->setTitleAndDescription();
 			$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
-			$this->tpl->addCss($this->pl->getStyleSheetLocation("content.css"));
+			$this->tpl->addCss($this->pl->getStyleSheetLocation('content.css'));
+			$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/scripts.js');
 			$this->setTabs();
 			switch ($next_class) {
+				case 'ilpermissiongui':
+					include_once('Services/AccessControl/classes/class.ilPermissionGUI.php');
+					$perm_gui = new ilPermissionGUI($this);
+					$this->tabs_gui->setTabActive('perm_settings');
+					$ret = $this->ctrl->forwardCommand($perm_gui);
+					break;
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {
 						$this->performCommand($this->getStandardCmd());
-						if (DEBUG) {
-							ilUtil::sendInfo("COMMAND NOT FOUND! Redirecting to standard class in ilObjSelfEvaluationGUI executeCommand()");
+						if (self::DEBUG) {
+							ilUtil::sendInfo('COMMAND NOT FOUND! Redirecting to standard class in ilObjSelfEvaluationGUI executeCommand()');
 						}
 						break;
 					}
@@ -119,7 +126,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
 		$this->pl->updateLanguages();
-		//				$this->pl->update();
+		//						$this->pl->update();
 	}
 
 
@@ -180,11 +187,13 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	function editProperties() {
-		global $tpl, $ilTabs;
-		$ilTabs->activateTab('properties');
+		if($this->object->hasDatasets()) {
+			ilUtil::sendInfo($this->pl->txt('scale_cannot_be_edited'));
+		}
+		$this->tabs_gui->activateTab('properties');
 		$this->initPropertiesForm();
 		$this->getPropertiesValues();
-		$tpl->setContent($this->form->getHTML());
+		$this->tpl->setContent($this->form->getHTML());
 	}
 
 
@@ -213,13 +222,13 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->form->setTitle($this->txt('edit_properties'));
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		// Append
-		$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId());
+		$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
 		$this->form = $aform->appendToForm($this->form);
 	}
 
 
 	function getPropertiesValues() {
-		$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId());
+		$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
 		$values = $aform->fillForm();
 		$values['title'] = $this->object->getTitle();
 		$values['desc'] = $this->object->getDescription();
@@ -235,7 +244,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->form->setValuesByPost();
 		if ($this->form->checkInput()) {
 			// Append
-			$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId());
+			$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
 			$aform->updateObject();
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('desc'));
@@ -256,28 +265,27 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	//
 	function showContent() {
 		global $ilUser;
-		$this->tabs_gui->activateTab('content');
-		$content = $this->pl->getTemplate('tpl.content.html');
-		$content->setVariable('INTRO_HEADER', $this->txt('intro_header'));
-		$content->setVariable('INTRO_BODY', $this->object->getIntro());
-		if ($this->object->isActive()) {
-			$content->setCurrentBlock('button');
-			switch (ilSelfEvaluationIdentity::_identityExists($this->object->getId(), $ilUser->getId())) {
-				case true:
-					$content->setVariable('START_BUTTON', $this->txt('resume_button'));
-					$content->setVariable('START_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationPresentationGUI', 'resume'));
-					break;
-				case false;
-					$content->setVariable('START_BUTTON', $this->txt('start_button'));
-					$content->setVariable('START_HREF', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationPresentationGUI', 'start'));
-					break;
+		if (self::_isAnonymous($ilUser->getId())) {
+			// redirect to identity generator
+		} else {
+			$id = ilSelfEvaluationIdentity::_getInstanceForObjId($this->object->getId(), $ilUser->getId());
+			$this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
+			$this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
+		}
+	}
+
+
+	//
+	// Helper
+	//
+	public static function _isAnonymous($user_id) {
+		foreach (ilObjUser::_getUsersForRole(ANONYMOUS_ROLE_ID) as $u) {
+			if ($u['usr_id'] == $user_id) {
+				return true;
 			}
-			$content->parseCurrentBlock();
 		}
-		else {
-			ilUtil::sendInfo($this->pl->txt('not_active'));
-		}
-		$this->tpl->setContent($content->get());
+
+		return false;
 	}
 }
 

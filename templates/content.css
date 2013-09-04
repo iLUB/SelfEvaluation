@@ -43,7 +43,7 @@ ul.matrix {
 
 ul.matrix li {
 	float:      left;
-	width:      100px;
+	/*width:      100px;*/
 	list-style: none;
 	text-align: center;
 	vertical-align: middle;
@@ -64,5 +64,13 @@ div.question {
 }
 
 div.blockInfo {
-	margin-bottom: 12px;
+	margin-bottom: 4px;
+}
+
+#form_evaluation_form div.ilForm {
+	width: 1024px;
+}
+
+#form_evaluation_form div.ilFormOption {
+	width: 300px;
 }

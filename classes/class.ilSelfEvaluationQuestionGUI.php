@@ -46,9 +46,11 @@ class ilSelfEvaluationQuestionGUI {
 	}
 
 
+	/**
+	 * @return bool
+	 */
 	public function executeCommand() {
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
-		$this->ctrl->saveParameter($this, 'position');
 		$this->ctrl->saveParameter($this, 'block_id');
 		$this->ctrl->saveParameter($this, 'question_id');
 		$this->tabs_gui->setTabActive('administration');
@@ -75,6 +77,7 @@ class ilSelfEvaluationQuestionGUI {
 	 */
 	function performCommand($cmd) {
 		switch ($cmd) {
+			case 'cancel':
 			case 'editProperties':
 			case 'addQuestion':
 			case 'createObject':
@@ -116,7 +119,7 @@ class ilSelfEvaluationQuestionGUI {
 		$this->form->addCommandButton($mode . 'Object', $this->pl->txt($mode . '_question_button'));
 		$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 		$te = new ilTextInputGUI($this->pl->txt('title'), 'title');
-		$te->setRequired(true);
+		$te->setRequired(false);
 		$this->form->addItem($te);
 		$te = new ilTextAreaInputGUI($this->pl->txt('question_body'), 'question_body');
 		$te->setRequired(true);
@@ -202,7 +205,7 @@ class ilSelfEvaluationQuestionGUI {
 	public function saveSorting() {
 		foreach ($_POST['position'] as $k => $v) {
 			$obj = new ilSelfEvaluationQuestion($v);
-			$obj->setPosition($k);
+			$obj->setPosition($k + 1);
 			$obj->update();
 		}
 		ilUtil::sendSuccess($this->pl->txt('sorting_saved'), true);

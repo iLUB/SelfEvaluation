@@ -1,23 +1,23 @@
 obj_xsev#:#SelfEvaluation
 objs_xsev#:#SelfEvaluations
-obj_xsev_duplicate#:#Copy
-objs_xsev_duplicate#:#Copy SelfEvaluation
-obj_xsev_select#:#Select SelfEvaluation
-xsev_add#:#Add SelfEvaluation
-xsev_new#:#Add New SelfEvaluation
-xsev_read#:#Read access to SelfEvaluation
-xsev_write#:#Edit SelfEvaluation
-xsev_delete#:#Delete SelfEvaluation
-xsev_visible#:#SelfEvaluation is visible
-xsev_edit_permission#:#Change permission settings
-crs_create_xsev#:#Create SelfEvaluation
-grp_create_xsev#:#Create SelfEvaluation
-fold_create_xsev#:#Create SelfEvaluation
-root_create_xsev#:#Create SelfEvaluation
-cat_create_xsev#:#Create SelfEvaluation
-content#:#Content
-properties#:#Properties
-edit_properties#:#Edit Properties
+obj_xsev_duplicate#:#Kopieren
+objs_xsev_duplicate#:#SelfEvaluation kopieren
+obj_xsev_select#:#SelfEvaluation auswählen
+xsev_add#:#SelfEvaluation hinzufügen
+xsev_new#:#Neue SelfEvaluation hinzufügen
+xsev_read#:#Lesezugriff zu SelfEvaluation
+xsev_write#:#SelfEvaluation bearbeiten
+xsev_delete#:#SelfEvaluation löschen
+xsev_visible#:#SelfEvaluation ist sichtbar
+xsev_edit_permission#:#Rechteeinstellungen ändern
+crs_create_xsev#:#SelfEvaluation erstellen
+grp_create_xsev#:#SelfEvaluation erstellen
+fold_create_xsev#:#SelfEvaluation erstellen
+root_create_xsev#:#SelfEvaluation erstellen
+cat_create_xsev#:#SelfEvaluation erstellen
+content#:#SelbstEvaluation
+properties#:#Einstellungen
+edit_properties#:#Einstellungen bearbeiten
 title#:#Titel
 description#:#Beschreibung
 save#:#Speichern
@@ -72,3 +72,9 @@ resume_button#:#Fortfahren
 data_saved#:#Daten wurden gespeichert.
 send_update#:#Änderungen speichern
 not_active#:#Die Selbstevaluation kann nicht gestartet werden, da sie noch keine Fragen enthält oder offline ist.
+count_questions#:#Anzahl Fragen
+is_inverted#:#Umgekehrte Skala
+outro_header#:#Selbstevaluation beendet
+
+scale_cannot_be_edited#:#Diese SelfEvaluation enthält bereits Datensätze von Nutzern, daher kann die Skalierung nicht mehr verändert werden.
+msg_has_datasets#:#Diese SelfEvaluation enthält bereits Datensätze von Nutzern. Fragen sollten daher nciht mehr verändert werden.

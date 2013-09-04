@@ -146,6 +146,9 @@ class ilSelfEvaluationScale {
 
 
 	public function update() {
+		if ($this->getId() == 0) {
+			$this->create();
+		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',

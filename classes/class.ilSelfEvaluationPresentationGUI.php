@@ -40,7 +40,12 @@ class ilSelfEvaluationPresentationGUI {
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = new ilSelfEvaluationPlugin();
-		$this->identity = new ilSelfEvaluationIdentity($_GET['uid'] ? $_GET['uid'] : 0);
+		if (! $_GET['uid']) {
+			ilUtil::sendFailure($this->pl->txt('uid_not_given'));
+			$this->ctrl->redirect($this->parent);
+		} else {
+			$this->identity = new ilSelfEvaluationIdentity($_GET['uid']);
+		}
 	}
 
 
@@ -75,13 +80,13 @@ class ilSelfEvaluationPresentationGUI {
 				//				$this->checkPermission('write'); FSX
 				$this->$cmd();
 				break;
-			case 'showContent':
+			case 'startScreen':
+			case 'startEvaluation':
+			case 'resumeEvaluation':
 			case 'newData':
-			case 'start':
-			case 'resume':
-			case 'resumeContent':
 			case 'updateData':
 			case 'cancel':
+			case 'endScreen':
 				//				$this->checkPermission('read'); FSX
 				$this->$cmd();
 				break;
@@ -94,35 +99,40 @@ class ilSelfEvaluationPresentationGUI {
 	}
 
 
-	public function start() {
-		$identity = ilSelfEvaluationIdentity::_getNewInstanceForObjId($this->parent->object->getId());
-		if (self::_isAnonymous($this->user->getId())) {
-			$identity->setTextKey('LX' . rand(100, 999));
-			ilUtil::sendFailure($this->pl->txt('anonymous_access_failed'), true);
-			$this->ctrl->redirect($this->parent, 'showContent');
+	public function startScreen() {
+		/**
+		 * @var $content ilTemplate
+		 */
+		$content = $this->pl->getTemplate('tpl.content.html');
+		$content->setVariable('INTRO_HEADER', $this->pl->txt('intro_header'));
+		$content->setVariable('INTRO_BODY', $this->parent->object->getIntro());
+		if ($this->parent->object->isActive()) {
+			$content->setCurrentBlock('button');
+			switch (ilSelfEvaluationDataset::_datasetExists($this->identity->getId())) {
+				case true:
+					$content->setVariable('START_BUTTON', $this->pl->txt('resume_button'));
+					$content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'resumeEvaluation'));
+					break;
+				case false;
+					$content->setVariable('START_BUTTON', $this->pl->txt('start_button'));
+					$content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'startEvaluation'));
+					break;
+			}
+			$content->parseCurrentBlock();
 		} else {
-			$identity->setUserId($this->user->getId());
-			$identity->create();
+			ilUtil::sendInfo($this->pl->txt('not_active'));
 		}
-		$this->ctrl->setParameter($this, 'uid', $identity->getId());
-		$this->ctrl->redirect($this, 'showContent');
+		$this->tpl->setContent($content->get());
 	}
 
 
-	public function resume() {
-		$identity = ilSelfEvaluationIdentity::_getInstanceByForForObjId($this->parent->object->getId(), $this->user->getId());
-		$this->ctrl->setParameter($this, 'uid', $identity->getId());
-		$this->ctrl->redirect($this, 'resumeContent');
-	}
-
-
-	public function showContent() {
+	public function startEvaluation() {
 		$this->initPresentationForm();
 		$this->tpl->setContent($this->form->getHTML());
 	}
 
 
-	public function resumeContent() {
+	public function resumeEvaluation() {
 		$this->initPresentationForm('update');
 		$this->fillForm();
 		$this->tpl->setContent($this->form->getHTML());
@@ -131,6 +141,7 @@ class ilSelfEvaluationPresentationGUI {
 
 	public function initPresentationForm($mode = 'new') {
 		$this->form = new ilPropertyFormGUI();
+		$this->form->setId('evaluation_form');
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->parent->object->getId()) as $block) {
 			$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
 			$this->form = $block_gui->getBlockForm($this->form);
@@ -158,7 +169,7 @@ class ilSelfEvaluationPresentationGUI {
 			$dataset = ilSelfEvaluationDataset::_getNewInstanceForIdentifierId($this->identity->getId());
 			$dataset->saveValuesByPost($_POST);
 			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
-			$this->cancel();
+			$this->ctrl->redirect($this, 'endScreen');
 		}
 		$this->form->setValuesByPost();
 		$this->tpl->setContent($this->form->getHTML());
@@ -171,10 +182,18 @@ class ilSelfEvaluationPresentationGUI {
 			$dataset = ilSelfEvaluationDataset::_getInstanceByIdentifierId($this->identity->getId());
 			$dataset->updateValuesByPost($_POST);
 			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
-			$this->cancel();
+			$this->ctrl->redirect($this, 'endScreen');
 		}
 		$this->form->setValuesByPost();
 		$this->tpl->setContent($this->form->getHTML());
+	}
+
+
+	public function endScreen() {
+		$content = $this->pl->getTemplate('tpl.content.html');
+		$content->setVariable('INTRO_HEADER', $this->pl->txt('outro_header'));
+		$content->setVariable('INTRO_BODY', $this->parent->object->getIntro());
+		$this->tpl->setContent($content->get());
 	}
 
 

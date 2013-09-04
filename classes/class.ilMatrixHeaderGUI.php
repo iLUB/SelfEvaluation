@@ -61,10 +61,12 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 	public function getHtml() {
 		$pl = new ilSelfEvaluationPlugin();
 		$tpl = $pl->getTemplate('default/tpl.matrix_header.html');
-		$tpl->setVariable('BLOCKINFO', $this->getBlockInfo());
+		//		$tpl->setVariable('BLOCKINFO', $this->getBlockInfo());
+		$width = round(100 / count($this->getScale()), 0);
 		foreach ($this->getScale() as $title) {
 			$tpl->setCurrentBlock('item');
 			$tpl->setVariable('NAME', $title);
+			$tpl->setVariable('STYLE', $width . '%');
 			$tpl->parseCurrentBlock();
 		}
 
@@ -173,6 +175,7 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 	 * @param string $block_info
 	 */
 	public function setBlockInfo($block_info) {
+		$this->setTitle($block_info);
 		$this->block_info = $block_info;
 	}
 

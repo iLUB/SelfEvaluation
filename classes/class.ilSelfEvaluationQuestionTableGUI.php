@@ -23,7 +23,6 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		 * @var $ilTabs ilTabsGUI
 		 */
 		$this->pl = new ilSelfEvaluationPlugin();
-		//		$this->pl->updateLanguages(); // FSX löschen
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $ilTabs;
 		$this->setId('');
@@ -36,10 +35,14 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 			$this->addColumn('', 'position', '20px');
 			$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
 			$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
+			$sorting = false;
+		} else {
+			$sorting = true;
 		}
-		$this->addColumn($this->pl->txt('title'), 'title', 'auto');
-		$this->addColumn($this->pl->txt('question_body'), 'question_body', 'auto');
-		$this->addColumn($this->pl->txt('actions'), 'actions', 'auto');
+		$this->addColumn($this->pl->txt('title'), $sorting ? 'title' : false, 'auto');
+		$this->addColumn($this->pl->txt('question_body'), $sorting ? 'question_body' : false, 'auto');
+		$this->addColumn($this->pl->txt('is_inverted'), $sorting ? 'is_inverted' : false, 'auto');
+		$this->addColumn($this->pl->txt('actions'), $sorting ? 'actions' : false, 'auto');
 		//
 		// ...
 		// Header
@@ -55,14 +58,15 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 	 */
 	public function fillRow($a_set) {
 		$obj = new ilSelfEvaluationQuestion($a_set['id']);
+		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', $obj->getId());
 		if ($this->block->isBlockSortable()) {
 			$this->tpl->setVariable('ID', $obj->getId());
 		}
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
 		$this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
+		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse()?ilUtil::getImagePath('icon_ok.png'):ilUtil::getImagePath('icon_not_ok.png'));
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
-		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', $obj->getId());
 		$ac->setId('block_' . $obj->getId());
 		$ac->addItem($this->pl->txt('edit_question'), 'edit_question', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion'));
 		$ac->addItem($this->pl->txt('delete_question'), 'delete_question', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'deleteQuestion'));

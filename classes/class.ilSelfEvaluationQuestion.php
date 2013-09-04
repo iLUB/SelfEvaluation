@@ -153,7 +153,7 @@ class ilSelfEvaluationQuestion {
 		global $ilDB;
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-		. $ilDB->quote($parent_id, 'integer'));
+		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
 			if ($as_array) {
 				$return[] = (array)new self($rec->id);
