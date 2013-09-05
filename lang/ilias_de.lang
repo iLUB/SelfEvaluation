@@ -78,3 +78,10 @@ outro_header#:#Selbstevaluation beendet
 
 scale_cannot_be_edited#:#Diese SelfEvaluation enthält bereits Datensätze von Nutzern, daher kann die Skalierung nicht mehr verändert werden.
 msg_has_datasets#:#Diese SelfEvaluation enthält bereits Datensätze von Nutzern. Fragen sollten daher nciht mehr verändert werden.
+
+create_feedback_form#:#Neues Feedback erfassen
+create_feedback_button#:#Erstellen
+start_value#:#Startwert
+end_value#:#Endwert
+feedback_text#:#Feedbacktext
+msg_feedback_created#:#Feedback angelegt

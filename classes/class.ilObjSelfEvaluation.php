@@ -22,13 +22,13 @@
 */
 
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
-require_once('class.ilSelfEvaluationBlock.php');
-require_once('class.ilSelfEvaluationQuestion.php');
-require_once('class.ilSelfEvaluationScale.php');
-require_once('class.ilSelfEvaluationScaleUnit.php');
-require_once('class.ilSelfEvaluationDataset.php');
-require_once('class.ilSelfEvaluationData.php');
-require_once('class.ilSelfEvaluationIdentity.php');
+require_once(dirname(__FILE__).'/Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__).'/Question/class.ilSelfEvaluationQuestion.php');
+require_once(dirname(__FILE__).'/Scale/class.ilSelfEvaluationScale.php');
+require_once(dirname(__FILE__).'/Scale/class.ilSelfEvaluationScaleUnit.php');
+require_once(dirname(__FILE__).'/Dataset/class.ilSelfEvaluationDataset.php');
+require_once(dirname(__FILE__).'/Dataset/class.ilSelfEvaluationData.php');
+require_once(dirname(__FILE__).'/Identity/class.ilSelfEvaluationIdentity.php');
 
 /**
  * Application class for SelfEvaluation repository object.

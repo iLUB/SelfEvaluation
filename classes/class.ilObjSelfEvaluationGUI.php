@@ -21,11 +21,11 @@
 	+-----------------------------------------------------------------------------+
 */
 
-require_once('Services/Form/classes/class.ilPropertyFormGUI.php');
+require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
 require_once('class.ilSelfEvaluationPlugin.php');
-require_once('class.ilSelfEvaluationScaleFormGUI.php');
-require_once('class.ilSelfEvaluationIdentity.php');
+require_once(dirname(__FILE__).'/Scale/class.ilSelfEvaluationScaleFormGUI.php');
+require_once(dirname(__FILE__).'/Identity/class.ilSelfEvaluationIdentity.php');
 
 
 /**
@@ -43,7 +43,7 @@ require_once('class.ilSelfEvaluationIdentity.php');
  *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI, ilAdministrationGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationBlockGUI, ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationBlockGUI, ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI, ilSelfEvaluationFeedbackGUI
  *
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
@@ -126,7 +126,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
 		$this->pl->updateLanguages();
-		//						$this->pl->update();
+//								$this->pl->update();
 	}
 
 
@@ -187,7 +187,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	function editProperties() {
-		if($this->object->hasDatasets()) {
+		if ($this->object->hasDatasets()) {
 			ilUtil::sendInfo($this->pl->txt('scale_cannot_be_edited'));
 		}
 		$this->tabs_gui->activateTab('properties');

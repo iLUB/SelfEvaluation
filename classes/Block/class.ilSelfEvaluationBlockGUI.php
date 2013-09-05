@@ -1,14 +1,14 @@
 <?php
-require_once('class.ilObjSelfEvaluationGUI.php');
-require_once('class.ilSelfEvaluationBlock.php');
-require_once('class.ilSelfEvaluationQuestionTableGUI.php');
-require_once('class.ilSelfEvaluationQuestion.php');
-require_once('class.ilSelfEvaluationQuestionGUI.php');
-require_once('class.ilSelfEvaluationBlockTableGUI.php');
-require_once('class.ilMatrixHeaderGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 require_once('./Modules/SurveyQuestionPool/classes/class.ilMatrixRowWizardInputGUI.php');
+require_once(dirname(__FILE__).'/../class.ilObjSelfEvaluationGUI.php');
+require_once('class.ilSelfEvaluationBlock.php');
+require_once('class.ilSelfEvaluationBlockTableGUI.php');
+require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestionTableGUI.php');
+require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestion.php');
+require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestionGUI.php');
+require_once(dirname(__FILE__).'/../Form/class.ilMatrixHeaderGUI.php');
 /**
  * GUI-Class ilSelfEvaluationBlockGUI
  *

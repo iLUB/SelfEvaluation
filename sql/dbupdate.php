@@ -74,4 +74,8 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
 $id = new ilSelfEvaluationIdentity();
 $id->initDB();
 
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationFeedback.php');
+$id = new ilSelfEvaluationFeedback();
+$id->initDB();
+
 ?>

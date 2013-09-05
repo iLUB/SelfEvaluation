@@ -1,8 +1,9 @@
 <?php
 require_once('./Services/Table/classes/class.ilTable2GUI.php');
-require_once('class.ilSelfEvaluationBlock.php');
-require_once('class.ilSelfEvaluationQuestion.php');
 require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
+require_once('class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestion.php');
+
 /**
  * TableGUI ilSelfEvaluationBlockTableGUI
  *
@@ -51,6 +52,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$obj = new ilSelfEvaluationBlock($a_set['id']);
 		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', $obj->getId());
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $obj->getId());
+		$this->ctrl->setParameterByClass('ilSelfEvaluationFeedbackGUI', 'block_id', $obj->getId());
 		// Row
 		$this->tpl->setVariable('ID', $obj->getId());
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
@@ -64,7 +66,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$ac->addItem($this->pl->txt('edit_block'), 'edit_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock'));
 		$ac->addItem($this->pl->txt('delete_block'), 'delete_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'deleteBlock'));
 		$ac->addItem($this->pl->txt('edit_questions'), 'edit_questions', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent'));
-		$ac->addItem($this->pl->txt('edit_feedback'), 'edit_feedback', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editFeedbacks'));
+		$ac->addItem($this->pl->txt('edit_feedback'), 'edit_feedback', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI'));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//
 		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', 0);

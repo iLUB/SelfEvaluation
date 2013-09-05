@@ -1,9 +1,8 @@
 <?php
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
-require_once('class.ilObjSelfEvaluationGUI.php');
+require_once(dirname(__FILE__).'/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationScale.php');
-require_once('class.ilMultipleFieldInputGUI.php');
-require_once('./Services/Form/classes/class.ilHierarchyFormGUI.php');
+require_once(dirname(__FILE__).'/../Form/class.ilMultipleFieldInputGUI.php');
 /**
  * GUI-Class ilSelfEvaluationScaleGUI
  *

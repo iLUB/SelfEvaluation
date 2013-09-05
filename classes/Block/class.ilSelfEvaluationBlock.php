@@ -1,5 +1,5 @@
 <?php
-require_once('class.ilSelfEvaluationScale.php');
+require_once(dirname(__FILE__).'/../Scale/class.ilSelfEvaluationScale.php');
 /**
  * ilSelfEvaluationBlock
  *

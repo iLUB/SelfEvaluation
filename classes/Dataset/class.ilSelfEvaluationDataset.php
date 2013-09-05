@@ -1,7 +1,7 @@
 <?php
 require_once('class.ilSelfEvaluationData.php');
-require_once('class.ilSelfEvaluationQuestionGUI.php');
-require_once('class.ilSelfEvaluationQuestion.php');
+require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestionGUI.php');
+require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestion.php');
 /**
  * ilSelfEvaluationDataset
  *

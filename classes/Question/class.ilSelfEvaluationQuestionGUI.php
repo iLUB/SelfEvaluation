@@ -1,11 +1,12 @@
 <?php
-require_once('class.ilObjSelfEvaluationGUI.php');
-require_once('class.ilSelfEvaluationQuestion.php');
-require_once('class.ilSelfEvaluationBlock.php');
-require_once('class.ilSelfEvaluationQuestionTableGUI.php');
-require_once('class.ilMatrixFieldInputGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
+require_once(dirname(__FILE__).'/../class.ilObjSelfEvaluationGUI.php');
+require_once('class.ilSelfEvaluationQuestion.php');
+require_once('class.ilSelfEvaluationQuestionTableGUI.php');
+require_once(dirname(__FILE__).'/../Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__).'/../Form/class.ilMatrixFieldInputGUI.php');
+
 /**
  * GUI-Class ilSelfEvaluationQuestionGUI
  *
