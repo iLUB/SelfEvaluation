@@ -3,6 +3,7 @@ require_once('./Services/Table/classes/class.ilTable2GUI.php');
 require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 require_once('class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestion.php');
+require_once(dirname(__FILE__).'/../Feedback/class.ilSelfEvaluationFeedback.php');
 
 /**
  * TableGUI ilSelfEvaluationBlockTableGUI
@@ -36,6 +37,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('title'), false, 'auto');
 		$this->addColumn($this->pl->txt('description'), false, 'auto');
 		$this->addColumn($this->pl->txt('count_questions'), false, 'auto');
+		$this->addColumn($this->pl->txt('count_feedbacks'), false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), false, 'auto');
 		$this->addHeaderCommand($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addBlock'), $this->pl->txt('add_new_block'));
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationBlockGUI'));
@@ -58,7 +60,9 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
 		$this->tpl->setVariable('DESCRIPTION', $obj->getDescription());
 		$this->tpl->setVariable('QUESTIONS_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent'));
+		$this->tpl->setVariable('FEEDBACK_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects'));
 		$this->tpl->setVariable('COUNT_QUESTIONS', count(ilSelfEvaluationQuestion::_getAllInstancesForParentId($obj->getId())));
+		$this->tpl->setVariable('COUNT_FEEDBACKS', count(ilSelfEvaluationFeedback::_getAllInstancesForParentId($obj->getId())));
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 
@@ -66,7 +70,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$ac->addItem($this->pl->txt('edit_block'), 'edit_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock'));
 		$ac->addItem($this->pl->txt('delete_block'), 'delete_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'deleteBlock'));
 		$ac->addItem($this->pl->txt('edit_questions'), 'edit_questions', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent'));
-		$ac->addItem($this->pl->txt('edit_feedback'), 'edit_feedback', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI'));
+		$ac->addItem($this->pl->txt('edit_feedback'), 'edit_feedbacks', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI'));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//
 		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', 0);

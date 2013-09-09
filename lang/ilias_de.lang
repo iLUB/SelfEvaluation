@@ -41,7 +41,7 @@ msg_block_deleted#:#Block wurde gelöscht
 create_block#:#Block erstellen
 create_block_button#:#Block erstellen
 edit_questions#:#Fragen bearbeiten
-edit_feedback#:#Feedbacks bearbeiten
+edit_feedback#:#Feedback bearbeiten
 
 scale_form#:#Skalierung
 
@@ -85,3 +85,15 @@ start_value#:#Startwert
 end_value#:#Endwert
 feedback_text#:#Feedbacktext
 msg_feedback_created#:#Feedback angelegt
+edit_feedbacks#:#Feedbacks bearbeiten
+delete_feedback#:#Feedback löschen
+add_new_feedback#:#Feedback hinzufügen
+update_feedback_form#:#Feedback bearbeiten
+update_feedback_button#:#Speichern
+count_feedbacks#:#Anzahl Feedbacks
+
+fb_title#:#Titel
+fb_body#:#Feedback
+fb_start#:#Ab
+fb_end#:#Bis
+warning_overlap#:#Die eingegeben Werte überschneiden sich mit einem anderen Feedback. Die nächst möglichen Werte werden gewählt.

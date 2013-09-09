@@ -125,7 +125,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->tpl = $tpl;
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
-		$this->pl->updateLanguages();
+//		$this->pl->updateLanguages();
 //								$this->pl->update();
 	}
 

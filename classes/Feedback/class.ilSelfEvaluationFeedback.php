@@ -13,7 +13,7 @@ class ilSelfEvaluationFeedback {
 	/**
 	 * @var int
 	 */
-	protected $id = 0;
+	public $id = 0;
 	/**
 	 * @var int
 	 */
@@ -33,7 +33,7 @@ class ilSelfEvaluationFeedback {
 	/**
 	 * @var int
 	 */
-	protected $end_value = 0;
+	protected $end_value = 100;
 	/**
 	 * @var string
 	 */
@@ -181,34 +181,16 @@ class ilSelfEvaluationFeedback {
 	// Static
 	//
 	/**
-	 * @param int $ref_id
-	 *
-	 * @return ilSelfEvaluationFeedback
-	 */
-	public static function _getInstanceByRefId($ref_id) {
-		global $ilDB;
-		// Existing Object
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE ref_id = "
-		. $ilDB->quote($ref_id, "integer"));
-		while ($rec = $ilDB->fetchObject($set)) {
-			return new self($rec->id);
-		}
-
-		return false;
-	}
-
-
-	/**
 	 * @param      $parent_id
 	 * @param bool $as_array
 	 *
 	 * @return ilSelfEvaluationFeedback[]
 	 */
-	public static function _getAllForParentId($parent_id, $as_array = false) {
+	public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
 		global $ilDB;
 		$return = array();
-		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE parent_id = "
-		. $ilDB->quote($parent_id, "integer"));
+		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
+		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY start_value ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
 			if ($as_array) {
 				$return[] = (array)new self($rec->id);
@@ -218,6 +200,81 @@ class ilSelfEvaluationFeedback {
 		}
 
 		return $return;
+	}
+
+
+	/**
+	 * @param     $parent_id
+	 * @param int $value
+	 * @param int $ignore
+	 *
+	 * @return int
+	 */
+	public static function _getNextMinValueForParentId($parent_id, $value = 0, $ignore = 0) {
+		global $ilDB;
+		/**
+		 * @var $ilDB ilDB
+		 */
+		for ($return = $value; $return <= 100; $return ++) {
+			$q =
+				'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer')
+				. ' AND start_value <= ' . $ilDB->quote($return, 'integer')
+				. ' AND end_value >= ' . $ilDB->quote($return, 'integer');
+			if ($ignore) {
+				$q .= ' AND id != ' . $ilDB->quote($ignore, 'integer');
+			}
+			$set = $ilDB->query($q);
+			$res = $ilDB->fetchObject($set);
+			if (! $res->id) {
+				return $return;
+			}
+		}
+	}
+
+
+	/**
+	 * @param     $parent_id
+	 * @param int $value
+	 * @param int $ignore
+	 *
+	 * @return int
+	 */
+	public static function _getNextMaxValueForParentId($parent_id, $value = 0, $ignore = 0) {
+		global $ilDB;
+		/**
+		 * @var $ilDB ilDB
+		 */
+		for ($return = $value; $return <= 100; $return ++) {
+			$q =
+				'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer')
+				. ' AND start_value <= ' . $ilDB->quote($return, 'integer')
+				. ' AND end_value >= ' . $ilDB->quote($return, 'integer');
+			if ($ignore) {
+				$q .= ' AND id != ' . $ilDB->quote($ignore, 'integer');
+			}
+			$set = $ilDB->query($q);
+			$res = $ilDB->fetchObject($set);
+			if ($res->id) {
+				return $return - 1;
+			}
+		}
+		return 100;
+	}
+
+
+	/**
+	 * @param $parent_id
+	 * @param $start_value
+	 * @param $end_value
+	 *
+	 * @return bool
+	 */
+	public static function _hasOverlap($parent_id, $start_value, $end_value) {
+		global $ilDB;
+
+		return true;
+
+		return false;
 	}
 
 
