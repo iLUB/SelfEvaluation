@@ -4,6 +4,8 @@ require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationFeedback.php');
 require_once('class.ilSelfEvaluationFeedbackTableGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilSliderInputGUI.php');
+require_once('./Services/Chart/classes/class.ilChart.php');
+require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 /**
  * GUI-Class ilSelfEvaluationFeedbackGUI
  *
@@ -15,6 +17,7 @@ require_once(dirname(__FILE__) . '/../Form/class.ilSliderInputGUI.php');
  */
 class ilSelfEvaluationFeedbackGUI {
 
+	const WIDTH = 700;
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -38,6 +41,7 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->toolbar = $ilToolbar;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = new ilSelfEvaluationPlugin();
+
 		$this->block = new ilSelfEvaluationBlock($_GET['block_id']);
 		if ($_GET['feedback_id']) {
 			$this->object = new ilSelfEvaluationFeedback($_GET['feedback_id']);
@@ -89,6 +93,8 @@ class ilSelfEvaluationFeedbackGUI {
 			case 'updateObject':
 			case 'editFeedback':
 			case 'checkNextValue':
+			case 'deleteFeedback':
+			case 'deleteObject':
 				//				$this->checkPermission('read'); FSX
 				$this->$cmd();
 				break;
@@ -232,6 +238,24 @@ class ilSelfEvaluationFeedbackGUI {
 	}
 
 
+	public function deleteFeedback() {
+		ilUtil::sendQuestion($this->pl->txt('qst_delete_feedback'));
+		$conf = new ilConfirmationGUI();
+		$conf->setFormAction($this->ctrl->getFormAction($this));
+		$conf->setCancel($this->pl->txt('cancel'), 'cancel');
+		$conf->setConfirm($this->pl->txt('delete_feedback'), 'deleteObject');
+		$conf->addItem('feedback_id', $this->object->getId(), $this->object->getTitle());
+		$this->tpl->setContent($conf->getHTML());
+	}
+
+
+	public function deleteObject() {
+		ilUtil::sendSuccess($this->pl->txt('msg_feedback_deleted'), true);
+		$this->object->delete();
+		$this->cancel();
+	}
+
+
 	public function getOverview() {
 		$ov = $this->pl->getTemplate('default/tpl.feedback_overview.html');
 		$last = 1;
@@ -266,6 +290,48 @@ class ilSelfEvaluationFeedbackGUI {
 		}
 
 		return $ov;
+	}
+
+
+	/**
+	 * @param ilSelfEvaluationDataset $dataset
+	 * @param bool                    $show_charts
+	 *
+	 * @return string
+	 */
+	public static function _getPresentationOfFeedback(ilSelfEvaluationDataset $dataset, $show_charts = true) {
+		$pl = new ilSelfEvaluationPlugin();
+		$tpl = $pl->getTemplate('default/tpl.feedback.html');
+		foreach ($dataset->getFeedbacksPerBlock() as $block_id => $fb) {
+			// Chart
+			$tpl->setCurrentBlock('feedback');
+			if ($show_charts) {
+				$chart = new ilChart('fb_' . $block_id, self::WIDTH - 15, round((self::WIDTH - 50) / 2, 0));
+				$legend = new ilChartLegend();
+				$chart->setLegend($legend);
+				$chart->setYAxisToInteger(true);
+				$data = new ilChartData('bars');
+				$data->setBarOptions(1, 'center');
+				$ticks = array();
+				foreach ($dataset->getDataPerBlock($block_id) as $qst_id => $value) {
+					$qst = new ilSelfEvaluationQuestion($qst_id);
+					$data->addPoint($qst_id, $value);
+					$ticks[$qst_id] = $qst->getTitle();
+				}
+				$chart->setTicks($ticks, false, true);
+				$chart->addData($data);
+				$tpl->setVariable('CHART', $chart->getHTML());
+			}
+			// Template
+			$block = new ilSelfEvaluationBlock($block_id);
+			$tpl->setVariable('BLOCK_TITLE', $block->getTitle());
+			$tpl->setVariable('WIDTH', self::WIDTH);
+			$tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
+			$tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
+			$tpl->parseCurrentBlock();
+		}
+
+		return $tpl->get();
 	}
 }
 

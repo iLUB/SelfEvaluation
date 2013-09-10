@@ -22,18 +22,18 @@
 */
 
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
-require_once(dirname(__FILE__).'/Block/class.ilSelfEvaluationBlock.php');
-require_once(dirname(__FILE__).'/Question/class.ilSelfEvaluationQuestion.php');
-require_once(dirname(__FILE__).'/Scale/class.ilSelfEvaluationScale.php');
-require_once(dirname(__FILE__).'/Scale/class.ilSelfEvaluationScaleUnit.php');
-require_once(dirname(__FILE__).'/Dataset/class.ilSelfEvaluationDataset.php');
-require_once(dirname(__FILE__).'/Dataset/class.ilSelfEvaluationData.php');
-require_once(dirname(__FILE__).'/Identity/class.ilSelfEvaluationIdentity.php');
+require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestion.php');
+require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScale.php');
+require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScaleUnit.php');
+require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
+require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
+require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php');
+require_once(dirname(__FILE__) . '/Feedback/class.ilSelfEvaluationFeedback.php');
 
 /**
  * Application class for SelfEvaluation repository object.
  *
- * @author Alex Killing <alex.killing@gmx.de>
  * @author Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  *
  * $Id$
@@ -70,6 +70,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var string
 	 */
 	protected $outro = '';
+	/**
+	 * @var bool
+	 */
+	protected $show_charts = true;
+	/**
+	 * @var bool
+	 */
+	protected $allow_multiple_datasets = false;
+	/**
+	 * @var bool
+	 */
+	protected $allow_dataset_editing = false;
+	/**
+	 * @var bool
+	 */
+	protected $allow_show_results = false;
 
 
 	/**
@@ -175,6 +191,9 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
 				$qst->delete();
 			}
+			foreach (ilSelfEvaluationFeedback::_getAllInstancesForParentId($block->getId()) as $fb) {
+				$fb->delete();
+			}
 			$block->delete();
 		}
 		$this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . ' id = '
@@ -204,7 +223,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @return bool
 	 */
 	public function isActive() {
-		return ($this->getOnline() AND $this->hasBlocks()) ? true : false;
+		return ($this->getOnline() AND $this->hasBlocks() AND $this->areFeedbacksComplete()) ? true : false;
 	}
 
 
@@ -233,6 +252,19 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * @return bool
+	 */
+	public function areFeedbacksComplete() {
+		$return = true;
+		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+			$return = ilSelfEvaluationFeedback::_isComplete($block->getId());
+		}
+
+		return $return;
 	}
 
 
@@ -329,6 +361,70 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function getDisplayType() {
 		return $this->display_type;
+	}
+
+
+	/**
+	 * @param boolean $show_charts
+	 */
+	public function setShowCharts($show_charts) {
+		$this->show_charts = $show_charts;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowCharts() {
+		return $this->show_charts;
+	}
+
+
+	/**
+	 * @param boolean $allow_multiple_datasets
+	 */
+	public function setAllowMultipleDatasets($allow_multiple_datasets) {
+		$this->allow_multiple_datasets = $allow_multiple_datasets;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getAllowMultipleDatasets() {
+		return $this->allow_multiple_datasets;
+	}
+
+
+	/**
+	 * @param boolean $allow_dataset_editing
+	 */
+	public function setAllowDatasetEditing($allow_dataset_editing) {
+		$this->allow_dataset_editing = $allow_dataset_editing;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getAllowDatasetEditing() {
+		return $this->allow_dataset_editing;
+	}
+
+
+	/**
+	 * @param boolean $allow_show_results
+	 */
+	public function setAllowShowResults($allow_show_results) {
+		$this->allow_show_results = $allow_show_results;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getAllowShowResults() {
+		return $this->allow_show_results;
 	}
 }
 

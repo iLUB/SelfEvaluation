@@ -24,8 +24,8 @@
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
 require_once('class.ilSelfEvaluationPlugin.php');
-require_once(dirname(__FILE__).'/Scale/class.ilSelfEvaluationScaleFormGUI.php');
-require_once(dirname(__FILE__).'/Identity/class.ilSelfEvaluationIdentity.php');
+require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScaleFormGUI.php');
+require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php');
 
 
 /**
@@ -43,12 +43,13 @@ require_once(dirname(__FILE__).'/Identity/class.ilSelfEvaluationIdentity.php');
  *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI, ilAdministrationGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationBlockGUI, ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI, ilSelfEvaluationFeedbackGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationBlockGUI, ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationDatasetGUI, ilSelfEvaluationFeedbackGUI
  *
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
-	const DEBUG = true;
+	const DEBUG = false;
 	/**
 	 * @var ilObjSelfEvaluation
 	 */
@@ -72,8 +73,14 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	 */
 	public function executeCommand() {
 		if (! $this->getCreationMode()) {
+			$this->ctrl->saveParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $_GET['uid']);
+			$this->ctrl->saveParameterByClass('ilSelfEvaluationDatasetGUI', 'uid', $_GET['uid']);
+			$this->ctrl->saveParameterByClass('ilSelfEvaluationFeedbackGUI', 'uid', $_GET['uid']);
 			$cmd = $this->ctrl->getCmd();
 			$next_class = $this->ctrl->getNextClass($this);
+			if (self::DEBUG) {
+				var_dump(array( 'next_class' => $next_class, 'cmd' => $cmd ));
+			}
 			$this->tpl->getStandardTemplate();
 			$this->setTitleAndDescription();
 			$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
@@ -125,8 +132,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->tpl = $tpl;
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
-//		$this->pl->updateLanguages();
-//								$this->pl->update();
+		if (self::DEBUG) {
+			$this->pl->updateLanguages();
+		}
 	}
 
 
@@ -174,6 +182,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 	function setTabs() {
 		global $ilAccess;
+		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
+			$this->object->setAllowShowResults(true);
+		}
 		if ($ilAccess->checkAccess('read', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab('content', $this->txt('content'), $this->ctrl->getLinkTarget($this, 'showContent'));
 		}
@@ -181,6 +192,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab('properties', $this->txt('properties'), $this->ctrl->getLinkTarget($this, 'editProperties'));
 			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
+		}
+		if (($this->object->getAllowShowResults())
+			AND $this->object->hasDatasets()
+		) {
+			$this->tabs_gui->addTab('results', $this->txt('show_results'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'listObjects'));
 		}
 		$this->addPermissionTab();
 	}

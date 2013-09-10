@@ -118,3 +118,15 @@ div.fsx_slider {
 div.fsx_slider_warning {
 	margin-bottom: 12px;
 }
+h1.feedback_block_title {
+	/*background-color: #D3D3D3;*/
+	border-bottom: 1px #808080 dotted;
+}
+
+div.feedback {
+	background-color: #FDFDFD;
+	border: 1px #808080 dotted;
+	margin: 12px;
+	float: left;
+	padding: 20px;
+}

@@ -1,11 +1,11 @@
 <?php
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('class.ilObjSelfEvaluationGUI.php');
-require_once(dirname(__FILE__).'/Block/class.ilSelfEvaluationBlock.php');
-require_once(dirname(__FILE__).'/Block/class.ilSelfEvaluationBlockGUI.php');
-require_once(dirname(__FILE__).'/Identity/class.ilSelfEvaluationIdentity.php');
-require_once(dirname(__FILE__).'/Dataset/class.ilSelfEvaluationDataset.php');
-require_once(dirname(__FILE__).'/Dataset/class.ilSelfEvaluationData.php');
+require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlockGUI.php');
+require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php');
+require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
+require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
  *
@@ -87,6 +87,7 @@ class ilSelfEvaluationPresentationGUI {
 			case 'updateData':
 			case 'cancel':
 			case 'endScreen':
+			case 'startNewEvaluation':
 				//				$this->checkPermission('read'); FSX
 				$this->$cmd();
 				break;
@@ -103,15 +104,30 @@ class ilSelfEvaluationPresentationGUI {
 		/**
 		 * @var $content ilTemplate
 		 */
-		$content = $this->pl->getTemplate('tpl.content.html');
+		$content = $this->pl->getTemplate('default/tpl.content.html');
 		$content->setVariable('INTRO_HEADER', $this->pl->txt('intro_header'));
 		$content->setVariable('INTRO_BODY', $this->parent->object->getIntro());
 		if ($this->parent->object->isActive()) {
 			$content->setCurrentBlock('button');
 			switch (ilSelfEvaluationDataset::_datasetExists($this->identity->getId())) {
 				case true:
-					$content->setVariable('START_BUTTON', $this->pl->txt('resume_button'));
-					$content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'resumeEvaluation'));
+					if ($this->parent->object->getAllowMultipleDatasets()) {
+						$content->setVariable('START_BUTTON', $this->pl->txt('start_new_button'));
+						$content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'startNewEvaluation'));
+						$content->parseCurrentBlock();
+						$content->setCurrentBlock('button');
+					}
+					if ($this->parent->object->getAllowDatasetEditing()) {
+						$content->setVariable('START_BUTTON', $this->pl->txt('resume_button'));
+						$content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'resumeEvaluation'));
+						$content->parseCurrentBlock();
+						$content->setCurrentBlock('button');
+					}
+					if (! $this->parent->object->getAllowMultipleDatasets()
+						AND ! $this->parent->object->getAllowDatasetEditing()
+					) {
+						ilUtil::sendInfo($this->pl->txt('msg_already_filled'));
+					}
 					break;
 				case false;
 					$content->setVariable('START_BUTTON', $this->pl->txt('start_button'));
@@ -123,6 +139,11 @@ class ilSelfEvaluationPresentationGUI {
 			ilUtil::sendInfo($this->pl->txt('not_active'));
 		}
 		$this->tpl->setContent($content->get());
+	}
+
+
+	public function startNewEvaluation() {
+		$this->startEvaluation();
 	}
 
 
@@ -169,7 +190,7 @@ class ilSelfEvaluationPresentationGUI {
 			$dataset = ilSelfEvaluationDataset::_getNewInstanceForIdentifierId($this->identity->getId());
 			$dataset->saveValuesByPost($_POST);
 			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
-			$this->ctrl->redirect($this, 'endScreen');
+			$this->redirectToResults($dataset);
 		}
 		$this->form->setValuesByPost();
 		$this->tpl->setContent($this->form->getHTML());
@@ -182,18 +203,19 @@ class ilSelfEvaluationPresentationGUI {
 			$dataset = ilSelfEvaluationDataset::_getInstanceByIdentifierId($this->identity->getId());
 			$dataset->updateValuesByPost($_POST);
 			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
-			$this->ctrl->redirect($this, 'endScreen');
+			$this->redirectToResults($dataset);
 		}
 		$this->form->setValuesByPost();
 		$this->tpl->setContent($this->form->getHTML());
 	}
 
 
-	public function endScreen() {
-		$content = $this->pl->getTemplate('tpl.content.html');
-		$content->setVariable('INTRO_HEADER', $this->pl->txt('outro_header'));
-		$content->setVariable('INTRO_BODY', $this->parent->object->getIntro());
-		$this->tpl->setContent($content->get());
+	/**
+	 * @param ilSelfEvaluationDataset $dataset
+	 */
+	public function redirectToResults(ilSelfEvaluationDataset $dataset) {
+		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', $dataset->getId());
+		$this->ctrl->redirectByClass('ilSelfEvaluationDatasetGUI', 'show');
 	}
 
 

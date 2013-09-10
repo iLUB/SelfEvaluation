@@ -26,25 +26,20 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		$this->setId('');
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 		$this->setTitle($this->pl->txt('title'));
-		//
 		// Columns
 		$this->addColumn($this->pl->txt('fb_title'), 'title', 'auto');
 		$this->addColumn($this->pl->txt('fb_body'), 'body', 'auto');
 		$this->addColumn($this->pl->txt('fb_start'), 'start', 'auto');
 		$this->addColumn($this->pl->txt('fb_end'), 'end', 'auto');
 		$this->addColumn($this->pl->txt('actions'), 'asction', 'auto');
-		//
-		// ...
 		// Header
-		$this->addHeaderCommand($this->ctrl->getLinkTarget($a_parent_obj, 'addNew'), $this->pl->txt('add_new_feedback'));
-		//$this->setDefaultOrderField('val_order');
-		//$this->setDefaultOrderDirection('asc');
-		//$this->setEnableHeader(true);
-		//$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
-		//$this->setEnableTitle(true);
+		if (! ilSelfEvaluationFeedback::_isComplete($a_parent_obj->block->getId())) {
+			$this->addHeaderCommand($this->ctrl->getLinkTarget($a_parent_obj, 'addNew'), $this->pl->txt('add_new_feedback'));
+		} else {
+			ilUtil::sendInfo($this->pl->txt('feedback_complete'));
+		}
 		$this->setRowTemplate('tpl.template_feedback_row.html', $this->pl->getDirectory());
 		$this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->block->getId(), true));
-		//		echo '<pre>'.print_r($this->getData(),1).'</pre>';
 	}
 
 

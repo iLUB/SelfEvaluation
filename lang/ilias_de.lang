@@ -68,7 +68,7 @@ anonymous_access_failed#:#Kein Zugriff. Bitte loggen sie sich ein.
 back_to_blocks#:#Zurück zu den Frageblocks
 is_inverse#:#Skala umkehren
 update_question#:#Frage bearbeiten
-resume_button#:#Fortfahren
+resume_button#:#Antworten bearbeiten
 data_saved#:#Daten wurden gespeichert.
 send_update#:#Änderungen speichern
 not_active#:#Die Selbstevaluation kann nicht gestartet werden, da sie noch keine Fragen enthält oder offline ist.
@@ -97,3 +97,15 @@ fb_body#:#Feedback
 fb_start#:#Ab
 fb_end#:#Bis
 warning_overlap#:#Die eingegeben Werte überschneiden sich mit einem anderen Feedback. Die nächst möglichen Werte werden gewählt.
+feedback_complete#:#Dieser Feedback-Block ist bereits komplett (100%). Es können keine weiteren Feedbacks hinzugefügt werden.
+qst_delete_feedback#:#Möchten Sie das folgende Feedback wirklich löschen?
+msg_feedback_deleted#:#Das Feedback wurde gelöscht
+delete_feedback#:#Feedback löschen
+slider#:#Prozentbereich
+start_new_button#:#Neuen Durchgang starten
+
+msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
+msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
+show_results#:#Resultate
+select_result_button#:#Datensatz auswählen
+dataset_from#:#Datensatz vom

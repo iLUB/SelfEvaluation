@@ -2,9 +2,8 @@
 require_once('./Services/Table/classes/class.ilTable2GUI.php');
 require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 require_once('class.ilSelfEvaluationBlock.php');
-require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestion.php');
-require_once(dirname(__FILE__).'/../Feedback/class.ilSelfEvaluationFeedback.php');
-
+require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
+require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedback.php');
 /**
  * TableGUI ilSelfEvaluationBlockTableGUI
  *
@@ -65,7 +64,6 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->tpl->setVariable('COUNT_FEEDBACKS', count(ilSelfEvaluationFeedback::_getAllInstancesForParentId($obj->getId())));
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
-
 		$ac->setId('block_' . $obj->getId());
 		$ac->addItem($this->pl->txt('edit_block'), 'edit_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock'));
 		$ac->addItem($this->pl->txt('delete_block'), 'delete_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'deleteBlock'));

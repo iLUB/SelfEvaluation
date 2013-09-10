@@ -226,6 +226,23 @@ class ilSelfEvaluationIdentity {
 
 
 	/**
+	 * @param $identity_id
+	 *
+	 * @return bool
+	 */
+	public static function _getObjIdForIdentityId($identity_id) {
+		global $ilDB;
+		$set = $ilDB->query('SELECT obj_id FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
+		. $ilDB->quote($identity_id, 'integer'));
+		while ($rec = $ilDB->fetchObject($set)) {
+			return $rec->obj_id;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * @param int $id
 	 */
 	public function setId($id) {

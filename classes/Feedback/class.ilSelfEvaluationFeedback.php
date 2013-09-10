@@ -204,6 +204,26 @@ class ilSelfEvaluationFeedback {
 
 
 	/**
+	 * @param $parent_id
+	 * @param $percentage
+	 *
+	 * @return ilSelfEvaluationFeedback
+	 */
+	public static function _getFeedbackForPercentage($parent_id, $percentage) {
+		global $ilDB;
+		$q = 'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer')
+			. ' AND start_value <= ' . $ilDB->quote($percentage, 'integer')
+			. ' AND end_value >= ' . $ilDB->quote($percentage, 'integer');
+		$set = $ilDB->query($q);
+		while ($res = $ilDB->fetchObject($set)) {
+			return new self($res->id);
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * @param     $parent_id
 	 * @param int $value
 	 * @param int $ignore
@@ -228,6 +248,8 @@ class ilSelfEvaluationFeedback {
 			if (! $res->id) {
 				return $return;
 			}
+
+			return 100;
 		}
 	}
 
@@ -258,7 +280,22 @@ class ilSelfEvaluationFeedback {
 				return $return - 1;
 			}
 		}
+
 		return 100;
+	}
+
+
+	/**
+	 * @param $parent_id
+	 *
+	 * @return bool
+	 */
+	public static function _isComplete($parent_id) {
+//		var_dump(self::_getNextMaxValueForParentId($parent_id) == - 1);
+//		var_dump(self::_getNextMinValueForParentId($parent_id) == 100);
+		return ((self::_getNextMaxValueForParentId($parent_id) == - 1 AND
+			self::_getNextMinValueForParentId($parent_id) == 100) ? true : false);
+
 	}
 
 
@@ -291,6 +328,9 @@ class ilSelfEvaluationFeedback {
 	}
 
 
+	//
+	// Setter & Getter
+	//
 	/**
 	 * @param int $id
 	 */
