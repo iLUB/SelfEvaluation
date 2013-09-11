@@ -61,9 +61,7 @@ class ilSelfEvaluationDatasetGUI {
 	 */
 	function performCommand($cmd) {
 		switch ($cmd) {
-			case 'show':
 			default:
-				//				$this->checkPermission('read'); FSX
 				$this->$cmd();
 				break;
 		}

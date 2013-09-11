@@ -17,7 +17,7 @@ require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
  */
 class ilSelfEvaluationFeedbackGUI {
 
-	const WIDTH = 700;
+	const WIDTH = 900;
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -41,7 +41,6 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->toolbar = $ilToolbar;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = new ilSelfEvaluationPlugin();
-
 		$this->block = new ilSelfEvaluationBlock($_GET['block_id']);
 		if ($_GET['feedback_id']) {
 			$this->object = new ilSelfEvaluationFeedback($_GET['feedback_id']);
@@ -109,15 +108,16 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	public function listObjects() {
-		//$ov = $this->getOverview();
+		$this->toolbar->addButton($this->pl->txt('back_to_blocks'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
+		$ov = $this->getOverview();
 		$table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects');
-		$this->tpl->setContent($table->getHTML());
+		$this->tpl->setContent($ov->get() . $table->getHTML());
 	}
 
 
 	public function addNew() {
 		$this->initForm();
-		$this->object->setStartValue(ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId()));
+		$this->object->setStartValue(ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $_GET['start_value'] ? $_GET['start_value'] : 0));
 		$this->object->setEndValue(ilSelfEvaluationFeedback::_getNextMaxValueForParentId($this->block->getId(), $this->object->getStartValue()));
 		$this->setValues();
 		$this->tpl->setContent($this->form->getHTML());
@@ -146,6 +146,10 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		$this->form->addCommandButton($mode . 'Object', $this->pl->txt($mode . '_feedback_button'));
 		$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
+		// Block
+		$te = new ilNonEditableValueGUI($this->pl->txt('block'), 'block');
+		$te->setValue($this->block->getTitle());
+		$this->form->addItem($te);
 		// Title
 		$te = new ilTextInputGUI($this->pl->txt('title'), 'title');
 		$te->setRequired(true);
@@ -256,40 +260,76 @@ class ilSelfEvaluationFeedbackGUI {
 	}
 
 
+	/**
+	 * @return ilTemplate
+	 */
 	public function getOverview() {
-		$ov = $this->pl->getTemplate('default/tpl.feedback_overview.html');
-		$last = 1;
+		$this->getMesurement();
+		$min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId());
 		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->block->getId());
-		foreach ($feedbacks as $i => $fb) {
-			$width = $fb->getEndValue() - $fb->getStartValue();
-			$ov->setCurrentBlock('fb');
-			$ov->setVariable('WIDTH', $width);
-			$ov->setVariable('TITLE', $fb->getTitle());
-			$this->ctrl->setParameter($this, 'feedback_id', $fb->getId());
-			$ov->setVariable('HREF', $this->ctrl->getLinkTarget($this, 'editFeedback'));
-			$ov->parseCurrentBlock();
-			if ($last != $fb->getStartValue() OR count($feedbacks) == 1 OR ($i == count($feedbacks) - 1 AND
-					$fb->getEndValue() != 100)
-			) {
-				if (count($feedbacks) == 1 OR ($i == count($feedbacks) - 1 AND
-						$fb->getEndValue() != 100)
-				) {
-					$width = 100 - $fb->getEndValue();
-				} else {
-					$width = $fb->getStartValue() - $last;
-				}
-				$ov->setCurrentBlock('fb');
-				$this->ctrl->setParameter($this, 'feedback_id', NULL);
-				$this->ctrl->setParameter($this, 'start_value', $fb->getEndValue());
-				$ov->setVariable('WIDTH', $width);
-				$ov->setVariable('CSS', '_blank');
-				$ov->setVariable('HREF', $this->ctrl->getLinkTarget($this, 'addNew'));
-				$ov->parseCurrentBlock();
+		if (count($feedbacks) == 0) {
+			$this->parseOverviewBlock('blank', 100, 0);
+
+			return $this->ov;
+		}
+		foreach ($feedbacks as $fb) {
+			if ($min !== false AND $min <= $fb->getStartValue()) {
+				$this->parseOverviewBlock('blank', $fb->getStartValue() - $min, $min);
 			}
-			$last = $fb->getEndValue();
+			$this->parseOverviewBlock('fb', $fb->getEndValue() - $fb->getStartValue(), $fb->getId(), $fb->getTitle());
+			$min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $fb->getEndValue());
+		}
+		if ($min != 100 AND is_object($fb)) {
+			$this->parseOverviewBlock('blank', 99 - $min, $min);
 		}
 
-		return $ov;
+		return $this->ov;
+	}
+
+
+	public function getMesurement() {
+		$this->ov = $this->pl->getTemplate('default/tpl.feedback_overview.html');
+		for ($x = 1; $x <= 100; $x += 1) {
+			$this->ov->setCurrentBlock('line');
+			if ($x % 5 == 0) {
+				$this->ov->setVariable('INT', $x . '&nbsp;');
+				$this->ov->setVariable('LINE_CSS', '_double');
+			} else {
+				$this->ov->setVariable('INT', '');
+			}
+			$this->ov->setVariable('WIDTH', 10);
+			$this->ov->parseCurrentBlock();
+		}
+	}
+
+
+	/**
+	 * @param        $type
+	 * @param        $width
+	 * @param        $value
+	 * @param string $title
+	 */
+	public function parseOverviewBlock($type, $width, $value, $title = '') { //$width, $title, $href, $css = '', $start_value = NULL) {
+		switch ($type) {
+			case 'blank':
+				$this->ctrl->setParameter($this, 'feedback_id', NULL);
+				$this->ctrl->setParameter($this, 'start_value', $value);
+				$href = $this->ctrl->getLinkTarget($this, 'addNew');
+				$css = '_blank';
+				$title = $this->pl->txt('insert_feedback');
+				break;
+			case 'fb':
+				$this->ctrl->setParameter($this, 'feedback_id', $value);
+				$href = $this->ctrl->getLinkTarget($this, 'editFeedback');
+				break;
+		}
+		$this->total += $width;
+		$this->ov->setCurrentBlock('fb');
+		$this->ov->setVariable('FEEDBACK', $title);
+		$this->ov->setVariable('HREF', $href);
+		$this->ov->setVariable('WIDTH', $width);
+		$this->ov->setVariable('CSS', $css);
+		$this->ov->parseCurrentBlock();
 	}
 
 
@@ -301,6 +341,7 @@ class ilSelfEvaluationFeedbackGUI {
 	 */
 	public static function _getPresentationOfFeedback(ilSelfEvaluationDataset $dataset, $show_charts = true) {
 		$pl = new ilSelfEvaluationPlugin();
+		$pl->updateLanguages();
 		$tpl = $pl->getTemplate('default/tpl.feedback.html');
 		foreach ($dataset->getFeedbacksPerBlock() as $block_id => $fb) {
 			// Chart
@@ -311,12 +352,14 @@ class ilSelfEvaluationFeedbackGUI {
 				$chart->setLegend($legend);
 				$chart->setYAxisToInteger(true);
 				$data = new ilChartData('bars');
-				$data->setBarOptions(1, 'center');
+				$data->setBarOptions(0.8, 'center');
 				$ticks = array();
+				$x = 1;
 				foreach ($dataset->getDataPerBlock($block_id) as $qst_id => $value) {
 					$qst = new ilSelfEvaluationQuestion($qst_id);
 					$data->addPoint($qst_id, $value);
-					$ticks[$qst_id] = $qst->getTitle();
+					$ticks[$qst_id] = $qst->getTitle() ? $qst->getTitle() : $pl->txt('question') . ' ' . $x;
+					$x ++;
 				}
 				$chart->setTicks($ticks, false, true);
 				$chart->addData($data);

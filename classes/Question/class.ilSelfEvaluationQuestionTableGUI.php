@@ -45,8 +45,8 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('is_inverted'), $sorting ? 'is_inverted' : false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), $sorting ? 'actions' : false, 'auto');
 		//
-		// ...
 		// Header
+		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', NULL);
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $block->getId());
 		$this->addHeaderCommand($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'addQuestion'), $this->pl->txt('add_new_question'));
 		$this->setRowTemplate('tpl.template_question_row.html', $this->pl->getDirectory());

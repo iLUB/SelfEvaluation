@@ -77,6 +77,7 @@ class ilObjSelfEvaluationAccess extends ilObjectPluginAccess {
 
 		return (boolean)$rec['is_online'];
 	}
+
 }
 
 ?>

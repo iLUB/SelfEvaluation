@@ -24,7 +24,6 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		 * @var $ilTabs ilTabsGUI
 		 */
 		$this->pl = new ilSelfEvaluationPlugin();
-		//		$this->pl->updateLanguages(); // FSX löschen
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $ilTabs;
 		$this->setId('');
@@ -38,6 +37,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('count_questions'), false, 'auto');
 		$this->addColumn($this->pl->txt('count_feedbacks'), false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), false, 'auto');
+		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', NULL);
 		$this->addHeaderCommand($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addBlock'), $this->pl->txt('add_new_block'));
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationBlockGUI'));
 		$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));

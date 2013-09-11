@@ -40,7 +40,6 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 		$this->tpl = $tpl;
 		$this->tabs = $ilTabs;
 		$this->pl = new ilSelfEvaluationPlugin();
-		//		$this->pl->updateLanguages(); // FSX löschen
 		$this->object = new ilSelfEvaluationConfig($this->pl->getConfigTableName());
 	}
 

@@ -77,7 +77,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	/**
 	 * @var bool
 	 */
-	protected $allow_multiple_datasets = false;
+	protected $allow_multiple_datasets = true;
 	/**
 	 * @var bool
 	 */
@@ -85,7 +85,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	/**
 	 * @var bool
 	 */
-	protected $allow_show_results = false;
+	protected $allow_show_results = true;
 
 
 	/**
@@ -223,7 +223,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @return bool
 	 */
 	public function isActive() {
-		return ($this->getOnline() AND $this->hasBlocks() AND $this->areFeedbacksComplete()) ? true : false;
+		return ((boolean)$this->getOnline() AND $this->hasBlocks() AND $this->areFeedbacksComplete()) ? true : false;
 	}
 
 
@@ -261,7 +261,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	public function areFeedbacksComplete() {
 		$return = true;
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
-			$return = ilSelfEvaluationFeedback::_isComplete($block->getId());
+			$return = ilSelfEvaluationFeedback::_isComplete($block->getId()) ? $return : false;
 		}
 
 		return $return;

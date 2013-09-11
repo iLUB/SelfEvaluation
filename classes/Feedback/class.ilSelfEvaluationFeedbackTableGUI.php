@@ -34,6 +34,7 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('actions'), 'asction', 'auto');
 		// Header
 		if (! ilSelfEvaluationFeedback::_isComplete($a_parent_obj->block->getId())) {
+			$this->ctrl->setParameter($this->parent_obj, 'feedback_id', NULL);
 			$this->addHeaderCommand($this->ctrl->getLinkTarget($a_parent_obj, 'addNew'), $this->pl->txt('add_new_feedback'));
 		} else {
 			ilUtil::sendInfo($this->pl->txt('feedback_complete'));
@@ -50,8 +51,8 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		$obj = new ilSelfEvaluationFeedback($a_set['id']);
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
 		$this->tpl->setVariable('BODY', strip_tags($obj->getFeedbackText()));
-		$this->tpl->setVariable('START', $obj->getStartValue() . '%');
-		$this->tpl->setVariable('END', $obj->getEndValue() . '%');
+		$this->tpl->setVariable('START', ($obj->getStartValue() == 0 ? '>= ' : '> ') . $obj->getStartValue() . '%');
+		$this->tpl->setVariable('END', '<= '.$obj->getEndValue() . '%');
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$this->ctrl->setParameter($this->parent_obj, 'feedback_id', $obj->getId());

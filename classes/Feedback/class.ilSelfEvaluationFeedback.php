@@ -212,8 +212,8 @@ class ilSelfEvaluationFeedback {
 	public static function _getFeedbackForPercentage($parent_id, $percentage) {
 		global $ilDB;
 		$q = 'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer')
-			. ' AND start_value <= ' . $ilDB->quote($percentage, 'integer')
-			. ' AND end_value >= ' . $ilDB->quote($percentage, 'integer');
+			. ' AND start_value < ' . $ilDB->quote($percentage, 'float')
+			. ' AND end_value >= ' . $ilDB->quote($percentage, 'float');
 		$set = $ilDB->query($q);
 		while ($res = $ilDB->fetchObject($set)) {
 			return new self($res->id);
@@ -232,14 +232,11 @@ class ilSelfEvaluationFeedback {
 	 */
 	public static function _getNextMinValueForParentId($parent_id, $value = 0, $ignore = 0) {
 		global $ilDB;
-		/**
-		 * @var $ilDB ilDB
-		 */
-		for ($return = $value; $return <= 100; $return ++) {
+		for ($return = $value; $return < 100; $return ++) {
 			$q =
 				'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer')
 				. ' AND start_value <= ' . $ilDB->quote($return, 'integer')
-				. ' AND end_value >= ' . $ilDB->quote($return, 'integer');
+				. ' AND end_value > ' . $ilDB->quote($return, 'integer');
 			if ($ignore) {
 				$q .= ' AND id != ' . $ilDB->quote($ignore, 'integer');
 			}
@@ -248,9 +245,9 @@ class ilSelfEvaluationFeedback {
 			if (! $res->id) {
 				return $return;
 			}
-
-			return 100;
 		}
+
+		return 100;
 	}
 
 
@@ -266,7 +263,7 @@ class ilSelfEvaluationFeedback {
 		/**
 		 * @var $ilDB ilDB
 		 */
-		for ($return = $value; $return <= 100; $return ++) {
+		for ($return = $value + 1; $return <= 100; $return ++) {
 			$q =
 				'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer')
 				. ' AND start_value <= ' . $ilDB->quote($return, 'integer')
@@ -277,7 +274,7 @@ class ilSelfEvaluationFeedback {
 			$set = $ilDB->query($q);
 			$res = $ilDB->fetchObject($set);
 			if ($res->id) {
-				return $return - 1;
+				return $return;
 			}
 		}
 
@@ -291,11 +288,10 @@ class ilSelfEvaluationFeedback {
 	 * @return bool
 	 */
 	public static function _isComplete($parent_id) {
-//		var_dump(self::_getNextMaxValueForParentId($parent_id) == - 1);
-//		var_dump(self::_getNextMinValueForParentId($parent_id) == 100);
-		return ((self::_getNextMaxValueForParentId($parent_id) == - 1 AND
-			self::_getNextMinValueForParentId($parent_id) == 100) ? true : false);
+		$min = self::_getNextMinValueForParentId($parent_id);
+		$max = self::_getNextMaxValueForParentId($parent_id, $min);
 
+		return ($min == 100 AND $max == 100) ? true : false;
 	}
 
 

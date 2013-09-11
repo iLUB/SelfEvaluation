@@ -41,7 +41,7 @@ class ilSelfEvaluationPresentationGUI {
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = new ilSelfEvaluationPlugin();
 		if (! $_GET['uid']) {
-			ilUtil::sendFailure($this->pl->txt('uid_not_given'));
+			ilUtil::sendFailure($this->pl->txt('uid_not_given'), true);
 			$this->ctrl->redirect($this->parent);
 		} else {
 			$this->identity = new ilSelfEvaluationIdentity($_GET['uid']);
@@ -213,23 +213,9 @@ class ilSelfEvaluationPresentationGUI {
 	/**
 	 * @param ilSelfEvaluationDataset $dataset
 	 */
-	public function redirectToResults(ilSelfEvaluationDataset $dataset) {
+	private function redirectToResults(ilSelfEvaluationDataset $dataset) {
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', $dataset->getId());
 		$this->ctrl->redirectByClass('ilSelfEvaluationDatasetGUI', 'show');
-	}
-
-
-	//
-	// HELPER
-	//
-	public static function _isAnonymous($user_id) {
-		foreach (ilObjUser::_getUsersForRole(ANONYMOUS_ROLE_ID) as $u) {
-			if ($u['usr_id'] == $user_id) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
 

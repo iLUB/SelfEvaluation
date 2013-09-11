@@ -96,7 +96,7 @@ fb_title#:#Titel
 fb_body#:#Feedback
 fb_start#:#Ab
 fb_end#:#Bis
-warning_overlap#:#Die eingegeben Werte überschneiden sich mit einem anderen Feedback. Die nächst möglichen Werte werden gewählt.
+warning_overlap#:#Die eingegeben Werte überschneiden sich mit einem anderen Feedback.<br>Die nächst möglichen Werte werden gewählt.
 feedback_complete#:#Dieser Feedback-Block ist bereits komplett (100%). Es können keine weiteren Feedbacks hinzugefügt werden.
 qst_delete_feedback#:#Möchten Sie das folgende Feedback wirklich löschen?
 msg_feedback_deleted#:#Das Feedback wurde gelöscht
@@ -109,3 +109,14 @@ msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
 show_results#:#Resultate
 select_result_button#:#Datensatz auswählen
 dataset_from#:#Datensatz vom
+
+block#:#Block
+
+insert_feedback#:#Neu
+start_with_new_identity#:#Mit neuer Identifikation starten
+start_with_existing_identity#:#Mit bestehender Identifikation starten
+uid#:#Identifikation
+start#:#Starten
+new_uid#:#Neue Identifikation generieren
+uid_not_exists#:#Die eingegebene Identifikation existiert nicht
+question#:#Frage

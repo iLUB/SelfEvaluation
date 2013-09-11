@@ -1,7 +1,16 @@
-<div id="feedback_overview">
-	<!-- BEGIN fb -->
-	<a href="{HREF}">
-	<div class="feedback_ov_item{CSS}" style="width: {WIDTH}%; ">{TITLE}</div>
-	</a>
-	<!-- END fb -->
-</div>
+<table id="feedback_overview_table">
+	<tr>
+		<!-- BEGIN line -->
+		<td class="feedback_overview_line{LINE_CSS}">
+			{INT}
+		</td>
+		<!-- END line -->
+	</tr>
+	<tr>
+		<!-- BEGIN fb -->
+		<td colspan="{WIDTH}" class="feedback_ov_item{CSS}">
+			<a href="{HREF}">{FEEDBACK}</a>
+		</td>
+		<!-- END fb -->
+	</tr>
+</table>

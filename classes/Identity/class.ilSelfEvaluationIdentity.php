@@ -10,32 +10,19 @@
 class ilSelfEvaluationIdentity {
 
 	const TABLE_NAME = 'rep_robj_xsev_uid';
-	const TYPE_USER = 1;
-	const TYPE_ANONYMOUS = 2;
+	const LENGTH = 10;
 	/**
 	 * @var int
 	 */
 	protected $id = 0;
 	/**
-	 * @var int
-	 */
-	protected $identifier_type = self::TYPE_USER;
-	/**
-	 * @var int
-	 */
-	protected $user_id = 0;
-	/**
 	 * @var string
 	 */
-	protected $text_key = '';
+	protected $identifier = '';
 	/**
 	 * @var int
 	 */
 	protected $obj_id = 0;
-	/**
-	 * @var int
-	 */
-	protected $type = self::TYPE_USER;
 
 
 	/**
@@ -171,22 +158,22 @@ class ilSelfEvaluationIdentity {
 	 */
 	public static function _getInstanceForObjId($obj_id, $identifier) {
 		global $ilDB;
-		// Existing Object
+		if ($identifier === NULL) {
+			$identifier = substr(md5(rand(1, 99999)), 0, self::LENGTH);
+			$set = $ilDB->query('SELECT identifier FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier = '
+			. $ilDB->quote($identifier, 'text'));
+			while (! $rec = $ilDB->fetchObject($set)) {
+				break;
+			}
+		}
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
-		. $ilDB->quote($obj_id, 'integer') . ' AND (user_id = ' . $ilDB->quote($identifier, 'integer')
-		. ' OR text_key = ' . $ilDB->quote($identifier, 'text') . ')');
+		. $ilDB->quote($obj_id, 'integer') . ' AND identifier = ' . $ilDB->quote($identifier, 'text'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
 		$obj = new self();
 		$obj->setObjId($obj_id);
-		if (self::_getType($identifier) == 'integer') {
-			$obj->setUserId($identifier);
-			$obj->setType(self::TYPE_USER);
-		} else {
-			$obj->setTextKey($identifier);
-			$obj->setType(self::TYPE_ANONYMOUS);
-		}
+		$obj->setIdentifier($identifier);
 		$obj->create();
 
 		return $obj;
@@ -215,8 +202,7 @@ class ilSelfEvaluationIdentity {
 	public static function _identityExists($obj_id, $identifier) {
 		global $ilDB;
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
-		. $ilDB->quote($obj_id, 'integer') . ' AND (user_id = ' . $ilDB->quote($identifier, 'integer')
-		. ' OR text_key = ' . $ilDB->quote($identifier, 'text') . ')');
+		. $ilDB->quote($obj_id, 'integer') . ' AND identifier = ' . $ilDB->quote($identifier, 'text'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return true;
 		}
@@ -259,22 +245,6 @@ class ilSelfEvaluationIdentity {
 
 
 	/**
-	 * @param int $identifier_type
-	 */
-	public function setIdentifierType($identifier_type) {
-		$this->identifier_type = $identifier_type;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getIdentifierType() {
-		return $this->identifier_type;
-	}
-
-
-	/**
 	 * @param int $obj_id
 	 */
 	public function setObjId($obj_id) {
@@ -291,50 +261,18 @@ class ilSelfEvaluationIdentity {
 
 
 	/**
-	 * @param string $text_key
+	 * @param string $identifier
 	 */
-	public function setTextKey($text_key) {
-		$this->text_key = $text_key;
+	public function setIdentifier($identifier) {
+		$this->identifier = $identifier;
 	}
 
 
 	/**
 	 * @return string
 	 */
-	public function getTextKey() {
-		return $this->text_key;
-	}
-
-
-	/**
-	 * @param int $user_id
-	 */
-	public function setUserId($user_id) {
-		$this->user_id = $user_id;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getUserId() {
-		return $this->user_id;
-	}
-
-
-	/**
-	 * @param int $type
-	 */
-	public function setType($type) {
-		$this->type = $type;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getType() {
-		return $this->type;
+	public function getIdentifier() {
+		return $this->identifier;
 	}
 
 

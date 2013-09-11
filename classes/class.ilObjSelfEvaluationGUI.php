@@ -50,6 +50,7 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 	const DEBUG = false;
+	const RELOAD = false;
 	/**
 	 * @var ilObjSelfEvaluation
 	 */
@@ -66,6 +67,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	 * @var ilPropertyFormGUI
 	 */
 	protected $form;
+	/**
+	 * @var ilNavigationHistory
+	 */
+	protected $history;
 
 
 	/**
@@ -73,6 +78,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	 */
 	public function executeCommand() {
 		if (! $this->getCreationMode()) {
+			if ($this->access->checkAccess('read', '', $_GET['ref_id'])) {
+				$this->history->addItem($_GET['ref_id'], $this->ctrl->getLinkTarget($this, $this->getStandardCmd()), $this->getType(), '');
+			}
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $_GET['uid']);
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationDatasetGUI', 'uid', $_GET['uid']);
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationFeedbackGUI', 'uid', $_GET['uid']);
@@ -80,6 +88,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$next_class = $this->ctrl->getNextClass($this);
 			if (self::DEBUG) {
 				var_dump(array( 'next_class' => $next_class, 'cmd' => $cmd ));
+			}
+			if (self::RELOAD) {
+				$this->pl->update();
 			}
 			$this->tpl->getStandardTemplate();
 			$this->setTitleAndDescription();
@@ -124,12 +135,16 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	protected function afterConstructor() {
-		global $tpl, $ilCtrl;
+		global $tpl, $ilCtrl, $ilAccess, $ilNavigationHistory;
 		/**
-		 * @var $tpl    ilTemplate
-		 * @var $ilCtrl ilCtrl
+		 * @var $tpl                 ilTemplate
+		 * @var $ilCtrl              ilCtrl
+		 * @var $ilAccess            ilAccessHandler
+		 * @var $ilNavigationHistory ilNavigationHistory
 		 */
 		$this->tpl = $tpl;
+		$this->history = $ilNavigationHistory;
+		$this->access = $ilAccess;
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
 		if (self::DEBUG) {
@@ -282,7 +297,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	function showContent() {
 		global $ilUser;
 		if (self::_isAnonymous($ilUser->getId())) {
-			// redirect to identity generator
+			$this->ctrl->redirectByClass('ilSelfEvaluationIdentityGUI', 'show');
 		} else {
 			$id = ilSelfEvaluationIdentity::_getInstanceForObjId($this->object->getId(), $ilUser->getId());
 			$this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
