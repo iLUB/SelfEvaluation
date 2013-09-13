@@ -10,7 +10,9 @@
 class ilSelfEvaluationIdentity {
 
 	const TABLE_NAME = 'rep_robj_xsev_uid';
-	const LENGTH = 10;
+	const LENGTH = 6;
+	const TYPE_LOGIN = 1;
+	const TYPE_EXTERNAL = 2;
 	/**
 	 * @var int
 	 */
@@ -23,6 +25,10 @@ class ilSelfEvaluationIdentity {
 	 * @var int
 	 */
 	protected $obj_id = 0;
+	/**
+	 * @var int
+	 */
+	protected $type = self::TYPE_LOGIN;
 
 
 	/**
@@ -35,7 +41,7 @@ class ilSelfEvaluationIdentity {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
-		//		$this->initDB();
+		//		$this->updateDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -89,6 +95,34 @@ class ilSelfEvaluationIdentity {
 			$this->db->createTable(self::TABLE_NAME, $fields);
 			$this->db->addPrimaryKey(self::TABLE_NAME, array( 'id' ));
 			$this->db->createSequence(self::TABLE_NAME);
+		}
+	}
+
+
+	final function updateDB() {
+		if (! $this->db->tableExists(self::TABLE_NAME)) {
+			$this->initDB();
+
+			return true;
+		}
+		foreach ($this->getArrayForDb() as $k => $v) {
+			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
+				$field = array(
+					'type' => $v[0],
+				);
+				switch ($v[0]) {
+					case 'integer':
+						$field['length'] = 4;
+						break;
+					case 'text':
+						$field['length'] = 1024;
+						break;
+				}
+				if ($k == 'id') {
+					$field['notnull'] = true;
+				}
+				$this->db->addTableColumn(self::TABLE_NAME, $k, $field);
+			}
 		}
 	}
 
@@ -159,7 +193,8 @@ class ilSelfEvaluationIdentity {
 	public static function _getInstanceForObjId($obj_id, $identifier) {
 		global $ilDB;
 		if ($identifier === NULL) {
-			$identifier = substr(md5(rand(1, 99999)), 0, self::LENGTH);
+			$external = true;
+			$identifier = strtoupper(substr(md5(rand(1, 99999)), 0, self::LENGTH));
 			$set = $ilDB->query('SELECT identifier FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier = '
 			. $ilDB->quote($identifier, 'text'));
 			while (! $rec = $ilDB->fetchObject($set)) {
@@ -174,6 +209,9 @@ class ilSelfEvaluationIdentity {
 		$obj = new self();
 		$obj->setObjId($obj_id);
 		$obj->setIdentifier($identifier);
+		if ($external) {
+			$obj->setType(self::TYPE_EXTERNAL);
+		}
 		$obj->create();
 
 		return $obj;
@@ -273,6 +311,22 @@ class ilSelfEvaluationIdentity {
 	 */
 	public function getIdentifier() {
 		return $this->identifier;
+	}
+
+
+	/**
+	 * @param int $type
+	 */
+	public function setType($type) {
+		$this->type = $type;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getType() {
+		return $this->type;
 	}
 
 

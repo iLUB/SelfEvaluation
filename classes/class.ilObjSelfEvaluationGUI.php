@@ -73,6 +73,20 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	protected $history;
 
 
+	public function displayIdentifier() {
+		/**
+		 * @var $ilToolbar ilToolbarGUI
+		 */
+		if ($_GET['uid']) {
+			$id = new ilSelfEvaluationIdentity($_GET['uid']);
+			if ($id->getType() == ilSelfEvaluationIdentity::TYPE_EXTERNAL) {
+				global $ilToolbar;
+				$ilToolbar->addText('<b>' . $this->pl->txt('your_uid') . ' ' . $id->getIdentifier() . '</b>');
+			}
+		}
+	}
+
+
 	/**
 	 * @return bool|void
 	 */
@@ -84,6 +98,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $_GET['uid']);
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationDatasetGUI', 'uid', $_GET['uid']);
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationFeedbackGUI', 'uid', $_GET['uid']);
+			$this->displayIdentifier();
 			$cmd = $this->ctrl->getCmd();
 			$next_class = $this->ctrl->getNextClass($this);
 			if (self::DEBUG) {

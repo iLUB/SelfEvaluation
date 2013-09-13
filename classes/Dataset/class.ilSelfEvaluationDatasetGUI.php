@@ -101,7 +101,7 @@ class ilSelfEvaluationDatasetGUI {
 		$this->tabs_gui->setTabActive('content');
 		$content = $this->pl->getTemplate('default/tpl.content.html');
 		$content->setVariable('INTRO_HEADER', $this->pl->txt('outro_header'));
-		$content->setVariable('INTRO_BODY', $this->parent->object->getIntro());
+		$content->setVariable('INTRO_BODY', $this->parent->object->getOutro());
 		if ($this->parent->object->getAllowShowResults()) {
 			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset, $this->parent->object->getShowCharts());
 		}
