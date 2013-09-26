@@ -36,6 +36,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('description'), false, 'auto');
 		$this->addColumn($this->pl->txt('count_questions'), false, 'auto');
 		$this->addColumn($this->pl->txt('count_feedbacks'), false, 'auto');
+		$this->addColumn($this->pl->txt('feedback_status'), false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), false, 'auto');
 		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', NULL);
 		$this->addHeaderCommand($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addBlock'), $this->pl->txt('add_new_block'));
@@ -62,6 +63,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->tpl->setVariable('FEEDBACK_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects'));
 		$this->tpl->setVariable('COUNT_QUESTIONS', count(ilSelfEvaluationQuestion::_getAllInstancesForParentId($obj->getId())));
 		$this->tpl->setVariable('COUNT_FEEDBACKS', count(ilSelfEvaluationFeedback::_getAllInstancesForParentId($obj->getId())));
+		$this->tpl->setVariable('FEEDBACK_STATUS', ilSelfEvaluationFeedback::_isComplete($obj->getId()) ? ilUtil::getImagePath('icon_ok.png') : ilUtil::getImagePath('icon_not_ok.png'));
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('block_' . $obj->getId());

@@ -28,6 +28,9 @@ class ilSelfEvaluationFeedbackGUI {
 	protected $form;
 
 
+	/**
+	 * @var array
+	 */
 	function __construct(ilObjSelfEvaluationGUI $parent) {
 		global $tpl, $ilCtrl, $ilToolbar;
 		/**
@@ -334,21 +337,69 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	/**
+	 * @param array $block_data
+	 * @param array $colors
+	 *
+	 * @return string
+	 */
+	public static function _getOverviewCharts(array $block_data, array $colors) {
+		$chart = new ilChart('fb_overview', self::WIDTH - 15, round((self::WIDTH - 50) / 2, 0));
+		$chart->setColors($colors);
+		$legend = new ilChartLegend();
+		$chart->setLegend($legend);
+		$chart->setYAxisToInteger(true);
+		$ticks = array();
+		foreach ($block_data as $block_id => $percentage) {
+			$data = new ilChartData('bars');
+			$data->setBarOptions(0.8, 'center');
+			$block = new ilSelfEvaluationBlock($block_id);
+			$data->addPoint($block_id, $percentage);
+			$ticks[$block_id] = $block->getTitle();
+			$chart->addData($data);
+		}
+		$chart->setTicks($ticks, false, true);
+
+		//		$chart->addData($data);
+		return $chart->getHTML();
+	}
+
+
+	/**
 	 * @param ilSelfEvaluationDataset $dataset
 	 * @param bool                    $show_charts
 	 *
 	 * @return string
 	 */
 	public static function _getPresentationOfFeedback(ilSelfEvaluationDataset $dataset, $show_charts = true) {
+		$colors = array(
+			'#D0E8FF',
+			'#00CCFF',
+			'#00CC99',
+			'#9999FF',
+			'#CC66FF',
+			'#FF99FF',
+			'#FF9933',
+			'#CCCC33',
+			'#CC6666',
+			'#669900',
+			'#666600',
+			'#333399',
+			'#0066CC',
+		);
+		//		shuffle($colors);
 		$pl = new ilSelfEvaluationPlugin();
 		$pl->updateLanguages();
 		$tpl = $pl->getTemplate('default/tpl.feedback.html');
+		$color_id = 0;
+		$percentages = $dataset->getPercentagePerBlock();
 		foreach ($dataset->getFeedbacksPerBlock() as $block_id => $fb) {
 			// Chart
 			$tpl->setCurrentBlock('feedback');
 			if ($show_charts) {
-				$chart = new ilChart('fb_' . $block_id, self::WIDTH - 15, round((self::WIDTH - 50) / 2, 0));
+				$chart = new ilChart('fb_' . $block_id, self::WIDTH - 15, round((self::WIDTH - 50) / 4, 0));
+				$chart->setColors(array( $colors[$color_id] ));
 				$legend = new ilChartLegend();
+				$legend->setBackground($colors[$color_id]);
 				$chart->setLegend($legend);
 				$chart->setYAxisToInteger(true);
 				$data = new ilChartData('bars');
@@ -372,6 +423,11 @@ class ilSelfEvaluationFeedbackGUI {
 			$tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
 			$tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
 			$tpl->parseCurrentBlock();
+			$overview_data[$block_id] = $percentages[$block_id];
+			$color_id ++;
+		}
+		if (count($dataset->getFeedbacksPerBlock()) > 1) {
+			$tpl->setVariable('OVERVIEW_CHART', self::_getOverviewCharts($overview_data, $colors));
 		}
 
 		return $tpl->get();

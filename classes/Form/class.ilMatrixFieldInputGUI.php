@@ -42,7 +42,7 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 		$width = round(100 / count($this->getScale()), 0);
 		foreach ($this->getScale() as $value => $title) {
 			$tpl->setCurrentBlock('item');
-			if ($this->getValue() == $value) {
+			if ($this->getValue() === $value) {
 				$tpl->setVariable('SELECTED', 'checked="checked"');
 			}
 			$tpl->setVariable('CSS', 'col' . $css);

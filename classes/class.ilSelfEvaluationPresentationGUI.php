@@ -6,6 +6,7 @@ require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlockGUI.php');
 require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
+require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestionGUI.php');
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
  *
@@ -88,6 +89,7 @@ class ilSelfEvaluationPresentationGUI {
 			case 'cancel':
 			case 'endScreen':
 			case 'startNewEvaluation':
+			case 'newNextPage':
 				//				$this->checkPermission('read'); FSX
 				$this->$cmd();
 				break;
@@ -163,13 +165,46 @@ class ilSelfEvaluationPresentationGUI {
 	public function initPresentationForm($mode = 'new') {
 		$this->form = new ilPropertyFormGUI();
 		$this->form->setId('evaluation_form');
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->parent->object->getId()) as $block) {
-			$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
-			$this->form = $block_gui->getBlockForm($this->form);
+		$blocks = ilSelfEvaluationBlock::_getAllInstancesByParentId($this->parent->object->getId());
+		switch ($this->parent->object->getDisplayType()) {
+			case ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE:
+				foreach ($blocks as $block) {
+					$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
+					$this->form = $block_gui->getBlockForm($this->form);
+				}
+				$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
+				$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
+				break;
+			case ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES:
+				$page = $_GET['page'] ? $_GET['page'] : 1;
+				$last_page = count($blocks);
+				$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/jquery.knob.js');
+				$knob = $this->pl->getTemplate('default/tpl.knob.html', false, false);
+				$knob->setVariable('PAGE', $page);
+				$knob->setVariable('MAX', $last_page);
+				$this->tpl->setRightContent($knob->get());
+				$this->ctrl->setParameter($this, 'page', $page);
+				if ($page < $last_page) {
+					$this->form->addCommandButton($mode . 'NextPage', $this->pl->txt('next_' . $mode));
+					$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
+				} else {
+					$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
+					$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
+				}
+				$block = $blocks[$page - 1];
+				$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
+				$this->form = $block_gui->getBlockForm($this->form);
+				break;
+			case ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED:
+				$h = new ilFormSectionHeaderGUI();
+				$h->setTitle($this->parent->object->getTitle());
+				$this->form->addItem($h);
+				ilSelfEvaluationQuestionGUI::getAllQuestionsForms($this->parent, $this->form);
+				$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
+				$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
+				break;
 		}
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
-		$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
-		$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 	}
 
 
@@ -184,9 +219,29 @@ class ilSelfEvaluationPresentationGUI {
 	}
 
 
+	public function newNextPage() {
+		$this->initPresentationForm();
+		if ($this->form->checkinput()) {
+			if (is_array($_SESSION['xsev_data'])) {
+				$_SESSION['xsev_data'] = array_merge($_SESSION['xsev_data'], $_POST);
+			} else {
+				$_SESSION['xsev_data'] = $_POST;
+			}
+			$this->ctrl->setParameter($this, 'page', $_GET['page'] + 1);
+			$this->ctrl->redirect($this, 'startEvaluation');
+		}
+		$this->form->setValuesByPost();
+		$this->tpl->setContent($this->form->getHTML());
+	}
+
+
 	public function newData() {
 		$this->initPresentationForm();
 		if ($this->form->checkinput()) {
+			if (is_array($_SESSION['xsev_data'])) {
+				$_POST = array_merge($_SESSION['xsev_data'], $_POST);
+				$_SESSION['xsev_data'] = '';
+			}
 			$dataset = ilSelfEvaluationDataset::_getNewInstanceForIdentifierId($this->identity->getId());
 			$dataset->saveValuesByPost($_POST);
 			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);

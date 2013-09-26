@@ -26,6 +26,10 @@ class ilSelfEvaluationScaleUnit {
 	 * @var int
 	 */
 	protected $parent_id = 0;
+	/**
+	 * @var int
+	 */
+	protected $position = 99;
 
 
 	/**
@@ -38,6 +42,7 @@ class ilSelfEvaluationScaleUnit {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
+		//		$this->updateDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -95,6 +100,34 @@ class ilSelfEvaluationScaleUnit {
 	}
 
 
+	final function updateDB() {
+		if (! $this->db->tableExists(self::TABLE_NAME)) {
+			$this->initDB();
+
+			return true;
+		}
+		foreach ($this->getArrayForDb() as $k => $v) {
+			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
+				$field = array(
+					'type' => $v[0],
+				);
+				switch ($v[0]) {
+					case 'integer':
+						$field['length'] = 4;
+						break;
+					case 'text':
+						$field['length'] = 1024;
+						break;
+				}
+				if ($k == 'id') {
+					$field['notnull'] = true;
+				}
+				$this->db->addTableColumn(self::TABLE_NAME, $k, $field);
+			}
+		}
+	}
+
+
 	final private function resetDB() {
 		$this->db->dropTable(self::TABLE_NAME);
 		$this->initDB();
@@ -102,6 +135,11 @@ class ilSelfEvaluationScaleUnit {
 
 
 	public function create() {
+		if ($this->getId() != 0) {
+			$this->update();
+
+			return true;
+		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
 	}
@@ -117,6 +155,11 @@ class ilSelfEvaluationScaleUnit {
 
 
 	public function update() {
+		if ($this->getId() == 0) {
+			$this->create();
+
+			return true;
+		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
@@ -136,17 +179,11 @@ class ilSelfEvaluationScaleUnit {
 	 */
 	public static function _getAllInstancesByParentId($parent_id) {
 		global $ilDB;
-		$obj = new self();
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-		. $ilDB->quote($parent_id, 'integer').' ORDER BY value ASC');
+		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
 			$return[] = new self($rec->id);
-		}
-		if (count($return) == 0) {
-//			$obj = new self();
-//			$obj->setParentId($parent_id);
-//			$return[] = $obj;
 		}
 
 		return $return;
@@ -214,6 +251,22 @@ class ilSelfEvaluationScaleUnit {
 	 */
 	public function getValue() {
 		return $this->value;
+	}
+
+
+	/**
+	 * @param int $position
+	 */
+	public function setPosition($position) {
+		$this->position = $position;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getPosition() {
+		return $this->position;
 	}
 
 

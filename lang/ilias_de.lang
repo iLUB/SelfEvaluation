@@ -32,8 +32,8 @@ outro#:#Abschliessender Text
 start_button#:#Start
 administration#:#Fragen bearbeiten
 actions#:#Aktionen
-edit_block#:#Bearbeiten
-delete_block#:#Löschen
+edit_block#:#Blockinformationen bearbeiten
+delete_block#:#Block Löschen
 update_block#:#Block bearbeiten
 update_block_button#:#Speichern
 qst_delete_block#:#Möchten Sie den folgenden Frageblock mit allen Fragen löschen?
@@ -121,3 +121,16 @@ new_uid#:#Neue Identifikation generieren
 uid_not_exists#:#Die eingegebene Identifikation existiert nicht
 question#:#Frage
 your_uid#:#Ihre Identifikation:
+
+multinput_value#:#Nummerischer Wert
+multinput_title#:#Bezeichnung
+sort_type#:#Sortierung
+sort_shuffle#:#Fragen pro Block mischen
+sort_manually#:#Reihenfolge der Fragen pro Block definieren
+display_type#:#Darstellung der Blocks
+single_page#:#Alle Blocks auf einer Seite
+multiple_pages#:#Eine Seite pro Block
+all_questions_shuffled#:#Alle Fragen blockübergreifend gemischt
+next_new#:#Weiter
+locked#:#Felder sind gesperrt
+feedback_status#:#100% abgedeckt

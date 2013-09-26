@@ -2,13 +2,13 @@
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 require_once('./Modules/SurveyQuestionPool/classes/class.ilMatrixRowWizardInputGUI.php');
-require_once(dirname(__FILE__).'/../class.ilObjSelfEvaluationGUI.php');
+require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationBlock.php');
 require_once('class.ilSelfEvaluationBlockTableGUI.php');
-require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestionTableGUI.php');
-require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestion.php');
-require_once(dirname(__FILE__).'/../Question/class.ilSelfEvaluationQuestionGUI.php');
-require_once(dirname(__FILE__).'/../Form/class.ilMatrixHeaderGUI.php');
+require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionTableGUI.php');
+require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
+require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionGUI.php');
+require_once(dirname(__FILE__) . '/../Form/class.ilMatrixHeaderGUI.php');
 /**
  * GUI-Class ilSelfEvaluationBlockGUI
  *
@@ -181,10 +181,6 @@ class ilSelfEvaluationBlockGUI {
 	}
 
 
-	public function setParentForm() {
-	}
-
-
 	/**
 	 * @param ilPropertyFormGUI $parent_form
 	 *
@@ -203,7 +199,11 @@ class ilSelfEvaluationBlockGUI {
 		$sc->setScale($this->object->getScale()->getUnitsAsArray());
 		$sc->setBlockInfo($this->object->getDescription());
 		$form->addItem($sc);
-		foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId()) as $qst) {
+		$questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId());
+		if ($this->parent->object->getSortType() == ilObjSelfEvaluation::SORT_SHUFFLE) {
+			shuffle($questions);
+		}
+		foreach ($questions as $qst) {
 			$qst_gui = new ilSelfEvaluationQuestionGUI($this->parent, $qst->getId(), $this->object->getId());
 			$qst_gui->getQuestionForm($form);
 		}

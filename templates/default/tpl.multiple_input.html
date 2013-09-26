@@ -1,24 +1,62 @@
 <script>
 	$(document).ready(function () {
-		$('img.add_button').click(function (e) {
-			$("div.multipleinput_new").last().clone().appendTo("div#input_colletion").show();
+		function handler(e) {
+			var last_value = parseInt($(".multipleinput_new").last().find('input').first().val());
+			if (last_value >= 0) {
+				var next_value = 1 + last_value;
+			} else {
+				next_value = '';
+			}
+
+			$('.multipleinput_new').last().clone().appendTo('#input_colletion').fadeIn(500);
+			$('.multipleinput_new').last().find('input').first().val(next_value);
+			$('.multipleinput_new').last().find('input').last().val('');
+
+			return false;
+		}
+
+
+		$('img.add_button').live("click", handler);
+
+
+		$('img.delete_button').click(function () {
+			var mydiff = $(this).parent().parent();
+			mydiff.children('input').last().val('');
+			mydiff.fadeOut(500);
+
 		});
 	});
 </script>
-<div id='input_colletion'>
-<!-- BEGIN input -->
-<div class='multipleinput' style="clear: both;">
-	<input {DISABLED} style='float: left' type='text' name='{VALUE_N}' value='{VALUE_V}'>
-	<input {DISABLED} style='float: left' type='text' name='{TITLE_N}' value='{TITLE_V}'>
-
-</div>
-<img class='add_button' src='{ADD_BUTTON}'><br>
-<!-- END input -->
-
-<div class='multipleinput_new' style="clear: both; ">
-	<input {DISABLED_N} style='float: left' type='text' name='{VALUE_N_NEW}' value='' placeholder="Key">
-	<input {DISABLED_N} style='float: left' type='text' name='{TITLE_N_NEW}' value='' placeholder="Value">
-</div>
-<img class='add_button' src='{ADD_BUTTON}'><br>
-
-</div>
+		<style>
+			.locked {
+				display: none;
+			}
+		</style>
+<table id='input_colletion'>
+	<!-- BEGIN input -->
+	<tr class='multipleinput_old fsxSortable'>
+		<td style="width: 30px" class="{LOCK_CSS}">
+			<img src="./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/move.png">
+		</td>
+		<td><input type="hidden" name="{POSTVAR}_position[]" value="{ID}"><input {DISABLED} style='float: left;'
+			type='text'
+			name='{VALUE_N}' value='{VALUE_V}'>
+		</td>
+		<td><input {DISABLED} style='float: left;' type='text' name='{TITLE_N}' value='{TITLE_V}'></td>
+		<td class="{LOCK_CSS}"><img style="display:block; float: left;" class='delete_button' src='{DELETE_BUTTON}'>
+		</td>
+	</tr>
+	<!-- END input -->
+	<!-- BEGIN new_input -->
+	<tr class='multipleinput_new'>
+		<td class="{LOCK_CSS}"></td>
+		<td><input {DISABLED_N} style='float: left' type='text' name='{VALUE_N_NEW}' value=''
+			placeholder="{PLACEHOLDER_VALUE}">
+		</td>
+		<td><input {DISABLED_N} style='float: left' type='text' name='{TITLE_N_NEW}' value=''
+			placeholder="{PLACEHOLDER_TITLE}">
+		</td>
+		<td class="{LOCK_CSS}"><img style="display:block; float: left;" class='add_button' src='{ADD_BUTTON}'></td>
+	</tr>
+	<!-- END new_input -->
+</table>

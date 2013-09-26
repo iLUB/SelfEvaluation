@@ -1,12 +1,11 @@
 <?php
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
-require_once(dirname(__FILE__).'/../class.ilObjSelfEvaluationGUI.php');
+require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
 require_once('class.ilSelfEvaluationQuestionTableGUI.php');
-require_once(dirname(__FILE__).'/../Block/class.ilSelfEvaluationBlock.php');
-require_once(dirname(__FILE__).'/../Form/class.ilMatrixFieldInputGUI.php');
-
+require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__) . '/../Form/class.ilMatrixFieldInputGUI.php');
 /**
  * GUI-Class ilSelfEvaluationQuestionGUI
  *
@@ -230,6 +229,33 @@ class ilSelfEvaluationQuestionGUI {
 		$te->setQuestion($this->object->getQuestionBody());
 		$te->setRequired(true);
 		$form->addItem($te);
+
+		return $form;
+	}
+
+
+	/**
+	 * @param ilObjSelfEvaluationGUI $parent
+	 * @param ilPropertyFormGUI      $form
+	 *
+	 * @return ilPropertyFormGUI
+	 */
+	public static function getAllQuestionsForms(ilObjSelfEvaluationGUI $parent, ilPropertyFormGUI &$form) {
+		$parent_id = $parent->object->getId();
+		$questions = array();
+		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($parent_id) as $block) {
+			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
+				$questions[] = $qst;
+			}
+		}
+		$sc = new ilMatrixHeaderGUI();
+		$sc->setScale($block->getScale()->getUnitsAsArray());
+		$form->addItem($sc);
+		shuffle($questions);
+		foreach ($questions as $qst) {
+			$qst_form = new self($parent, $qst->getId(), $block->getId());
+			$form = $qst_form->getQuestionForm($form);
+		}
 
 		return $form;
 	}

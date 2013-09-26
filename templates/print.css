@@ -1,0 +1,29 @@
+@media print {
+	body {
+		background-color: white;
+		background-image: none;
+	}
+
+	div.feedback {
+		page-break-before: always;
+	}
+
+	div.ilMainHeader, div.il_HeaderOuter, div.ilPermaLink, div.il_Footer {
+		display: none;
+	}
+
+	#mainspacekeeper, div.ilTabContentOuter {
+		box-shadow: none;
+		padding:    0;
+		margin:     0;
+	}
+
+	#mainspacekeeper {
+		background-color: white;
+	}
+
+	@page {
+		size:   29.7cm 21.00cm;
+		margin: 4cm 3cm 3cm 4cm;
+	}
+}

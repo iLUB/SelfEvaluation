@@ -49,6 +49,7 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
+	const DEV = true;
 	const DEBUG = false;
 	const RELOAD = false;
 	/**
@@ -101,16 +102,14 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->displayIdentifier();
 			$cmd = $this->ctrl->getCmd();
 			$next_class = $this->ctrl->getNextClass($this);
-			if (self::DEBUG) {
-				var_dump(array( 'next_class' => $next_class, 'cmd' => $cmd ));
-			}
-			if (self::RELOAD) {
-				$this->pl->update();
+			if (self::RELOAD OR $_GET['rl'] == 'true') {
+				$this->pl->updateLanguages();
 			}
 			$this->tpl->getStandardTemplate();
 			$this->setTitleAndDescription();
 			$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
 			$this->tpl->addCss($this->pl->getStyleSheetLocation('content.css'));
+			$this->tpl->addCss($this->pl->getStyleSheetLocation('print.css'), 'print');
 			$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/scripts.js');
 			$this->setTabs();
 			switch ($next_class) {
@@ -263,6 +262,25 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$te = new ilTextAreaInputGUI($this->txt('outro'), 'outro');
 		$te->setUseRte(true);
 		$this->form->addItem($te);
+		if (self::DEV) {
+			// Sorting
+			$se = new ilSelectInputGUI($this->pl->txt('sort_type'), 'sort_type');
+			$opt = array(
+				ilObjSelfEvaluation::SORT_MANUALLY => $this->pl->txt('sort_manually'),
+				ilObjSelfEvaluation::SORT_SHUFFLE => $this->pl->txt('sort_shuffle'),
+			);
+			$se->setOptions($opt);
+			$this->form->addItem($se);
+			// DisplayType
+			$se = new ilSelectInputGUI($this->pl->txt('display_type'), 'display_type');
+			$opt = array(
+				ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->pl->txt('single_page'),
+				ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->pl->txt('multiple_pages'),
+				ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->pl->txt('all_questions_shuffled'),
+			);
+			$se->setOptions($opt);
+			$this->form->addItem($se);
+		}
 		// Buttons
 		$this->form->addCommandButton('updateProperties', $this->txt('save'));
 		$this->form->setTitle($this->txt('edit_properties'));
@@ -281,6 +299,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['online'] = $this->object->getOnline();
 		$values['intro'] = $this->object->getIntro();
 		$values['outro'] = $this->object->getOutro();
+		$values['sort_type'] = $this->object->getSortType();
+		$values['display_type'] = $this->object->getDisplayType();
 		$this->form->setValuesByArray($values);
 	}
 
@@ -297,6 +317,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setOnline($this->form->getInput('online'));
 			$this->object->setIntro($this->form->getInput('intro'));
 			$this->object->setOutro($this->form->getInput('outro'));
+			if (self::DEV) {
+				$this->object->setSortType($this->form->getInput('sort_type'));
+				$this->object->setDisplayType($this->form->getInput('display_type'));
+			}
 			$this->object->update();
 			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'editProperties');

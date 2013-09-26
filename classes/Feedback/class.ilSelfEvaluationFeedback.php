@@ -212,7 +212,7 @@ class ilSelfEvaluationFeedback {
 	public static function _getFeedbackForPercentage($parent_id, $percentage) {
 		global $ilDB;
 		$q = 'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer')
-			. ' AND start_value < ' . $ilDB->quote($percentage, 'float')
+			. ' AND start_value <= ' . $ilDB->quote($percentage, 'float')
 			. ' AND end_value >= ' . $ilDB->quote($percentage, 'float');
 		$set = $ilDB->query($q);
 		while ($res = $ilDB->fetchObject($set)) {

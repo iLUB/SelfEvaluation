@@ -1,3 +1,5 @@
+@import url('print.css');
+
 div.new_block, div.block {
 	/*width: 60%;*/
 	clear: both;
@@ -95,6 +97,7 @@ div.feedback_ov_item, div.feedback_ov_item_blank {
 	float:                 left;
 	margin-right:          -2px;
 
+
 }
 
 div.feedback_ov_item_blank {
@@ -153,10 +156,14 @@ td.feedback_ov_item, td.feedback_ov_item_blank {
 
 }
 
-td.feedback_ov_item {
-	background-color: lightskyblue;
+td.feedback_ov_item, div.ui-slider-range {
+	background-color: rgb(208, 232, 255);
+	background-image: none;
 }
 
 td.feedback_ov_item_blank {
 	background-color: #D3D3D3;
 }
+
+
+

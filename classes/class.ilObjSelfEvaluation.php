@@ -44,8 +44,9 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	const TYPE_GROUP = 1;
 	const SORT_MANUALLY = 1;
 	const SORT_SHUFFLE = 2;
-	const DISPLAY_TYPE_SINGLE = 1;
-	const DISPLAY_TYPE_MULTIPLE = 2;
+	const DISPLAY_TYPE_SINGLE_PAGE = 1; // Single Page
+	const DISPLAY_TYPE_MULTIPLE_PAGES = 2; // Multiple Pages
+	const DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED = 3; // All Questions on one Page, shuffled
 	/**
 	 * @var bool
 	 */
@@ -61,7 +62,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	/**
 	 * @var int
 	 */
-	protected $display_type = self::DISPLAY_TYPE_SINGLE;
+	protected $display_type = self::DISPLAY_TYPE_SINGLE_PAGE;
 	/**
 	 * @var string
 	 */

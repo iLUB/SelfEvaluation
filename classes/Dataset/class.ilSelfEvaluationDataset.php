@@ -123,6 +123,11 @@ class ilSelfEvaluationDataset {
 
 
 	public function update() {
+		if ($this->getId() == 0) {
+			$this->create();
+
+			return true;
+		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
@@ -229,17 +234,20 @@ class ilSelfEvaluationDataset {
 
 
 	/**
-	 * @param bool $block_id
+	 * @param null $block_id
 	 *
-	 * @return ilSelfEvaluationFeedback[]
+	 * @return array
 	 */
-	public function getFeedbacksPerBlock($block_id = false) {
+	public function getFeedbacksPerBlock($block_id = NULL) {
 		$return = array();
 		foreach ($this->getPercentagePerBlock() as $k => $v) {
 			$return[$k] = ilSelfEvaluationFeedback::_getFeedbackForPercentage($k, $v);;
 		}
-
-		return $return;
+		if ($block_id) {
+			return $return[$block_id];
+		} else {
+			return $return;
+		}
 	}
 
 
@@ -279,6 +287,11 @@ class ilSelfEvaluationDataset {
 		}
 
 		return false;
+		//		$obj = new self();
+		//		$obj->setIdentifierId($identifier_id);
+		//		$obj->update();
+		//
+		//		return $obj;
 	}
 
 

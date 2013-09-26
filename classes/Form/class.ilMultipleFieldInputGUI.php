@@ -6,7 +6,7 @@ require_once('./Services/Form/classes/class.ilSubEnabledFormPropertyGUI.php');
 /**
  * Class ilMultipleTextInputGUI
  *
- * @author  Fabian Schmid <fs@studer-raimann.ch>
+ * @author  Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * @author  Oskar Truffer <ot@studer-raimann.ch>
  * @version $Id:
  */
@@ -19,42 +19,64 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 	/**
 	 * @var string
 	 */
-	protected $placeholder;
+	protected $field_name;
 	/**
-	 * @var bool
+	 * @var string
 	 */
-	protected $disableOldFields;
+	protected $placeholder_value = 'Value';
+	/**
+	 * @var string
+	 */
+	protected $placeholder_title = 'Title';
 
 
-	public function __construct($title, $post_var, $placeholder) {
+	/**
+	 * @param string $title
+	 * @param string $post_var
+	 * @param        $field_name
+	 */
+	public function __construct($title, $post_var, $field_name) {
 		parent::__construct($title, $post_var);
-		$this->placeholder = $placeholder;
+		$this->setFieldName($field_name);
 	}
 
 
+	/**
+	 * @return string
+	 */
 	public function getHtml() {
-		return $this->buildHTML();
-	}
-
-
-	private function buildHTML() {
 		$pl = new ilSelfEvaluationPlugin();
-		$tpl = $pl->getTemplate('default/tpl.multiple_input.html');
-		$tpl->setVariable('ADD_BUTTON', $pl->getDirectory() . '/templates/images/edit_add.png');
-		foreach ($this->values as $id => $value) {
-			$tpl->setCurrentBlock('input');
-			$tpl->setVariable('VALUE_N', $this->placeholder . '_old[value][' . $id . ']');
-			$tpl->setVariable('VALUE_V', $value['value']);
-			$tpl->setVariable('TITLE_N', $this->placeholder . '_old[title][' . $id . ']');
-			$tpl->setVariable('TITLE_V', $value['title']);
-			$tpl->setVariable('DISABLED', $this->getDisabled() ? 'disabled' : '');
+		$tpl = $pl->getTemplate('default/tpl.multiple_input.html', true, true);
+		$tpl->setVariable('LOCK_CSS', $this->getDisabled() ? 'locked' : '');
+		if ($this->getDisabled()) {
+			$this->setInfo($pl->txt('locked'));
+		}
+		if (count($this->getValues()) > 0) {
+			foreach ($this->getValues() as $id => $value) {
+				$tpl->setCurrentBlock('input');
+				$tpl->setVariable('DELETE_BUTTON', $pl->getDirectory() . '/templates/images/edit_remove.png');
+				$tpl->setVariable('VALUE_N', $this->getFieldName() . '_old[value][' . $id . ']');
+				$tpl->setVariable('VALUE_V', $value['value']);
+				$tpl->setVariable('TITLE_N', $this->getFieldName() . '_old[title][' . $id . ']');
+				$tpl->setVariable('TITLE_V', $value['title']);
+				$tpl->setVariable('DISABLED', $this->getDisabled() ? 'disabled' : '');
+				$tpl->setVariable('POSTVAR', $this->getPostVar());
+				$tpl->setVariable('LOCK_CSS', $this->getDisabled() ? 'locked' : '');
+				$tpl->setVariable('ID', $id);
+				$tpl->parseCurrentBlock();
+			}
+		}
+		if (! $this->getDisabled()) {
+			$tpl->setCurrentBlock('new_input');
+			$tpl->setVariable('ADD_BUTTON', $pl->getDirectory() . '/templates/images/edit_add.png');
+			$tpl->setVariable('VALUE_N_NEW', $this->getFieldName() . '_new[value][]');
+			$tpl->setVariable('TITLE_N_NEW', $this->getFieldName() . '_new[title][]');
+			$tpl->setVariable('DISABLED_N', $this->getDisabled() ? 'disabled' : '');
+			$tpl->setVariable('PLACEHOLDER_VALUE', $this->getPlaceholderValue());
+			$tpl->setVariable('PLACEHOLDER_TITLE', $this->getPlaceholderTitle());
+			$tpl->setVariable('LOCK_CSS', $this->getDisabled() ? 'locked' : '');
 			$tpl->parseCurrentBlock();
 		}
-		$tpl->setCurrentBlock('new_input');
-		$tpl->setVariable('VALUE_N_NEW', $this->placeholder . '_new[value][]');
-		$tpl->setVariable('TITLE_N_NEW', $this->placeholder . '_new[title][]');
-		$tpl->setVariable('DISABLED_N', $this->getDisabled() ? 'disabled' : '');
-		$tpl->parseCurrentBlock();
 
 		return $tpl->get();
 	}
@@ -65,23 +87,74 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 	 */
 	public function setValueByArray($value) {
 		parent::setValueByArray($value);
-		$this->values = is_array($value[$this->getPostVar()]) ? $value[$this->getPostVar()] : array();
+		$this->setValues(is_array($value[$this->getPostVar()]) ? $value[$this->getPostVar()] : array());
+	}
+
+
+	//
+	// Setter&Getter
+	//
+	/**
+	 * @param array $values
+	 */
+	public function setValues($values) {
+		$this->values = $values;
 	}
 
 
 	/**
-	 * @param boolean $disableOldFields
+	 * @return array
 	 */
-	public function setDisableOldFields($disableOldFields) {
-		$this->disableOldFields = $disableOldFields;
+	public function getValues() {
+		return $this->values;
 	}
 
 
 	/**
-	 * @return boolean
+	 * @param string $field_name
 	 */
-	public function getDisableOldFields() {
-		return $this->disableOldFields;
+	public function setFieldName($field_name) {
+		$this->field_name = $field_name;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getFieldName() {
+		return $this->field_name;
+	}
+
+
+	/**
+	 * @param string $placeholder_title
+	 */
+	public function setPlaceholderTitle($placeholder_title) {
+		$this->placeholder_title = $placeholder_title;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getPlaceholderTitle() {
+		return $this->placeholder_title;
+	}
+
+
+	/**
+	 * @param string $placeholder_value
+	 */
+	public function setPlaceholderValue($placeholder_value) {
+		$this->placeholder_value = $placeholder_value;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getPlaceholderValue() {
+		return $this->placeholder_value;
 	}
 }
 
