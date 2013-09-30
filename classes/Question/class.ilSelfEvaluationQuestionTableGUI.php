@@ -62,7 +62,8 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		if ($this->block->isBlockSortable()) {
 			$this->tpl->setVariable('ID', $obj->getId());
 		}
-		$this->tpl->setVariable('TITLE', $obj->getTitle());
+		$this->tpl->setVariable('TITLE', $obj->getTitle() ? $obj->getTitle() :
+			$this->pl->txt('question') . ' ID ' . $a_set['id']);
 		$this->tpl->setVariable('EDIT_LINK', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
 		$this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
 		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse() ? ilUtil::getImagePath('icon_ok.png') : ilUtil::getImagePath('icon_not_ok.png'));
