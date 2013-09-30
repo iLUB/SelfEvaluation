@@ -62,7 +62,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	/**
 	 * @var int
 	 */
-	protected $display_type = self::DISPLAY_TYPE_SINGLE_PAGE;
+	protected $display_type = self::DISPLAY_TYPE_MULTIPLE_PAGES;
 	/**
 	 * @var string
 	 */

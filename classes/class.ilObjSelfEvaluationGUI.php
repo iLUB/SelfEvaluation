@@ -49,7 +49,7 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
-	const DEV = true;
+	const DEV = false;
 	const DEBUG = false;
 	const RELOAD = false;
 	/**
@@ -264,15 +264,15 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$te = new ilTextAreaInputGUI($this->txt('outro'), 'outro');
 		$te->setUseRte(true);
 		$this->form->addItem($te);
+		// Sorting
+		$se = new ilSelectInputGUI($this->pl->txt('sort_type'), 'sort_type');
+		$opt = array(
+			ilObjSelfEvaluation::SORT_MANUALLY => $this->pl->txt('sort_manually'),
+			ilObjSelfEvaluation::SORT_SHUFFLE => $this->pl->txt('sort_shuffle'),
+		);
+		$se->setOptions($opt);
+		$this->form->addItem($se);
 		if (self::DEV) {
-			// Sorting
-			$se = new ilSelectInputGUI($this->pl->txt('sort_type'), 'sort_type');
-			$opt = array(
-				ilObjSelfEvaluation::SORT_MANUALLY => $this->pl->txt('sort_manually'),
-				ilObjSelfEvaluation::SORT_SHUFFLE => $this->pl->txt('sort_shuffle'),
-			);
-			$se->setOptions($opt);
-			$this->form->addItem($se);
 			// DisplayType
 			$se = new ilSelectInputGUI($this->pl->txt('display_type'), 'display_type');
 			$opt = array(
