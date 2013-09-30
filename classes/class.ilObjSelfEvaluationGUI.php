@@ -163,7 +163,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->access = $ilAccess;
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
-		if (self::DEBUG) {
+		if (self::DEBUG OR $_GET['rl'] == 'true') {
 			$this->pl->updateLanguages();
 		}
 	}
