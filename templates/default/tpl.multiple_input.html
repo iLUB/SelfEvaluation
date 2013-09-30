@@ -11,6 +11,7 @@
 			$('.multipleinput_new').last().clone().appendTo('#input_colletion').fadeIn(500);
 			$('.multipleinput_new').last().find('input').first().val(next_value);
 			$('.multipleinput_new').last().find('input').last().val('');
+			$('.multipleinput_new').last().find('input').last().focus();
 
 			return false;
 		}
@@ -27,11 +28,11 @@
 		});
 	});
 </script>
-		<style>
-			.locked {
-				display: none;
-			}
-		</style>
+<style>
+	.locked {
+		display: none;
+	}
+</style>
 <table id='input_colletion'>
 	<!-- BEGIN input -->
 	<tr class='multipleinput_old fsxSortable'>

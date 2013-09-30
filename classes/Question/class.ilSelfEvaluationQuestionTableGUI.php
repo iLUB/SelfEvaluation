@@ -2,7 +2,7 @@
 require_once('./Services/Table/classes/class.ilTable2GUI.php');
 require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
-
+require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * TableGUI ilSelfEvaluationQuestionTableGUI
  *
@@ -30,7 +30,6 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		$this->block = $block;
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 		$this->setTitle($this->pl->txt('question_table_title'));
-		//
 		// Columns
 		if ($this->block->isBlockSortable()) {
 			$this->addColumn('', 'position', '20px');
@@ -48,7 +47,7 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		// Header
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', NULL);
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $block->getId());
-		$this->addHeaderCommand($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'addQuestion'), $this->pl->txt('add_new_question'));
+		$this->addHeaderCommand(ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'addQuestion')), $this->pl->txt('add_new_question'));
 		$this->setRowTemplate('tpl.template_question_row.html', $this->pl->getDirectory());
 		$this->setData(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId(), true));
 	}
@@ -64,13 +63,14 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 			$this->tpl->setVariable('ID', $obj->getId());
 		}
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
+		$this->tpl->setVariable('EDIT_LINK', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
 		$this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
-		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse()?ilUtil::getImagePath('icon_ok.png'):ilUtil::getImagePath('icon_not_ok.png'));
+		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse() ? ilUtil::getImagePath('icon_ok.png') : ilUtil::getImagePath('icon_not_ok.png'));
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('block_' . $obj->getId());
-		$ac->addItem($this->pl->txt('edit_question'), 'edit_question', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion'));
-		$ac->addItem($this->pl->txt('delete_question'), 'delete_question', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'deleteQuestion'));
+		$ac->addItem($this->pl->txt('edit_question'), 'edit_question', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
+		$ac->addItem($this->pl->txt('delete_question'), 'delete_question', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'deleteQuestion')));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//
 		$this->tpl->setVariable('ACTIONS', $ac->getHTML());

@@ -9,6 +9,7 @@ require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionTab
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilMatrixHeaderGUI.php');
+require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * GUI-Class ilSelfEvaluationBlockGUI
  *
@@ -20,6 +21,7 @@ require_once(dirname(__FILE__) . '/../Form/class.ilMatrixHeaderGUI.php');
  */
 class ilSelfEvaluationBlockGUI {
 
+	const AJAX = true;
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -51,7 +53,6 @@ class ilSelfEvaluationBlockGUI {
 
 	public function executeCommand() {
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
-		$this->ctrl->saveParameter($this, 'position');
 		$this->ctrl->saveParameter($this, 'block_id');
 		$this->tabs_gui->setTabActive('administration');
 		switch ($cmd) {
@@ -100,6 +101,10 @@ class ilSelfEvaluationBlockGUI {
 	public function addBlock() {
 		$this->initForm();
 		$this->tpl->setContent($this->form->getHTML());
+		if (self::AJAX) {
+			$this->tpl->hide = true;
+			echo $this->form->getHTML();
+		}
 	}
 
 
@@ -127,12 +132,12 @@ class ilSelfEvaluationBlockGUI {
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('description'));
-			$this->object->setPosition($_GET['position']);
 			$this->object->setParentId($this->parent->object->getId());
 			$this->object->create();
 			ilUtil::sendSuccess($this->pl->txt('msg_block_created'));
 			$this->cancel();
 		}
+		$this->tpl->setContent($this->form->getHTML());
 	}
 
 
@@ -140,6 +145,10 @@ class ilSelfEvaluationBlockGUI {
 		$this->initForm('update');
 		$this->setObjectValues();
 		$this->tpl->setContent($this->form->getHTML());
+		if (self::AJAX) {
+			$this->tpl->hide = true;
+			echo $this->form->getHTML();
+		}
 	}
 
 
@@ -160,6 +169,7 @@ class ilSelfEvaluationBlockGUI {
 			ilUtil::sendSuccess($this->pl->txt('msg_block_updated'));
 			$this->cancel();
 		}
+		$this->tpl->setContent($this->form->getHTML());
 	}
 
 
@@ -171,6 +181,10 @@ class ilSelfEvaluationBlockGUI {
 		$conf->setConfirm($this->pl->txt('delete_block'), 'deleteObject');
 		$conf->addItem('block_id', $this->object->getId(), $this->object->getTitle());
 		$this->tpl->setContent($conf->getHTML());
+		if (self::AJAX) {
+			$this->tpl->hide = true;
+			echo $conf->getHTML();
+		}
 	}
 
 
@@ -214,8 +228,9 @@ class ilSelfEvaluationBlockGUI {
 
 	public function showContent() {
 		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
+		$async = new ilOverlayRequestGUI();
 		$table = new ilSelfEvaluationBlockTableGUI($this->parent, 'showContent');
-		$this->tpl->setContent($table->getHTML());
+		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 	}
 
 

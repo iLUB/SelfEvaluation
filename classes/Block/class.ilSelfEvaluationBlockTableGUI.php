@@ -4,6 +4,7 @@ require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvan
 require_once('class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
 require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedback.php');
+require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * TableGUI ilSelfEvaluationBlockTableGUI
  *
@@ -39,7 +40,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('feedback_status'), false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), false, 'auto');
 		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', NULL);
-		$this->addHeaderCommand($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addBlock'), $this->pl->txt('add_new_block'));
+		$this->addHeaderCommand(ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addBlock')), $this->pl->txt('add_new_block'));
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationBlockGUI'));
 		$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
 		$this->setRowTemplate('tpl.template_block_row.html', $this->pl->getDirectory());
@@ -58,6 +59,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		// Row
 		$this->tpl->setVariable('ID', $obj->getId());
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
+		$this->tpl->setVariable('EDIT_LINK', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock')));
 		$this->tpl->setVariable('DESCRIPTION', $obj->getDescription());
 		$this->tpl->setVariable('QUESTIONS_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent'));
 		$this->tpl->setVariable('FEEDBACK_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects'));
@@ -67,8 +69,8 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('block_' . $obj->getId());
-		$ac->addItem($this->pl->txt('edit_block'), 'edit_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock'));
-		$ac->addItem($this->pl->txt('delete_block'), 'delete_block', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'deleteBlock'));
+		$ac->addItem($this->pl->txt('edit_block'), 'edit_block', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock')));
+		$ac->addItem($this->pl->txt('delete_block'), 'delete_block', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'deleteBlock')));
 		$ac->addItem($this->pl->txt('edit_questions'), 'edit_questions', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent'));
 		$ac->addItem($this->pl->txt('edit_feedback'), 'edit_feedbacks', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI'));
 		$ac->setListTitle($this->pl->txt('actions'));

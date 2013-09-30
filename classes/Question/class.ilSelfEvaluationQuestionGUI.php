@@ -6,6 +6,7 @@ require_once('class.ilSelfEvaluationQuestion.php');
 require_once('class.ilSelfEvaluationQuestionTableGUI.php');
 require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilMatrixFieldInputGUI.php');
+require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * GUI-Class ilSelfEvaluationQuestionGUI
  *
@@ -17,6 +18,7 @@ require_once(dirname(__FILE__) . '/../Form/class.ilMatrixFieldInputGUI.php');
  */
 class ilSelfEvaluationQuestionGUI {
 
+	const AJAX = true;
 	const POSTVAR_PREFIX = 'qst_';
 	/**
 	 * @var ilTabsGUI
@@ -98,9 +100,12 @@ class ilSelfEvaluationQuestionGUI {
 
 
 	public function addQuestion() {
-		$this->tabs_gui->setTabActive('administration');
 		$this->initQuestionMForm();
 		$this->tpl->setContent($this->form->getHTML());
+		if (self::AJAX) {
+			$this->tpl->hide = true;
+			echo $this->form->getHTML();
+		}
 	}
 
 
@@ -142,6 +147,7 @@ class ilSelfEvaluationQuestionGUI {
 			ilUtil::sendSuccess($this->pl->txt('msg_question_created'));
 			$this->cancel();
 		}
+		$this->tpl->setContent($this->form->getHTML());
 	}
 
 
@@ -149,6 +155,10 @@ class ilSelfEvaluationQuestionGUI {
 		$this->initQuestionMForm('update');
 		$this->setObjectValues();
 		$this->tpl->setContent($this->form->getHTML());
+		if (self::AJAX) {
+			$this->tpl->hide = true;
+			echo $this->form->getHTML();
+		}
 	}
 
 
@@ -171,6 +181,7 @@ class ilSelfEvaluationQuestionGUI {
 			ilUtil::sendSuccess($this->pl->txt('msg_question_updated'));
 			$this->cancel();
 		}
+		$this->tpl->setContent($this->form->getHTML());
 	}
 
 
@@ -182,6 +193,10 @@ class ilSelfEvaluationQuestionGUI {
 		$conf->setConfirm($this->pl->txt('delete_question'), 'deleteObject');
 		$conf->addItem('question_id', $this->object->getId(), $this->object->getTitle());
 		$this->tpl->setContent($conf->getHTML());
+		if (self::AJAX) {
+			$this->tpl->hide = true;
+			echo $conf->getHTML();
+		}
 	}
 
 
@@ -196,9 +211,10 @@ class ilSelfEvaluationQuestionGUI {
 		if ($this->block->isBlockSortable()) {
 			$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
 		}
+		$async = new ilOverlayRequestGUI();
 		$this->toolbar->addButton($this->pl->txt('back_to_blocks'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		$table = new ilSelfEvaluationQuestionTableGUI($this, 'showContent', $this->block);
-		$this->tpl->setContent($table->getHTML());
+		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 	}
 
 

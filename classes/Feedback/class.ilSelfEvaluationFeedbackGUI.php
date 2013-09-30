@@ -6,6 +6,7 @@ require_once('class.ilSelfEvaluationFeedbackTableGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilSliderInputGUI.php');
 require_once('./Services/Chart/classes/class.ilChart.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
+require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * GUI-Class ilSelfEvaluationFeedbackGUI
  *
@@ -111,10 +112,11 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	public function listObjects() {
+		$async = new ilOverlayRequestGUI();
 		$this->toolbar->addButton($this->pl->txt('back_to_blocks'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		$ov = $this->getOverview();
 		$table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects');
-		$this->tpl->setContent($ov->get() . $table->getHTML());
+		$this->tpl->setContent($async->getHTML() . $ov->get() . $table->getHTML());
 	}
 
 
@@ -124,6 +126,8 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->object->setEndValue(ilSelfEvaluationFeedback::_getNextMaxValueForParentId($this->block->getId(), $this->object->getStartValue()));
 		$this->setValues();
 		$this->tpl->setContent($this->form->getHTML());
+		//		$this->tpl->hide = true;
+		//		echo $this->form->getHTML();
 	}
 
 
@@ -139,6 +143,7 @@ class ilSelfEvaluationFeedbackGUI {
 			'next_from' => $next_min,
 			'next_to' => $next_max
 		));
+		$this->tpl->hide = true;
 		exit;
 	}
 
@@ -317,13 +322,15 @@ class ilSelfEvaluationFeedbackGUI {
 			case 'blank':
 				$this->ctrl->setParameter($this, 'feedback_id', NULL);
 				$this->ctrl->setParameter($this, 'start_value', $value);
-				$href = $this->ctrl->getLinkTarget($this, 'addNew');
+				$href = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTarget($this, 'addNew'));
+				$href = ($this->ctrl->getLinkTarget($this, 'addNew'));
 				$css = '_blank';
 				$title = $this->pl->txt('insert_feedback');
 				break;
 			case 'fb':
 				$this->ctrl->setParameter($this, 'feedback_id', $value);
-				$href = $this->ctrl->getLinkTarget($this, 'editFeedback');
+				$href = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTarget($this, 'editFeedback'));
+				$href = ($this->ctrl->getLinkTarget($this, 'editFeedback'));
 				break;
 		}
 		$this->total += $width;

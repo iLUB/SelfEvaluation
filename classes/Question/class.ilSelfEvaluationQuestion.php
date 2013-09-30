@@ -25,7 +25,7 @@ class ilSelfEvaluationQuestion {
 	/**
 	 * @var int
 	 */
-	protected $position = 0;
+	protected $position = 99;
 	/**
 	 * @var bool
 	 */
@@ -46,6 +46,7 @@ class ilSelfEvaluationQuestion {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
+		// $this->updateDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -103,6 +104,34 @@ class ilSelfEvaluationQuestion {
 	}
 
 
+	final function updateDB() {
+		if (! $this->db->tableExists(self::TABLE_NAME)) {
+			$this->initDB();
+
+			return true;
+		}
+		foreach ($this->getArrayForDb() as $k => $v) {
+			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
+				$field = array(
+					'type' => $v[0],
+				);
+				switch ($v[0]) {
+					case 'integer':
+						$field['length'] = 4;
+						break;
+					case 'text':
+						$field['length'] = 1024;
+						break;
+				}
+				if ($k == 'id') {
+					$field['notnull'] = true;
+				}
+				$this->db->addTableColumn(self::TABLE_NAME, $k, $field);
+			}
+		}
+	}
+
+
 	final private function resetDB() {
 		$this->db->dropTable(self::TABLE_NAME);
 		$this->initDB();
@@ -116,6 +145,7 @@ class ilSelfEvaluationQuestion {
 			return true;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
+		$this->setPosition(self::_getNextPosition($this->getParentId()));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
 	}
 
@@ -130,6 +160,11 @@ class ilSelfEvaluationQuestion {
 
 
 	public function update() {
+		if ($this->getId() == 0) {
+			$this->create();
+
+			return true;
+		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
@@ -205,6 +240,23 @@ class ilSelfEvaluationQuestion {
 
 
 	/**
+	 * @param $parent_id
+	 *
+	 * @return int
+	 */
+	public static function _getNextPosition($parent_id) {
+		global $ilDB;
+		$set = $ilDB->query('SELECT MAX(position) next_pos FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
+		. $ilDB->quote($parent_id, 'integer'));
+		while ($rec = $ilDB->fetchObject($set)) {
+			return $rec->next_pos + 1;
+		}
+
+		return 1;
+	}
+
+
+	/**
 	 * @param int $id
 	 */
 	public function setId($id) {
@@ -217,6 +269,38 @@ class ilSelfEvaluationQuestion {
 	 */
 	public function getId() {
 		return $this->id;
+	}
+
+
+	/**
+	 * @param int $position
+	 */
+	public function setPosition($position) {
+		$this->position = $position;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getPosition() {
+		return $this->position;
+	}
+
+
+	/**
+	 * @param boolean $is_inverse
+	 */
+	public function setIsInverse($is_inverse) {
+		$this->is_inverse = $is_inverse;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getIsInverse() {
+		return $this->is_inverse;
 	}
 
 
@@ -265,38 +349,6 @@ class ilSelfEvaluationQuestion {
 	 */
 	public function getTitle() {
 		return $this->title;
-	}
-
-
-	/**
-	 * @param boolean $is_inverse
-	 */
-	public function setIsInverse($is_inverse) {
-		$this->is_inverse = $is_inverse;
-	}
-
-
-	/**
-	 * @return boolean
-	 */
-	public function getIsInverse() {
-		return $this->is_inverse;
-	}
-
-
-	/**
-	 * @param int $position
-	 */
-	public function setPosition($position) {
-		$this->position = $position;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getPosition() {
-		return $this->position;
 	}
 
 

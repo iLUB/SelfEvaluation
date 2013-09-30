@@ -139,7 +139,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 					$this->ctrl->forwardCommand($gui);
 					break;
 			}
-			$this->tpl->show();
+			if ($this->tpl->hide === false OR $this->tpl->hide === NULL) {
+				$this->tpl->show();
+			}
 
 			return true;
 		} else {
