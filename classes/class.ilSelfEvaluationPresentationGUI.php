@@ -182,7 +182,9 @@ class ilSelfEvaluationPresentationGUI {
 				$knob = $this->pl->getTemplate('default/tpl.knob.html', false, false);
 				$knob->setVariable('PAGE', $page);
 				$knob->setVariable('MAX', $last_page);
-				$this->tpl->setRightContent($knob->get());
+				if ($last_page > 1) {
+					$this->tpl->setRightContent($knob->get());
+				}
 				$this->ctrl->setParameter($this, 'page', $page);
 				if ($page < $last_page) {
 					$this->form->addCommandButton($mode . 'NextPage', $this->pl->txt('next_' . $mode));

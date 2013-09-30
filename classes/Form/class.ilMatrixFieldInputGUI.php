@@ -63,7 +63,6 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 	public function setValueByArray($value) {
 		parent::setValueByArray($value);
 		$this->setValue($value[$this->getPostVar()]);
-		//$this->values = is_array($value[$this->getPostVar()]) ? $value[$this->getPostVar()] : array();
 	}
 
 

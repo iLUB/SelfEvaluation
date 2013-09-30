@@ -40,6 +40,8 @@ ul.matrix, ul.matrix li {
 ul.matrix {
 	border-top:    1px dotted #E8E8E8;
 	border-bottom: 1px dotted #E8E8E8;
+	margin-bottom: 15px;
+	margin-top: 5px;
 
 }
 

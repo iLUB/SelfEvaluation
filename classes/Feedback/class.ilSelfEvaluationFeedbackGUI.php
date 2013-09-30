@@ -51,10 +51,6 @@ class ilSelfEvaluationFeedbackGUI {
 		} else {
 			$this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
 		}
-		// jQuery
-		$this->tpl->addCss($this->pl->getDirectory()
-		. '/templates/jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.min.css');
-		//		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js');
 		$this->tpl->addJavaScript($this->pl->getDirectory()
 		. '/templates/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js');
 	}
@@ -113,6 +109,7 @@ class ilSelfEvaluationFeedbackGUI {
 
 	public function listObjects() {
 		$async = new ilOverlayRequestGUI();
+//		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addNew'));
 		$this->toolbar->addButton($this->pl->txt('back_to_blocks'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		$ov = $this->getOverview();
 		$table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects');
@@ -126,8 +123,6 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->object->setEndValue(ilSelfEvaluationFeedback::_getNextMaxValueForParentId($this->block->getId(), $this->object->getStartValue()));
 		$this->setValues();
 		$this->tpl->setContent($this->form->getHTML());
-		//		$this->tpl->hide = true;
-		//		echo $this->form->getHTML();
 	}
 
 
@@ -288,7 +283,7 @@ class ilSelfEvaluationFeedbackGUI {
 			$min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $fb->getEndValue());
 		}
 		if ($min != 100 AND is_object($fb)) {
-			$this->parseOverviewBlock('blank', 99 - $min, $min);
+			$this->parseOverviewBlock('blank', 100 - $min, $min);
 		}
 
 		return $this->ov;

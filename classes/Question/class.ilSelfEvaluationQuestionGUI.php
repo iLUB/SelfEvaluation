@@ -18,7 +18,6 @@ require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
  */
 class ilSelfEvaluationQuestionGUI {
 
-	const AJAX = true;
 	const POSTVAR_PREFIX = 'qst_';
 	/**
 	 * @var ilTabsGUI
@@ -102,10 +101,6 @@ class ilSelfEvaluationQuestionGUI {
 	public function addQuestion() {
 		$this->initQuestionMForm();
 		$this->tpl->setContent($this->form->getHTML());
-		if (self::AJAX) {
-			$this->tpl->hide = true;
-			echo $this->form->getHTML();
-		}
 	}
 
 
@@ -155,10 +150,6 @@ class ilSelfEvaluationQuestionGUI {
 		$this->initQuestionMForm('update');
 		$this->setObjectValues();
 		$this->tpl->setContent($this->form->getHTML());
-		if (self::AJAX) {
-			$this->tpl->hide = true;
-			echo $this->form->getHTML();
-		}
 	}
 
 
@@ -193,10 +184,6 @@ class ilSelfEvaluationQuestionGUI {
 		$conf->setConfirm($this->pl->txt('delete_question'), 'deleteObject');
 		$conf->addItem('question_id', $this->object->getId(), $this->object->getTitle());
 		$this->tpl->setContent($conf->getHTML());
-		if (self::AJAX) {
-			$this->tpl->hide = true;
-			echo $conf->getHTML();
-		}
 	}
 
 
@@ -212,6 +199,7 @@ class ilSelfEvaluationQuestionGUI {
 			$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
 		}
 		$async = new ilOverlayRequestGUI();
+		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addQuestion'));
 		$this->toolbar->addButton($this->pl->txt('back_to_blocks'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		$table = new ilSelfEvaluationQuestionTableGUI($this, 'showContent', $this->block);
 		$this->tpl->setContent($async->getHTML() . $table->getHTML());

@@ -4,8 +4,14 @@
 			var replacer = new RegExp('amp;', 'g');
 			link = link.replace(replacer, '');
 
-			$("#result").load(link, function () {
+			$("#result").load(link + ' div.ilTabContentInner', function () {
 				$('#fsxOverlay').fadeIn(300);
+				$.getScript( link, function( data, textStatus, jqxhr ) {
+					console.log( data ); // Data returned
+					console.log( textStatus ); // Success
+					console.log( jqxhr.status ); // 200
+					console.log( "Load was performed." );
+				});
 			});
 
 		}
@@ -16,7 +22,19 @@
 			$('#fsxOverlay').fadeOut(300);
 		}
 	});
-</script>
+
+
+</script><!-- BEGIN addnew -->
+<script type="text/javascript">
+	$(window).keydown(function (e) {
+		if (e.metaKey && e.keyCode == 78) {
+			// window.open('{ADD_NEW}');
+			$.fn.{FUNCTION_NAME}('{ADD_NEW}');
+			event.preventDefault();
+			return false;
+		}
+	});
+</script><!-- END addnew -->
 <style>
 	#fsxOverlay {
 		width:            100%;
@@ -34,7 +52,7 @@
 		margin-left:      auto;
 		margin-right:     auto;
 		margin-top:       300px;
-		background-color: green;
+		/*background-color: green;*/
 	}
 
 	#result div.ilForm, #result div.ilTableOuter {

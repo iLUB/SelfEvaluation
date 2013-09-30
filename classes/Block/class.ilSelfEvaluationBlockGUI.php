@@ -21,7 +21,6 @@ require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
  */
 class ilSelfEvaluationBlockGUI {
 
-	const AJAX = true;
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -101,10 +100,6 @@ class ilSelfEvaluationBlockGUI {
 	public function addBlock() {
 		$this->initForm();
 		$this->tpl->setContent($this->form->getHTML());
-		if (self::AJAX) {
-			$this->tpl->hide = true;
-			echo $this->form->getHTML();
-		}
 	}
 
 
@@ -145,10 +140,6 @@ class ilSelfEvaluationBlockGUI {
 		$this->initForm('update');
 		$this->setObjectValues();
 		$this->tpl->setContent($this->form->getHTML());
-		if (self::AJAX) {
-			$this->tpl->hide = true;
-			echo $this->form->getHTML();
-		}
 	}
 
 
@@ -181,10 +172,6 @@ class ilSelfEvaluationBlockGUI {
 		$conf->setConfirm($this->pl->txt('delete_block'), 'deleteObject');
 		$conf->addItem('block_id', $this->object->getId(), $this->object->getTitle());
 		$this->tpl->setContent($conf->getHTML());
-		if (self::AJAX) {
-			$this->tpl->hide = true;
-			echo $conf->getHTML();
-		}
 	}
 
 
@@ -229,6 +216,7 @@ class ilSelfEvaluationBlockGUI {
 	public function showContent() {
 		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
 		$async = new ilOverlayRequestGUI();
+		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addBlock'));
 		$table = new ilSelfEvaluationBlockTableGUI($this->parent, 'showContent');
 		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 	}
