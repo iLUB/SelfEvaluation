@@ -13,7 +13,8 @@ require_once('class.ilSelfEvaluationPlugin.php');
  *
  */
 class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
-
+	const TYPE_TEXT = 'ilTextInputGUI';
+	const TYPE_CHECKBOX = 'ilCheckboxInputGUI';
 	/**
 	 * @var ilSelfEvaluationConfig
 	 */
@@ -40,6 +41,9 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 		$this->tpl = $tpl;
 		$this->tabs = $ilTabs;
 		$this->pl = new ilSelfEvaluationPlugin();
+		if($_GET['rl'] == 'true') {
+			$this->pl->updateLanguages();
+		}
 		$this->object = new ilSelfEvaluationConfig($this->pl->getConfigTableName());
 	}
 
@@ -49,8 +53,8 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 	 */
 	public function getFields() {
 		$this->fields = array(
-			'container' => array(
-				'type' => 'ilTextInputGUI',
+			'async' => array(
+				'type' => self::TYPE_CHECKBOX,
 				'info' => false,
 				'subelements' => NULL
 			),

@@ -8,7 +8,6 @@ require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
  */
 class ilOverlayRequestGUI {
 
-	const AJAX = true;
 	const FUNCTION_NAME = 'overlayRequest';
 	/**
 	 * @var string
@@ -67,7 +66,8 @@ class ilOverlayRequestGUI {
 	 * @return string
 	 */
 	public static function getLink($link = '') {
-		if (self::AJAX) {
+		$pl = new ilSelfEvaluationPlugin();
+		if ($pl->getConfigObject()->getAsync()) {
 			return 'javascript:$.fn.' . self::FUNCTION_NAME . '(\'' . $link . '\');';
 		} else {
 			return $link;

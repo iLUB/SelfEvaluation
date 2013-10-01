@@ -1,6 +1,6 @@
 <?php
 $id = 'xsev';
-$version = '0.0.44';
+$version = '1.0.00';
 $ilias_min_version = '4.3.0';
 $ilias_max_version = '4.4.999';
 $responsible = 'Fabian Schmid';

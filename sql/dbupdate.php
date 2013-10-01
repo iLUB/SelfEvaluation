@@ -6,6 +6,7 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
 $pl = new ilSelfEvaluationPlugin();
 $conf = $pl->getConfigObject();
 $conf->initDB();
+$conf->setAsync(true);
 ?>
 <#2>
 <?php

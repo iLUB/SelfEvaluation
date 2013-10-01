@@ -50,7 +50,7 @@ class ilSelfEvaluationFeedback {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
-		$this->updateDB();
+//		$this->updateDB();
 		if ($id != 0) {
 			$this->read();
 		}

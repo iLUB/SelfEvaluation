@@ -134,3 +134,6 @@ all_questions_shuffled#:#Alle Fragen blockübergreifend gemischt
 next_new#:#Weiter
 locked#:#Felder sind gesperrt
 feedback_status#:#100% abgedeckt
+
+async#:#Asynchrone Darstellung der Input-Masken
+configuration#:#Konfiguration
