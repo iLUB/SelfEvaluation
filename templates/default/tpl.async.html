@@ -4,16 +4,14 @@
 			var replacer = new RegExp('amp;', 'g');
 			link = link.replace(replacer, '');
 
-			$.get(link, function (data) {
-
-				$('#result').html($('<div>lorem</div>').html(data).find('div.ilTabContentInner').clone());
-				$('#fsxOverlay').fadeIn(300);
-			});
-
-
-//			$("#result").load(link + ' div.ilTabContentInner', function () {
+//			$.get(link, function (data) {
+//				$('#result').html($('<div>lorem</div>').html(data).find('div.ilTabContentInner').clone());
 //				$('#fsxOverlay').fadeIn(300);
 //			});
+
+			$("#result").load(link + ' div.ilTabContentInner', function () {
+				$('#fsxOverlay').fadeIn(300);
+			});
 		}
 	})(jQuery);
 
