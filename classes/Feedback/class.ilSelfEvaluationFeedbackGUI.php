@@ -52,7 +52,7 @@ class ilSelfEvaluationFeedbackGUI {
 			$this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
 		}
 		$this->tpl->addJavaScript($this->pl->getDirectory()
-		. '/templates/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js');
+		. '/templates/js/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js');
 
 	}
 

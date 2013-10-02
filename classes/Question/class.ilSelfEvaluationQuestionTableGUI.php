@@ -26,7 +26,7 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		$this->pl = new ilSelfEvaluationPlugin();
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $ilTabs;
-		$this->setId('');
+		$this->setId('sev_feedbacks');
 		$this->block = $block;
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 		$this->setTitle($this->pl->txt('question_table_title'));
