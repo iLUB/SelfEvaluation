@@ -51,8 +51,9 @@ class ilSelfEvaluationFeedbackGUI {
 		} else {
 			$this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
 		}
-		$this->tpl->addJavaScript($this->pl->getDirectory()
-		. '/templates/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js');
+//		$this->tpl->addJavaScript($this->pl->getDirectory()
+//		. '/templates/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js');
+
 	}
 
 
@@ -61,6 +62,7 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->ctrl->saveParameter($this, 'block_id');
 		$this->ctrl->saveParameter($this, 'feedback_id');
 		$this->ctrl->saveParameterByClass('ilSelfEvaluationBlockGUI', 'block_id');
+		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/slider.js');
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
 		switch ($cmd) {
 			default:
@@ -109,7 +111,7 @@ class ilSelfEvaluationFeedbackGUI {
 
 	public function listObjects() {
 		$async = new ilOverlayRequestGUI();
-//		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addNew'));
+		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addNew'));
 		$this->toolbar->addButton($this->pl->txt('back_to_blocks'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		$ov = $this->getOverview();
 		$table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects');

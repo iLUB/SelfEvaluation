@@ -4,16 +4,16 @@
 			var replacer = new RegExp('amp;', 'g');
 			link = link.replace(replacer, '');
 
-			$("#result").load(link + ' div.ilTabContentInner', function () {
+			$.get(link, function (data) {
+
+				$('#result').html($('<div>lorem</div>').html(data).find('div.ilTabContentInner').clone());
 				$('#fsxOverlay').fadeIn(300);
-				$.getScript( link, function( data, textStatus, jqxhr ) {
-					console.log( data ); // Data returned
-					console.log( textStatus ); // Success
-					console.log( jqxhr.status ); // 200
-					console.log( "Load was performed." );
-				});
 			});
 
+
+//			$("#result").load(link + ' div.ilTabContentInner', function () {
+//				$('#fsxOverlay').fadeIn(300);
+//			});
 		}
 	})(jQuery);
 
@@ -22,13 +22,10 @@
 			$('#fsxOverlay').fadeOut(300);
 		}
 	});
-
-
 </script><!-- BEGIN addnew -->
 <script type="text/javascript">
 	$(window).keydown(function (e) {
 		if (e.metaKey && e.keyCode == 78) {
-			// window.open('{ADD_NEW}');
 			$.fn.{FUNCTION_NAME}('{ADD_NEW}');
 			event.preventDefault();
 			return false;
@@ -39,7 +36,7 @@
 	#fsxOverlay {
 		width:            100%;
 		height:           100%;
-		position:         absolute;
+		position:         fixed;
 		top:              0;
 		left:             0;
 		display:          none;

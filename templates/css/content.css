@@ -6,7 +6,7 @@ div.new_block, div.block {
 }
 
 div.new_block:hover {
-	background-image: url("images/drop_back_active.png");
+	background-image: url("../images/drop_back_active.png");
 	border-color:     #000000;
 }
 
