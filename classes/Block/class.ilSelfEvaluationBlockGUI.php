@@ -214,7 +214,7 @@ class ilSelfEvaluationBlockGUI {
 
 
 	public function showContent() {
-		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
+		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/js/sortable.js');
 		$async = new ilOverlayRequestGUI();
 		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addBlock'));
 		$table = new ilSelfEvaluationBlockTableGUI($this->parent, 'showContent');

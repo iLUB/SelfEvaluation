@@ -51,8 +51,8 @@ class ilSelfEvaluationFeedbackGUI {
 		} else {
 			$this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
 		}
-//		$this->tpl->addJavaScript($this->pl->getDirectory()
-//		. '/templates/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js');
+		$this->tpl->addJavaScript($this->pl->getDirectory()
+		. '/templates/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js');
 
 	}
 
@@ -293,7 +293,7 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	public function getMesurement() {
-		$this->ov = $this->pl->getTemplate('default/tpl.feedback_overview.html');
+		$this->ov = $this->pl->getTemplate('default/Feedback/tpl.feedback_overview.html');
 		for ($x = 1; $x <= 100; $x += 1) {
 			$this->ov->setCurrentBlock('line');
 			if ($x % 5 == 0) {
@@ -393,7 +393,7 @@ class ilSelfEvaluationFeedbackGUI {
 		//		shuffle($colors);
 		$pl = new ilSelfEvaluationPlugin();
 		$pl->updateLanguages();
-		$tpl = $pl->getTemplate('default/tpl.feedback.html');
+		$tpl = $pl->getTemplate('default/Feedback/tpl.feedback.html');
 		$color_id = 0;
 		$percentages = $dataset->getPercentagePerBlock();
 		foreach ($dataset->getFeedbacksPerBlock() as $block_id => $fb) {

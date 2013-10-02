@@ -39,7 +39,7 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		} else {
 			ilUtil::sendInfo($this->pl->txt('feedback_complete'));
 		}
-		$this->setRowTemplate('tpl.template_feedback_row.html', $this->pl->getDirectory());
+		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Feedback/tpl.template_feedback_row.html');
 		$this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->block->getId(), true));
 	}
 
@@ -52,7 +52,7 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
 		$this->tpl->setVariable('BODY', strip_tags($obj->getFeedbackText()));
 		$this->tpl->setVariable('START', ($obj->getStartValue() == 0 ? '>= ' : '> ') . $obj->getStartValue() . '%');
-		$this->tpl->setVariable('END', '<= '.$obj->getEndValue() . '%');
+		$this->tpl->setVariable('END', '<= ' . $obj->getEndValue() . '%');
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$this->ctrl->setParameter($this->parent_obj, 'feedback_id', $obj->getId());

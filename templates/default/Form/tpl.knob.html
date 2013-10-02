@@ -1,0 +1,23 @@
+<div class="knob">
+	<input type='text' value='{VALUE}' id='{ID}'>
+	<script>
+		$(function () {
+			$('#{ID}').knob({
+				'min': {MIN},
+				'max': {MAX},
+				readOnly: {READONLY},
+				fgColor: 'rgb({FGCOLOR})',
+				inputColor: 'rgb({INCOLOR})',
+				bgColor:'rgb({BGCOLOR})',
+				angleOffset: {ANGLEOFFSET},
+				angleArc: {ANGLEARC},
+				stopper: {STOPPER},
+				thickness: {THICKNESS},
+				lineCap: {LINECAP},
+				width: {WIDTH},
+				displayInput: {DISPLAYINPUT},
+				displayPrevious: {DISPLAYPREVIOUS}
+			});
+		});
+	</script>
+</div>

@@ -33,7 +33,7 @@ class ilOverlayRequestGUI {
 		//		$te->setUseRte(true);
 		//		$this->form->addItem($te);
 		//		$this->html->setVariable('FORM', $this->form->getHTML());
-		$this->html = $this->pl->getTemplate('default/tpl.async.html', true, true);
+		$this->html = $this->pl->getTemplate('default/Form/tpl.async.html', true, true);
 		$this->html->setVariable('FUNCTION_NAME', self::FUNCTION_NAME);
 		if ($this->getAddNewLink()) {
 			$this->html->setCurrentBlock('add_new');

@@ -50,7 +50,7 @@ class ilSliderInputGUI extends ilCustomInputGUI {
 
 	private function buildHTML() {
 		$pl = new ilSelfEvaluationPlugin();
-		$tpl = $pl->getTemplate('default/tpl.slider_input.html');
+		$tpl = $pl->getTemplate('default/Form/tpl.slider_input.html');
 		$values = $this->getValues();
 		$tpl->setVariable('VAL_FROM', $values[0]);
 		$tpl->setVariable('VAL_TO', $values[1]);

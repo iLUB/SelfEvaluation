@@ -7,6 +7,7 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
 require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestionGUI.php');
+require_once(dirname(__FILE__) . '/Form/class.ilKnobGUI.php');
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
  *
@@ -178,12 +179,11 @@ class ilSelfEvaluationPresentationGUI {
 			case ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES:
 				$page = $_GET['page'] ? $_GET['page'] : 1;
 				$last_page = count($blocks);
-				$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/jquery.knob.js');
-				$knob = $this->pl->getTemplate('default/tpl.knob.html', false, false);
-				$knob->setVariable('PAGE', $page);
-				$knob->setVariable('MAX', $last_page);
+				$knob = new ilKnobGUI();
+				$knob->setValue($page);
+				$knob->setMax($last_page);
 				if ($last_page > 1) {
-					$this->tpl->setRightContent($knob->get());
+					$this->tpl->setRightContent($knob->getHtml());
 				}
 				$this->ctrl->setParameter($this, 'page', $page);
 				if ($page < $last_page) {

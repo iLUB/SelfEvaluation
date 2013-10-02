@@ -48,7 +48,7 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', NULL);
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $block->getId());
 		$this->addHeaderCommand(ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'addQuestion')), $this->pl->txt('add_new_question'));
-		$this->setRowTemplate('tpl.template_question_row.html', $this->pl->getDirectory());
+		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Question/tpl.template_question_row.html');
 		$this->setData(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId(), true));
 	}
 

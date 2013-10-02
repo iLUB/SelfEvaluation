@@ -46,7 +46,7 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 	 */
 	public function getHtml() {
 		$pl = new ilSelfEvaluationPlugin();
-		$tpl = $pl->getTemplate('default/tpl.multiple_input.html', true, true);
+		$tpl = $pl->getTemplate('default/Form/tpl.multiple_input.html', true, true);
 		$tpl->setVariable('LOCK_CSS', $this->getDisabled() ? 'locked' : '');
 		if ($this->getDisabled()) {
 			$this->setInfo($pl->txt('locked'));
