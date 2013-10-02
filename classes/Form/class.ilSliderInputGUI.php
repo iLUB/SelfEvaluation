@@ -30,9 +30,9 @@ class ilSliderInputGUI extends ilCustomInputGUI {
 	 */
 	protected $unit = '%';
 	/**
-	 * @var
+	 * @var string
 	 */
-	protected $ajax;
+	protected $ajax = '';
 
 
 	public function __construct($title, $post_var, $min, $max, $ajax_request = false) {

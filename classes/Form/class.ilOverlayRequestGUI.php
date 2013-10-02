@@ -28,13 +28,13 @@ class ilOverlayRequestGUI {
 	 * @return string
 	 */
 	public function getHTML() {
-		$this->form= new ilPropertyFormGUI();
-		$te = new ilTextareaInputGUI($this->pl->txt('test'), 'test');
-		$te->setUseRte(true);
-		$this->form->addItem($te);
+		//		$this->form= new ilPropertyFormGUI();
+		//		$te = new ilTextareaInputGUI($this->pl->txt('test'), 'test');
+		//		$te->setUseRte(true);
+		//		$this->form->addItem($te);
+		//		$this->html->setVariable('FORM', $this->form->getHTML());
 		$this->html = $this->pl->getTemplate('default/tpl.async.html', true, true);
 		$this->html->setVariable('FUNCTION_NAME', self::FUNCTION_NAME);
-		$this->html->setVariable('FORM', $this->form->getHTML());
 		if ($this->getAddNewLink()) {
 			$this->html->setCurrentBlock('add_new');
 			$this->html->setVariable('FUNCTION_NAME', self::FUNCTION_NAME);
