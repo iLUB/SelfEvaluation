@@ -40,9 +40,11 @@ $fields = array(
 		'type' => 'clob',
 	),
 );
+if (! $this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+	$ilDB->createTable(ilObjSelfEvaluation::TABLE_NAME, $fields);
+	$ilDB->addPrimaryKey(ilObjSelfEvaluation::TABLE_NAME, array( 'id' ));
+}
 
-$ilDB->createTable(ilObjSelfEvaluation::TABLE_NAME, $fields);
-$ilDB->addPrimaryKey(ilObjSelfEvaluation::TABLE_NAME, array( 'id' ));
 ?>
 <#3>
 <?php
