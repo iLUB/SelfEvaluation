@@ -47,7 +47,7 @@ class ilSelfEvaluationDataset {
 
 	public function read() {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
-		. $this->db->quote($this->getId(), 'integer'));
+			. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
 			foreach ($this->getArrayForDb() as $k => $v) {
 				$this->{$k} = $rec->{$k};
@@ -118,7 +118,7 @@ class ilSelfEvaluationDataset {
 	 */
 	public function delete() {
 		return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
-		. $this->db->quote($this->getId(), 'integer'));
+			. $this->db->quote($this->getId(), 'integer'));
 	}
 
 
@@ -220,9 +220,7 @@ class ilSelfEvaluationDataset {
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($obj_id) as $block) {
 			$sum = array();
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
-				//				$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $qst->getId());
-				//				$sum[] = $da->getValue();
-				$sum = $this->getDataPerBlock($block->getId());
+				$sum[] = $this->getDataPerBlock($block->getId());
 			}
 			$possible = count($sum) * count(ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray());
 			$percentage = array_sum($sum) / $possible * 100;
@@ -234,17 +232,17 @@ class ilSelfEvaluationDataset {
 
 
 	/**
-	 * @param null $block_id
+	 * @param null $a_block_id
 	 *
 	 * @return array
 	 */
-	public function getFeedbacksPerBlock($block_id = NULL) {
+	public function getFeedbacksPerBlock($a_block_id = NULL) {
 		$return = array();
-		foreach ($this->getPercentagePerBlock() as $k => $v) {
-			$return[$k] = ilSelfEvaluationFeedback::_getFeedbackForPercentage($k, $v);;
+		foreach ($this->getPercentagePerBlock() as $block_id => $percentage) {
+			$return[$block_id] = ilSelfEvaluationFeedback::_getFeedbackForPercentage($block_id, $percentage);;
 		}
-		if ($block_id) {
-			return $return[$block_id];
+		if ($a_block_id) {
+			return $return[$a_block_id];
 		} else {
 			return $return;
 		}
@@ -263,7 +261,7 @@ class ilSelfEvaluationDataset {
 		global $ilDB;
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-		. $ilDB->quote($identifier_id, 'integer') . ' ORDER BY creation_date ASC');
+			. $ilDB->quote($identifier_id, 'integer') . ' ORDER BY creation_date ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
 			$return[] = new self($rec->id);
 		}
@@ -281,7 +279,7 @@ class ilSelfEvaluationDataset {
 		global $ilDB;
 		// Existing Object
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-		. $ilDB->quote($identifier_id, 'integer'));
+			. $ilDB->quote($identifier_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
@@ -317,7 +315,7 @@ class ilSelfEvaluationDataset {
 	public static function _datasetExists($identifier_id) {
 		global $ilDB;
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-		. $ilDB->quote($identifier_id, 'integer'));
+			. $ilDB->quote($identifier_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return true;
 		}
