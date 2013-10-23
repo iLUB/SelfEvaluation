@@ -38,7 +38,6 @@ class ilSelfEvaluationDataset {
 		 */
 		$this->id = $id;
 		$this->db = $ilDB;
-		//		$this->resetDB();
 		if ($id != 0) {
 			$this->read();
 		}
@@ -72,6 +71,7 @@ class ilSelfEvaluationDataset {
 
 
 	final function initDB() {
+		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
 				'type' => $v[0],
@@ -110,6 +110,8 @@ class ilSelfEvaluationDataset {
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
+
+		return true;
 	}
 
 
@@ -134,6 +136,8 @@ class ilSelfEvaluationDataset {
 				$this->getId()
 			),
 		));
+
+		return true;
 	}
 
 
@@ -202,6 +206,7 @@ class ilSelfEvaluationDataset {
 	 * @return mixed
 	 */
 	public function getDataPerBlock($block_id) {
+		$sum = array();
 		foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block_id) as $qst) {
 			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $qst->getId());
 			$sum[$qst->getId()] = $da->getValue();
@@ -221,6 +226,7 @@ class ilSelfEvaluationDataset {
 			$sum = array();
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
 				$sum[] = $this->getDataPerBlock($block->getId());
+				unset($qst);
 			}
 			$possible = count($sum) * count(ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray());
 			$percentage = array_sum($sum) / $possible * 100;
@@ -259,6 +265,9 @@ class ilSelfEvaluationDataset {
 	 */
 	public static function _getAllInstancesByIdentifierId($identifier_id) {
 		global $ilDB;
+		/**
+		 * @var $ilDB ilDB
+		 */
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
 			. $ilDB->quote($identifier_id, 'integer') . ' ORDER BY creation_date ASC');
@@ -277,7 +286,9 @@ class ilSelfEvaluationDataset {
 	 */
 	public static function _getInstanceByIdentifierId($identifier_id) {
 		global $ilDB;
-		// Existing Object
+		/**
+		 * @var $ilDB ilDB
+		 */
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
 			. $ilDB->quote($identifier_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
@@ -285,11 +296,6 @@ class ilSelfEvaluationDataset {
 		}
 
 		return false;
-		//		$obj = new self();
-		//		$obj->setIdentifierId($identifier_id);
-		//		$obj->update();
-		//
-		//		return $obj;
 	}
 
 

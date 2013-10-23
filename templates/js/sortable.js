@@ -7,7 +7,7 @@ $(document).ready(function () {
 	};
 
 	$("table tbody").sortable({
-		helper: fixHelper
+		helper: fixHelper,
+		items: '.fsxSortable'
 	}).disableSelection();
 });
-
