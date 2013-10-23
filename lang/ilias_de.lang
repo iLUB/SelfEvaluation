@@ -1,21 +1,21 @@
-obj_xsev#:#SelfEvaluation
-objs_xsev#:#SelfEvaluations
+obj_xsev#:#Selbstevaluation
+objs_xsev#:#Selbstevaluations
 obj_xsev_duplicate#:#Kopieren
-objs_xsev_duplicate#:#SelfEvaluation kopieren
-obj_xsev_select#:#SelfEvaluation auswählen
-xsev_add#:#SelfEvaluation hinzufügen
-xsev_new#:#Neue SelfEvaluation hinzufügen
-xsev_read#:#Lesezugriff zu SelfEvaluation
-xsev_write#:#SelfEvaluation bearbeiten
-xsev_delete#:#SelfEvaluation löschen
-xsev_visible#:#SelfEvaluation ist sichtbar
+objs_xsev_duplicate#:#Selbstevaluation kopieren
+obj_xsev_select#:#Selbstevaluation auswählen
+xsev_add#:#Selbstevaluation hinzufügen
+xsev_new#:#Neue Selbstevaluation hinzufügen
+xsev_read#:#Lesezugriff zu Selbstevaluation
+xsev_write#:#Selbstevaluation bearbeiten
+xsev_delete#:#Selbstevaluation löschen
+xsev_visible#:#Selbstevaluation ist sichtbar
 xsev_edit_permission#:#Rechteeinstellungen ändern
-crs_create_xsev#:#SelfEvaluation erstellen
-grp_create_xsev#:#SelfEvaluation erstellen
-fold_create_xsev#:#SelfEvaluation erstellen
-root_create_xsev#:#SelfEvaluation erstellen
-cat_create_xsev#:#SelfEvaluation erstellen
-content#:#SelbstEvaluation
+crs_create_xsev#:#Selbstevaluation erstellen
+grp_create_xsev#:#Selbstevaluation erstellen
+fold_create_xsev#:#Selbstevaluation erstellen
+root_create_xsev#:#Selbstevaluation erstellen
+cat_create_xsev#:#Selbstevaluation erstellen
+content#:#Selbstevaluation
 properties#:#Einstellungen
 edit_properties#:#Einstellungen bearbeiten
 title#:#Titel
@@ -76,8 +76,8 @@ count_questions#:#Anzahl Fragen
 is_inverted#:#Umgekehrte Skala
 outro_header#:#Selbstevaluation beendet
 
-scale_cannot_be_edited#:#Diese SelfEvaluation enthält bereits Datensätze von Nutzern, daher kann die Skalierung nicht mehr verändert werden.
-msg_has_datasets#:#Diese SelfEvaluation enthält bereits Datensätze von Nutzern. Fragen sollten daher nciht mehr verändert werden.
+scale_cannot_be_edited#:#Diese Selbstevaluation enthält bereits Datensätze von Nutzern, daher kann die Skalierung nicht mehr verändert werden.
+msg_has_datasets#:#Diese Selbstevaluation enthält bereits Datensätze von Nutzern. Fragen sollten daher nciht mehr verändert werden.
 
 create_feedback_form#:#Neues Feedback erfassen
 create_feedback_button#:#Erstellen
