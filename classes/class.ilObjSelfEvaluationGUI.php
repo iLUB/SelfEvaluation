@@ -88,6 +88,24 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	}
 
 
+	public function initHeader() {
+		global $ilLocator;
+		/**
+		 * @var $ilLocator ilLocatorGUI
+		 */
+		$ilLocator->addRepositoryItems($this->object->getRefId());
+		$this->tpl->setLocator($ilLocator->getHTML());
+		$this->tpl->getStandardTemplate();
+		$this->setTitleAndDescription();
+		$this->displayIdentifier();
+		$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
+		$this->tpl->addCss($this->pl->getStyleSheetLocation('css/content.css'));
+		$this->tpl->addCss($this->pl->getStyleSheetLocation('css/print.css'), 'print');
+		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/scripts.js');
+		$this->setTabs();
+	}
+
+
 	/**
 	 * @return bool|void
 	 */
@@ -96,22 +114,15 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			if ($this->access->checkAccess('read', '', $_GET['ref_id'])) {
 				$this->history->addItem($_GET['ref_id'], $this->ctrl->getLinkTarget($this, $this->getStandardCmd()), $this->getType(), '');
 			}
-			$this->ctrl->saveParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $_GET['uid']);
-			$this->ctrl->saveParameterByClass('ilSelfEvaluationDatasetGUI', 'uid', $_GET['uid']);
-			$this->ctrl->saveParameterByClass('ilSelfEvaluationFeedbackGUI', 'uid', $_GET['uid']);
-			$this->displayIdentifier();
 			$cmd = $this->ctrl->getCmd();
 			$next_class = $this->ctrl->getNextClass($this);
 			if (self::RELOAD OR $_GET['rl'] == 'true') {
 				$this->pl->updateLanguages();
 			}
-			$this->tpl->getStandardTemplate();
-			$this->setTitleAndDescription();
-			$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
-			$this->tpl->addCss($this->pl->getStyleSheetLocation('css/content.css'));
-			$this->tpl->addCss($this->pl->getStyleSheetLocation('css/print.css'), 'print');
-			$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/scripts.js');
-			$this->setTabs();
+			$this->ctrl->saveParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $_GET['uid']);
+			$this->ctrl->saveParameterByClass('ilSelfEvaluationDatasetGUI', 'uid', $_GET['uid']);
+			$this->ctrl->saveParameterByClass('ilSelfEvaluationFeedbackGUI', 'uid', $_GET['uid']);
+			$this->initHeader();
 			switch ($next_class) {
 				case 'ilpermissiongui':
 					include_once('Services/AccessControl/classes/class.ilPermissionGUI.php');
