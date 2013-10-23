@@ -93,7 +93,6 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI {
 		return $form_gui;
 	}
 
-
 	//
 	// Create & Update Object
 	//

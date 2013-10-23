@@ -13,8 +13,9 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 	/**
 	 * @param ilSelfEvaluationFeedbackGUI $a_parent_obj
 	 * @param string                      $a_parent_cmd
+	 * @param ilSelfEvaluationBlock       $block
 	 */
-	function __construct(ilSelfEvaluationFeedbackGUI $a_parent_obj, $a_parent_cmd) {
+	function __construct(ilSelfEvaluationFeedbackGUI $a_parent_obj, $a_parent_cmd, ilSelfEvaluationBlock $block) {
 		global $ilCtrl, $ilTabs;
 		/**
 		 * @var $ilCtrl ilCtrl
@@ -25,7 +26,7 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		$this->tabs = $ilTabs;
 		$this->setId('');
 		parent::__construct($a_parent_obj, $a_parent_cmd);
-		$this->setTitle($this->pl->txt('title'));
+		$this->setTitle($block->getTitle().': '. $this->pl->txt('edit_feedbacks'));
 		// Columns
 		$this->addColumn($this->pl->txt('fb_title'), 'title', 'auto');
 		$this->addColumn($this->pl->txt('fb_body'), 'body', 'auto');

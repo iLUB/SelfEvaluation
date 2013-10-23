@@ -99,7 +99,7 @@ class ilSelfEvaluationQuestionGUI {
 
 
 	public function addQuestion() {
-		$this->initQuestionMForm();
+		$this->initQuestionForm();
 		$this->tpl->setContent($this->form->getHTML());
 	}
 
@@ -112,7 +112,7 @@ class ilSelfEvaluationQuestionGUI {
 	/**
 	 * @param string $mode
 	 */
-	public function initQuestionMForm($mode = 'create') {
+	public function initQuestionForm($mode = 'create') {
 		$this->form = new  ilPropertyFormGUI();
 		$this->form->setTitle($this->pl->txt($mode . '_question'));
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
@@ -132,7 +132,7 @@ class ilSelfEvaluationQuestionGUI {
 
 
 	public function createObject() {
-		$this->initQuestionMForm();
+		$this->initQuestionForm();
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setQuestionBody($this->form->getInput('question_body'));
@@ -147,7 +147,7 @@ class ilSelfEvaluationQuestionGUI {
 
 
 	public function editQuestion() {
-		$this->initQuestionMForm('update');
+		$this->initQuestionForm('update');
 		$this->setObjectValues();
 		$this->tpl->setContent($this->form->getHTML());
 	}
@@ -162,7 +162,7 @@ class ilSelfEvaluationQuestionGUI {
 
 
 	public function updateObject() {
-		$this->initQuestionMForm();
+		$this->initQuestionForm();
 		$this->form->setValuesByPost();
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
@@ -200,7 +200,7 @@ class ilSelfEvaluationQuestionGUI {
 		}
 		$async = new ilOverlayRequestGUI();
 		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addQuestion'));
-		$this->toolbar->addButton($this->pl->txt('back_to_blocks'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
+		$this->toolbar->addButton('<b>&lt;&lt; '.$this->pl->txt('back_to_blocks').'</b>', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		$table = new ilSelfEvaluationQuestionTableGUI($this, 'showContent', $this->block);
 		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 	}

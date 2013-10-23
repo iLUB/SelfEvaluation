@@ -7,7 +7,6 @@
 			} else {
 				next_value = '';
 			}
-
 			$('.multipleinput_new').last().clone().appendTo('#input_colletion').fadeIn(500);
 			$('.multipleinput_new').last().find('input').first().val(next_value);
 			$('.multipleinput_new').last().find('input').last().val('');
@@ -16,16 +15,31 @@
 			return false;
 		}
 
-
 		$('img.add_button').live("click", handler);
-
-
 		$('img.delete_button').click(function () {
 			var mydiff = $(this).parent().parent();
-			mydiff.children('input').last().val('');
+			console.log(mydiff);
+			mydiff.find('input').each(function () {
+				$(this).val('');
+			});
 			mydiff.fadeOut(500);
 
 		});
+	});
+
+
+	$(document).ready(function () {
+		var fixHelper = function (e, ui) {
+			ui.children().each(function () {
+				$(this).width($(this).width());
+			});
+			return ui;
+		};
+
+		$("table#input_colletion tbody").sortable({
+			helper: fixHelper,
+			items: '.fsxSortable'
+		}).disableSelection();
 	});
 </script>
 <style>

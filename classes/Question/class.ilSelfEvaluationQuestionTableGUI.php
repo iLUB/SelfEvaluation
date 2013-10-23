@@ -28,8 +28,9 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		$this->tabs = $ilTabs;
 		$this->setId('sev_feedbacks');
 		$this->block = $block;
+
 		parent::__construct($a_parent_obj, $a_parent_cmd);
-		$this->setTitle($this->pl->txt('question_table_title'));
+		$this->setTitle($block->getTitle() . ': ' . $this->pl->txt('question_table_title'));
 		// Columns
 		if ($this->block->isBlockSortable()) {
 			$this->addColumn('', 'position', '20px');
