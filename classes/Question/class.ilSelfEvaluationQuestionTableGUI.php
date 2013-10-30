@@ -18,7 +18,7 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 	 * @param ilSelfEvaluationBlock       $block
 	 */
 	function __construct(ilSelfEvaluationQuestionGUI $a_parent_obj, $a_parent_cmd, ilSelfEvaluationBlock $block) {
-		global $ilCtrl, $ilTabs;
+		global $ilCtrl, $ilTabs, $tpl;
 		/**
 		 * @var $ilCtrl ilCtrl
 		 * @var $ilTabs ilTabsGUI
@@ -33,6 +33,7 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		$this->setTitle($block->getTitle() . ': ' . $this->pl->txt('question_table_title'));
 		// Columns
 		if ($this->block->isBlockSortable()) {
+			$tpl->addJavaScript($this->pl->getDirectory() . '/templates/js/sortable.js');
 			$this->addColumn('', 'position', '20px');
 			$this->setFormAction($ilCtrl->getFormAction($a_parent_obj));
 			$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
@@ -67,7 +68,7 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 			$this->pl->txt('question') . ' ID ' . $a_set['id']);
 		$this->tpl->setVariable('EDIT_LINK', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
 		$this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
-		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse() ? ilUtil::getImagePath('icon_ok.png') : ilUtil::getImagePath('icon_not_ok.png'));
+		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse() ? ilUtil::getImagePath('ok.png', $this->pl->getDirectory()) : ilUtil::getImagePath('blank.png', $this->pl->getDirectory()));
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('block_' . $obj->getId());

@@ -29,17 +29,12 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
 
 
 /**
- * User Interface class for example repository object.
+ * Class ilObjSelfEvaluationGUI
  *
  * @author            Alex Killing <alex.killing@gmx.de>
- * @author            fabian Schmid <Fabian.schmid@ilub.unibe.ch>
+ * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  *
  * $Id$
- *
- * Integration into control structure:
- * - The GUI class is called by ilRepositoryGUI
- * - GUI classes used by this class are ilPermissionGUI (provides the rbac
- *   screens) and ilInfoScreenGUI (handles the info screen).
  *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI, ilAdministrationGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
