@@ -148,3 +148,7 @@ show_my_results#:#Meine Resultate
 show_all_results#:#Alle Resultate
 percentage#:#Prozent
 date#:#Datum
+delete_dataset#:#Datensatz löschen
+show_feedback#:#Feedback anzeigen
+qst_delete_dataset#:#Möchten Sie den Datensatz wirklich löschen?
+msg_dataset_deleted#:#Datensatz gelöscht

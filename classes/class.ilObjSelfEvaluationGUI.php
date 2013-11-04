@@ -233,11 +233,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		if (($this->object->getAllowShowResults())
 			AND $this->object->hasDatasets()
 		) {
-			$this->tabs_gui->addTab('my_results', $this->txt('show_my_results'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'listMyObjects'));
+			//			$this->tabs_gui->addTab('my_results', $this->txt('show_my_results'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'listMyObjects'));
 			if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
 				$this->tabs_gui->addTab('all_results', $this->txt('show_all_results'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'listObjects'));
 			}
-
 		}
 		$this->addPermissionTab();
 	}

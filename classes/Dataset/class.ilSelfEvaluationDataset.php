@@ -120,6 +120,9 @@ class ilSelfEvaluationDataset {
 	 * @return int
 	 */
 	public function delete() {
+		$this->db->manipulate('DELETE FROM ' . ilSelfEvaluationData::TABLE_NAME . ' WHERE dataset_id = '
+			. $this->db->quote($this->getId(), 'integer'));
+
 		return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
 			. $this->db->quote($this->getId(), 'integer'));
 	}
