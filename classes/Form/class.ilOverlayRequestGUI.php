@@ -19,7 +19,7 @@ class ilOverlayRequestGUI {
 	protected $html = '';
 
 
-	function __construct() {
+	function __construct($disable = false) {
 		$this->pl = new ilSelfEvaluationPlugin();
 	}
 
@@ -28,11 +28,6 @@ class ilOverlayRequestGUI {
 	 * @return string
 	 */
 	public function getHTML() {
-		//		$this->form= new ilPropertyFormGUI();
-		//		$te = new ilTextareaInputGUI($this->pl->txt('test'), 'test');
-		//		$te->setUseRte(true);
-		//		$this->form->addItem($te);
-		//		$this->html->setVariable('FORM', $this->form->getHTML());
 		$this->html = $this->pl->getTemplate('default/Form/tpl.async.html', true, true);
 		$this->html->setVariable('FUNCTION_NAME', self::FUNCTION_NAME);
 		if ($this->getAddNewLink()) {
@@ -67,12 +62,13 @@ class ilOverlayRequestGUI {
 	//
 	/**
 	 * @param string $link
+	 * @param bool   $disable
 	 *
 	 * @return string
 	 */
-	public static function getLink($link = '') {
+	public static function getLink($link = '', $disable = false) {
 		$pl = new ilSelfEvaluationPlugin();
-		if ($pl->getConfigObject()->getAsync()) {
+		if ($pl->getConfigObject()->getAsync() AND ! $disable) {
 			return 'javascript:$.fn.' . self::FUNCTION_NAME . '(\'' . $link . '\');';
 		} else {
 			return $link;

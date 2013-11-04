@@ -2,6 +2,7 @@
 require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedbackGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
+require_once('class.ilSelfEvaluationDatasetTableGUI.php');
 /**
  * GUI-Class ilSelfEvaluationResultsGUI
  *
@@ -37,6 +38,10 @@ class ilSelfEvaluationDatasetGUI {
 
 
 	public function executeCommand() {
+		if ($_GET['rl'] == 'true') {
+			$this->pl = new ilSelfEvaluationPlugin();
+			$this->pl->updateLanguages();
+		}
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
 		switch ($cmd) {
 			default:
@@ -70,12 +75,22 @@ class ilSelfEvaluationDatasetGUI {
 
 	public function selectResult() {
 		$this->ctrl->setParameter($this, 'dataset_id', $_POST['select_result']);
-		$this->ctrl->redirect($this, 'listObjects');
+		$this->ctrl->redirect($this, 'listMyObjects');
 	}
 
 
 	public function listObjects() {
-		$this->tabs_gui->setTabActive('results');
+		$async = new ilOverlayRequestGUI();
+		$this->tabs_gui->setTabActive('all_results');
+		$table = new ilSelfEvaluationDatasetTableGUI($this->parent, 'listObjects');
+		$this->tpl->setContent($async->getHTML() . $table->getHTML());
+
+		return;
+	}
+
+
+	public function listMyObjects() {
+		$this->tabs_gui->setTabActive('my_results');
 		$se = new ilSelectInputGUI($this->pl->txt('select_result'), 'select_result');
 		foreach (ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($_GET['uid']) as $ds) {
 			$opt[$ds->getId()] = $this->pl->txt('dataset_from') . ' ' . date('d.m.Y - H:i:s', $ds->getCreationDate());
@@ -106,6 +121,10 @@ class ilSelfEvaluationDatasetGUI {
 			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset, $this->parent->object->getShowCharts());
 		}
 		$this->tpl->setContent($content->get() . $feedback);
+	}
+
+
+	public function confirmDelete() {
 	}
 }
 

@@ -68,7 +68,7 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 			$this->pl->txt('question') . ' ID ' . $a_set['id']);
 		$this->tpl->setVariable('EDIT_LINK', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
 		$this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
-		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse() ? ilUtil::getImagePath('ok.png', $this->pl->getDirectory()) : ilUtil::getImagePath('blank.png', $this->pl->getDirectory()));
+		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse() ? './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/ok.png' : './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/blank.png');
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('block_' . $obj->getId());

@@ -137,3 +137,14 @@ feedback_status#:#Feedback-Block vollständig
 
 async#:#Asynchrone Darstellung der Input-Masken
 configuration#:#Konfiguration
+
+identity_type_1#:#ILIAS-Benutzer
+identity_type_2#:#Anonym
+identity_type#:#Typ
+dataset_table_title#:#Datensätze
+identity#:#Benutzer-Kennung
+
+show_my_results#:#Meine Resultate
+show_all_results#:#Alle Resultate
+percentage#:#Prozent
+date#:#Datum

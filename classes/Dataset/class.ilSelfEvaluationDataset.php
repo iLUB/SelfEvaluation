@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionGUI
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
 require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedback.php');
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Identity/class.ilSelfEvaluationIdentity.php');
 /**
  * ilSelfEvaluationDataset
  *
@@ -17,7 +18,7 @@ class ilSelfEvaluationDataset {
 	/**
 	 * @var int
 	 */
-	protected $id = 0;
+	public $id = 0;
 	/**
 	 * @var int
 	 */
@@ -209,7 +210,7 @@ class ilSelfEvaluationDataset {
 		$sum = array();
 		foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block_id) as $qst) {
 			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $qst->getId());
-			$sum[$qst->getId()] = $da->getValue();
+			$sum[$qst->getId()] = (int)$da->getValue();
 		}
 
 		return $sum;
@@ -218,22 +219,36 @@ class ilSelfEvaluationDataset {
 
 	/**
 	 * @return array
+	 * @description return array(block_id => percentage)
 	 */
 	public function getPercentagePerBlock() {
-		$obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
 		$return = array();
+		$obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+		$scale = ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray();
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($obj_id) as $block) {
-			$sum = array();
-			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
-				$sum[] = $this->getDataPerBlock($block->getId());
-				unset($qst);
-			}
-			$possible = count($sum) * count(ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray());
-			$percentage = array_sum($sum) / $possible * 100;
+			$answer_data = $this->getDataPerBlock($block->getId());
+			$anser_total = array_sum($answer_data);
+			$possible_per_block = count($answer_data) * array_sum(array_keys($scale));
+			$percentage = $anser_total / $possible_per_block * 100;
 			$return[$block->getId()] = $percentage;
 		}
 
 		return $return;
+	}
+
+
+	/**
+	 * @return float
+	 */
+	public function getOverallPercentage() {
+		$sum = 0;
+		$x = 0;
+		foreach ($this->getPercentagePerBlock() as $percentage) {
+			$sum += $percentage;
+			$x ++;
+		}
+
+		return round($sum / $x, 2);
 	}
 
 
@@ -273,6 +288,34 @@ class ilSelfEvaluationDataset {
 			. $ilDB->quote($identifier_id, 'integer') . ' ORDER BY creation_date ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
 			$return[] = new self($rec->id);
+		}
+
+		return $return;
+	}
+
+
+	/**
+	 * @param      $obj_id
+	 * @param bool $as_array
+	 *
+	 * @return array
+	 */
+	public static function _getAllInstancesByObjectId($obj_id, $as_array = false) {
+		global $ilDB;
+		/**
+		 * @var $ilDB ilDB
+		 */
+		$return = array();
+		foreach (ilSelfEvaluationIdentity::_getAllInstancesByForForObjId($obj_id) as $identity) {
+			$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+				. $ilDB->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
+			while ($rec = $ilDB->fetchObject($set)) {
+				if ($as_array) {
+					$return[] = (array)new self($rec->id);
+				} else {
+					$return[] = new self($rec->id);
+				}
+			}
 		}
 
 		return $return;
