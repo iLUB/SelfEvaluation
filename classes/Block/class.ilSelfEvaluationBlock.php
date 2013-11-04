@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
-//require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/srModelObject/class.srModelObject.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/srModelObject/class.srModelObject.php');
 /**
  * ilSelfEvaluationBlock
  *
