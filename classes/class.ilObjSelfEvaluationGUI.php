@@ -281,17 +281,19 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		);
 		$se->setOptions($opt);
 		$this->form->addItem($se);
-		if (self::DEV) {
-			// DisplayType
-			$se = new ilSelectInputGUI($this->pl->txt('display_type'), 'display_type');
-			$opt = array(
-				ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->pl->txt('single_page'),
-				ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->pl->txt('multiple_pages'),
-				ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->pl->txt('all_questions_shuffled'),
-			);
-			$se->setOptions($opt);
-			$this->form->addItem($se);
-		}
+		// DisplayType
+		$se = new ilSelectInputGUI($this->pl->txt('display_type'), 'display_type');
+		$opt = array(
+			ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->pl->txt('single_page'),
+			ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->pl->txt('multiple_pages'),
+			//ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->pl->txt('all_questions_shuffled'),
+		);
+		$se->setOptions($opt);
+		$this->form->addItem($se);
+		// Show Questions
+		$cb = new ilCheckboxInputGUI($this->pl->txt('show_questions'), 'show_questions');
+		$cb->setValue(1);
+		$this->form->addItem($cb);
 		// Buttons
 		$this->form->addCommandButton('updateProperties', $this->txt('save'));
 		$this->form->setTitle($this->txt('edit_properties'));
@@ -312,6 +314,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['outro'] = $this->object->getOutro();
 		$values['sort_type'] = $this->object->getSortType();
 		$values['display_type'] = $this->object->getDisplayType();
+		$values['display_type'] = $this->object->getDisplayType();
+		$values['show_questions'] = $this->object->getAllowShowQuestions();
 		$this->form->setValuesByArray($values);
 	}
 
@@ -328,10 +332,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setOnline($this->form->getInput('online'));
 			$this->object->setIntro($this->form->getInput('intro'));
 			$this->object->setOutro($this->form->getInput('outro'));
-			if (self::DEV) {
-				$this->object->setSortType($this->form->getInput('sort_type'));
-				$this->object->setDisplayType($this->form->getInput('display_type'));
-			}
+			$this->object->setSortType($this->form->getInput('sort_type'));
+			$this->object->setDisplayType($this->form->getInput('display_type'));
+			$this->object->setAllowShowQuestions($this->form->getInput('show_questions'));
 			$this->object->update();
 			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'editProperties');

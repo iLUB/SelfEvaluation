@@ -87,6 +87,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var bool
 	 */
 	protected $allow_show_results = true;
+	/**
+	 * @var bool
+	 */
+	protected $allow_show_questions = false;
 
 
 	/**
@@ -140,6 +144,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'text',
 				$this->getOutro()
 			),
+			'show_questions' => array(
+				'integer',
+				$this->getAllowShowQuestions()
+			),
 		);
 	}
 
@@ -151,7 +159,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 	function doRead() {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
-		. $this->db->quote($this->getId(), 'integer'));
+			. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
 			$this->setOnline($rec->is_online);
 			$this->setEvaluationType($rec->evaluation_type);
@@ -159,11 +167,13 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setDisplayType($rec->display_type);
 			$this->setIntro($rec->intro);
 			$this->setOutro($rec->outro);
+			$this->setAllowShowQuestions($rec->show_questions);
 		}
 	}
 
 
 	function doUpdate() {
+
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
@@ -198,7 +208,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$block->delete();
 		}
 		$this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . ' id = '
-		. $this->db->quote($this->getId(), 'integer'));
+			. $this->db->quote($this->getId(), 'integer'));
 
 		return true;
 	}
@@ -426,6 +436,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function getAllowShowResults() {
 		return $this->allow_show_results;
+	}
+
+
+	/**
+	 * @param boolean $allow_show_questions
+	 */
+	public function setAllowShowQuestions($allow_show_questions) {
+		$this->allow_show_questions = $allow_show_questions;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getAllowShowQuestions() {
+		return $this->allow_show_questions;
 	}
 }
 

@@ -115,7 +115,7 @@ class ilSelfEvaluationFeedbackGUI {
 			. '</b>', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
 		$ov = $this->getOverview();
 		$table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects', $this->block);
-		$this->tpl->setContent($async->getHTML() . $ov->get() .'<br><br>'. $table->getHTML());
+		$this->tpl->setContent($async->getHTML() . $ov->get() . '<br><br>' . $table->getHTML());
 	}
 
 
@@ -376,7 +376,7 @@ class ilSelfEvaluationFeedbackGUI {
 	 */
 	public static function _getPresentationOfFeedback(ilSelfEvaluationDataset $dataset, $show_charts = true) {
 		$colors = array(
-			'#D0E8FF',
+//			'#D0E8FF',
 			'#00CCFF',
 			'#00CC99',
 			'#9999FF',
@@ -392,7 +392,6 @@ class ilSelfEvaluationFeedbackGUI {
 		);
 		//		shuffle($colors);
 		$pl = new ilSelfEvaluationPlugin();
-		$pl->updateLanguages();
 		$tpl = $pl->getTemplate('default/Feedback/tpl.feedback.html');
 		$color_id = 0;
 		$percentages = $dataset->getPercentagePerBlock();
@@ -407,13 +406,13 @@ class ilSelfEvaluationFeedbackGUI {
 				$chart->setLegend($legend);
 				$chart->setYAxisToInteger(true);
 				$data = new ilChartData('bars');
-				$data->setBarOptions(0.8, 'center');
+				$data->setBarOptions(0.6, 'center');
 				$ticks = array();
 				$x = 1;
 				foreach ($dataset->getDataPerBlock($block_id) as $qst_id => $value) {
 					$qst = new ilSelfEvaluationQuestion($qst_id);
-					$data->addPoint($qst_id, $value);
-					$ticks[$qst_id] = $qst->getTitle() ? $qst->getTitle() : $pl->txt('question') . ' ' . $x;
+					$data->addPoint($x, $value);
+					$ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $pl->txt('question') . ' ' . $x;
 					$x ++;
 				}
 				$chart->setTicks($ticks, false, true);

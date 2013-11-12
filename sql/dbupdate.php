@@ -82,3 +82,19 @@ $id = new ilSelfEvaluationFeedback();
 $id->initDB();
 
 ?>
+<#4>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+	$field = array(
+		'type' => 'integer',
+		'length' => 1,
+	);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_questions' , $field);
+
+}
+
+?>

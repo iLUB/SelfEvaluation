@@ -102,7 +102,7 @@ class ilSelfEvaluationDatasetGUI {
 		$this->toolbar->addInputItem($se);
 		$this->toolbar->addFormButton($this->pl->txt('select_result_button'), 'selectResult');
 		if ($this->parent->object->getAllowShowResults() AND $this->dataset->getId() != 0) {
-			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset, $this->parent->object->getShowCharts());
+			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset, $this->parent->object->getAllowShowQuestions());
 			$header = '<h1>' . $this->pl->txt('dataset_from') . ' '
 				. date('d.m.Y - H:i:s', $this->dataset->getCreationDate()) . '</h1>';
 			$this->tpl->setContent($header . $feedback);
@@ -120,7 +120,7 @@ class ilSelfEvaluationDatasetGUI {
 		$content->setVariable('INTRO_HEADER', $this->pl->txt('outro_header'));
 		$content->setVariable('INTRO_BODY', $this->parent->object->getOutro());
 		if ($this->parent->object->getAllowShowResults()) {
-			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset, $this->parent->object->getShowCharts());
+			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset, $this->parent->object->getAllowShowQuestions());
 		}
 		$this->tpl->setContent($content->get() . $feedback);
 	}

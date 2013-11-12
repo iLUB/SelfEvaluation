@@ -28,7 +28,6 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		$this->tabs = $ilTabs;
 		$this->setId('sev_feedbacks');
 		$this->block = $block;
-
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 		$this->setTitle($block->getTitle() . ': ' . $this->pl->txt('question_table_title'));
 		// Columns
@@ -65,13 +64,13 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 			$this->tpl->setVariable('ID', $obj->getId());
 		}
 		$this->tpl->setVariable('TITLE', $obj->getTitle() ? $obj->getTitle() :
-			$this->pl->txt('question') . ' ID ' . $a_set['id']);
+			$this->pl->txt('question') . ' ' . $this->block->getPosition() . '.' . $obj->getPosition());
 		$this->tpl->setVariable('EDIT_LINK', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
 		$this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
 		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse() ? './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/ok.png' : './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/blank.png');
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
-		$ac->setId('block_' . $obj->getId());
+		$ac->setId('question_' . $obj->getId());
 		$ac->addItem($this->pl->txt('edit_question'), 'edit_question', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
 		$ac->addItem($this->pl->txt('delete_question'), 'delete_question', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'deleteQuestion')));
 		$ac->setListTitle($this->pl->txt('actions'));

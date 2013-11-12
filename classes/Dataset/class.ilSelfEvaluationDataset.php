@@ -228,11 +228,15 @@ class ilSelfEvaluationDataset {
 		$return = array();
 		$obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
 		$scale = ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray();
+		$sorted_scale = array_keys($scale);
+		sort($sorted_scale);
+		$highest = $sorted_scale[count($sorted_scale) - 1];
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($obj_id) as $block) {
 			$answer_data = $this->getDataPerBlock($block->getId());
-			$anser_total = array_sum($answer_data);
-			$possible_per_block = count($answer_data) * array_sum(array_keys($scale));
-			$percentage = $anser_total / $possible_per_block * 100;
+			$answer_total = array_sum($answer_data);
+			$anzahl_fragen = count($answer_data);
+			$possible_per_block = $anzahl_fragen * $highest;
+			$percentage = $answer_total / $possible_per_block * 100;
 			$return[$block->getId()] = $percentage;
 		}
 
