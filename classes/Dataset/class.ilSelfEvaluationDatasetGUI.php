@@ -127,10 +127,10 @@ class ilSelfEvaluationDatasetGUI {
 
 
 	public function confirmDelete() {
-//		ilUtil::sendQuestion($this->pl->txt('qst_delete_dataset'));
+		//		ilUtil::sendQuestion($this->pl->txt('qst_delete_dataset'));
 		$conf = new ilConfirmationGUI();
 		$conf->setFormAction($this->ctrl->getFormAction($this));
-		$conf->setCancel($this->pl->txt('cancel'), 'cancel');
+		$conf->setCancel($this->pl->txt('cancel'), 'listObjects');
 		$conf->setConfirm($this->pl->txt('delete_dataset'), 'delete');
 		$conf->addItem('dataset_id', $this->dataset->getId(), date('d.m.Y - H:i:s', $this->dataset->getCreationDate()));
 		$this->tpl->setContent($conf->getHTML());
