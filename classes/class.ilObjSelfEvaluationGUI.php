@@ -286,7 +286,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$opt = array(
 			ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->pl->txt('single_page'),
 			ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->pl->txt('multiple_pages'),
-			//ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->pl->txt('all_questions_shuffled'),
+//			ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->pl->txt('all_questions_shuffled'),
 		);
 		$se->setOptions($opt);
 		$this->form->addItem($se);

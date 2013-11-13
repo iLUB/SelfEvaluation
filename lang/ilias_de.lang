@@ -126,7 +126,7 @@ multinput_value#:#Nummerischer Wert
 multinput_title#:#Bezeichnung
 sort_type#:#Sortierung
 sort_shuffle#:#Fragen pro Block mischen
-sort_manually#:#Reihenfolge der Fragen pro Block definieren
+sort_manually#:#Festgelegte Reihenfolge
 display_type#:#Darstellung der Blocks
 single_page#:#Alle Blocks auf einer Seite
 multiple_pages#:#Eine Seite pro Block

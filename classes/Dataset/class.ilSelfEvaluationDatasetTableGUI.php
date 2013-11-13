@@ -75,8 +75,8 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('dataset_' . $obj->getId());
-		$ac->addItem($this->pl->txt('delete_dataset'), 'delete_dataset', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDelete')));
 		$ac->addItem($this->pl->txt('show_feedback'), 'show_dataset', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'), true));
+		$ac->addItem($this->pl->txt('delete_dataset'), 'delete_dataset', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDelete')));
 		//		$ac->addItem($this->pl->txt('show_feedback'), 'show_dataset', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//

@@ -165,6 +165,7 @@ class ilSelfEvaluationPresentationGUI {
 
 	public function initPresentationForm($mode = 'new') {
 		$this->form = new ilPropertyFormGUI();
+
 		$this->form->setId('evaluation_form');
 		$blocks = ilSelfEvaluationBlock::_getAllInstancesByParentId($this->parent->object->getId());
 		switch ($this->parent->object->getDisplayType()) {

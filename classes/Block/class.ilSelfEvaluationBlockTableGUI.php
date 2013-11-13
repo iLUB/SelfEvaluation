@@ -19,6 +19,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 	 * @param string                 $a_parent_cmd
 	 */
 	function __construct(ilObjSelfEvaluationGUI $a_parent_obj, $a_parent_cmd) {
+//		echo ilObject2::_lookupObjectId($_GET['ref_id']);
 		global $ilCtrl, $ilTabs;
 		/**
 		 * @var $ilCtrl ilCtrl

@@ -248,7 +248,7 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	public function deleteFeedback() {
-		ilUtil::sendQuestion($this->pl->txt('qst_delete_feedback'));
+//		ilUtil::sendQuestion($this->pl->txt('qst_delete_feedback'));
 		$conf = new ilConfirmationGUI();
 		$conf->setFormAction($this->ctrl->getFormAction($this));
 		$conf->setCancel($this->pl->txt('cancel'), 'cancel');
@@ -400,12 +400,15 @@ class ilSelfEvaluationFeedbackGUI {
 			$tpl->setCurrentBlock('feedback');
 			if ($show_charts) {
 				$chart = new ilChart('fb_' . $block_id, self::WIDTH - 15, round((self::WIDTH - 50) / 4, 0));
+//				$chart->
 				$chart->setColors(array( $colors[$color_id] ));
 				$legend = new ilChartLegend();
+
 				$legend->setBackground($colors[$color_id]);
 				$chart->setLegend($legend);
 				$chart->setYAxisToInteger(true);
 				$data = new ilChartData('bars');
+				//$chart->setXAxisToInteger(false);
 				$data->setBarOptions(0.6, 'center');
 				$ticks = array();
 				$x = 1;

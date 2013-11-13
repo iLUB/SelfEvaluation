@@ -165,7 +165,7 @@ class ilSelfEvaluationBlockGUI {
 
 
 	public function deleteBlock() {
-		ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
+//		ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
 		$conf = new ilConfirmationGUI();
 		$conf->setFormAction($this->ctrl->getFormAction($this));
 		$conf->setCancel($this->pl->txt('cancel'), 'cancel');
@@ -208,6 +208,13 @@ class ilSelfEvaluationBlockGUI {
 			$qst_gui = new ilSelfEvaluationQuestionGUI($this->parent, $qst->getId(), $this->object->getId());
 			$qst_gui->getQuestionForm($form);
 		}
+		//
+		$te = new ilColorPickerInputGUI($this->pl->txt('color'), 'color');
+		$te->setDefaultColor('000');
+//		$te->setRequired(true);
+		$form->addItem($te);
+
+
 
 		return $form;
 	}

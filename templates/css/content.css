@@ -73,10 +73,12 @@ div.blockInfo {
 
 #form_evaluation_form div.ilForm {
 	width: 1024px;
+	/*width: 100%;*/
 }
 
 #form_evaluation_form div.ilFormOption {
 	width: 300px;
+	/*width: 100px;*/
 }
 
 div#feedback_overview {
