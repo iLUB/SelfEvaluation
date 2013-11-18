@@ -119,6 +119,11 @@ class ilSelfEvaluationBlockGUI {
 		$this->form->addItem($te);
 		$te = new ilTextAreaInputGUI($this->pl->txt('description'), 'description');
 		$this->form->addItem($te);
+		if (ilObjSelfEvaluationGUI::DEV) {
+			$te = new ilColorPickerInputGUI($this->pl->txt('color'), 'color');
+			$te->setDefaultColor('000000');
+			$this->form->addItem($te);
+		}
 	}
 
 
@@ -165,7 +170,7 @@ class ilSelfEvaluationBlockGUI {
 
 
 	public function deleteBlock() {
-//		ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
+		//		ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
 		$conf = new ilConfirmationGUI();
 		$conf->setFormAction($this->ctrl->getFormAction($this));
 		$conf->setCancel($this->pl->txt('cancel'), 'cancel');
@@ -208,13 +213,6 @@ class ilSelfEvaluationBlockGUI {
 			$qst_gui = new ilSelfEvaluationQuestionGUI($this->parent, $qst->getId(), $this->object->getId());
 			$qst_gui->getQuestionForm($form);
 		}
-		//
-		$te = new ilColorPickerInputGUI($this->pl->txt('color'), 'color');
-		$te->setDefaultColor('000');
-//		$te->setRequired(true);
-		$form->addItem($te);
-
-
 
 		return $form;
 	}
