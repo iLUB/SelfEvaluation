@@ -233,9 +233,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		if (($this->object->getAllowShowResults())
 			AND $this->object->hasDatasets()
 		) {
-			//			$this->tabs_gui->addTab('my_results', $this->txt('show_my_results'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'listMyObjects'));
 			if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
-				$this->tabs_gui->addTab('all_results', $this->txt('show_all_results'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'listObjects'));
+				$this->tabs_gui->addTab('all_results', $this->txt('show_all_results'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'index'));
 			}
 		}
 		$this->addPermissionTab();
@@ -286,7 +285,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$opt = array(
 			ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->pl->txt('single_page'),
 			ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->pl->txt('multiple_pages'),
-//			ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->pl->txt('all_questions_shuffled'),
+			//			ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->pl->txt('all_questions_shuffled'),
 		);
 		$se->setOptions($opt);
 		$this->form->addItem($se);

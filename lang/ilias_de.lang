@@ -154,3 +154,7 @@ show_feedback#:#Feedback anzeigen
 qst_delete_dataset#:#Möchten Sie den Datensatz wirklich löschen?
 msg_dataset_deleted#:#Datensatz gelöscht
 show_questions#:#Grafiken für einzelne Fragen anzeigen
+
+delete_all_datasets#:#Alle Datensätze löschen
+confirm_delete_all_datasets#:#Möchten Sie alle Datensätze löschen?
+all_datasets_deleted#:#Alle Datensätze wurden gelöscht

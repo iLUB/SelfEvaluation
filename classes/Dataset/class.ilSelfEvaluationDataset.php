@@ -305,7 +305,7 @@ class ilSelfEvaluationDataset {
 	 * @param      $obj_id
 	 * @param bool $as_array
 	 *
-	 * @return array
+	 * @return ilSelfEvaluationDataset[]
 	 */
 	public static function _getAllInstancesByObjectId($obj_id, $as_array = false) {
 		global $ilDB;
@@ -326,6 +326,20 @@ class ilSelfEvaluationDataset {
 		}
 
 		return $return;
+	}
+
+
+	/**
+	 * @param $obj_id
+	 *
+	 * @return bool
+	 */
+	public static function _deleteAllInstancesByObjectId($obj_id) {
+		foreach (self::_getAllInstancesByObjectId($obj_id) as $obj) {
+			$obj->delete();
+		}
+
+		return true;
 	}
 
 

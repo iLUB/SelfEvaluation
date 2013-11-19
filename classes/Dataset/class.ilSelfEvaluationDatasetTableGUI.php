@@ -17,12 +17,14 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 	/**
 	 * @param ilObjSelfEvaluationGUI $a_parent_obj
 	 * @param string                 $a_parent_cmd
+	 *
 	 */
 	function __construct(ilObjSelfEvaluationGUI $a_parent_obj, $a_parent_cmd) {
-		global $ilCtrl, $ilTabs;
+		global $ilCtrl, $ilTabs, $ilToolbar;
 		/**
 		 * @var $ilCtrl ilCtrl
 		 * @var $ilTabs ilTabsGUI
+		 * @var $ilToolbar ilToolbarGUI
 		 */
 		$this->pl = new ilSelfEvaluationPlugin();
 		$this->ctrl = $ilCtrl;
@@ -40,8 +42,9 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', NULL);
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationDatasetGUI'));
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Dataset/tpl.template_dataset_row.html');
+		$ilToolbar->addButton($this->pl->txt('delete_all_datasets'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDeleteAll'));
 		switch ($a_parent_cmd) {
-			case 'listObjects':
+			case 'index':
 				$this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($a_parent_obj->object->getId(), true));
 				break;
 		}
