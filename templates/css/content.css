@@ -94,6 +94,14 @@ div#feedback_overview {
 
 }
 
+div.feedback {
+	margin-bottom: 30px;
+	margin-top: 10px;
+	background-color: #F4F4F4;
+	padding: 15px;
+	margin-left: -15px;
+}
+
 div.feedback_ov_item, div.feedback_ov_item_blank {
 	background-color: #CEE6FF;
 	height:           30px;
