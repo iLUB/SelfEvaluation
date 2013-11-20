@@ -98,3 +98,22 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 }
 
 ?>
+<#5>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+	$field = array(
+		'type' => 'integer',
+		'length' => 1,
+	);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_fbs' , $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_fbs_charts' , $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_fbs_overview' , $field);
+	$ilDB->dropTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_questions');
+
+}
+
+?>

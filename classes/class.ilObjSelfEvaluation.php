@@ -90,7 +90,15 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	/**
 	 * @var bool
 	 */
-	protected $allow_show_questions = false;
+	protected $show_feedbacks = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_feedbacks_charts = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_feedbacks_overview = true;
 
 
 	/**
@@ -144,9 +152,17 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'text',
 				$this->getOutro()
 			),
-			'show_questions' => array(
+			'show_fbs' => array(
 				'integer',
-				$this->getAllowShowQuestions()
+				$this->getShowFeedbacks()
+			),
+			'show_fbs_charts' => array(
+				'integer',
+				$this->getShowFeedbacksCharts()
+			),
+			'show_fbs_overview' => array(
+				'integer',
+				$this->getShowFeedbacksOverview()
 			),
 		);
 	}
@@ -167,13 +183,14 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setDisplayType($rec->display_type);
 			$this->setIntro($rec->intro);
 			$this->setOutro($rec->outro);
-			$this->setAllowShowQuestions($rec->show_questions);
+			$this->setShowFeedbacks($rec->show_fbs);
+			$this->setShowFeedbacksCharts($rec->show_fbs_charts);
+			$this->setShowFeedbacksOverview($rec->show_fbs_overview);
 		}
 	}
 
 
 	function doUpdate() {
-
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
@@ -440,18 +457,50 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 
 	/**
-	 * @param boolean $allow_show_questions
+	 * @param boolean $show_feedbacks
 	 */
-	public function setAllowShowQuestions($allow_show_questions) {
-		$this->allow_show_questions = $allow_show_questions;
+	public function setShowFeedbacks($show_feedbacks) {
+		$this->show_feedbacks = $show_feedbacks;
 	}
 
 
 	/**
 	 * @return boolean
 	 */
-	public function getAllowShowQuestions() {
-		return $this->allow_show_questions;
+	public function getShowFeedbacks() {
+		return $this->show_feedbacks;
+	}
+
+
+	/**
+	 * @param boolean $show_feedbacks_charts
+	 */
+	public function setShowFeedbacksCharts($show_feedbacks_charts) {
+		$this->show_feedbacks_charts = $show_feedbacks_charts;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowFeedbacksCharts() {
+		return $this->show_feedbacks_charts;
+	}
+
+
+	/**
+	 * @param boolean $show_feedbacks_overview
+	 */
+	public function setShowFeedbacksOverview($show_feedbacks_overview) {
+		$this->show_feedbacks_overview = $show_feedbacks_overview;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowFeedbacksOverview() {
+		return $this->show_feedbacks_overview;
 	}
 }
 

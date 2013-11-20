@@ -393,13 +393,17 @@ class ilSelfEvaluationFeedbackGUI {
 		);
 		//		shuffle($colors);
 		$pl = new ilSelfEvaluationPlugin();
+		/**
+		 * @var $obj ilObjSelfEvaluation
+		 */
+		$obj = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
 		$tpl = $pl->getTemplate('default/Feedback/tpl.feedback.html');
 		$color_id = 0;
 		$percentages = $dataset->getPercentagePerBlock();
 		foreach ($dataset->getFeedbacksPerBlock() as $block_id => $fb) {
 			// Chart
 			$tpl->setCurrentBlock('feedback');
-			if ($show_charts) {
+			if ($obj->getShowFeedbacksCharts()) {
 				$chart = new ilChart('fb_' . $block_id, self::WIDTH - 15, round((self::WIDTH - 50) / 4, 0));
 				//				$chart->
 				$chart->setColors(array( $colors[$color_id] ));
@@ -427,7 +431,10 @@ class ilSelfEvaluationFeedbackGUI {
 			$tpl->setVariable('BLOCK_TITLE', $block->getTitle());
 			$tpl->setVariable('WIDTH', self::WIDTH);
 			$tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
-			$tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
+			$tpl->setVariable('FEEDBACK_TITLE_INTRO', $pl->txt('feedback_title_intro') . ':');
+			if ($obj->getShowFeedbacks()) {
+				$tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
+			}
 			$tpl->parseCurrentBlock();
 			//			$overview_data[$block_id] = $percentages[$block_id];
 			$blocks[$block->getPosition()] = array(
@@ -436,7 +443,7 @@ class ilSelfEvaluationFeedbackGUI {
 			);
 			$color_id ++;
 		}
-		if (count($dataset->getFeedbacksPerBlock()) > 1) {
+		if (count($dataset->getFeedbacksPerBlock()) > 1 AND $obj->getShowFeedbacksOverview()) {
 			$tpl->setVariable('OVERVIEW_CHART', self::_getOverviewCharts($blocks, $colors));
 		}
 

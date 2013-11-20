@@ -309,10 +309,23 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		);
 		$se->setOptions($opt);
 		$this->form->addItem($se);
-		// Show Questions
-		$cb = new ilCheckboxInputGUI($this->pl->txt('show_questions'), 'show_questions');
+		// Show Feedbacks
+		$cb = new ilCheckboxInputGUI($this->pl->txt('show_fbs_overview'), 'show_fbs_overview');
 		$cb->setValue(1);
 		$this->form->addItem($cb);
+		//
+		$cb = new ilCheckboxInputGUI($this->pl->txt('show_fbs'), 'show_fbs');
+		$cb->setValue(1);
+
+		//
+		$cb_a = new ilCheckboxInputGUI($this->pl->txt('show_fbs_charts'), 'show_fbs_charts');
+		$cb_a->setValue(1);
+		$cb->addSubItem($cb_a);
+		$this->form->addItem($cb);
+
+
+
+
 		// Buttons
 		$this->form->addCommandButton('updateProperties', $this->txt('save'));
 		$this->form->setTitle($this->txt('edit_properties'));
@@ -334,7 +347,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['sort_type'] = $this->object->getSortType();
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['display_type'] = $this->object->getDisplayType();
-		$values['show_questions'] = $this->object->getAllowShowQuestions();
+		$values['show_fbs_overview'] = $this->object->getShowFeedbacksOverview();
+		$values['show_fbs'] = $this->object->getShowFeedbacks();
+		$values['show_fbs_charts'] = $this->object->getShowFeedbacksCharts();
 		$this->form->setValuesByArray($values);
 	}
 
@@ -353,7 +368,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setOutro($this->form->getInput('outro'));
 			$this->object->setSortType($this->form->getInput('sort_type'));
 			$this->object->setDisplayType($this->form->getInput('display_type'));
-			$this->object->setAllowShowQuestions($this->form->getInput('show_questions'));
+			$this->object->setShowFeedbacksOverview($this->form->getInput('show_fbs_overview'));
+			$this->object->setShowFeedbacks($this->form->getInput('show_fbs'));
+			$this->object->setShowFeedbacksCharts($this->form->getInput('show_fbs_charts'));
 			$this->object->update();
 			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'editProperties');

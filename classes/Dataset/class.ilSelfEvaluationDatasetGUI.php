@@ -117,7 +117,7 @@ class ilSelfEvaluationDatasetGUI {
 		$content->setVariable('INTRO_HEADER', $this->pl->txt('outro_header'));
 		$content->setVariable('INTRO_BODY', $this->parent->object->getOutro());
 		if ($this->parent->object->getAllowShowResults()) {
-			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset, $this->parent->object->getAllowShowQuestions());
+			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset);
 		}
 		$this->tpl->setContent($content->get() . $feedback);
 	}
