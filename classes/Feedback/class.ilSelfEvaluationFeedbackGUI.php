@@ -359,8 +359,8 @@ class ilSelfEvaluationFeedbackGUI {
 			$data = new ilChartData('bars');
 			$data->setBarOptions(self::BAR_WIDTH, 'center');
 			$block = new ilSelfEvaluationBlock($block_d['block_id']);
-			$data->addPoint($block->getId(), $block_d['percentage']);
-			$ticks[$block->getId()] = $block->getTitle();
+			$data->addPoint($block->getPosition(), $block_d['percentage']);
+			$ticks[$block->getPosition()] = $block->getTitle();
 			$chart->addData($data);
 		}
 		$chart->setTicks($ticks, false, true);
@@ -437,7 +437,7 @@ class ilSelfEvaluationFeedbackGUI {
 			}
 			$tpl->parseCurrentBlock();
 			//			$overview_data[$block_id] = $percentages[$block_id];
-			$blocks[$block->getPosition()] = array(
+			$blocks[] = array(
 				'block_id' => $block->getId(),
 				'percentage' => $percentages[$block->getId()]
 			);
