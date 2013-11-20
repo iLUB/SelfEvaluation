@@ -12,7 +12,7 @@ require_once('./Services/Form/classes/class.ilSubEnabledFormPropertyGUI.php');
  */
 class ilSliderInputGUI extends ilCustomInputGUI {
 
-	const PREFIX = 'fsx_';
+	const PREFIX = 'fsx_sl_';
 	/**
 	 * @var array
 	 */

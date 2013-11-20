@@ -53,7 +53,9 @@ class ilSelfEvaluationFeedbackGUI {
 			$this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
 		}
 		$this->tpl->addJavaScript($this->pl->getDirectory()
-			. '/templates/js/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js');
+			. '/templates/js/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js', false, 1);
+		$this->tpl->addCss($this->pl->getDirectory()
+			. '/templates/js/jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.min.css');
 	}
 
 
@@ -62,7 +64,6 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->ctrl->saveParameter($this, 'block_id');
 		$this->ctrl->saveParameter($this, 'feedback_id');
 		$this->ctrl->saveParameterByClass('ilSelfEvaluationBlockGUI', 'block_id');
-		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/slider.js');
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
 		switch ($cmd) {
 			default:
