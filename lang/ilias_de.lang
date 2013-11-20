@@ -76,7 +76,7 @@ count_questions#:#Anzahl Fragen
 is_inverted#:#Umgekehrte Skala
 outro_header#:#Selbstevaluation beendet
 
-scale_cannot_be_edited#:#Diese Selbstevaluation enthält bereits Datensätze von Nutzern, daher kann die Skalierung nicht mehr verändert werden.
+scale_cannot_be_edited#:#Diese Selbstevaluation enthält bereits Datensätze von Nutzern, daher kann die Skalierung und Sortierung nicht mehr verändert werden.
 msg_has_datasets#:#Diese Selbstevaluation enthält bereits Datensätze von Nutzern. Fragen sollten daher nciht mehr verändert werden.
 
 create_feedback_form#:#Neues Feedback erfassen

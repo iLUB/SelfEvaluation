@@ -31,26 +31,29 @@ div.blockActions {
 }
 
 ul.matrix, ul.matrix li {
-	margin:  0px;
-	display: block;
-	padding: 0px !important;
-	height:  20px;
+	margin:      0px;
+	display:     block;
+	padding:     0px !important;
+	height:      25px;
+	line-height: 25px;
+
 }
 
 ul.matrix {
 	border-top:    1px dotted #E8E8E8;
 	border-bottom: 1px dotted #E8E8E8;
 	margin-bottom: 15px;
-	margin-top: 5px;
+	margin-top:    5px;
+	/*width: 800px;*/
 
 }
 
 ul.matrix li {
 	float:          left;
-	/*width:      100px;*/
 	list-style:     none;
 	text-align:     center;
 	vertical-align: middle;
+	width:          120px !important;
 }
 
 ul.matrix.header {
@@ -72,7 +75,7 @@ div.blockInfo {
 }
 
 #form_evaluation_form div.ilForm {
-	width: 1024px;
+	/*width: 1024px;*/
 	/*width: 100%;*/
 }
 
@@ -92,21 +95,20 @@ div#feedback_overview {
 }
 
 div.feedback_ov_item, div.feedback_ov_item_blank {
-	background-color:      #CEE6FF;
-	height:                30px;
-	border:                1px #808080 solid;
-	text-align:            center;
-	line-height:           30px;
-	z-index:               10;
-	float:                 left;
-	margin-right:          -2px;
-
+	background-color: #CEE6FF;
+	height:           30px;
+	border:           1px #808080 solid;
+	text-align:       center;
+	line-height:      30px;
+	z-index:          10;
+	float:            left;
+	margin-right:     -2px;
 
 }
 
 div.feedback_ov_item_blank {
 	background-color: #E8E8E8;
-	color: #696969;
+	color:            #696969;
 }
 
 div.slider_warning {
@@ -127,12 +129,12 @@ h1.feedback_block_title {
 	border-bottom: 1px #808080 dotted;
 }
 
-
 table#feedback_overview_table {
 	/*background-color: red;*/
-	width: 100%;
+	width:       100%;
 	border-left: 1px solid #808080;
 }
+
 table#feedback_overview_table td {
 	width: 1%;
 
@@ -140,11 +142,11 @@ table#feedback_overview_table td {
 
 td.feedback_overview_line, td.feedback_overview_line_double {
 	border-right: 1px solid #808080;
-	height: 20px;
-	font-size: 8px;
-	line-height: 20px;
-	color: #808080;
-	text-align: right;
+	height:       20px;
+	font-size:    8px;
+	line-height:  20px;
+	color:        #808080;
+	text-align:   right;
 }
 
 td.feedback_overview_line_double {
@@ -152,11 +154,11 @@ td.feedback_overview_line_double {
 }
 
 td.feedback_ov_item, td.feedback_ov_item_blank {
-	border:  1px solid #808080;
+	border:      1px solid #808080;
 	border-left: none;
-	height: 20px;
+	height:      20px;
 	line-height: 20px;
-	text-align: center;
+	text-align:  center;
 
 }
 
@@ -168,6 +170,4 @@ td.feedback_ov_item, div.ui-slider-range {
 td.feedback_ov_item_blank {
 	background-color: #D3D3D3;
 }
-
-
 

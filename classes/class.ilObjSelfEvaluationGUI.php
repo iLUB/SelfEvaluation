@@ -47,6 +47,24 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	const DEV = false;
 	const DEBUG = false;
 	const RELOAD = false;
+	protected static $disabled_buttons = array(
+		'charmap',
+		'undo',
+		'redo',
+		'justifyleft',
+		'justifycenter',
+		'justifyright',
+		'justifyfull',
+		'anchor',
+		'fullscreen',
+		'cut',
+		'copy',
+		'paste',
+		'pastetext',
+		'formatselect',
+		'imgupload',
+		'ilimgupload',
+	);
 	/**
 	 * @var ilObjSelfEvaluation
 	 */
@@ -267,10 +285,12 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		// intro
 		$te = new ilTextAreaInputGUI($this->txt('intro'), 'intro');
 		$te->setUseRte(true);
+		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
 		// outro
 		$te = new ilTextAreaInputGUI($this->txt('outro'), 'outro');
 		$te->setUseRte(true);
+		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
 		// Sorting
 		$se = new ilSelectInputGUI($this->pl->txt('sort_type'), 'sort_type');
