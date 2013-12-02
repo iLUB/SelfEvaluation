@@ -137,6 +137,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationFeedbackGUI', 'uid', $_GET['uid']);
 			$this->initHeader();
 			switch ($next_class) {
+				case 'ilcommonactiondispatchergui':
+					include_once 'Services/Object/classes/class.ilCommonActionDispatcherGUI.php';
+					$gui = ilCommonActionDispatcherGUI::getInstanceFromAjaxCall();
+					$this->ctrl->forwardCommand($gui);
+					break;
 				case 'ilpermissiongui':
 					include_once('Services/AccessControl/classes/class.ilPermissionGUI.php');
 					$perm_gui = new ilPermissionGUI($this);
@@ -316,16 +321,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		//
 		$cb = new ilCheckboxInputGUI($this->pl->txt('show_fbs'), 'show_fbs');
 		$cb->setValue(1);
-
 		//
 		$cb_a = new ilCheckboxInputGUI($this->pl->txt('show_fbs_charts'), 'show_fbs_charts');
 		$cb_a->setValue(1);
 		$cb->addSubItem($cb_a);
 		$this->form->addItem($cb);
-
-
-
-
 		// Buttons
 		$this->form->addCommandButton('updateProperties', $this->txt('save'));
 		$this->form->setTitle($this->txt('edit_properties'));
