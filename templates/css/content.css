@@ -53,17 +53,19 @@ ul.matrix li {
 	list-style:     none;
 	text-align:     center;
 	vertical-align: middle;
-	/*width:          120px !important;*/
+	
 	line-height: 25px;
 	/*height: auto;*/
 }
 
 ul.matrix.header {
-	display: inline-block;
+	/*display: inline-block;*/
 	background-color: #E8E8E8;
+
 }
 
 ul.matrix.header  li {
+
 	background-color: #E8E8E8;
 	font-weight: bold;
 }
