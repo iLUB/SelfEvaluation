@@ -71,7 +71,7 @@ update_question#:#Frage bearbeiten
 resume_button#:#Antworten bearbeiten
 data_saved#:#Daten wurden gespeichert.
 send_update#:#Änderungen speichern
-not_active#:#Die Selbstevaluation kann nicht gestartet werden, da sie noch keine Fragen enthält oder offline ist.
+not_active#:#Die Selbstevaluation kann nicht gestartet werden, da sie noch keine Fragen enthält, das Feedback unvollständig oder die Selbstevaluation offline ist.
 count_questions#:#Anzahl Fragen
 is_inverted#:#Umgekehrte Skala
 outro_header#:#Selbstevaluation beendet
