@@ -49,24 +49,31 @@ ul.matrix {
 }
 
 ul.matrix li {
-	float:          left;
+	float:          left; 
 	list-style:     none;
 	text-align:     center;
 	vertical-align: middle;
-	width:          120px !important;
+	word-wrap: normal;
 	line-height: 25px;
+	padding: 40px;
+	height: auto;
 	/*height: auto;*/
 }
 
 ul.matrix.header {
 	/*display: inline-block;*/
 	background-color: #E8E8E8;
+	min-width: 480px;
+	overflow:hidden;
+	
 }
+
 
 ul.matrix.header  li {
 	background-color: #E8E8E8;
 	font-weight: bold;
-	width:          120px !important;
+
+
 }
 
 li.col2 {
@@ -82,8 +89,7 @@ div.blockInfo {
 }
 
 #form_evaluation_form div.ilForm {
-	/*width: 1024px;*/
-	/*width: 100%;*/
+	width: 100%;
 }
 
 #form_evaluation_form div.ilFormOption {

@@ -64,6 +64,11 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 		//		$tpl->setVariable('BLOCKINFO', $this->getBlockInfo());
 		$width = round(100 / count($this->getScale()), 0);
 		foreach ($this->getScale() as $title) {
+		    if ($title == '' || $title == ' '){
+                $title = '&nbsp;';
+            }
+            $title = str_replace('  ','&nbsp;',$title);
+            
 			$tpl->setCurrentBlock('item');
 			$tpl->setVariable('NAME', $title);
 			$tpl->setVariable('STYLE', $width . '%');

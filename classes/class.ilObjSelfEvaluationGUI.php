@@ -106,8 +106,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		/**
 		 * @var $ilLocator ilLocatorGUI
 		 */
-		$ilLocator->addRepositoryItems($this->object->getRefId());
-		$this->tpl->setLocator($ilLocator->getHTML());
+		$this->setLocator();
 		$this->tpl->getStandardTemplate();
 		$this->setTitleAndDescription();
 		$this->displayIdentifier();
@@ -127,6 +126,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			if ($this->access->checkAccess('read', '', $_GET['ref_id'])) {
 				$this->history->addItem($_GET['ref_id'], $this->ctrl->getLinkTarget($this, $this->getStandardCmd()), $this->getType(), '');
 			}
+            
 			$cmd = $this->ctrl->getCmd();
 			$next_class = $this->ctrl->getNextClass($this);
 			if (self::RELOAD OR $_GET['rl'] == 'true') {
@@ -148,6 +148,12 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 					$this->tabs_gui->setTabActive('perm_settings');
 					$ret = $this->ctrl->forwardCommand($perm_gui);
 					break;
+                case 'ilinfoscreengui':
+                    $this->tabs_gui->setTabActive('info_short');
+                    require_once($this->ctrl->lookupClassPath($next_class));
+                    $gui = new $next_class($this);
+                    $this->ctrl->forwardCommand($gui);
+                    break;
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {
 						$this->performCommand($this->getStandardCmd());

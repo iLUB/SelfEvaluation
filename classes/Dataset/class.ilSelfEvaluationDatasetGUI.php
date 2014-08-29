@@ -82,7 +82,7 @@ class ilSelfEvaluationDatasetGUI {
 
 	public function index() {
 		$async = new ilOverlayRequestGUI();
-		$table = new ilSelfEvaluationDatasetTableGUI($this->parent, 'index');
+		$table = new ilSelfEvaluationDatasetTableGUI($this, 'index',$this->parent->object->getId());
 		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 
 		return;

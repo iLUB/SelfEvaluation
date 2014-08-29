@@ -19,7 +19,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 	 * @param string                 $a_parent_cmd
 	 *
 	 */
-	function __construct(ilObjSelfEvaluationGUI $a_parent_obj, $a_parent_cmd) {
+	function __construct(ilSelfEvaluationDatasetGUI $a_parent_obj, $a_parent_cmd, $obj_id=0) {
 		global $ilCtrl, $ilTabs, $ilToolbar;
 		/**
 		 * @var $ilCtrl ilCtrl
@@ -45,7 +45,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$ilToolbar->addButton($this->pl->txt('delete_all_datasets'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDeleteAll'));
 		switch ($a_parent_cmd) {
 			case 'index':
-				$this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($a_parent_obj->object->getId(), true));
+				$this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id, true));
 				break;
 		}
 	}

@@ -318,7 +318,7 @@ class ilSelfEvaluationDataset {
 				. $ilDB->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
 			while ($rec = $ilDB->fetchObject($set)) {
 				if ($as_array) {
-					$return[] = (array)new self($rec->id);
+					$return[] = (array)new self($rec->id);                                     
 				} else {
 					$return[] = new self($rec->id);
 				}

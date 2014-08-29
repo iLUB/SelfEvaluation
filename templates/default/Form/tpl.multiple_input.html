@@ -1,6 +1,6 @@
 <script>
 	$(document).ready(function () {
-		function handler(e) {
+		var handler = function(e) {
 			var last_value = parseInt($(".multipleinput_new").last().find('input').first().val());
 			if (last_value >= 0) {
 				var next_value = 1 + last_value;
@@ -39,7 +39,7 @@
 		$("table#input_colletion tbody").sortable({
 			helper: fixHelper,
 			items: '.fsxSortable'
-		}).disableSelection();
+		});
 	});
 </script>
 <style>
