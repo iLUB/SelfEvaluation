@@ -10,6 +10,7 @@ require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.ph
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilMatrixHeaderGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
+require_once(dirname(__FILE__) . '/../Form/class.ilFormSectionHeaderGUIFixed.php');
 /**
  * GUI-Class ilSelfEvaluationBlockGUI
  *
@@ -192,18 +193,23 @@ class ilSelfEvaluationBlockGUI {
 	 *
 	 * @return ilPropertyFormGUI
 	 */
-	public function getBlockForm(ilPropertyFormGUI $parent_form = NULL) {
+	public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
 		if ($parent_form) {
 			$form = $parent_form;
 		} else {
 			$form = new ilPropertyFormGUI();
 		}
-		$h = new ilFormSectionHeaderGUI();
-		$h->setTitle($this->object->getTitle());
-		$form->addItem($h);
+		$h = new ilFormSectionHeaderGUIFixed();
+        $h->setTitle($this->object->getTitle());
+        if($first)
+        {
+            $form->addItem($h);
+            $h = new ilFormSectionHeaderGUIFixed();
+        }
+        $h->setInfo($this->object->getDescription());
+        $form->addItem($h);
 		$sc = new ilMatrixHeaderGUI();
 		$sc->setScale($this->object->getScale()->getUnitsAsArray());
-		$sc->setBlockInfo($this->object->getDescription());
 		$form->addItem($sc);
 		$questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId());
 		if ($this->parent->object->getSortType() == ilObjSelfEvaluation::SORT_SHUFFLE) {

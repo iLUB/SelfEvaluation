@@ -170,9 +170,11 @@ class ilSelfEvaluationPresentationGUI {
 		$blocks = ilSelfEvaluationBlock::_getAllInstancesByParentId($this->parent->object->getId());
 		switch ($this->parent->object->getDisplayType()) {
 			case ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE:
+                $first = true;
 				foreach ($blocks as $block) {
 					$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
-					$this->form = $block_gui->getBlockForm($this->form);
+					$this->form = $block_gui->getBlockForm($this->form, $first);
+                    $first = false;
 				}
 				$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
 				$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
