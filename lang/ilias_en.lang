@@ -122,8 +122,9 @@ uid_not_exists#:#Die eingegebene Identifikation existiert nicht
 question#:#Frage
 your_uid#:#Ihre Identifikation:
 
-multinput_value#:#Nummerischer Wert
+multinput_value#:#Numerischer Wert
 multinput_title#:#Bezeichnung
+multinput_description#:#Es empfiehlt sich, den ersten numerischen Wert 0 nicht zu ändern, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
 sort_type#:#Sortierung
 sort_shuffle#:#Fragen pro Block mischen
 sort_manually#:#Festgelegte Reihenfolge

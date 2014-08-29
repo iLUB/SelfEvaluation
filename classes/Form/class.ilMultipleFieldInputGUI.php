@@ -23,11 +23,22 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 	/**
 	 * @var string
 	 */
-	protected $placeholder_value = 'Value';
+	protected $placeholder_value = "Value";
 	/**
 	 * @var string
 	 */
 	protected $placeholder_title = 'Title';
+    /**
+     * @var int
+     */
+    protected $default_value = 0;
+
+    /**
+     * @var string
+     */
+    protected $description = "";
+
+
 
 
 	/**
@@ -73,9 +84,11 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 			$tpl->setVariable('TITLE_N_NEW', $this->getFieldName() . '_new[title][]');
 			$tpl->setVariable('DISABLED_N', $this->getDisabled() ? 'disabled' : '');
 			$tpl->setVariable('PLACEHOLDER_VALUE', $this->getPlaceholderValue());
+            $tpl->setVariable('DEFAULT_VALUE', $this->getDefaultValue());
 			$tpl->setVariable('PLACEHOLDER_TITLE', $this->getPlaceholderTitle());
 			$tpl->setVariable('LOCK_CSS', $this->getDisabled() ? 'locked' : '');
 			$tpl->parseCurrentBlock();
+            $tpl->setVariable("DESCRIPTION", $this->getDescription());
 		}
 
 		return $tpl->get();
@@ -156,6 +169,38 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 	public function getPlaceholderValue() {
 		return $this->placeholder_value;
 	}
+
+    /**
+     * @param string $default_value
+     */
+    public function setDefaultValue($default_value)
+    {
+        $this->default_value = $default_value;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultValue()
+    {
+        return $this->default_value;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
 }
 
 ?>

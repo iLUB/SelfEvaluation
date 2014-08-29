@@ -54,6 +54,7 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI {
 		$te = new ilMultipleFieldInputGUI($this->pl->txt('scale'), 'scale', self::FIELD_NAME);
 		$te->setPlaceholderValue($this->pl->txt('multinput_value'));
 		$te->setPlaceholderTitle($this->pl->txt('multinput_title'));
+        $te->setDescription($this->pl->txt('multinput_description'));
 		$te->setDisabled($this->locked);
 		$this->addItem($te);
 		// FillForm
