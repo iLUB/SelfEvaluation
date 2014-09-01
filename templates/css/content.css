@@ -63,7 +63,7 @@ ul.matrix li {
 ul.matrix.header {
 	/*display: inline-block;*/
 	background-color: #E8E8E8;
-	min-width: 480px;
+	min-width: 600px;
 	overflow:hidden;
 	
 }

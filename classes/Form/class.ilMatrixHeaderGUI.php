@@ -62,7 +62,7 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 		$pl = new ilSelfEvaluationPlugin();
 		$tpl = $pl->getTemplate('default/Form/tpl.matrix_header.html');
 		//		$tpl->setVariable('BLOCKINFO', $this->getBlockInfo());
-		$width = round(100 / count($this->getScale()), 0);
+		$width = floor(100 / count($this->getScale()));
 		foreach ($this->getScale() as $title) {
 		    if ($title == '' || $title == ' '){
                 $title = '&nbsp;';
