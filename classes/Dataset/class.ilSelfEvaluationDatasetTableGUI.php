@@ -60,6 +60,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', $obj->getId());
 		// Row
 		$this->tpl->setVariable('DATE', date('d.m.Y - H:i:s', $obj->getCreationDate()));
+        $this->tpl->setVariable('EDIT_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'));
 		switch ($identifier->getType()) {
 			case ilSelfEvaluationIdentity::TYPE_EXTERNAL:
 				$this->tpl->setVariable('TYPE', $this->pl->txt('identity_type_'
