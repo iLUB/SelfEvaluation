@@ -187,8 +187,8 @@ class ilSelfEvaluationFeedbackGUI {
 		$sl->setRequired(true);
 		$this->form->addItem($sl);
 		// Feedbacktext
-		$te = new ilTextAreaInputGUI($this->pl->txt('feedback_text'), 'feedback_text');
-		$te->setUseRte(true);
+		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
+		$te = new ilTinyMceTextAreaInputGUI($this->pl->txt('feedback_text'), 'feedback_text');
 		$te->setRequired(true);
 		$this->form->addItem($te);
 	}

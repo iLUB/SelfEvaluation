@@ -294,13 +294,12 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$cb = new ilCheckboxInputGUI($this->txt('online'), 'online');
 		$this->form->addItem($cb);
 		// intro
-		$te = new ilTextAreaInputGUI($this->txt('intro'), 'intro');
-		$te->setUseRte(true);
+		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
+		$te = new ilTinyMceTextAreaInputGUI($this->txt('intro'), 'intro');
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
 		// outro
-		$te = new ilTextAreaInputGUI($this->txt('outro'), 'outro');
-		$te->setUseRte(true);
+		$te = new ilTinyMceTextAreaInputGUI($this->txt('outro'), 'outro');
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
 		// Sorting
