@@ -260,7 +260,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function hasDatasets() {
 		foreach (ilSelfEvaluationIdentity::_getAllInstancesByForForObjId($this->getId()) as $id) {
-			foreach (ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId()) as $ds) {
+			if (count(ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId())) > 0) {
 				return true;
 			}
 		}
@@ -274,7 +274,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function hasBLocks() {
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
-			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
+			if (count(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId())) > 0) {
 				return true;
 			}
 		}

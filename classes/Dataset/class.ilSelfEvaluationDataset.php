@@ -262,7 +262,7 @@ class ilSelfEvaluationDataset {
 	/**
 	 * @param null $a_block_id
 	 *
-	 * @return array
+	 * @return ilSelfEvaluationFeedback[]
 	 */
 	public function getFeedbacksPerBlock($a_block_id = NULL) {
 		$return = array();

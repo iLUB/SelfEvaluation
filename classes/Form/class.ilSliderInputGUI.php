@@ -114,7 +114,7 @@ class ilSliderInputGUI extends ilCustomInputGUI {
 	/**
 	 * @return boolean
 	 */
-	public function getDisableOldFields() {
+	public function getDisableOldFields() { // TODO obsolete?
 		return $this->disableOldFields;
 	}
 

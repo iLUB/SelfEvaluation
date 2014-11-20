@@ -89,7 +89,7 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 	}
 
 
-	public function insert(&$a_tpl) {
+	public function insert(ilTemplate &$a_tpl) {
 		$a_tpl->setCurrentBlock('prop_custom');
 		$a_tpl->setVariable('CUSTOM_CONTENT', $this->getHtml());
 		$a_tpl->parseCurrentBlock();

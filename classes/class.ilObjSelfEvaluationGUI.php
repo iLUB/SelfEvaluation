@@ -86,6 +86,14 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	 * @var ilNavigationHistory
 	 */
 	protected $history;
+	/**
+	 * @var ilAccessHandler
+	 */
+	protected $access;
+	/**
+	 * @var ilTabsGUI
+	 */
+	public $tabs_gui; // Dirty type hinting fix for nasty implicit declaration by upstream code
 
 
 	public function displayIdentifier() {
@@ -103,10 +111,6 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	public function initHeader() {
-		global $ilLocator;
-		/**
-		 * @var $ilLocator ilLocatorGUI
-		 */
 		$this->setLocator();
 		$this->tpl->getStandardTemplate();
 		$this->setTitleAndDescription();
@@ -147,7 +151,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 					include_once('Services/AccessControl/classes/class.ilPermissionGUI.php');
 					$perm_gui = new ilPermissionGUI($this);
 					$this->tabs_gui->setTabActive('perm_settings');
-					$ret = $this->ctrl->forwardCommand($perm_gui);
+					$this->ctrl->forwardCommand($perm_gui);
 					break;
                 case 'ilinfoscreengui':
                     $this->tabs_gui->setTabActive('info_short');
@@ -181,7 +185,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 			return true;
 		} else {
-			parent::executeCommand();
+			return parent::executeCommand();
 		}
 	}
 
@@ -248,6 +252,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	function setTabs() {
+		/** @var ilAccessHandler $ilAccess */
 		global $ilAccess;
 		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
 			$this->object->setAllowShowResults(true);

@@ -36,7 +36,7 @@ class ilFormSectionHeaderGUIFixed extends ilFormSectionHeaderGUI
      * Insert property html
      *
      */
-    function insert(&$a_tpl)
+    function insert(ilTemplate &$a_tpl)
     {
         $a_tpl->setCurrentBlock("header");
         $a_tpl->setVariable("TXT_TITLE", $this->getTitle());

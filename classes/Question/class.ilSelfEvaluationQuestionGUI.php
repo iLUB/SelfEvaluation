@@ -246,14 +246,16 @@ class ilSelfEvaluationQuestionGUI {
 	 */
 	public static function getAllQuestionsForms(ilObjSelfEvaluationGUI $parent, ilPropertyFormGUI &$form) {
 		$parent_id = $parent->object->getId();
+		/** @var ilSelfEvaluationQuestion[] $questions */
 		$questions = array();
+
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($parent_id) as $block) {
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
 				$questions[] = $qst;
 			}
 		}
 		$sc = new ilMatrixHeaderGUI();
-		$sc->setScale($block->getScale()->getUnitsAsArray());
+		$sc->setScale($block->getScale()->getUnitsAsArray()); // TODO this looks nasty. Why is the the scale of hte last block onyl?
 		$form->addItem($sc);
 		shuffle($questions);
 		foreach ($questions as $qst) {

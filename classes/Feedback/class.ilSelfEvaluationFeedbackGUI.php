@@ -28,6 +28,14 @@ class ilSelfEvaluationFeedbackGUI {
 	 * @var ilPropertyFormGUI
 	 */
 	protected $form;
+	/**
+	 * @var ilTemplate
+	 */
+	protected $ov;
+	/**
+	 * @var int
+	 */
+	protected $total;
 
 
 	/**
@@ -142,7 +150,7 @@ class ilSelfEvaluationFeedbackGUI {
 			'next_from' => $next_min,
 			'next_to' => $next_max
 		));
-		$this->tpl->hide = true;
+		$this->tpl->hide = true; // TODO this looks very nasty (writing to the global template object)
 		exit;
 	}
 
@@ -271,7 +279,7 @@ class ilSelfEvaluationFeedbackGUI {
 	 * @return ilTemplate
 	 */
 	public function getOverview() {
-		$this->getMesurement();
+		$this->getMeasurement();
 		$min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId());
 		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->block->getId());
 		if (count($feedbacks) == 0) {
@@ -279,6 +287,7 @@ class ilSelfEvaluationFeedbackGUI {
 
 			return $this->ov;
 		}
+		$fb = NULL;
 		foreach ($feedbacks as $fb) {
 			if ($min !== false AND $min <= $fb->getStartValue()) {
 				$this->parseOverviewBlock('blank', $fb->getStartValue() - $min, $min);
@@ -294,7 +303,7 @@ class ilSelfEvaluationFeedbackGUI {
 	}
 
 
-	public function getMesurement() {
+	public function getMeasurement() {
 		$this->ov = $this->pl->getTemplate('default/Feedback/tpl.feedback_overview.html');
 		for ($x = 1; $x <= 100; $x += 1) {
 			$this->ov->setCurrentBlock('line');
@@ -311,24 +320,26 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	/**
-	 * @param        $type
-	 * @param        $width
-	 * @param        $value
+	 * @param string $type  should be 'blank' or 'fb'
+	 * @param int    $width
+	 * @param int    $value
 	 * @param string $title
 	 */
 	public function parseOverviewBlock($type, $width, $value, $title = '') { //$width, $title, $href, $css = '', $start_value = NULL) {
+		$href = '';
+		$css = '';
 		switch ($type) {
 			case 'blank':
 				$this->ctrl->setParameter($this, 'feedback_id', NULL);
 				$this->ctrl->setParameter($this, 'start_value', $value);
-				$href = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTarget($this, 'addNew'));
+//				$href = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTarget($this, 'addNew')); // auskommentiert da es unsinng scheint. TODO remove
 				$href = ($this->ctrl->getLinkTarget($this, 'addNew'));
 				$css = '_blank';
 				$title = $this->pl->txt('insert_feedback');
 				break;
 			case 'fb':
 				$this->ctrl->setParameter($this, 'feedback_id', $value);
-				$href = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTarget($this, 'editFeedback'));
+//				$href = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTarget($this, 'editFeedback')); // auskommentiert da es unsinng scheint. TODO remove
 				$href = ($this->ctrl->getLinkTarget($this, 'editFeedback'));
 				break;
 		}
@@ -370,12 +381,12 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	/**
-	 * @param ilSelfEvaluationDataset $dataset
+	 * @param ilSelfEvaluationDataset $data_set
 	 * @param bool                    $show_charts
 	 *
 	 * @return string
 	 */
-	public static function _getPresentationOfFeedback(ilSelfEvaluationDataset $dataset, $show_charts = true) {
+	public static function _getPresentationOfFeedback(ilSelfEvaluationDataset $data_set, $show_charts = true) {
 		$colors = array(
 			//			'#D0E8FF',
 			'#00CCFF',
@@ -396,11 +407,13 @@ class ilSelfEvaluationFeedbackGUI {
 		/**
 		 * @var $obj ilObjSelfEvaluation
 		 */
-		$obj = ilObjectFactory::getInstanceByRefId($_GET['ref_id']);
+		$factory = new ilObjectFactory();
+		$obj = $factory->getInstanceByRefId($_GET['ref_id']);
 		$tpl = $pl->getTemplate('default/Feedback/tpl.feedback.html');
 		$color_id = 0;
-		$percentages = $dataset->getPercentagePerBlock();
-		foreach ($dataset->getFeedbacksPerBlock() as $block_id => $fb) {
+		$percentages = $data_set->getPercentagePerBlock();
+		$blocks = array();
+		foreach ($data_set->getFeedbacksPerBlock() as $block_id => $fb) {
 			// Chart
 			$tpl->setCurrentBlock('feedback');
 			if ($obj->getShowFeedbacksCharts()) {
@@ -416,7 +429,7 @@ class ilSelfEvaluationFeedbackGUI {
 				$data->setBarOptions(self::BAR_WIDTH, 'center');
 				$ticks = array();
 				$x = 1;
-				foreach ($dataset->getDataPerBlock($block_id) as $qst_id => $value) {
+				foreach ($data_set->getDataPerBlock($block_id) as $qst_id => $value) {
 					$qst = new ilSelfEvaluationQuestion($qst_id);
 					$data->addPoint($x, $value);
 					$ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $pl->txt('question') . ' ' . $x;
@@ -443,7 +456,7 @@ class ilSelfEvaluationFeedbackGUI {
 			);
 			$color_id ++;
 		}
-		if (count($dataset->getFeedbacksPerBlock()) > 1 AND $obj->getShowFeedbacksOverview()) {
+		if (count($data_set->getFeedbacksPerBlock()) > 1 AND $obj->getShowFeedbacksOverview()) {
 			$tpl->setVariable('OVERVIEW_CHART', self::_getOverviewCharts($blocks, $colors));
 		}
 

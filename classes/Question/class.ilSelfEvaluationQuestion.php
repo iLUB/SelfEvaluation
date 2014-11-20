@@ -80,6 +80,7 @@ class ilSelfEvaluationQuestion {
 
 
 	final function initDB() {
+		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
 				'type' => $v[0],
@@ -108,7 +109,7 @@ class ilSelfEvaluationQuestion {
 		if (! $this->db->tableExists(self::TABLE_NAME)) {
 			$this->initDB();
 
-			return true;
+			return;
 		}
 		foreach ($this->getArrayForDb() as $k => $v) {
 			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
@@ -142,7 +143,7 @@ class ilSelfEvaluationQuestion {
 		if ($this->getId() != 0) {
 			$this->update();
 
-			return true;
+			return;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->setPosition(self::_getNextPosition($this->getParentId()));
@@ -163,7 +164,7 @@ class ilSelfEvaluationQuestion {
 		if ($this->getId() == 0) {
 			$this->create();
 
-			return true;
+			return;
 		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(

@@ -75,6 +75,7 @@ class ilSelfEvaluationIdentity {
 
 
 	final function initDB() {
+		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
 				'type' => $v[0],
@@ -103,7 +104,7 @@ class ilSelfEvaluationIdentity {
 		if (! $this->db->tableExists(self::TABLE_NAME)) {
 			$this->initDB();
 
-			return true;
+			return;
 		}
 		foreach ($this->getArrayForDb() as $k => $v) {
 			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
@@ -137,7 +138,7 @@ class ilSelfEvaluationIdentity {
 		if ($this->getId() != 0) {
 			$this->update();
 
-			return true;
+			return;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
@@ -192,6 +193,7 @@ class ilSelfEvaluationIdentity {
 	 */
 	public static function _getInstanceForObjId($obj_id, $identifier) {
 		global $ilDB;
+		$external = false;
 		if ($identifier === NULL) {
 			$external = true;
 			$identifier = strtoupper(substr(md5(rand(1, 99999)), 0, self::LENGTH));

@@ -19,6 +19,10 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 	/**
 	 * @var array
 	 */
+	protected $values;
+	/**
+	 * @var array
+	 */
 	protected $scale = array();
 	/**
 	 * @var string

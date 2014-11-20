@@ -15,9 +15,9 @@ require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 
 	/**
-	 * @param ilObjSelfEvaluationGUI $a_parent_obj
-	 * @param string                 $a_parent_cmd
-	 *
+	 * @param \ilObjSelfEvaluationGUI|\ilSelfEvaluationDatasetGUI $a_parent_obj TODO this looks nasty
+	 * @param string                                              $a_parent_cmd
+	 * @param int                                                 $obj_id
 	 */
 	function __construct(ilSelfEvaluationDatasetGUI $a_parent_obj, $a_parent_cmd, $obj_id=0) {
 		global $ilCtrl, $ilTabs, $ilToolbar;

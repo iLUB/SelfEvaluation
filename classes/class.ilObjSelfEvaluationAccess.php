@@ -46,6 +46,7 @@ class ilObjSelfEvaluationAccess extends ilObjectPluginAccess {
 	 * @return bool
 	 */
 	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = '') {
+		/** @var ilAccessHandler $ilAccess */
 		global $ilUser, $ilAccess;
 		if ($a_user_id == '') {
 			$a_user_id = $ilUser->getId();

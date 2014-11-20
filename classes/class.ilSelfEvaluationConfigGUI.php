@@ -28,6 +28,10 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 	 * @var string
 	 */
 	protected $table_name = '';
+	/**
+	 * @var ilPropertyFormGUI
+	 */
+	protected $form;
 
 
 	function __construct() {
@@ -102,6 +106,7 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 
 
 	public function getValues() {
+		$values = array();
 		foreach ($this->getFields() as $key => $item) {
 			$values[$key] = $this->object->getValue($key);
 			if (is_array($item['subelements'])) {
@@ -119,17 +124,20 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 	 */
 	public function initConfigurationForm() {
 		global $lng, $ilCtrl;
-		include_once('Services/Form/classes/class.ilPropertyFormGUI.php');
+		require_once('Services/Form/classes/class.ilPropertyFormGUI.php');
 		$this->form = new ilPropertyFormGUI();
 		foreach ($this->getFields() as $key => $item) {
+			/** @var ilFormPropertyGUI $field */
 			$field = new $item['type']($this->pl->txt($key), $key);
 			if ($item['info']) {
 				$field->setInfo($this->pl->txt($key . '_info'));
 			}
 			if (is_array($item['subelements'])) {
+				/** @var ilSubEnabledFormPropertyGUI $field */
 				foreach ($item['subelements'] as $subkey => $subitem) {
 					$subfield = new $subitem['type']($this->pl->txt($key . '_' . $subkey), $key . '_' . $subkey);
 					if ($subitem['info']) {
+						/** @var ilFormPropertyGUI $subfield */
 						$subfield->setInfo($this->pl->txt($key . '_info'));
 					}
 					$field->addSubItem($subfield);

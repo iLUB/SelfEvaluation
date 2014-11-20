@@ -84,6 +84,7 @@ class ilSelfEvaluationFeedback {
 
 
 	final function initDB() {
+		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
 				'type' => $v[0],
@@ -112,7 +113,7 @@ class ilSelfEvaluationFeedback {
 		if (! $this->db->tableExists(self::TABLE_NAME)) {
 			$this->initDB();
 
-			return true;
+			return;
 		}
 		foreach ($this->getArrayForDb() as $k => $v) {
 			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
@@ -146,7 +147,7 @@ class ilSelfEvaluationFeedback {
 		if ($this->getId() != 0) {
 			$this->update();
 
-			return true;
+			return;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
@@ -166,7 +167,7 @@ class ilSelfEvaluationFeedback {
 		if ($this->getId() == 0) {
 			$this->create();
 
-			return true;
+			return;
 		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
@@ -302,7 +303,7 @@ class ilSelfEvaluationFeedback {
 	 *
 	 * @return bool
 	 */
-	public static function _hasOverlap($parent_id, $start_value, $end_value) {
+	public static function _hasOverlap($parent_id, $start_value, $end_value) { // TODO delete?
 		global $ilDB;
 
 		return true;

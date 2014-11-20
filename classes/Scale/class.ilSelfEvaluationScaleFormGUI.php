@@ -66,6 +66,7 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI {
 	 * @return array
 	 */
 	public function fillForm() {
+		$array = array();
 		foreach ($this->obj->units as $u) {
 			/**
 			 * @var $u ilSelfEvaluationScaleUnit

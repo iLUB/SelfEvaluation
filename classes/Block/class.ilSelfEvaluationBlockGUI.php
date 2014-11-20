@@ -190,6 +190,7 @@ class ilSelfEvaluationBlockGUI {
 
 	/**
 	 * @param ilPropertyFormGUI $parent_form
+	 * @param bool              $first
 	 *
 	 * @return ilPropertyFormGUI
 	 */

@@ -1,6 +1,5 @@
 <?php
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
-//error_reporting(E_ALL);
 /**
  * ilSelfEvaluationBlock
  *
@@ -82,6 +81,7 @@ class ilSelfEvaluationBlock {
 
 
 	final function initDB() {
+		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
 				'type' => $v[0],
@@ -144,7 +144,7 @@ class ilSelfEvaluationBlock {
 		if ($this->getId() != 0) {
 			$this->update();
 
-			return true;
+			return;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->setPosition(self::_getNextPosition($this->getParentId()));
@@ -165,7 +165,7 @@ class ilSelfEvaluationBlock {
 		if ($this->getId() == 0) {
 			$this->create();
 
-			return true;
+			return;
 		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
@@ -183,11 +183,14 @@ class ilSelfEvaluationBlock {
 		/**
 		 * @var $parentObject ilObjSelfEvaluation
 		 */
-		$parentObject = ilObjectFactory::getInstanceByObjId($this->getParentId());
+		$object_factory = new ilObjectFactory();
+		$parentObject = $object_factory->getInstanceByObjId($this->getParentId());
 		switch ($parentObject->getSortType()) {
 			case ilObjSelfEvaluation::SORT_MANUALLY:
 				return true;
 			case ilObjSelfEvaluation::SORT_SHUFFLE:
+				return false;
+			default:
 				return false;
 		}
 	}
