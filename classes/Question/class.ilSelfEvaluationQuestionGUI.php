@@ -122,7 +122,7 @@ class ilSelfEvaluationQuestionGUI {
 		$te->setRequired(false);
 		$this->form->addItem($te);
 		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
-		$te = new ilTinyMceTextAreaInputGUI($this->pl->txt('question_body'), 'question_body');
+		$te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->pl->txt('question_body'), 'question_body');
 		$te->setRequired(true);
 		$cb = new ilCheckboxInputGUI($this->pl->txt('is_inverse'), 'is_inverse');
 		$cb->setValue(1);

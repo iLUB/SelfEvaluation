@@ -61,9 +61,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		'copy',
 		'paste',
 		'pastetext',
+		'pasteword',
 		'formatselect',
 		'imgupload',
-		'ilimgupload',
+		'ilimgupload'
 	);
 	/**
 	 * @var ilObjSelfEvaluation
@@ -295,11 +296,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->form->addItem($cb);
 		// intro
 		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
-		$te = new ilTinyMceTextAreaInputGUI($this->txt('intro'), 'intro');
+		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('intro'), 'intro');
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
 		// outro
-		$te = new ilTinyMceTextAreaInputGUI($this->txt('outro'), 'outro');
+		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('outro'), 'outro');
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
 		// Sorting
