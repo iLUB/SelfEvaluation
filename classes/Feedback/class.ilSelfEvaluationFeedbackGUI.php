@@ -445,7 +445,6 @@ class ilSelfEvaluationFeedbackGUI {
 				$tpl->setVariable('BLOCK_TITLE', $block->getTitle());
 				$tpl->setVariable('WIDTH', self::WIDTH);
 				$tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
-				$tpl->setVariable('FEEDBACK_TITLE_INTRO', $pl->txt('feedback_title_intro') . ':');
 				$tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
 				$tpl->parseCurrentBlock();
 				//			$overview_data[$block_id] = $percentages[$block_id];
