@@ -99,6 +99,14 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var bool
 	 */
 	protected $show_feedbacks_overview = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_block_titles_during_evaluation = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_block_titles_during_feedback = true;
 
 
 	/**
@@ -164,6 +172,14 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'integer',
 				$this->getShowFeedbacksOverview()
 			),
+			'show_block_titles_sev' => array(
+				'integer',
+				$this->getShowBlockTitlesDuringEvaluation()
+			),
+			'show_block_titles_fb' => array(
+				'integer',
+				$this->getShowBlockTitlesDuringFeedback()
+			)
 		);
 	}
 
@@ -186,6 +202,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setShowFeedbacks($rec->show_fbs);
 			$this->setShowFeedbacksCharts($rec->show_fbs_charts);
 			$this->setShowFeedbacksOverview($rec->show_fbs_overview);
+			$this->setShowBlockTitlesDuringEvaluation($rec->show_block_titles_sev);
+			$this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
 		}
 	}
 
@@ -501,6 +519,38 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function getShowFeedbacksOverview() {
 		return $this->show_feedbacks_overview;
+	}
+
+
+	/**
+	 * @param boolean $show_block_titles_during_evaluation
+	 */
+	public function setShowBlockTitlesDuringEvaluation($show_block_titles_during_evaluation) {
+		$this->show_block_titles_during_evaluation = $show_block_titles_during_evaluation;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowBlockTitlesDuringEvaluation() {
+		return $this->show_block_titles_during_evaluation;
+	}
+
+
+	/**
+	 * @param boolean $show_block_titles_during_feedback
+	 */
+	public function setShowBlockTitlesDuringFeedback($show_block_titles_during_feedback) {
+		$this->show_block_titles_during_feedback = $show_block_titles_during_feedback;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowBlockTitlesDuringFeedback() {
+		return $this->show_block_titles_during_feedback;
 	}
 }
 

@@ -200,13 +200,16 @@ class ilSelfEvaluationBlockGUI {
 		} else {
 			$form = new ilPropertyFormGUI();
 		}
+		if ($first) {
+			$h = new ilFormSectionHeaderGUIFixed();
+			$form->addItem($h);
+		}
 		$h = new ilFormSectionHeaderGUIFixed();
-        $h->setTitle($this->object->getTitle());
-        if($first)
-        {
-            $form->addItem($h);
-            $h = new ilFormSectionHeaderGUIFixed();
-        }
+		if ($this->parent->object->getShowBlockTitlesDuringEvaluation()) {
+            $h->setTitle($this->object->getTitle());
+		} else {
+			$h->setTitle('');
+		}
         $h->setInfo($this->object->getDescription());
         $form->addItem($h);
 		$sc = new ilMatrixHeaderGUI();

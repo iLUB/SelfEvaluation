@@ -325,6 +325,12 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		);
 		$se->setOptions($opt);
 		$this->form->addItem($se);
+		// Show question block titles during evaluation
+		$cb = new ilCheckboxInputGUI($this->pl->txt('show_block_titles_sev'), 'show_block_titles_sev');
+		$this->form->addItem($cb);
+		// Show question block titles during feedback
+		$cb = new ilCheckboxInputGUI($this->pl->txt('show_block_titles_fb'), 'show_block_titles_fb');
+		$this->form->addItem($cb);
 		// Show Feedbacks
 		$cb = new ilCheckboxInputGUI($this->pl->txt('show_fbs_overview'), 'show_fbs_overview');
 		$cb->setValue(1);
@@ -361,6 +367,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['show_fbs_overview'] = $this->object->getShowFeedbacksOverview();
 		$values['show_fbs'] = $this->object->getShowFeedbacks();
 		$values['show_fbs_charts'] = $this->object->getShowFeedbacksCharts();
+		$values['show_block_titles_sev'] = $this->object->getShowBlockTitlesDuringEvaluation();
+		$values['show_block_titles_fb'] = $this->object->getShowBlockTitlesDuringFeedback();
 		$this->form->setValuesByArray($values);
 	}
 
@@ -382,6 +390,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setShowFeedbacksOverview($this->form->getInput('show_fbs_overview'));
 			$this->object->setShowFeedbacks($this->form->getInput('show_fbs'));
 			$this->object->setShowFeedbacksCharts($this->form->getInput('show_fbs_charts'));
+			$this->object->setShowBlockTitlesDuringEvaluation($this->form->getInput('show_block_titles_sev'));
+			$this->object->setShowBlockTitlesDuringFeedback($this->form->getInput('show_block_titles_fb'));
 			$this->object->update();
 			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'editProperties');
