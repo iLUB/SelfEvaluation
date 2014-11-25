@@ -457,7 +457,7 @@ class ilSelfEvaluationFeedbackGUI {
 			);
 			$color_id ++;
 		}
-		if (count($data_set->getFeedbacksPerBlock()) > 1 AND $obj->getShowFeedbacksOverview()) {
+		if (count($data_set->getFeedbacksPerBlock()) > 0 AND $obj->getShowFeedbacksOverview()) {
 			$tpl->setVariable('OVERVIEW_CHART', self::_getOverviewCharts($blocks, $colors));
 		}
 
