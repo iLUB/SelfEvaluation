@@ -233,6 +233,9 @@ class ilSelfEvaluationDataset {
 		$highest = $sorted_scale[count($sorted_scale) - 1];
 		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($obj_id) as $block) {
 			$answer_data = $this->getDataPerBlock($block->getId());
+			if (count($answer_data) == 0) {
+				break;
+			}
 			$answer_total = array_sum($answer_data);
 			$anzahl_fragen = count($answer_data);
 			$possible_per_block = $anzahl_fragen * $highest;

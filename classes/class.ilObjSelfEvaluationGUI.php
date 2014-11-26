@@ -46,7 +46,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 	const DEV = false;
 	const DEBUG = false;
-	const RELOAD = false;
+	const RELOAD = false; // set to true or use the GET parameter rl=true to reload the plugin languages
 	protected static $disabled_buttons = array(
 		'charmap',
 		'undo',
