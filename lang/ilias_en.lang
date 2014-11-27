@@ -49,6 +49,7 @@ scale_form#:#Skalierung
 create_question#:#Frage erstellen
 create_question_button#:#Frage erstellen
 question_body#:#Fragetext
+question_title_info#:#Der Titel wird für die Benennung der Feedback Grafiken verwendet.
 add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke
 add_new_block#:#Frageblock hinzufügen
