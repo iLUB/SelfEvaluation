@@ -118,6 +118,8 @@ class ilSelfEvaluationBlockGUI {
 		$te = new ilTextInputGUI($this->pl->txt('title'), 'title');
 		$te->setRequired(true);
 		$this->form->addItem($te);
+		$te = new ilTextInputGUI($this->pl->txt('abbreviation'), 'abbreviation');
+		$this->form->addItem($te);
 		$te = new ilTextAreaInputGUI($this->pl->txt('description'), 'description');
 		$this->form->addItem($te);
 		if (ilObjSelfEvaluationGUI::DEV) {
@@ -132,6 +134,7 @@ class ilSelfEvaluationBlockGUI {
 		$this->initForm();
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
+			$this->object->setAbbreviation($this->form->getInput('abbreviation'));
 			$this->object->setDescription($this->form->getInput('description'));
 			$this->object->setParentId($this->parent->object->getId());
 			$this->object->create();
@@ -161,6 +164,7 @@ class ilSelfEvaluationBlockGUI {
 		$this->form->setValuesByPost();
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
+			$this->object->setAbbreviation($this->form->getInput('abbreviation'));
 			$this->object->setDescription($this->form->getInput('description'));
 			$this->object->update(false);
 			ilUtil::sendSuccess($this->pl->txt('msg_block_updated'));

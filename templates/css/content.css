@@ -150,6 +150,9 @@ h1.feedback_block_title {
 	border-bottom: 1px #808080 dotted;
 }
 
+.feedback_block_abbreviation:before { content:"[" }
+.feedback_block_abbreviation:after { content:"]" }
+
 table#feedback_overview_table {
 	/*background-color: red;*/
 	width:       100%;

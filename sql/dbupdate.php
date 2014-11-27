@@ -93,7 +93,7 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 		'type' => 'integer',
 		'length' => 1,
 	);
-	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_questions' , $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_questions', $field);
 
 }
 
@@ -109,10 +109,10 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 		'type' => 'integer',
 		'length' => 1,
 	);
-	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_fbs' , $field);
-	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_fbs_charts' , $field);
-	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_fbs_overview' , $field);
-	$ilDB->dropTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_questions');
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs', $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_charts', $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview', $field);
+	$ilDB->dropTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_questions');
 
 }
 
@@ -128,8 +128,8 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 		'type' => 'integer',
 		'length' => 1,
 	);
-	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_block_titles_sev' , $field);
-	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_block_titles_fb' , $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_block_titles_sev', $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_block_titles_fb', $field);
 	$ilDB->manipulate('UPDATE ' . ilObjSelfEvaluation::TABLE_NAME .
 		' SET `show_block_titles_sev` = 1, `show_block_titles_fb` = 1;');
 }
@@ -145,9 +145,24 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 		'type' => 'integer',
 		'length' => 1,
 	);
-	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_block_desc_sev' , $field);
-	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_block_desc_fb' , $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_block_desc_sev', $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_block_desc_fb', $field);
 	$ilDB->manipulate('UPDATE ' . ilObjSelfEvaluation::TABLE_NAME .
 		' SET `show_block_desc_sev` = 1, `show_block_desc_fb` = 1;');
+}
+?>
+<#8>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationBlock.php');
+/**
+ * @var $ilDB ilDB
+ */
+if (!$ilDB->tableColumnExists(ilSelfEvaluationBlock::TABLE_NAME, 'abbreviation')) {
+	$field = array(
+		'type' => 'text',
+		'length' => 1024,
+	);
+	$ilDB->addTableColumn(ilSelfEvaluationBlock::TABLE_NAME, 'abbreviation', $field);
 }
 ?>

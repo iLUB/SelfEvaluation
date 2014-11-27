@@ -35,6 +35,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		// Columns
 		$this->addColumn('', '', '20px');
 		$this->addColumn($this->pl->txt('title'), false, 'auto');
+		$this->addColumn($this->pl->txt('abbreviation'), false, 'auto');
 		$this->addColumn($this->pl->txt('description'), false, 'auto');
 		$this->addColumn($this->pl->txt('count_questions'), false, 'auto');
 		$this->addColumn($this->pl->txt('count_feedbacks'), false, 'auto');
@@ -61,6 +62,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->tpl->setVariable('ID', $obj->getId());
 		$this->tpl->setVariable('TITLE', $obj->getTitle());
 		$this->tpl->setVariable('EDIT_LINK', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock')));
+		$this->tpl->setVariable('ABBREVIATION', $obj->getAbbreviation());
 		$this->tpl->setVariable('DESCRIPTION', $obj->getDescription());
 		$this->tpl->setVariable('QUESTIONS_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent'));
 		$this->tpl->setVariable('FEEDBACK_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects'));

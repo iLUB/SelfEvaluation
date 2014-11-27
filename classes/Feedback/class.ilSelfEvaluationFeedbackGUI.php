@@ -371,7 +371,7 @@ class ilSelfEvaluationFeedbackGUI {
 			$data->setBarOptions(self::BAR_WIDTH, 'center');
 			$block = new ilSelfEvaluationBlock($block_d['block_id']);
 			$data->addPoint($block->getPosition(), $block_d['percentage']);
-			$ticks[$block->getPosition()] = $block->getTitle();
+			$ticks[$block->getPosition()] = $block_d['label'];
 			$chart->addData($data);
 		}
 		$chart->setTicks($ticks, false, true);
@@ -440,10 +440,20 @@ class ilSelfEvaluationFeedbackGUI {
 				$tpl->setVariable('CHART', $chart->getHTML());
 			}
 			$block = new ilSelfEvaluationBlock($block_id);
+			$abbreviation = $block->getAbbreviation();
+			$block_label = $abbreviation == '' ? $block->getTitle() : $abbreviation;
 			if ($obj->getShowFeedbacks()) {
 				// Template
 				if ($obj->getShowBlockTitlesDuringFeedback()) {
 					$tpl->setVariable('BLOCK_TITLE', $block->getTitle());
+					if ($abbreviation != '') {
+						$tpl->setCurrentBlock('block_abbreviation');
+						$tpl->setVariable('BLOCK_ABBREVIATION', $abbreviation);
+					}
+				} else if ($obj->getShowFeedbacksOverview()) {
+					// Display a generic title when titles are not allowed but a mapping from overview to block is needed
+					$block_label = $pl->txt('block') . ' ' . ($color_id + 1);
+					$tpl->setVariable('BLOCK_TITLE', $block_label);
 				}
 				if ($obj->getShowBlockDescriptionsDuringFeedback()) {
 					$tpl->setVariable('BLOCK_DESCRIPTION', $block->getDescription());
@@ -456,7 +466,8 @@ class ilSelfEvaluationFeedbackGUI {
 			}
 			$blocks[] = array(
 				'block_id' => $block->getId(),
-				'percentage' => $percentages[$block->getId()]
+				'percentage' => $percentages[$block->getId()],
+				'label' => $block_label
 			);
 			$color_id ++;
 		}

@@ -23,6 +23,10 @@ class ilSelfEvaluationBlock {
 	 */
 	protected $description = '';
 	/**
+	 * @var string
+	 */
+	protected $abbreviation = '';
+	/**
 	 * @var int
 	 */
 	protected $position = 99;
@@ -71,7 +75,8 @@ class ilSelfEvaluationBlock {
 	public function getArrayForDb() {
 		$e = array();
 		foreach (get_object_vars($this) as $k => $v) {
-			if (! in_array($k, array( 'db', 'scale' ))) {
+			$non_db_fields = array( 'db', 'scale' );
+			if (! in_array($k, $non_db_fields)) {
 				$e[$k] = array( self::_getType($v), $this->$k );
 			}
 		}
@@ -110,7 +115,7 @@ class ilSelfEvaluationBlock {
 		if (! $this->db->tableExists(self::TABLE_NAME)) {
 			$this->initDB();
 
-			return true;
+			return;
 		}
 		foreach ($this->getArrayForDb() as $k => $v) {
 			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
@@ -268,6 +273,22 @@ class ilSelfEvaluationBlock {
 	 */
 	public function getDescription() {
 		return $this->description;
+	}
+
+
+	/**
+	 * @param string $abbreviation
+	 */
+	public function setAbbreviation($abbreviation) {
+		$this->abbreviation = $abbreviation;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getAbbreviation() {
+		return $this->abbreviation;
 	}
 
 
