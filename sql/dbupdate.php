@@ -153,7 +153,6 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 ?>
 <#8>
 <?php
-require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationBlock.php');
 /**
  * @var $ilDB ilDB
@@ -164,5 +163,23 @@ if (!$ilDB->tableColumnExists(ilSelfEvaluationBlock::TABLE_NAME, 'abbreviation')
 		'length' => 1024,
 	);
 	$ilDB->addTableColumn(ilSelfEvaluationBlock::TABLE_NAME, 'abbreviation', $field);
+}
+?>
+<#9>
+<?php
+require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilSelfEvaluationPlugin.php');
+$pl = new ilSelfEvaluationPlugin();
+if ($this->db->tableExists('robjselfevaluation_c') AND ! $this->db->tableExists($pl->getConfigTableName())) {
+	$this->db->renameTable('robjselfevaluation_c', $pl->getConfigTableName());
+}
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+	$field = array(
+		'type' => 'clob',
+	);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'identity_selection_info', $field);
 }
 ?>

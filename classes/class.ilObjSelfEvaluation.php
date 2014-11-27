@@ -72,6 +72,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	protected $outro = '';
 	/**
+	 * @var string
+	 */
+	protected $identity_selection_info_text = '';
+	/**
 	 * @var bool
 	 */
 	protected $show_charts = true;
@@ -168,6 +172,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'text',
 				$this->getOutro()
 			),
+			'identity_selection_info' => array(
+				'text',
+				$this->getIdentitySelectionInfoText()
+			),
 			'show_fbs' => array(
 				'integer',
 				$this->getShowFeedbacks()
@@ -201,6 +209,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 
 	function doCreate() {
+		/** @var ilSelfEvaluationPlugin $plugin */
+		$plugin = $this->plugin;
+		$config = new ilSelfEvaluationConfig($plugin->getConfigTableName());
+		$this->setIdentitySelectionInfoText($config->getValue('identity_selection'));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
 	}
 
@@ -215,6 +227,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setDisplayType($rec->display_type);
 			$this->setIntro($rec->intro);
 			$this->setOutro($rec->outro);
+			$this->setIdentitySelectionInfoText($rec->identity_selection_info);
 			$this->setShowFeedbacks($rec->show_fbs);
 			$this->setShowFeedbacksCharts($rec->show_fbs_charts);
 			$this->setShowFeedbacksOverview($rec->show_fbs_overview);
@@ -279,6 +292,11 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setDisplayType($this->getDisplayType());
 		$new_obj->setIntro($this->getIntro());
 		$new_obj->setOutro($this->getOutro());
+		$new_obj->setIdentitySelectionInfoText($this->getIdentitySelectionInfoText());
+		$new_obj->setShowBlockTitlesDuringEvaluation($this->getShowBlockTitlesDuringEvaluation());
+		$new_obj->setShowBlockDescriptionsDuringEvaluation($this->getShowBlockDescriptionsDuringEvaluation());
+		$new_obj->setShowBlockTitlesDuringFeedback($this->getShowBlockTitlesDuringFeedback());
+		$new_obj->setShowBlockDescriptionsDuringFeedback($this->getShowBlockDescriptionsDuringFeedback());
 		$new_obj->update();
 	}
 
@@ -377,6 +395,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function getOutro() {
 		return $this->outro;
+	}
+
+
+	/**
+	 * @param string $info
+	 */
+	public function setIdentitySelectionInfoText($info) {
+		$this->identity_selection_info_text = $info;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getIdentitySelectionInfoText() {
+		return $this->identity_selection_info_text;
 	}
 
 

@@ -308,6 +308,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('outro'), 'outro');
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
+		// identity selection info text for anonymous users
+		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('identity_selection'), 'identity_selection_info');
+		$te->setInfo($this->txt('identity_selection_info'));
+		$te->disableButtons(self::$disabled_buttons);
+		$this->form->addItem($te);
 		// Sorting
 		$se = new ilSelectInputGUI($this->pl->txt('sort_type'), 'sort_type');
 		$opt = array(
@@ -367,6 +372,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['online'] = $this->object->getOnline();
 		$values['intro'] = $this->object->getIntro();
 		$values['outro'] = $this->object->getOutro();
+		$values['identity_selection_info'] = $this->object->getIdentitySelectionInfoText();
 		$values['sort_type'] = $this->object->getSortType();
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['display_type'] = $this->object->getDisplayType();
@@ -393,6 +399,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setOnline($this->form->getInput('online'));
 			$this->object->setIntro($this->form->getInput('intro'));
 			$this->object->setOutro($this->form->getInput('outro'));
+			$this->object->setIdentitySelectionInfoText($this->form->getInput('identity_selection_info'));
 			$this->object->setSortType($this->form->getInput('sort_type'));
 			$this->object->setDisplayType($this->form->getInput('display_type'));
 			$this->object->setShowFeedbacksOverview($this->form->getInput('show_fbs_overview'));

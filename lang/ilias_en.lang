@@ -139,6 +139,8 @@ feedback_status#:#Feedback-Block vollständig
 feedback_title
 
 async#:#Asynchrone Darstellung der Input-Masken
+identity_selection#:#Standardtext zu der Identitätsauswahl bei anonymen Selbstevaluationen
+identity_selection_info#:#identity_selection_info#:#Dieser Text wird den anonymen Nutzern des SelfEvaluation Plugins angezeigt.
 configuration#:#Konfiguration
 
 identity_type_1#:#ILIAS-Benutzer

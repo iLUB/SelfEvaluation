@@ -14,13 +14,13 @@ require_once('class.ilSelfEvaluationPlugin.php');
  */
 class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 	const TYPE_TEXT = 'ilTextInputGUI';
+	const TYPE_RTE_TEXT_AREA = 'ilTextAreaInputGUI';
 	const TYPE_CHECKBOX = 'ilCheckboxInputGUI';
 	/**
 	 * @var ilSelfEvaluationConfig
 	 */
 	protected $object;
-	/**q
-	 *
+	/**
 	 * @var array
 	 */
 	protected $fields = array();
@@ -62,6 +62,11 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 				'info' => false,
 				'subelements' => NULL
 			),
+			'identity_selection' => array(
+				'type' => self::TYPE_RTE_TEXT_AREA,
+				'info' => true,
+				'subelements' => NULL
+			)
 		);
 
 		return $this->fields;
@@ -129,6 +134,15 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI {
 		foreach ($this->getFields() as $key => $item) {
 			/** @var ilFormPropertyGUI $field */
 			$field = new $item['type']($this->pl->txt($key), $key);
+			if ($item['type'] === self::TYPE_RTE_TEXT_AREA) {
+				/** @var ilTextAreaInputGUI $field */
+				$field->setUseRte(true);
+				/* A hack to use RTE in places without ref_ids is to set set the object id to '1' and the
+				 * object type to 'tst'. Then ilWebAccessChecker only verifies that the user has read access to the repository.
+				 */
+				$field->setRTESupport(1, 'tst', '', NULL, FALSE, '3.4.7');
+				$field->setRteTagSet('extended_img');
+			}
 			if ($item['info']) {
 				$field->setInfo($this->pl->txt($key . '_info'));
 			}

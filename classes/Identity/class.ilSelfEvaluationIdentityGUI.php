@@ -87,7 +87,7 @@ class ilSelfEvaluationIdentityGUI {
 		$this->initNewForm();
 		$this->pl->updateLanguages();
 		$template = $this->pl->getTemplate('default/Identity/tpl.identity_selection.html');
-		$template->setVariable('IDENTITY_INFO_TEXT', $this->pl->txt('identity_selection_info')); // TODO set language variable
+		$template->setVariable('IDENTITY_INFO_TEXT', $this->parent->object->getIdentitySelectionInfoText());
 		$acc = new ilAccordionGUI();
 		$acc->setOrientation(ilAccordionGUI::VERTICAL);
 		$acc->addItem($this->pl->txt('start_with_new_identity'), $this->new->getHTML());
