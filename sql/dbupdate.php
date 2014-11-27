@@ -134,3 +134,20 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 		' SET `show_block_titles_sev` = 1, `show_block_titles_fb` = 1;');
 }
 ?>
+<#7>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+	$field = array(
+		'type' => 'integer',
+		'length' => 1,
+	);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_block_desc_sev' , $field);
+	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME,'show_block_desc_fb' , $field);
+	$ilDB->manipulate('UPDATE ' . ilObjSelfEvaluation::TABLE_NAME .
+		' SET `show_block_desc_sev` = 1, `show_block_desc_fb` = 1;');
+}
+?>

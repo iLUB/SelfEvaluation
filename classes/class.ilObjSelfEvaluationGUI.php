@@ -328,8 +328,14 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		// Show question block titles during evaluation
 		$cb = new ilCheckboxInputGUI($this->pl->txt('show_block_titles_sev'), 'show_block_titles_sev');
 		$this->form->addItem($cb);
+		// Show question block descriptions during evaluation
+		$cb = new ilCheckboxInputGUI($this->pl->txt('show_block_desc_sev'), 'show_block_desc_sev');
+		$this->form->addItem($cb);
 		// Show question block titles during feedback
 		$cb = new ilCheckboxInputGUI($this->pl->txt('show_block_titles_fb'), 'show_block_titles_fb');
+		$this->form->addItem($cb);
+		// Show question block descriptions during feedback
+		$cb = new ilCheckboxInputGUI($this->pl->txt('show_block_desc_fb'), 'show_block_desc_fb');
 		$this->form->addItem($cb);
 		// Show Feedbacks
 		$cb = new ilCheckboxInputGUI($this->pl->txt('show_fbs_overview'), 'show_fbs_overview');
@@ -368,7 +374,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['show_fbs'] = $this->object->getShowFeedbacks();
 		$values['show_fbs_charts'] = $this->object->getShowFeedbacksCharts();
 		$values['show_block_titles_sev'] = $this->object->getShowBlockTitlesDuringEvaluation();
+		$values['show_block_desc_sev'] = $this->object->getShowBlockDescriptionsDuringEvaluation();
 		$values['show_block_titles_fb'] = $this->object->getShowBlockTitlesDuringFeedback();
+		$values['show_block_desc_fb'] = $this->object->getShowBlockTitlesDuringFeedback();
 		$this->form->setValuesByArray($values);
 	}
 
@@ -391,7 +399,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setShowFeedbacks($this->form->getInput('show_fbs'));
 			$this->object->setShowFeedbacksCharts($this->form->getInput('show_fbs_charts'));
 			$this->object->setShowBlockTitlesDuringEvaluation($this->form->getInput('show_block_titles_sev'));
+			$this->object->setShowBlockDescriptionsDuringEvaluation($this->form->getInput('show_block_desc_sev'));
 			$this->object->setShowBlockTitlesDuringFeedback($this->form->getInput('show_block_titles_fb'));
+			$this->object->setShowBlockDescriptionsDuringFeedback($this->form->getInput('show_block_desc_fb'));
 			$this->object->update();
 			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'editProperties');

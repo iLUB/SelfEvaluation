@@ -106,7 +106,15 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	/**
 	 * @var bool
 	 */
+	protected $show_block_descriptions_during_evaluation = true;
+	/**
+	 * @var bool
+	 */
 	protected $show_block_titles_during_feedback = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_block_descriptions_during_feedback = true;
 
 
 	/**
@@ -176,9 +184,17 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'integer',
 				$this->getShowBlockTitlesDuringEvaluation()
 			),
+			'show_block_desc_sev' => array(
+				'integer',
+				$this->getShowBlockDescriptionsDuringEvaluation()
+			),
 			'show_block_titles_fb' => array(
 				'integer',
 				$this->getShowBlockTitlesDuringFeedback()
+			),
+			'show_block_desc_fb' => array(
+				'integer',
+				$this->getShowBlockDescriptionsDuringFeedback()
 			)
 		);
 	}
@@ -203,7 +219,9 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setShowFeedbacksCharts($rec->show_fbs_charts);
 			$this->setShowFeedbacksOverview($rec->show_fbs_overview);
 			$this->setShowBlockTitlesDuringEvaluation($rec->show_block_titles_sev);
+			$this->setShowBlockDescriptionsDuringEvaluation($rec->show_block_desc_sev);
 			$this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
+			$this->setShowBlockDescriptionsDuringFeedback($rec->show_block_desc_fb);
 		}
 	}
 
@@ -539,6 +557,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 
 	/**
+	 * @param boolean $show_block_descriptions_during_evaluation
+	 */
+	public function setShowBlockDescriptionsDuringEvaluation($show_block_descriptions_during_evaluation) {
+		$this->show_block_descriptions_during_evaluation = $show_block_descriptions_during_evaluation;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowBlockDescriptionsDuringEvaluation() {
+		return $this->show_block_descriptions_during_evaluation;
+	}
+
+
+	/**
 	 * @param boolean $show_block_titles_during_feedback
 	 */
 	public function setShowBlockTitlesDuringFeedback($show_block_titles_during_feedback) {
@@ -551,6 +585,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function getShowBlockTitlesDuringFeedback() {
 		return $this->show_block_titles_during_feedback;
+	}
+
+
+	/**
+	 * @param boolean $show_block_descriptions_during_feedback
+	 */
+	public function setShowBlockDescriptionsDuringFeedback($show_block_descriptions_during_feedback) {
+		$this->show_block_descriptions_during_feedback = $show_block_descriptions_during_feedback;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowBlockDescriptionsDuringFeedback() {
+		return $this->show_block_descriptions_during_feedback;
 	}
 }
 

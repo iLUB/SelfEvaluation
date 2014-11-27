@@ -208,9 +208,11 @@ class ilSelfEvaluationBlockGUI {
 		if ($this->parent->object->getShowBlockTitlesDuringEvaluation()) {
             $h->setTitle($this->object->getTitle());
 		} else {
-			$h->setTitle('');
+			$h->setTitle(''); // set an empty title to keep the optical separation of blocks
 		}
-        $h->setInfo($this->object->getDescription());
+		if ($this->parent->object->getShowBlockDescriptionsDuringEvaluation()) {
+            $h->setInfo($this->object->getDescription());
+		}
         $form->addItem($h);
 		$sc = new ilMatrixHeaderGUI();
 		$sc->setScale($this->object->getScale()->getUnitsAsArray());

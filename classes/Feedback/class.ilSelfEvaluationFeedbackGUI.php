@@ -445,6 +445,9 @@ class ilSelfEvaluationFeedbackGUI {
 				if ($obj->getShowBlockTitlesDuringFeedback()) {
 					$tpl->setVariable('BLOCK_TITLE', $block->getTitle());
 				}
+				if ($obj->getShowBlockDescriptionsDuringFeedback()) {
+					$tpl->setVariable('BLOCK_DESCRIPTION', $block->getDescription());
+				}
 				$tpl->setVariable('WIDTH', self::WIDTH);
 				$tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
 				$tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
