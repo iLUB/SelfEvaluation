@@ -119,6 +119,7 @@ class ilSelfEvaluationBlockGUI {
 		$te->setRequired(true);
 		$this->form->addItem($te);
 		$te = new ilTextInputGUI($this->pl->txt('abbreviation'), 'abbreviation');
+		$te->setMaxLength(8);
 		$this->form->addItem($te);
 		$te = new ilTextAreaInputGUI($this->pl->txt('description'), 'description');
 		$this->form->addItem($te);

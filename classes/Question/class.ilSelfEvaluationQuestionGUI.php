@@ -120,6 +120,7 @@ class ilSelfEvaluationQuestionGUI {
 		$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 		$te = new ilTextInputGUI($this->pl->txt('title'), 'title');
 		$te->setInfo($this->pl->txt('question_title_info'));
+		$te->setMaxLength(8);
 		$te->setRequired(false);
 		$this->form->addItem($te);
 		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
