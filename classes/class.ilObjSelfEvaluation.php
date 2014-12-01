@@ -42,8 +42,9 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 	const TABLE_NAME = 'rep_robj_xsev_data';
 	const TYPE_GROUP = 1;
-	const SORT_MANUALLY = 1;
-	const SORT_SHUFFLE = 2;
+	const SHUFFLE_OFF = 1;
+	const SHUFFLE_IN_BLOCKS = 2;
+	const SHUFFLE_ACROSS_BLOCKS = 3;
 	const DISPLAY_TYPE_SINGLE_PAGE = 1; // Single Page
 	const DISPLAY_TYPE_MULTIPLE_PAGES = 2; // Multiple Pages
 	const DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED = 3; // All Questions on one Page, shuffled
@@ -58,7 +59,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	/**
 	 * @var int
 	 */
-	protected $sort_type = self::SORT_MANUALLY;
+	protected $sort_type = self::SHUFFLE_OFF;
 	/**
 	 * @var int
 	 */

@@ -223,7 +223,7 @@ class ilSelfEvaluationBlockGUI {
 		$sc->setScale($this->object->getScale()->getUnitsAsArray());
 		$form->addItem($sc);
 		$questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId());
-		if ($this->parent->object->getSortType() == ilObjSelfEvaluation::SORT_SHUFFLE) {
+		if ($this->parent->object->getSortType() == ilObjSelfEvaluation::SHUFFLE_IN_BLOCKS) {
 			shuffle($questions);
 		}
 		foreach ($questions as $qst) {

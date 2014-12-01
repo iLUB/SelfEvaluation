@@ -128,12 +128,13 @@ multinput_value#:#Numerischer Wert
 multinput_title#:#Bezeichnung
 multinput_description#:#Es empfiehlt sich, den ersten numerischen Wert 0 nicht zu ändern, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
 sort_type#:#Sortierung
-sort_shuffle#:#Fragen pro Block mischen
-sort_manually#:#Festgelegte Reihenfolge
+shuffle_in_blocks#:#Fragen pro Block mischen
+shuffle_across_blocks#:#Alle Fragen blockübergreifend gemischt
+no_questions_per_page#:#Anzahl Fragen pro Seite
+shuffle_off#:#Festgelegte Reihenfolge
 display_type#:#Darstellung der Blocks
 single_page#:#Alle Blocks auf einer Seite
 multiple_pages#:#Eine Seite pro Block
-all_questions_shuffled#:#Alle Fragen blockübergreifend gemischt
 next_new#:#Weiter
 locked#:#Felder sind gesperrt
 feedback_status#:#Feedback-Block vollständig

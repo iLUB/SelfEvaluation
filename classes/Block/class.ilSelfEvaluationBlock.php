@@ -191,9 +191,9 @@ class ilSelfEvaluationBlock {
 		$object_factory = new ilObjectFactory();
 		$parentObject = $object_factory->getInstanceByObjId($this->getParentId());
 		switch ($parentObject->getSortType()) {
-			case ilObjSelfEvaluation::SORT_MANUALLY:
+			case ilObjSelfEvaluation::SHUFFLE_OFF:
 				return true;
-			case ilObjSelfEvaluation::SORT_SHUFFLE:
+			case ilObjSelfEvaluation::SHUFFLE_IN_BLOCKS:
 				return false;
 			default:
 				return false;
@@ -205,7 +205,7 @@ class ilSelfEvaluationBlock {
 	// Static
 	//
 	/**
-	 * @param      $parent_id
+	 * @param int  $parent_id ilObjSelfEvaluation obj id
 	 * @param bool $as_array
 	 *
 	 * @return ilSelfEvaluationBlock[]

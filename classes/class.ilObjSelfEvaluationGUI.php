@@ -316,8 +316,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		// Sorting
 		$se = new ilSelectInputGUI($this->pl->txt('sort_type'), 'sort_type');
 		$opt = array(
-			ilObjSelfEvaluation::SORT_MANUALLY => $this->pl->txt('sort_manually'),
-			ilObjSelfEvaluation::SORT_SHUFFLE => $this->pl->txt('sort_shuffle'),
+			ilObjSelfEvaluation::SHUFFLE_OFF => $this->pl->txt('shuffle_off'),
+			ilObjSelfEvaluation::SHUFFLE_IN_BLOCKS => $this->pl->txt('shuffle_in_blocks'),
+			ilObjSelfEvaluation::SHUFFLE_ACROSS_BLOCKS => $this->pl->txt('shuffle_across_blocks') // TODO add an option to enter the number of questions per page. How is this possible?
 		);
 		$se->setOptions($opt);
 		$this->form->addItem($se);
