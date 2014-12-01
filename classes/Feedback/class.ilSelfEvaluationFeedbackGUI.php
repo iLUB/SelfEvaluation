@@ -4,13 +4,13 @@ require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationFeedback.php');
 require_once('class.ilSelfEvaluationFeedbackTableGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilSliderInputGUI.php');
-require_once('./Services/Chart/classes/class.ilChart.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * GUI-Class ilSelfEvaluationFeedbackGUI
  *
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
+ * @author            Fabio Heer
  * @version           $Id:
  *
  * @ilCtrl_Calls      ilSelfEvaluationFeedbackGUI:
@@ -18,8 +18,6 @@ require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
  */
 class ilSelfEvaluationFeedbackGUI {
 
-	const BAR_WIDTH = 0.5;
-	const WIDTH = 900;
 	/**
 	 * @var ilTabsGUI
 	 */
@@ -350,132 +348,6 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->ov->setVariable('WIDTH', $width);
 		$this->ov->setVariable('CSS', $css);
 		$this->ov->parseCurrentBlock();
-	}
-
-
-	/**
-	 * @param array $block_data
-	 * @param array $colors
-	 *
-	 * @return string
-	 */
-	public static function _getOverviewCharts(array $block_data, array $colors) {
-		$chart = new ilChart('fb_overview', self::WIDTH - 15, round((self::WIDTH - 50) / 2, 0));
-		$chart->setColors($colors);
-		$legend = new ilChartLegend();
-		$chart->setLegend($legend);
-		$chart->setYAxisToInteger(true);
-		$ticks = array();
-		foreach ($block_data as $block_d) {
-			$data = new ilChartData('bars');
-			$data->setBarOptions(self::BAR_WIDTH, 'center');
-			$block = new ilSelfEvaluationBlock($block_d['block_id']);
-			$data->addPoint($block->getPosition(), $block_d['percentage']);
-			$ticks[$block->getPosition()] = $block_d['label'];
-			$chart->addData($data);
-		}
-		$chart->setTicks($ticks, false, true);
-
-		return $chart->getHTML();
-	}
-
-
-	/**
-	 * @param ilSelfEvaluationDataset $data_set
-	 * @param bool                    $show_charts
-	 *
-	 * @return string
-	 */
-	public static function _getPresentationOfFeedback(ilSelfEvaluationDataset $data_set, $show_charts = true) {
-		$colors = array(
-			//			'#D0E8FF',
-			'#00CCFF',
-			'#00CC99',
-			'#9999FF',
-			'#CC66FF',
-			'#FF99FF',
-			'#FF9933',
-			'#CCCC33',
-			'#CC6666',
-			'#669900',
-			'#666600',
-			'#333399',
-			'#0066CC',
-		);
-		//		shuffle($colors);
-		$pl = new ilSelfEvaluationPlugin();
-		/**
-		 * @var $obj ilObjSelfEvaluation
-		 */
-		$factory = new ilObjectFactory();
-		$obj = $factory->getInstanceByRefId($_GET['ref_id']);
-		$tpl = $pl->getTemplate('default/Feedback/tpl.feedback.html');
-		$color_id = 0;
-		$percentages = $data_set->getPercentagePerBlock();
-		$blocks = array();
-		foreach ($data_set->getFeedbacksPerBlock() as $block_id => $fb) {
-			// Chart
-			$tpl->setCurrentBlock('feedback');
-			if ($obj->getShowFeedbacksCharts()) {
-				$chart = new ilChart('fb_' . $block_id, self::WIDTH - 15, round((self::WIDTH - 50) / 4, 0));
-				//				$chart->
-				$chart->setColors(array( $colors[$color_id] ));
-				$legend = new ilChartLegend();
-				$legend->setBackground($colors[$color_id]);
-				$chart->setLegend($legend);
-				$chart->setYAxisToInteger(true);
-				$data = new ilChartData('bars');
-				//$chart->setXAxisToInteger(false);
-				$data->setBarOptions(self::BAR_WIDTH, 'center');
-				$ticks = array();
-				$x = 1;
-				foreach ($data_set->getDataPerBlock($block_id) as $qst_id => $value) {
-					$qst = new ilSelfEvaluationQuestion($qst_id);
-					$data->addPoint($x, $value);
-					$ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $pl->txt('question') . ' ' . $x;
-					$x ++;
-				}
-				$chart->setTicks($ticks, false, true);
-				$chart->addData($data);
-				$tpl->setVariable('CHART', $chart->getHTML());
-			}
-			$block = new ilSelfEvaluationBlock($block_id);
-			$abbreviation = $block->getAbbreviation();
-			$block_label = $abbreviation == '' ? $block->getTitle() : $abbreviation;
-			if ($obj->getShowFeedbacks()) {
-				// Template
-				if ($obj->getShowBlockTitlesDuringFeedback()) {
-					$tpl->setVariable('BLOCK_TITLE', $block->getTitle());
-					if ($abbreviation != '') {
-						$tpl->setCurrentBlock('block_abbreviation');
-						$tpl->setVariable('BLOCK_ABBREVIATION', $abbreviation);
-					}
-				} else if ($obj->getShowFeedbacksOverview()) {
-					// Display a generic title when titles are not allowed but a mapping from overview to block is needed
-					$block_label = $pl->txt('block') . ' ' . ($color_id + 1);
-					$tpl->setVariable('BLOCK_TITLE', $block_label);
-				}
-				if ($obj->getShowBlockDescriptionsDuringFeedback()) {
-					$tpl->setVariable('BLOCK_DESCRIPTION', $block->getDescription());
-				}
-				$tpl->setVariable('WIDTH', self::WIDTH);
-				$tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
-				$tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
-				$tpl->parseCurrentBlock();
-				//			$overview_data[$block_id] = $percentages[$block_id];
-			}
-			$blocks[] = array(
-				'block_id' => $block->getId(),
-				'percentage' => $percentages[$block->getId()],
-				'label' => $block_label
-			);
-			$color_id ++;
-		}
-		if (count($data_set->getFeedbacksPerBlock()) > 0 AND $obj->getShowFeedbacksOverview()) {
-			$tpl->setVariable('OVERVIEW_CHART', self::_getOverviewCharts($blocks, $colors));
-		}
-
-		return $tpl->get();
 	}
 }
 

@@ -118,7 +118,11 @@ class ilSelfEvaluationDatasetGUI {
 		$content->setVariable('INTRO_BODY', $this->parent->object->getOutro());
 		$feedback = '';
 		if ($this->parent->object->getAllowShowResults()) {
-			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset);
+			global $tpl;
+			$tpl->addJavaScript('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/bar_spider_chart_toggle.js');
+			require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Feedback/class.ilSelfEvaluationFeedbackChartGUI.php');
+			$charts = new ilSelfEvaluationFeedbackChartGUI();
+			$feedback = $charts->getPresentationOfFeedback($this->dataset);
 		}
 		$this->tpl->setContent($content->get() . $feedback);
 	}

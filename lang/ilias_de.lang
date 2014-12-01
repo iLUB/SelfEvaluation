@@ -106,6 +106,9 @@ delete_feedback#:#Feedback löschen
 slider#:#Prozentbereich
 start_new_button#:#Neuen Durchgang starten
 
+show_spider_chart#:#Spinnengrafik anzeigen
+show_bar_chart#:#Balkendiagramm anzeigen
+
 msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
 show_results#:#Resultate
@@ -137,7 +140,6 @@ all_questions_shuffled#:#Alle Fragen blockübergreifend gemischt
 next_new#:#Weiter
 locked#:#Felder sind gesperrt
 feedback_status#:#Feedback-Block vollständig
-feedback_title
 
 async#:#Asynchrone Darstellung der Input-Masken
 identity_selection#:#Standardtext zu der Identitätsauswahl bei anonymen Selbstevaluationen

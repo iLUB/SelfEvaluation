@@ -45,7 +45,7 @@ class ilSelfEvaluationScale {
 	/**
 	 * @param bool $flipped
 	 *
-	 * @return array
+	 * @return array (unit value => unit title)
 	 */
 	public function getUnitsAsArray($flipped = false) {
 		$return = array();
