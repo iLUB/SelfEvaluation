@@ -84,7 +84,7 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 			$tpl->setVariable('TITLE_N_NEW', $this->getFieldName() . '_new[title][]');
 			$tpl->setVariable('DISABLED_N', $this->getDisabled() ? 'disabled' : '');
 			$tpl->setVariable('PLACEHOLDER_VALUE', $this->getPlaceholderValue());
-            $tpl->setVariable('DEFAULT_VALUE', $this->getDefaultValue());
+//            $tpl->setVariable('DEFAULT_VALUE', $this->getDefaultValue());
 			$tpl->setVariable('PLACEHOLDER_TITLE', $this->getPlaceholderTitle());
 			$tpl->setVariable('LOCK_CSS', $this->getDisabled() ? 'locked' : '');
 			$tpl->parseCurrentBlock();
