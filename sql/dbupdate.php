@@ -57,8 +57,8 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
 $block = new ilSelfEvaluationScale();
 $block->initDB();
 
-require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationBlock.php');
-$block = new ilSelfEvaluationBlock();
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationQuestionBlock.php');
+$block = new ilSelfEvaluationQuestionBlock();
 $block->initDB();
 
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Question/class.ilSelfEvaluationQuestion.php');
@@ -157,12 +157,13 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
 /**
  * @var $ilDB ilDB
  */
-if (!$ilDB->tableColumnExists(ilSelfEvaluationBlock::TABLE_NAME, 'abbreviation')) {
+$block = new ilSelfEvaluationQuestionBlock();
+if (!$ilDB->tableColumnExists($block->getTableName(), 'abbreviation')) {
 	$field = array(
 		'type' => 'text',
 		'length' => 1024,
 	);
-	$ilDB->addTableColumn(ilSelfEvaluationBlock::TABLE_NAME, 'abbreviation', $field);
+	$ilDB->addTableColumn($block->getTableName(), 'abbreviation', $field);
 }
 ?>
 <#9>

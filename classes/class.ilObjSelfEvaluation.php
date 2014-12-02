@@ -265,7 +265,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			}
 			$id->delete();
 		}
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->getId()) as $block) {
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
 				$qst->delete();
 			}
@@ -328,7 +328,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @return bool
 	 */
 	public function hasBLocks() {
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->getId()) as $block) {
 			if (count(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId())) > 0) {
 				return true;
 			}
@@ -343,7 +343,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function areFeedbacksComplete() {
 		$return = true;
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->getId()) as $block) {
 			$return = ilSelfEvaluationFeedback::_isComplete($block->getId()) ? $return : false;
 		}
 

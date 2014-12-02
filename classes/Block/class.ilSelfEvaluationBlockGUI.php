@@ -3,7 +3,7 @@ require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 require_once('./Modules/SurveyQuestionPool/classes/class.ilMatrixRowWizardInputGUI.php');
 require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
-require_once('class.ilSelfEvaluationBlock.php');
+require_once('class.ilSelfEvaluationQuestionBlock.php');
 require_once('class.ilSelfEvaluationBlockTableGUI.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionTableGUI.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
@@ -12,13 +12,13 @@ require_once(dirname(__FILE__) . '/../Form/class.ilMatrixHeaderGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilFormSectionHeaderGUIFixed.php');
 /**
- * GUI-Class ilSelfEvaluationBlockGUI
+ * GUI-Class ilSelfEvaluationQuestionBlockGUI
  *
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
+ * @author            Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version           $Id:
  *
- * @ilCtrl_Calls      ilSelfEvaluationBlockGUI:
- * @ilCtrl_IsCalledBy ilSelfEvaluationBlockGUI:
+ * @ilCtrl_Calls      ilSelfEvaluationBlockGUI: ilSelfEvaluationQuestionBlockGUI
  */
 class ilSelfEvaluationBlockGUI {
 
@@ -27,7 +27,7 @@ class ilSelfEvaluationBlockGUI {
 	 */
 	protected $tabs_gui;
 	/**
-	 * @var ilSelfEvaluationBlock
+	 * @var ilSelfEvaluationQuestionBlock
 	 */
 	public $object;
 	/**
@@ -47,7 +47,7 @@ class ilSelfEvaluationBlockGUI {
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = new ilSelfEvaluationPlugin();
-		$this->object = new ilSelfEvaluationBlock($block_id ? $block_id : $_GET['block_id']);
+		$this->object = new ilSelfEvaluationQuestionBlock($block_id ? $block_id : $_GET['block_id']);
 	}
 
 
@@ -69,7 +69,7 @@ class ilSelfEvaluationBlockGUI {
 	 * @return string
 	 */
 	public function getStandardCommand() {
-		return 'addNew';
+		return 'addBlock';
 	}
 
 
@@ -246,7 +246,7 @@ class ilSelfEvaluationBlockGUI {
 
 	public function saveSorting() {
 		foreach ($_POST['position'] as $k => $v) {
-			$obj = new ilSelfEvaluationBlock($v);
+			$obj = new ilSelfEvaluationQuestionBlock($v);
 			$obj->setPosition($k + 1);
 			$obj->update();
 		}

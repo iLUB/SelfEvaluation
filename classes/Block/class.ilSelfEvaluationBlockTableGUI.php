@@ -46,7 +46,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationBlockGUI'));
 		$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
 		$this->setRowTemplate($this->pl->getDirectory().'/templates/default/Block/tpl.template_block_row.html');
-		$this->setData(ilSelfEvaluationBlock::_getAllInstancesByParentId($a_parent_obj->object->getId(), true));
+		$this->setData(ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($a_parent_obj->object->getId(), true));
 	}
 
 
@@ -54,7 +54,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 	 * @param array $a_set
 	 */
 	public function fillRow($a_set) {
-		$obj = new ilSelfEvaluationBlock($a_set['id']);
+		$obj = new ilSelfEvaluationQuestionBlock($a_set['id']);
 		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', $obj->getId());
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $obj->getId());
 		$this->ctrl->setParameterByClass('ilSelfEvaluationFeedbackGUI', 'block_id', $obj->getId());

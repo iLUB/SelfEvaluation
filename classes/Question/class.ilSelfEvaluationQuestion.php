@@ -179,35 +179,12 @@ class ilSelfEvaluationQuestion {
 	// Static
 	//
 	/**
-	 * @param      $parent_id
+	 * @param int  $parent_id is a block id
 	 * @param bool $as_array
 	 *
 	 * @return ilSelfEvaluationQuestion[]
 	 */
 	public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
-		global $ilDB;
-		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
-		while ($rec = $ilDB->fetchObject($set)) {
-			if ($as_array) {
-				$return[] = (array)new self($rec->id);
-			} else {
-				$return[] = new self($rec->id);
-			}
-		}
-
-		return $return;
-	}
-
-
-	/**
-	 * @param      $parent_id
-	 * @param bool $as_array
-	 *
-	 * @return ilSelfEvaluationQuestion[]
-	 */
-	public static function _getInstancesForQuestionId($parent_id, $as_array = false) {
 		global $ilDB;
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '

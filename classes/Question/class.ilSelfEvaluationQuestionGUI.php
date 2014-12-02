@@ -4,7 +4,7 @@ require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
 require_once('class.ilSelfEvaluationQuestionTableGUI.php');
-require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationQuestionBlock.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilMatrixFieldInputGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
@@ -42,7 +42,7 @@ class ilSelfEvaluationQuestionGUI {
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = new ilSelfEvaluationPlugin();
-		$this->block = new ilSelfEvaluationBlock($block_id ? $block_id : $_GET['block_id']);
+		$this->block = new ilSelfEvaluationQuestionBlock($block_id ? $block_id : $_GET['block_id']);
 		$this->object = new ilSelfEvaluationQuestion($question_id ? $question_id : $_GET['question_id']);
 	}
 
@@ -251,7 +251,7 @@ class ilSelfEvaluationQuestionGUI {
 		/** @var ilSelfEvaluationQuestion[] $questions */
 		$questions = array();
 
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($parent_id) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($parent_id) as $block) {
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
 				$questions[] = $qst;
 			}

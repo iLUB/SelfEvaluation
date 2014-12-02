@@ -154,10 +154,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 					$this->ctrl->forwardCommand($perm_gui);
 					break;
                 case 'ilinfoscreengui':
-                    $this->tabs_gui->setTabActive('info_short');
-                    require_once($this->ctrl->lookupClassPath($next_class));
-                    $gui = new $next_class($this);
-                    $this->ctrl->forwardCommand($gui);
+	                include_once('Services/InfoScreen/classes/class.ilInfoScreenGUI.php');
+	                $gui = new ilInfoScreenGUI($this);
+	                $this->tabs_gui->setTabActive('info_short');
+	                $this->ctrl->forwardCommand($gui);
                     break;
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {

@@ -75,7 +75,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 				$tpl->setVariable('SPIDER_CHART', $spider_chart->getHTML());
 				$tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
 			}
-			$block = new ilSelfEvaluationBlock($block_id);
+			$block = new ilSelfEvaluationQuestionBlock($block_id);
 			$abbreviation = $block->getAbbreviation();
 			$block_label = $abbreviation == '' ? $block->getTitle() : $abbreviation;
 			if ($obj->getShowFeedbacks()) {
@@ -253,7 +253,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 		foreach ($block_data as $block_d) {
 			$data = $chart->getDataInstance(ilChartGrid50::DATA_BARS);
 			$data->setBarOptions(self::BAR_WIDTH, 'center');
-			$block = new ilSelfEvaluationBlock($block_d['block_id']);
+			$block = new ilSelfEvaluationQuestionBlock($block_d['block_id']);
 			$data->addPoint($block->getPosition(), $block_d['percentage']);
 			$x_axis[$block->getPosition()] = $block_d['label'];
 			$chart->addData($data);

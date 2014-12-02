@@ -231,7 +231,7 @@ class ilSelfEvaluationDataset {
 		$sorted_scale = array_keys($scale);
 		sort($sorted_scale);
 		$highest = $sorted_scale[count($sorted_scale) - 1];
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($obj_id) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($obj_id) as $block) {
 			$answer_data = $this->getDataPerBlock($block->getId());
 			if (count($answer_data) == 0) {
 				break;

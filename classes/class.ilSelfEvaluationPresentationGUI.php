@@ -167,7 +167,7 @@ class ilSelfEvaluationPresentationGUI {
 		$this->form = new ilPropertyFormGUI();
 
 		$this->form->setId('evaluation_form');
-		$blocks = ilSelfEvaluationBlock::_getAllInstancesByParentId($this->parent->object->getId());
+		$blocks = ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->parent->object->getId());
 		switch ($this->parent->object->getDisplayType()) {
 			case ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE:
                 $first = true;
