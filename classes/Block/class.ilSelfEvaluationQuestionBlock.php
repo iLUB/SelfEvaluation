@@ -1,11 +1,11 @@
 <?php
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
 /**
- * ilSelfEvaluationQuestionBlock
+ * Class ilSelfEvaluationQuestionBlock
  *
  * @author  Fabian Schmid <fs@studer-raimann.ch>
- *
- * @version
+ * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
+ * @version $Id$
  */
 class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 
@@ -29,7 +29,7 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 	 * @return array
 	 */
 	protected function getNonDbFields() {
-		return array( 'db', 'scale' );
+		return array_merge(parent::getNonDbFields(), array('scale'));
 	}
 
 
@@ -83,7 +83,37 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 	 * @return ilSelfEvaluationBlock[]
 	 */
 	public static function _getAllInstancesByParentId($parent_id, $as_array = false) {
-		return self::getAllInstancesByParentId($parent_id, $as_array);
+		global $ilDB;
+		$return = array();
+		$set = $ilDB->query('SELECT * FROM ' . self::getTableName() . ' ' . ' WHERE parent_id = '
+			. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
+		while ($rec = $ilDB->fetchObject($set)) {
+			$scale = ilSelfEvaluationScale::_getInstanceByRefId($parent_id);
+
+			if ($as_array) {
+				$return[] = array(
+					'id' => (int)$rec->id,
+					'parent_id' => (int)$rec->parent_id,
+					'title' => (string)$rec->title,
+					'description' => (string)$rec->description,
+					'abbreviation' => (string)$rec->abbreviation,
+					'scale_id' => (int)$scale->getId(),
+				);
+			} else {
+				$block = new ilSelfEvaluationQuestionBlock();
+				$block->setId((int)$rec->id);
+				$block->setParentId((int)$rec->parent_id);
+				$block->setPosition((int)$rec->position);
+				$block->setTitle((string)$rec->title);
+				$block->setDescription((string)$rec->description);
+				$block->setAbbreviation((string)$rec->abbrevation);
+
+				$block->setScale($scale);
+				$return[] = $block;
+			}
+		}
+
+		return $return;
 	}
 }
 

@@ -38,7 +38,7 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
  *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI, ilAdministrationGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationBlockGUI, ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationDatasetGUI, ilSelfEvaluationFeedbackGUI
  *
  */
@@ -159,6 +159,20 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	                $this->tabs_gui->setTabActive('info_short');
 	                $this->ctrl->forwardCommand($gui);
                     break;
+				case 'ilselfevaluationblockgui':
+					require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
+					$block = new ilSelfEvaluationQuestionBlock((int)$_GET['block_id']);
+					$block->setParentId($this->object->getId());
+					$block_gui = new ilSelfEvaluationBlockGUI($this, $block);
+					$this->ctrl->forwardCommand($block_gui);
+					break;
+				case 'ilselfevaluationquestionblockgui':
+					require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
+					$block = new ilSelfEvaluationQuestionBlock((int)$_GET['block_id']);
+					$block->setParentId($this->object->getId());
+					$block_gui = new ilSelfEvaluationQuestionBlockGUI($this, $block);
+					$this->ctrl->forwardCommand($block_gui);
+					break;
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {
 						$this->performCommand($this->getStandardCmd());

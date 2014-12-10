@@ -42,8 +42,8 @@ class ilSelfEvaluationQuestionGUI {
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = new ilSelfEvaluationPlugin();
-		$this->block = new ilSelfEvaluationQuestionBlock($block_id ? $block_id : $_GET['block_id']);
-		$this->object = new ilSelfEvaluationQuestion($question_id ? $question_id : $_GET['question_id']);
+		$this->block = new ilSelfEvaluationQuestionBlock($block_id ? $block_id : (int)$_GET['block_id']);
+		$this->object = new ilSelfEvaluationQuestion($question_id ? $question_id : (int)$_GET['question_id']);
 	}
 
 

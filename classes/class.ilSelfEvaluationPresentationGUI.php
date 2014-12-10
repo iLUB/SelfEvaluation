@@ -172,7 +172,7 @@ class ilSelfEvaluationPresentationGUI {
 			case ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE:
                 $first = true;
 				foreach ($blocks as $block) {
-					$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
+					$block_gui = new ilSelfEvaluationQuestionBlockGUI($this->parent, $block);
 					$this->form = $block_gui->getBlockForm($this->form, $first);
                     $first = false;
 				}
@@ -197,7 +197,7 @@ class ilSelfEvaluationPresentationGUI {
 					$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 				}
 				$block = $blocks[$page - 1];
-				$block_gui = new ilSelfEvaluationBlockGUI($this->parent, $block->getId());
+				$block_gui = new ilSelfEvaluationQuestionBlockGUI($this->parent, $block);
 				$this->form = $block_gui->getBlockForm($this->form);
 				break;
 			case ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED:
