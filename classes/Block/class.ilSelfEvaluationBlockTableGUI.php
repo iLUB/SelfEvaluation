@@ -42,7 +42,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('feedback_status'), false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), false, 'auto');
 		$this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', NULL);
-		$this->addHeaderCommand(ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'addBlock')), $this->pl->txt('add_new_block'));
+		$this->addHeaderCommand(ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionBlockGUI', 'addBlock')), $this->pl->txt('add_new_block'));
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationBlockGUI'));
 		$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
 		$this->setRowTemplate($this->pl->getDirectory().'/templates/default/Block/tpl.template_block_row.html');
