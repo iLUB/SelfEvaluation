@@ -19,6 +19,7 @@ content#:#Selbstevaluation
 properties#:#Einstellungen
 edit_properties#:#Einstellungen bearbeiten
 title#:#Titel
+short_title#:#Kurztitel
 description#:#Beschreibung
 abbreviation#:#Abkürzung
 save#:#Speichern
@@ -48,7 +49,7 @@ scale_form#:#Skalierung
 
 create_question#:#Frage erstellen
 create_question_button#:#Frage erstellen
-question_body#:#Fragetext
+question_body#:#Frage
 question_title_info#:#Der Titel wird für die Benennung der Feedback Grafiken verwendet.
 add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke

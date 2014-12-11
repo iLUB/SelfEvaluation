@@ -118,18 +118,18 @@ class ilSelfEvaluationQuestionGUI {
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		$this->form->addCommandButton($mode . 'Object', $this->pl->txt($mode . '_question_button'));
 		$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
-		$te = new ilTextInputGUI($this->pl->txt('title'), 'title');
+		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
+		$te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->pl->txt('question_body'), 'question_body');
+		$te->setRequired(true);
+		$this->form->addItem($te);
+		$te = new ilTextInputGUI($this->pl->txt('short_title'), 'title');
 		$te->setInfo($this->pl->txt('question_title_info'));
 		$te->setMaxLength(8);
 		$te->setRequired(false);
 		$this->form->addItem($te);
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
-		$te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->pl->txt('question_body'), 'question_body');
-		$te->setRequired(true);
 		$cb = new ilCheckboxInputGUI($this->pl->txt('is_inverse'), 'is_inverse');
 		$cb->setValue(1);
 		$this->form->addItem($cb);
-		$this->form->addItem($te);
 	}
 
 
