@@ -87,11 +87,11 @@ class ilSelfEvaluationBlockGUI {
 			case 'editQuestions':
 			case 'showContent':
 			case 'saveSorting':
-				//				$this->parent->checkPermission('write');
+				$this->parent->permissionCheck('write');
 				$this->$cmd();
 				break;
 			case 'cancel':
-				//				$this->parent->checkPermission('read');
+				$this->parent->permissionCheck('read');
 				$this->$cmd();
 				break;
 		}
