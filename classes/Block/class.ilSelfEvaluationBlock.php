@@ -326,6 +326,22 @@ abstract class ilSelfEvaluationBlock {
 	}
 
 
+	/**
+	 * @return ilSelfEvaluationBlockTableRow
+	 */
+	public function getBlockTableRow() {
+		require_once(dirname(__FILE__) . '/Table/class.ilSelfEvaluationBlockTableRow.php');
+		$row = new ilSelfEvaluationBlockTableRow($this);
+
+		return $row;
+	}
+
+
+	public function getPositionId() {
+		return get_class($this) . '_' . $this->getId();
+	}
+
+
 	//
 	// Helper
 	//

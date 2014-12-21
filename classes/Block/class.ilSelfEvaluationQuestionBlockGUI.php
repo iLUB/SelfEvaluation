@@ -1,5 +1,5 @@
 <?php
-require_once('class.ilSelfEvaluationBlockGUI.php');
+require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockGUI.php');
 
 /**
  * GUI-Class ilSelfEvaluationQuestionBlockGUI
@@ -54,6 +54,7 @@ class ilSelfEvaluationQuestionBlockGUI extends ilSelfEvaluationBlockGUI {
 	public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
 		$form = parent::getBlockForm($parent_form, $first);
 
+		require_once(dirname(__FILE__) . '/../Form/class.ilMatrixHeaderGUI.php');
 		$sc = new ilMatrixHeaderGUI();
 		$sc->setScale($this->object->getScale()->getUnitsAsArray());
 		$form->addItem($sc);

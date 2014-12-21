@@ -159,19 +159,18 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	                $this->tabs_gui->setTabActive('info_short');
 	                $this->ctrl->forwardCommand($gui);
                     break;
-				case 'ilselfevaluationblockgui':
-					require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
-					$block = new ilSelfEvaluationQuestionBlock((int)$_GET['block_id']);
-					$block->setParentId($this->object->getId());
-					$block_gui = new ilSelfEvaluationBlockGUI($this, $block);
-					$this->ctrl->forwardCommand($block_gui);
+				case 'ilselfevaluationlistblocksgui':
+					require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationListBlocksGUI.php');
+					$gui = new ilSelfEvaluationListBlocksGUI($this);
+					$this->tabs_gui->setTabActive('administration');
+					$this->ctrl->forwardCommand($gui);
 					break;
 				case 'ilselfevaluationquestionblockgui':
 					require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
 					$block = new ilSelfEvaluationQuestionBlock((int)$_GET['block_id']);
 					$block->setParentId($this->object->getId());
 					$block_gui = new ilSelfEvaluationQuestionBlockGUI($this, $block);
-					$this->ctrl->forwardCommand($block_gui);
+					$this->ctrl->forwardCommand($block_gui); // TODO do we need access check?
 					break;
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {
@@ -277,7 +276,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->addInfoTab();
 		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab('properties', $this->txt('properties'), $this->ctrl->getLinkTarget($this, 'editProperties'));
-			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
+			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
 		}
 		if (($this->object->getAllowShowResults())
 			AND $this->object->hasDatasets()
@@ -459,6 +458,31 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		}
 
 		return false;
+	}
+
+
+	//
+	// Make important but unfortunately as 'final' declared methods available
+	//
+
+	/**
+	 * Get plugin object
+	 *
+	 * @return ilSelfEvaluationPlugin plugin object
+	 */
+	public function getPluginObject() {
+		return $this->plugin;
+	}
+
+
+	/**
+	 * @param string $permission
+	 * @param string $cmd
+	 *
+	 * @return bool
+	 */
+	public function permissionCheck($permission, $cmd = '') {
+		return $this->checkPermission($permission, $cmd);
 	}
 }
 

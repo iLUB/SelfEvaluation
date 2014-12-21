@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
+
 /**
  * Class ilSelfEvaluationQuestionBlock
  *
@@ -80,7 +81,7 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 	 * @param int  $parent_id ilObjSelfEvaluation obj id
 	 * @param bool $as_array
 	 *
-	 * @return ilSelfEvaluationBlock[]
+	 * @return ilSelfEvaluationQuestionBlock[]
 	 */
 	public static function _getAllInstancesByParentId($parent_id, $as_array = false) {
 		global $ilDB;
@@ -114,6 +115,17 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 		}
 
 		return $return;
+	}
+
+
+	/**
+	 * @return ilSelfEvaluationBlockTableRow
+	 */
+	public function getBlockTableRow() {
+		require_once(dirname(__FILE__) . '/Table/class.ilSelfEvaluationQuestionBlockTableRow.php');
+		$row = new ilSelfEvaluationQuestionBlockTableRow($this);
+
+		return $row;
 	}
 }
 

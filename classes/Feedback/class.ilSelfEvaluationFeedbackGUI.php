@@ -119,8 +119,8 @@ class ilSelfEvaluationFeedbackGUI {
 	public function listObjects() {
 		$async = new ilOverlayRequestGUI();
 		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addNew'));
-		$this->toolbar->addButton('<b>&lt;&lt; ' . $this->pl->txt('back_to_blocks')
-			. '</b>', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
+		$this->toolbar->addButton('<b>&lt;&lt; ' . $this->pl->txt('back_to_blocks') . '</b>',
+			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
 		$ov = $this->getOverview();
 		$table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects', $this->block);
 		$this->tpl->setContent($async->getHTML() . $ov->get() . '<br><br>' . $table->getHTML());
