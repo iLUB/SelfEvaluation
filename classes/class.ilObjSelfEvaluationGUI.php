@@ -413,6 +413,21 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 		return false;
 	}
+
+
+	//
+	// Make important but unfortunately as 'final' declared methods available
+	//
+
+	/**
+	 * @param string $permission
+	 * @param string $cmd
+	 *
+	 * @return bool
+	 */
+	public function permissionCheck($permission, $cmd = '') {
+		return $this->checkPermission($permission, $cmd);
+	}
 }
 
 ?>
