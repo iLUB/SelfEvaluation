@@ -208,7 +208,7 @@ class ilSelfEvaluationQuestion {
 	 */
 	public static function _isObject($id) {
 		global $ilDB;
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = ' . $ilDB->quote($id, 'integer'));
+		$set = $ilDB->query('SELECT id FROM ' . self::TABLE_NAME . ' WHERE id = ' . $ilDB->quote($id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return true;
 		}

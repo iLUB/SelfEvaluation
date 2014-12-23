@@ -16,7 +16,7 @@ class ilSelfEvaluationQuestionBlockGUI extends ilSelfEvaluationBlockGUI {
 	/**
 	 * @var ilSelfEvaluationQuestionBlock
 	 */
-	public $object;
+	protected $object;
 
 
 	public function initForm($mode = 'create') {

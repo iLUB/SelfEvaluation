@@ -20,90 +20,43 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationMetaBlock.php');
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationQuestionBlock.php');
+require_once('Customizing/global/plugins/Libraries/iLubFieldDefiniton/classes/class.iLubFieldDefinition.php');
+
 /**
- * Class ilSelfEvaluationBlockFactory
+ * Class ilSelfEvaluationMetaQuestion
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationBlockFactory {
+class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition {
 
-	/**
-	 * @var int
-	 */
-	protected $id;
+	const TABLE_NAME = 'rep_robj_xsev_mqst';
 
 
 	/**
-	 * @param int $self_eval_id
+	 * @param string $container_id
+	 * @param int    $id
 	 */
-	public function __construct($self_eval_id) {
-		$this->id = $self_eval_id;
+	public function __construct($container_id, $id = 0) {
+		parent::__construct(self::TABLE_NAME, $container_id, $id);
 	}
 
 
 	/**
-	 * @return ilSelfEvaluationBlock[]
-	 */
-	public function getAllBlocks() {
-		$blocks = ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->id);
-
-		$blocks = array_merge($blocks, ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->id));
-
-		$this->sortByPosition($blocks);
-
-		return $blocks;
-	}
-
-
-	/**
-	 * @param $self_eval_id
-	 *
-	 * @return int
-	 */
-	public static function getNextPositionAcrossBlocks($self_eval_id) {
-		$block = new ilSelfEvaluationQuestionBlock();
-		$pos = $block->getNextPosition($self_eval_id);
-		$block = new ilSelfEvaluationMetaBlock();
-		$pos = max($block->getNextPosition($self_eval_id), $pos);
-
-		return $pos;
-	}
-
-
-	/**
-	 * usort callback function
-	 *
-	 * @param ilSelfEvaluationBlock $a
-	 * @param ilSelfEvaluationBlock $b
-	 *
-	 * @return int
-	 */
-	protected function positionSort(ilSelfEvaluationBlock $a, ilSelfEvaluationBlock $b) {
-		if ($a->getPosition() == $b->getPosition()) {
-
-			return 0; // a and b are equal
-
-		} else {
-			if ($a->getPosition() > $b->getPosition()) {
-
-				return 1; // a is after b
-			} else {
-
-				return -1; // a is before b
-			}
-		}
-	}
-
-
-	/**
-	 * @param ilSelfEvaluationBlock[] $blocks
+	 * @param int $field_id
 	 *
 	 * @return bool
 	 */
-	public function sortByPosition(&$blocks) {
-		return usort($blocks, array(get_class(), "positionSort"));
+	public static function isObject($field_id) {
+		global $ilDB;
+
+		$set = $ilDB->query('SELECT field_id FROM ' . self::TABLE_NAME . ' WHERE field_id = '
+			. $ilDB->quote($field_id, 'integer'));
+
+		while ($rec = $ilDB->fetchObject($set)) {
+			return true;
+		}
+
+		return false;
 	}
-}
+} 

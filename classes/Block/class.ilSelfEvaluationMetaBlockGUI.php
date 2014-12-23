@@ -20,90 +20,37 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationMetaBlock.php');
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationQuestionBlock.php');
+require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockGUI.php');
+
 /**
- * Class ilSelfEvaluationBlockFactory
+ * Class ilSelfEvaluationMetaBlockGUI
+ *
+ * @ilCtrl_isCalledBy ilSelfEvaluationMetaBlockGUI: ilObjSelfEvaluationGUI
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationBlockFactory {
+class ilSelfEvaluationMetaBlockGUI extends ilSelfEvaluationBlockGUI {
 
 	/**
-	 * @var int
+	 * @var ilSelfEvaluationMetaBlock
 	 */
-	protected $id;
+	protected $object;
 
 
 	/**
-	 * @param int $self_eval_id
-	 */
-	public function __construct($self_eval_id) {
-		$this->id = $self_eval_id;
-	}
-
-
-	/**
-	 * @return ilSelfEvaluationBlock[]
-	 */
-	public function getAllBlocks() {
-		$blocks = ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->id);
-
-		$blocks = array_merge($blocks, ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->id));
-
-		$this->sortByPosition($blocks);
-
-		return $blocks;
-	}
-
-
-	/**
-	 * @param $self_eval_id
+	 * @param ilPropertyFormGUI $parent_form
+	 * @param bool              $first
 	 *
-	 * @return int
+	 * @return ilPropertyFormGUI
 	 */
-	public static function getNextPositionAcrossBlocks($self_eval_id) {
-		$block = new ilSelfEvaluationQuestionBlock();
-		$pos = $block->getNextPosition($self_eval_id);
-		$block = new ilSelfEvaluationMetaBlock();
-		$pos = max($block->getNextPosition($self_eval_id), $pos);
+	public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
+		$form = parent::getBlockForm($parent_form, $first);
 
-		return $pos;
-	}
+		require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestionGUI.php');
+		$question_gui = new ilSelfEvaluationMetaQuestionGUI($this->object->getMetaContainer(),
+			$this->object->getTitle(), $this->parent->getPluginObject(), $this->parent->object->getRefId());
 
-
-	/**
-	 * usort callback function
-	 *
-	 * @param ilSelfEvaluationBlock $a
-	 * @param ilSelfEvaluationBlock $b
-	 *
-	 * @return int
-	 */
-	protected function positionSort(ilSelfEvaluationBlock $a, ilSelfEvaluationBlock $b) {
-		if ($a->getPosition() == $b->getPosition()) {
-
-			return 0; // a and b are equal
-
-		} else {
-			if ($a->getPosition() > $b->getPosition()) {
-
-				return 1; // a is after b
-			} else {
-
-				return -1; // a is before b
-			}
-		}
-	}
-
-
-	/**
-	 * @param ilSelfEvaluationBlock[] $blocks
-	 *
-	 * @return bool
-	 */
-	public function sortByPosition(&$blocks) {
-		return usort($blocks, array(get_class(), "positionSort"));
+		return $question_gui->getQuestionForm($form);
 	}
 }

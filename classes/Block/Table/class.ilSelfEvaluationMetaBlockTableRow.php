@@ -28,41 +28,28 @@ require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationQuestionBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
 
 	/**
-	 * @param ilSelfEvaluationQuestionBlock $block
+	 * @param ilSelfEvaluationMetaBlock $block
 	 */
-	public function __construct(ilSelfEvaluationQuestionBlock $block) {
+	public function __construct(ilSelfEvaluationMetaBlock $block) {
 		parent::__construct($block);
 
-		$questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId());
-		$this->setQuestionCount(count($questions));
+		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
 		$question_action = $this->getQuestionAction();
 		$this->setQuestionsLink($question_action->getLink());
 		$this->addAction($question_action);
 
-		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($block->getId());
-		$this->setFeedbackCount(count($feedbacks));
-		$feedback_action = $this->getFeedbackAction();
-		$this->setFeedbackLink($feedback_action->getLink());
-		$this->addAction($feedback_action);
-
-		if (ilSelfEvaluationFeedback::_isComplete($block->getId())) {
-			$img_path = ilUtil::getImagePath('icon_ok.png');
-		} else {
-			$img_path = ilUtil::getImagePath('icon_not_ok.png');
-		}
+		$this->setFeedbackCount('-');
+		$img_path = ilUtil::getImagePath('icon_ok.png');
 		$this->setStatusImg($img_path);
-
-		$this->setAbbreviation($block->getAbbreviation());
 	}
 
 
 	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI',    'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI',         'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationFeedbackGUI',         'block_id', $this->getBlockId());
+		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
+		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
 	}
 
 
@@ -71,20 +58,9 @@ class ilSelfEvaluationQuestionBlockTableRow extends ilSelfEvaluationBlockTableRo
 	 */
 	protected function getQuestionAction() {
 		$title = $this->pl->txt('edit_questions');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent');
+		require_once('Customizing/global/plugins/Libraries/iLubFieldDefiniton/classes/class.iLubFieldDefinitionContainerGUI.php');
+		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
 		$cmd = 'edit_questions';
-
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
-	}
-
-
-	/**
-	 * @return ilSelfEvaluationTableAction
-	 */
-	protected function getFeedbackAction() {
-		$title = $this->pl->txt('edit_feedback');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI');
-		$cmd = 'edit_feedbacks';
 
 		return new ilSelfEvaluationTableAction($title, $cmd, $link);
 	}

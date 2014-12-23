@@ -98,6 +98,16 @@ class ilSelfEvaluationListBlocksGUI {
 //		$async->setAddNewLink($this->ctrl->getLinkTargetByClass('ilselfevaluationquestionblockgui', 'addBlock')); // TODO is this needed?
 		$table = new ilSelfEvaluationBlockTableGUI($this->parent, 'showContent');
 
+		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI', 'block_id', NULL);
+		$question_block_link = ilOverlayRequestGUI::getLink(
+			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionBlockGUI', 'addBlock'));
+		$table->addHeaderCommand($question_block_link, $this->txt('add_new_question_block'));
+
+		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', NULL);
+		$meta_block_link = ilOverlayRequestGUI::getLink(
+			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaBlockGUI', 'addBlock'));
+		$table->addHeaderCommand($meta_block_link, $this->txt('add_new_meta_block'));
+
 		$factory = new ilSelfEvaluationBlockFactory($this->getSelfEvalId());
 		$blocks = $factory->getAllBlocks();
 
@@ -116,9 +126,9 @@ class ilSelfEvaluationListBlocksGUI {
 		$blocks = $factory->getAllBlocks();
 		$positions = $_POST['position'];
 		foreach ($blocks as $block) {
-			$position = array_search($block->getPositionId(), $positions) + 1;
+			$position = (int)array_search($block->getPositionId(), $positions) + 1;
 			if ($position) {
-				$block->setPosition($position );
+				$block->setPosition($position);
 				$block->update();
 			}
 		}

@@ -22,7 +22,7 @@ abstract class ilSelfEvaluationBlockGUI {
 	/**
 	 * @var ilSelfEvaluationBlock
 	 */
-	public $object;
+	protected $object;
 	/**
 	 * @var ilPropertyFormGUI
 	 */
@@ -44,7 +44,7 @@ abstract class ilSelfEvaluationBlockGUI {
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->object = $block;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 	}
 
 
@@ -81,7 +81,6 @@ abstract class ilSelfEvaluationBlockGUI {
 			case 'updateObject':
 			case 'deleteBlock':
 			case 'deleteObject':
-			case 'editQuestions':
 				$this->parent->permissionCheck('write');
 				$this->$cmd();
 				break;
@@ -93,6 +92,9 @@ abstract class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Show the add block input GUI
+	 */
 	public function addBlock() {
 		$this->initForm();
 		$this->tpl->setContent($this->form->getHTML());
@@ -104,6 +106,11 @@ abstract class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Initialise the block form
+	 *
+	 * @param string $mode create or update mode
+	 */
 	public function initForm($mode = 'create') {
 		$this->form = new  ilPropertyFormGUI();
 		$this->form->setTitle($this->pl->txt($mode . '_block'));
@@ -119,6 +126,9 @@ abstract class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Create a new block object
+	 */
 	public function createObject() {
 		$this->initForm();
 		if ($this->form->checkInput()) {
@@ -131,6 +141,9 @@ abstract class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Show the edit block GUI
+	 */
 	public function editBlock() {
 		$this->initForm('update');
 		$values = $this->getObjectValuesAsArray();
@@ -147,6 +160,9 @@ abstract class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Update a block object
+	 */
 	public function updateObject() {
 		$this->initForm();
 		$this->form->setValuesByPost();
@@ -160,6 +176,9 @@ abstract class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Show the delete block GUI
+	 */
 	public function deleteBlock() {
 		//		ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
 		$conf = new ilConfirmationGUI();
@@ -171,6 +190,9 @@ abstract class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Delete a block object
+	 */
 	public function deleteObject() {
 		ilUtil::sendSuccess($this->pl->txt('msg_block_deleted'), true);
 		$this->object->delete();

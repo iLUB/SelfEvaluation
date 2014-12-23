@@ -2,6 +2,7 @@
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once(dirname(__FILE__) . '/class.ilObjSelfEvaluationGUI.php');
 require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
+require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlockGUI.php');
 require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
@@ -40,7 +41,7 @@ class ilSelfEvaluationPresentationGUI {
 		$this->ctrl = $ilCtrl;
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 		if (! $_GET['uid']) {
 			ilUtil::sendFailure($this->pl->txt('uid_not_given'), true);
 			$this->ctrl->redirect($this->parent);
@@ -166,12 +167,18 @@ class ilSelfEvaluationPresentationGUI {
 		$this->form = new ilPropertyFormGUI();
 
 		$this->form->setId('evaluation_form');
-		$blocks = ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->parent->object->getId());
+		require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlockFactory.php');
+		$factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
+		$blocks = $factory->getAllBlocks();
 		switch ($this->parent->object->getDisplayType()) {
 			case ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE:
                 $first = true;
 				foreach ($blocks as $block) {
-					$block_gui = new ilSelfEvaluationQuestionBlockGUI($this->parent, $block);
+					/**
+					 * @var ilSelfEvaluationBlockGUI $block_gui
+					 */
+					$gui_class = get_class($block) . 'GUI';
+					$block_gui = new $gui_class($this->parent, $block);
 					$this->form = $block_gui->getBlockForm($this->form, $first);
                     $first = false;
 				}
@@ -196,14 +203,22 @@ class ilSelfEvaluationPresentationGUI {
 					$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 				}
 				$block = $blocks[$page - 1];
-				$block_gui = new ilSelfEvaluationQuestionBlockGUI($this->parent, $block);
+				/**
+				 * @var ilSelfEvaluationBlockGUI $block_gui
+				 */
+				$gui_class = get_class($block) . 'GUI';
+				$block_gui = new $gui_class($this->parent, $block);
 				$this->form = $block_gui->getBlockForm($this->form);
 				break;
 			case ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED:
+				/*
+				 * TODO this is the draft of the "all questions shuffled" mode from Fabian Schmid.
+				 * Ideally, make a general blockRenderGUI and feed it the questions you want displayed,
+				 */
 				$h = new ilFormSectionHeaderGUI();
 				$h->setTitle($this->parent->object->getTitle());
 				$this->form->addItem($h);
-				ilSelfEvaluationQuestionGUI::getAllQuestionsForms($this->parent, $this->form);
+				$this->form = ilSelfEvaluationQuestionGUI::getAllQuestionsForms($this->parent, $this->form);
 				$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
 				$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 				break;

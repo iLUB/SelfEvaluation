@@ -87,12 +87,17 @@ class ilSelfEvaluationBlockTableRow {
 	 * @var ilSelfEvaluationTableAction[]
 	 */
 	protected $actions;
+	/**
+	 * @var string
+	 */
+	protected $block_gui_class;
 
 
 	public function __construct(ilSelfEvaluationBlock $block) {
 		global $ilCtrl;
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
+		$this->block_gui_class = get_class($block) . 'GUI';
 
 		$this->setBlockId($block->getId());
 		$this->setPositionId($block->getPositionId());
@@ -120,7 +125,7 @@ class ilSelfEvaluationBlockTableRow {
 		$arr['title'] = $this->getTitle();
 		$arr['description'] = $this->getDescription();
 		$arr['abbreviation'] = $this->getAbbreviation();
-		$arr['question_count'] = $this->getQuestionCount();
+		$arr['question_count'] = is_numeric($this->getQuestionCount()) ? $this->getQuestionCount() : 0;
 		$arr['feedback_count'] = $this->getFeedbackCount();
 		$arr['status_img'] = $this->getStatusImg();
 		$arr['edit_link'] = $this->getBlockEditLink();
@@ -343,7 +348,7 @@ class ilSelfEvaluationBlockTableRow {
 	 */
 	protected function getEditAction() {
 		$title = $this->pl->txt('edit_block');
-		$link = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'editBlock'));
+		$link = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass($this->block_gui_class, 'editBlock'));
 		$cmd = 'edit_block';
 
 		return new ilSelfEvaluationTableAction($title, $cmd, $link);
@@ -355,7 +360,7 @@ class ilSelfEvaluationBlockTableRow {
 	 */
 	protected function getDeleteAction() {
 		$title = $this->pl->txt('delete_block');
-		$link = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionBlockGUI', 'deleteBlock'));
+		$link = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass($this->block_gui_class, 'deleteBlock'));
 		$cmd = 'delete_block';
 
 		return new ilSelfEvaluationTableAction($title, $cmd, $link);

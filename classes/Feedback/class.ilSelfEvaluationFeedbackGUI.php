@@ -51,7 +51,7 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->parent = $parent;
 		$this->toolbar = $ilToolbar;
 		$this->tabs_gui = $this->parent->tabs_gui;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 		$this->block = new ilSelfEvaluationQuestionBlock($_GET['block_id']);
 		if ($_GET['feedback_id']) {
 			$this->object = new ilSelfEvaluationFeedback($_GET['feedback_id']);

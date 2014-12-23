@@ -51,9 +51,7 @@ abstract class ilSelfEvaluationBlock {
 		$set = $this->db->query('SELECT * FROM ' . $this->getTableName() . ' ' . ' WHERE id = '
 			. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
-			foreach ($this->getArrayForDb() as $k => $v) {
-				$this->{$k} = $rec->{$k};
-			}
+			$this->setObjectValuesFromRecord($this, $rec);
 		}
 	}
 
@@ -87,7 +85,7 @@ abstract class ilSelfEvaluationBlock {
 	abstract public function getTableName();
 
 
-	final function initDB() {
+	public function initDB() {
 		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
@@ -141,6 +139,17 @@ abstract class ilSelfEvaluationBlock {
 	}
 
 
+	/**
+	 * @param ilSelfEvaluationBlock $block
+	 * @param stdClass $rec
+	 */
+	protected function setObjectValuesFromRecord(ilSelfEvaluationBlock &$block, $rec) {
+		foreach ($block->getArrayForDb() as $k => $v) {
+			$block->{$k} = $rec->{$k};
+		}
+	}
+
+
 	final private function resetDB() {
 		$this->db->dropTable($this->getTableName());
 		$this->initDB();
@@ -154,7 +163,8 @@ abstract class ilSelfEvaluationBlock {
 			return;
 		}
 		$this->setId($this->db->nextID($this->getTableName()));
-		$this->setPosition($this->getNextPosition($this->getParentId()));
+		require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockFactory.php');
+		$this->setPosition(ilSelfEvaluationBlockFactory::getNextPositionAcrossBlocks($this->getParentId()));
 		$this->db->insert($this->getTableName(), $this->getArrayForDb());
 	}
 
@@ -208,21 +218,19 @@ abstract class ilSelfEvaluationBlock {
 	//
 	/**
 	 * @param int  $parent_id ilObjSelfEvaluation obj id
-	 * @param bool $as_array
 	 *
 	 * @return ilSelfEvaluationBlock[]
 	 */
-	protected function getAllInstancesByParentId($parent_id, $as_array = false) {
+	public static function getAllInstancesByParentId($parent_id) {
 		global $ilDB;
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . static::getTableName() . ' ' . ' WHERE parent_id = '
 			. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
-			if ($as_array) {
-				$return[] = (array)new static($rec->id);
-			} else {
-				$return[] = new static($rec->id);
-			}
+			/** @var ilSelfEvaluationBlock $block */
+			$block = new static();
+			static::setObjectValuesFromRecord($block, $rec);
+			$return[] = $block;
 		}
 
 		return $return;
@@ -329,12 +337,7 @@ abstract class ilSelfEvaluationBlock {
 	/**
 	 * @return ilSelfEvaluationBlockTableRow
 	 */
-	public function getBlockTableRow() {
-		require_once(dirname(__FILE__) . '/Table/class.ilSelfEvaluationBlockTableRow.php');
-		$row = new ilSelfEvaluationBlockTableRow($this);
-
-		return $row;
-	}
+	abstract public function getBlockTableRow();
 
 
 	public function getPositionId() {

@@ -32,14 +32,13 @@ class ilSelfEvaluationDatasetGUI {
 		$this->parent = $parent;
 		$this->toolbar = $ilToolbar;
 		$this->tabs_gui = $this->parent->tabs_gui;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 		$this->dataset = new ilSelfEvaluationDataset($_GET['dataset_id'] ? $_GET['dataset_id'] : 0);
 	}
 
 
 	public function executeCommand() {
 		if ($_GET['rl'] == 'true') {
-			$this->pl = new ilSelfEvaluationPlugin();
 			$this->pl->updateLanguages();
 		}
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
@@ -82,7 +81,7 @@ class ilSelfEvaluationDatasetGUI {
 
 	public function index() {
 		$async = new ilOverlayRequestGUI();
-		$table = new ilSelfEvaluationDatasetTableGUI($this, 'index',$this->parent->object->getId());
+		$table = new ilSelfEvaluationDatasetTableGUI($this, 'index', $this->pl, $this->parent->object->getId());
 		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 
 		return;

@@ -20,7 +20,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		 * @var $ilCtrl ilCtrl
 		 * @var $ilTabs ilTabsGUI
 		 */
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $a_parent_obj->getPluginObject();
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $ilTabs;
 		$this->setId('');
@@ -36,9 +36,6 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('count_feedbacks'), false, 'auto');
 		$this->addColumn($this->pl->txt('feedback_status'), false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), false, 'auto');
-		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI', 'block_id', NULL);
-		require_once(dirname(__FILE__) . '/../../Form/class.ilOverlayRequestGUI.php');
-		$this->addHeaderCommand(ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionBlockGUI', 'addBlock')), $this->pl->txt('add_new_block'));
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationListBlocksGUI'));
 		$this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
 		$this->setRowTemplate($this->pl->getDirectory().'/templates/default/Block/tpl.template_block_row.html');
@@ -56,15 +53,36 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		$this->tpl->setVariable('EDIT_LINK', $a_set['edit_link']);
 		$this->tpl->setVariable('ABBREVIATION', $a_set['abbreviation']);
 		$this->tpl->setVariable('DESCRIPTION', $a_set['description']);
-		$this->tpl->setVariable('QUESTIONS_LINK', $a_set['questions_link']);
-		$this->tpl->setVariable('FEEDBACK_LINK', $a_set['feedback_link']);
-		$this->tpl->setVariable('COUNT_QUESTIONS', $a_set['question_count']);
-		$this->tpl->setVariable('COUNT_FEEDBACKS', $a_set['feedback_count']);
-		$this->tpl->setVariable('FEEDBACK_STATUS', $a_set['status_img']);
+		if ($a_set['questions_link'] == '') {
+			$this->tpl->setCurrentBlock('question_count');
+			$this->tpl->setVariable('COUNT_QUESTIONS', $a_set['question_count']);
+			$this->tpl->parseCurrentBlock();
+		} else {
+			$this->tpl->setCurrentBlock('question_count_with_link');
+			$this->tpl->setVariable('QUESTIONS_LINK', $a_set['questions_link']);
+			$this->tpl->setVariable('COUNT_QUESTIONS', $a_set['question_count']);
+			$this->tpl->parseCurrentBlock();
+		}
+		if ($a_set['feedback_link'] == '') {
+			$this->tpl->setCurrentBlock('feedback_count');
+			$this->tpl->setVariable('COUNT_FEEDBACKS', $a_set['feedback_count']);
+			$this->tpl->parseCurrentBlock();
+			$this->tpl->setCurrentBlock('status_img');
+			$this->tpl->setVariable('FEEDBACK_STATUS', $a_set['status_img']);
+			$this->tpl->parseCurrentBlock();
+		} else {
+			$this->tpl->setCurrentBlock('feedback_count_with_link');
+			$this->tpl->setVariable('COUNT_FEEDBACKS', $a_set['feedback_count']);
+			$this->tpl->parseCurrentBlock();
+			$this->tpl->setCurrentBlock('status_img_with_link');
+			$this->tpl->setVariable('FEEDBACK_STATUS', $a_set['status_img']);
+			$this->tpl->parseCurrentBlock();
+			$this->tpl->setVariable('FEEDBACK_LINK', $a_set['feedback_link']);
+		}
 		// Actions
 		require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 		$ac = new ilAdvancedSelectionListGUI();
-		$ac->setId('block_' . $id);
+		$ac->setId($a_set['position_id']);
 		$ac->setListTitle($this->pl->txt('actions'));
 		/**
 		 * @var ilSelfEvaluationTableAction[] $actions
@@ -73,8 +91,6 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		foreach ($actions as $action) {
 			$ac->addItem($action->getTitle(), $action->getCmd(), $action->getLink());
 		}
-		// TODO is this important? Maybe when addind a new block
-		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI', 'block_id', 0);
 		$this->tpl->setVariable('ACTIONS', $ac->getHTML());
 	}
 }

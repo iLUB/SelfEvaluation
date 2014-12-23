@@ -23,6 +23,7 @@
 
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
 require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestion.php');
 require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScale.php');
 require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScaleUnit.php');
@@ -265,13 +266,16 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			}
 			$id->delete();
 		}
-		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
 				$qst->delete();
 			}
 			foreach (ilSelfEvaluationFeedback::_getAllInstancesForParentId($block->getId()) as $fb) {
 				$fb->delete();
 			}
+			$block->delete();
+		}
+		foreach (ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->getId()) as $block) {
 			$block->delete();
 		}
 		$this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . ' id = '
@@ -298,6 +302,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setShowBlockDescriptionsDuringEvaluation($this->getShowBlockDescriptionsDuringEvaluation());
 		$new_obj->setShowBlockTitlesDuringFeedback($this->getShowBlockTitlesDuringFeedback());
 		$new_obj->setShowBlockDescriptionsDuringFeedback($this->getShowBlockDescriptionsDuringFeedback());
+		// TODO clone meta blocks and questions?
 		$new_obj->update();
 	}
 
@@ -325,11 +330,19 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 
 	/**
+	 * Return if there are any blocks with at least one question
+	 *
 	 * @return bool
 	 */
 	public function hasBLocks() {
-		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
 			if (count(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId())) > 0) {
+				return true;
+			}
+		}
+		foreach (ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->getId()) as $block) {
+			/** @var ilSelfEvaluationMetaBlock $block */
+			if (count($block->getMetaContainer()->getFieldDefinitions()) > 0) {
 				return true;
 			}
 		}
@@ -343,7 +356,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function areFeedbacksComplete() {
 		$return = true;
-		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
 			$return = ilSelfEvaluationFeedback::_isComplete($block->getId()) ? $return : false;
 		}
 
