@@ -41,8 +41,8 @@ $fields = array(
 	),
 );
 if (! $this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-	$ilDB->createTable(ilObjSelfEvaluation::TABLE_NAME, $fields);
-	$ilDB->addPrimaryKey(ilObjSelfEvaluation::TABLE_NAME, array( 'id' ));
+	$this->db->createTable(ilObjSelfEvaluation::TABLE_NAME, $fields);
+	$this->db->addPrimaryKey(ilObjSelfEvaluation::TABLE_NAME, array( 'id' ));
 }
 
 ?>
@@ -182,5 +182,29 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 		'type' => 'clob',
 	);
 	$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'identity_selection_info', $field);
+}
+?>
+<#10>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationMetaBlock.php');
+/**
+ * @var $ilDB ilDB
+ */
+$block = new ilSelfEvaluationMetaBlock();
+$block->initDB();
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Dataset/class.ilSelfEvaluationData.php');
+/**
+ * @var $ilDB ilDB
+ */
+if (!$ilDB->tableColumnExists(ilSelfEvaluationData::TABLE_NAME, 'question_type')) {
+	$field = array(
+		'type' => 'text',
+		'length' => 1024,
+		'notnull' => true
+	);
+	$ilDB->addTableColumn(ilSelfEvaluationData::TABLE_NAME, 'question_type', $field);
+	$ilDB->manipulate('UPDATE ' . ilSelfEvaluationData::TABLE_NAME .
+		' SET `question_type` = ' . $ilDB->quote(ilSelfEvaluationData::QUESTION_TYPE, 'text') . ';');
+	$ilDB->modifyTableColumn(ilSelfEvaluationData::TABLE_NAME, 'value', array('type' => 'clob'));
 }
 ?>

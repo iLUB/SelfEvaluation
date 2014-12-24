@@ -1,6 +1,4 @@
 <?php
-require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
-require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Accordion/classes/class.ilAccordionGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 /**
@@ -40,7 +38,7 @@ class ilSelfEvaluationIdentityGUI {
 		$this->parent = $parent;
 		$this->toolbar = $ilToolbar;
 		$this->tabs_gui = $this->parent->tabs_gui;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 	}
 
 

@@ -12,9 +12,6 @@ require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
  *
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * @version           $Id:
- *
- * @ilCtrl_Calls      ilSelfEvaluationQuestionGUI:
- * @ilCtrl_IsCalledBy ilSelfEvaluationQuestionGUI:
  */
 class ilSelfEvaluationQuestionGUI {
 
@@ -41,7 +38,7 @@ class ilSelfEvaluationQuestionGUI {
 		$this->ctrl = $ilCtrl;
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 		$this->block = new ilSelfEvaluationQuestionBlock($block_id ? $block_id : (int)$_GET['block_id']);
 		$this->object = new ilSelfEvaluationQuestion($question_id ? $question_id : (int)$_GET['question_id']);
 	}
@@ -202,7 +199,8 @@ class ilSelfEvaluationQuestionGUI {
 		}
 		$async = new ilOverlayRequestGUI();
 		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addQuestion'));
-		$this->toolbar->addButton('<b>&lt;&lt; '.$this->pl->txt('back_to_blocks').'</b>', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
+		$this->toolbar->addButton('<b>&lt;&lt; '.$this->pl->txt('back_to_blocks').'</b>',
+			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
 		$table = new ilSelfEvaluationQuestionTableGUI($this, 'showContent', $this->block);
 		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 	}
@@ -251,7 +249,7 @@ class ilSelfEvaluationQuestionGUI {
 		/** @var ilSelfEvaluationQuestion[] $questions */
 		$questions = array();
 
-		foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($parent_id) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($parent_id) as $block) {
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
 				$questions[] = $qst;
 			}

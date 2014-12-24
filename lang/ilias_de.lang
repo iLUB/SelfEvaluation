@@ -53,7 +53,8 @@ question_body#:#Frage
 question_title_info#:#Der Titel wird für die Benennung der Feedback Grafiken verwendet.
 add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke
-add_new_block#:#Frageblock hinzufügen
+add_new_question_block#:#Frageblock hinzufügen
+add_new_meta_block#:#Metafrageblock hinzufügen
 edit_question#:#Frage bearbeiten
 delete_question#:#Frage löschen
 sorting_saved#:#Reihenfolge gespeichert

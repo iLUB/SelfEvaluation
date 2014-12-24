@@ -1,15 +1,6 @@
 <?php
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
-require_once('./Modules/SurveyQuestionPool/classes/class.ilMatrixRowWizardInputGUI.php');
-require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
-require_once('class.ilSelfEvaluationQuestionBlock.php');
-require_once('class.ilSelfEvaluationBlockTableGUI.php');
-require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionTableGUI.php');
-require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
-require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionGUI.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilMatrixHeaderGUI.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilFormSectionHeaderGUIFixed.php');
 
 
@@ -22,7 +13,7 @@ require_once(dirname(__FILE__) . '/../Form/class.ilFormSectionHeaderGUIFixed.php
  * @author            Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version           $Id:
  */
-class ilSelfEvaluationBlockGUI {
+abstract class ilSelfEvaluationBlockGUI {
 
 	/**
 	 * @var ilTabsGUI
@@ -31,7 +22,7 @@ class ilSelfEvaluationBlockGUI {
 	/**
 	 * @var ilSelfEvaluationBlock
 	 */
-	public $object;
+	protected $object;
 	/**
 	 * @var ilPropertyFormGUI
 	 */
@@ -53,7 +44,7 @@ class ilSelfEvaluationBlockGUI {
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->object = $block;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 	}
 
 
@@ -90,20 +81,20 @@ class ilSelfEvaluationBlockGUI {
 			case 'updateObject':
 			case 'deleteBlock':
 			case 'deleteObject':
-			case 'editQuestions':
-			case 'showContent':
-			case 'saveSorting':
-				//				$this->parent->checkPermission('write');
+				$this->parent->permissionCheck('write');
 				$this->$cmd();
 				break;
 			case 'cancel':
-				//				$this->parent->checkPermission('read');
+				$this->parent->permissionCheck('read');
 				$this->$cmd();
 				break;
 		}
 	}
 
 
+	/**
+	 * Show the add block input GUI
+	 */
 	public function addBlock() {
 		$this->initForm();
 		$this->tpl->setContent($this->form->getHTML());
@@ -111,10 +102,15 @@ class ilSelfEvaluationBlockGUI {
 
 
 	public function cancel() {
-		$this->ctrl->redirectByClass('ilSelfEvaluationBlockGUI', 'showContent');
+		$this->ctrl->redirectByClass('ilSelfEvaluationListBlocksGUI', 'showContent');
 	}
 
 
+	/**
+	 * Initialise the block form
+	 *
+	 * @param string $mode create or update mode
+	 */
 	public function initForm($mode = 'create') {
 		$this->form = new  ilPropertyFormGUI();
 		$this->form->setTitle($this->pl->txt($mode . '_block'));
@@ -130,6 +126,9 @@ class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Create a new block object
+	 */
 	public function createObject() {
 		$this->initForm();
 		if ($this->form->checkInput()) {
@@ -142,6 +141,9 @@ class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Show the edit block GUI
+	 */
 	public function editBlock() {
 		$this->initForm('update');
 		$values = $this->getObjectValuesAsArray();
@@ -158,6 +160,9 @@ class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Update a block object
+	 */
 	public function updateObject() {
 		$this->initForm();
 		$this->form->setValuesByPost();
@@ -171,6 +176,9 @@ class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Show the delete block GUI
+	 */
 	public function deleteBlock() {
 		//		ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
 		$conf = new ilConfirmationGUI();
@@ -182,6 +190,9 @@ class ilSelfEvaluationBlockGUI {
 	}
 
 
+	/**
+	 * Delete a block object
+	 */
 	public function deleteObject() {
 		ilUtil::sendSuccess($this->pl->txt('msg_block_deleted'), true);
 		$this->object->delete();
@@ -217,29 +228,6 @@ class ilSelfEvaluationBlockGUI {
 		$form->addItem($h);
 
 		return $form;
-	}
-
-
-	public function showContent() {
-		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/js/sortable.js');
-		$async = new ilOverlayRequestGUI();
-		$async->setAddNewLink($this->ctrl->getLinkTargetByClass('ilselfevaluationquestionblockgui', 'addBlock'));
-		$table = new ilSelfEvaluationBlockTableGUI($this->parent, 'showContent');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Block/class.ilSelfEvaluationBlockTableData.php');
-		$data = new ilSelfEvaluationBlockTableData();
-		$table->setData($data->getTableDataForAllBlocks($this->object->getParentId()));
-		$this->tpl->setContent($async->getHTML() . $table->getHTML());
-	}
-
-
-	public function saveSorting() {
-		foreach ($_POST['position'] as $k => $v) {
-			$obj = new ilSelfEvaluationQuestionBlock($v);
-			$obj->setPosition($k + 1);
-			$obj->update();
-		}
-		ilUtil::sendSuccess($this->pl->txt('sorting_saved'), true);
-		$this->ctrl->redirect($this, 'showContent');
 	}
 
 

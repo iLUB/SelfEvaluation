@@ -1,5 +1,7 @@
 <?php
+require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
+
 /**
  * Class ilSelfEvaluationQuestionBlock
  *
@@ -19,9 +21,13 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 	protected $abbreviation = '';
 
 
-	public function read() {
-		parent::read();
-		$this->setScale(ilSelfEvaluationScale::_getInstanceByRefId($this->getParentId()));
+	/**
+	 * @param ilSelfEvaluationQuestionBlock $block
+	 * @param stdClass                      $rec
+	 */
+	protected function setObjectValuesFromRecord(ilSelfEvaluationQuestionBlock &$block, $rec) {
+		parent::setObjectValuesFromRecord($block, $rec);
+		$block->setScale(ilSelfEvaluationScale::_getInstanceByRefId($block->getParentId()));
 	}
 
 
@@ -73,47 +79,14 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 	}
 
 
-	//
-	// Static
-	//
 	/**
-	 * @param int  $parent_id ilObjSelfEvaluation obj id
-	 * @param bool $as_array
-	 *
-	 * @return ilSelfEvaluationBlock[]
+	 * @return ilSelfEvaluationBlockTableRow
 	 */
-	public static function _getAllInstancesByParentId($parent_id, $as_array = false) {
-		global $ilDB;
-		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::getTableName() . ' ' . ' WHERE parent_id = '
-			. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
-		while ($rec = $ilDB->fetchObject($set)) {
-			$scale = ilSelfEvaluationScale::_getInstanceByRefId($parent_id);
+	public function getBlockTableRow() {
+		require_once(dirname(__FILE__) . '/Table/class.ilSelfEvaluationQuestionBlockTableRow.php');
+		$row = new ilSelfEvaluationQuestionBlockTableRow($this);
 
-			if ($as_array) {
-				$return[] = array(
-					'id' => (int)$rec->id,
-					'parent_id' => (int)$rec->parent_id,
-					'title' => (string)$rec->title,
-					'description' => (string)$rec->description,
-					'abbreviation' => (string)$rec->abbreviation,
-					'scale_id' => (int)$scale->getId(),
-				);
-			} else {
-				$block = new ilSelfEvaluationQuestionBlock();
-				$block->setId((int)$rec->id);
-				$block->setParentId((int)$rec->parent_id);
-				$block->setPosition((int)$rec->position);
-				$block->setTitle((string)$rec->title);
-				$block->setDescription((string)$rec->description);
-				$block->setAbbreviation((string)$rec->abbrevation);
-
-				$block->setScale($scale);
-				$return[] = $block;
-			}
-		}
-
-		return $return;
+		return $row;
 	}
 }
 

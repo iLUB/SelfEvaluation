@@ -26,7 +26,7 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI {
 
 
 	/**
-	 * @param      $parent_id
+	 * @param int  $parent_id
 	 * @param bool $locked
 	 */
 	public function __construct($parent_id, $locked = false) {
