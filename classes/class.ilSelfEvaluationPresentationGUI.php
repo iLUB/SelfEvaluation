@@ -9,6 +9,8 @@ require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
 require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestionGUI.php');
 require_once(dirname(__FILE__) . '/Form/class.ilKnobGUI.php');
+require_once(dirname(__FILE__) . '/Presentation/class.ilSelfEvaluationPresentationFormGUI.php');
+
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
  *
@@ -165,7 +167,7 @@ class ilSelfEvaluationPresentationGUI {
 
 
 	public function initPresentationForm($mode = 'new') {
-		$this->form = new ilPropertyFormGUI();
+		$this->form = new ilSelfEvaluationPresentationFormGUI();
 
 		$this->form->setId('evaluation_form');
 		$blocks = ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->parent->object->getId());
