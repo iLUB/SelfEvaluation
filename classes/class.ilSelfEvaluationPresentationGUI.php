@@ -7,7 +7,7 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
 require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestionGUI.php');
-require_once(dirname(__FILE__) . '/Form/class.ilKnobGUI.php');
+require_once(dirname(__FILE__) . '/Presentation/class.ilKnobGUI.php');
 require_once(dirname(__FILE__) . '/Presentation/class.ilSelfEvaluationPresentationFormGUI.php');
 
 /**
@@ -166,12 +166,14 @@ class ilSelfEvaluationPresentationGUI {
 
 
 	public function initPresentationForm($mode = 'new') {
+
 		$this->form = new ilSelfEvaluationPresentationFormGUI();
 
 		$this->form->setId('evaluation_form');
 		require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlockFactory.php');
 		$factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
 		$blocks = $factory->getAllBlocks();
+
 		switch ($this->parent->object->getDisplayType()) {
 			case ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE:
                 $first = true;
@@ -190,11 +192,9 @@ class ilSelfEvaluationPresentationGUI {
 			case ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES:
 				$page = $_GET['page'] ? $_GET['page'] : 1;
 				$last_page = count($blocks);
-				$knob = new ilKnobGUI();
-				$knob->setValue($page);
-				$knob->setMax($last_page);
+
 				if ($last_page > 1) {
-					$this->tpl->setRightContent($knob->getHtml());
+					$this->form->addKnob($page,$last_page);
 				}
 				$this->ctrl->setParameter($this, 'page', $page);
 				if ($page < $last_page) {

@@ -54,10 +54,13 @@ class ilSelfEvaluationQuestionBlockGUI extends ilSelfEvaluationBlockGUI {
 	public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
 		$form = parent::getBlockForm($parent_form, $first);
 
-		require_once(dirname(__FILE__) . '/../Form/class.ilMatrixHeaderGUI.php');
+		require_once(dirname(__FILE__) . '/../Presentation/class.ilMatrixHeaderGUI.php');
 		$sc = new ilMatrixHeaderGUI();
 		$sc->setScale($this->object->getScale()->getUnitsAsArray());
 		$form->addItem($sc);
+
+        $question_form_size = min(max(12 - ($this->object->getScale()->getAmount()+1),3),6);
+        $form->setQuestionFieldSize($question_form_size);
 
 		$questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId());
 		if ($this->parent->object->getSortType() == ilObjSelfEvaluation::SHUFFLE_IN_BLOCKS) {

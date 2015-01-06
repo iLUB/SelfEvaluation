@@ -27,45 +27,6 @@ div.blockActions {
 	float:      right;
 }
 
-ul.matrix, ul.matrix li {
-	margin:      0;
-	display:     block;
-	padding:     0 !important;
-}
-
-ul.matrix {
-	border-top:    1px dotted #E8E8E8;
-	border-bottom: 1px dotted #E8E8E8;
-	margin-bottom: 15px;
-	margin-top:    5px;
-}
-
-ul.matrix li {
-	float:          left; 
-	list-style:     none;
-	text-align:     center;
-	vertical-align: middle;
-	word-wrap:      normal;
-	line-height:    25px;
-	padding:        40px;
-	height:         auto;
-}
-
-ul.matrix.header {
-	background-color: #E8E8E8;
-	min-width: 600px;
-	overflow:hidden;
-}
-
-ul.matrix.header  li {
-	background-color: #E8E8E8;
-	font-weight: bold;
-}
-
-li.col2 {
-	background-color: #E8E8E8;
-}
-
 div.question {
 	margin-top: -7px;
 }
@@ -74,13 +35,6 @@ div.blockInfo {
 	margin-bottom: 4px;
 }
 
-#form_evaluation_form div.ilForm {
-	width: 100%;
-}
-
-#form_evaluation_form div.ilFormOption {
-	width: 300px;
-}
 
 div#feedback_overview {
 	width:    100%;

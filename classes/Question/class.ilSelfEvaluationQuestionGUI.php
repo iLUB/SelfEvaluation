@@ -5,7 +5,7 @@ require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
 require_once('class.ilSelfEvaluationQuestionTableGUI.php');
 require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationQuestionBlock.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilMatrixFieldInputGUI.php');
+require_once(dirname(__FILE__) . '/../Presentation/class.ilMatrixFieldInputGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * GUI-Class ilSelfEvaluationQuestionGUI
@@ -228,9 +228,8 @@ class ilSelfEvaluationQuestionGUI {
 		} else {
 			$form = new ilPropertyFormGUI();
 		}
-		$te = new ilMatrixFieldInputGUI($this->object->getTitle(), self::POSTVAR_PREFIX . $this->object->getId());
+		$te = new ilMatrixFieldInputGUI($this->object->getQuestionBody(), self::POSTVAR_PREFIX . $this->object->getId());
 		$te->setScale($this->block->getScale()->getUnitsAsArray($this->object->getIsInverse()));
-		$te->setQuestion($this->object->getQuestionBody());
 		$te->setRequired(true);
 		$form->addItem($te);
 
@@ -255,7 +254,7 @@ class ilSelfEvaluationQuestionGUI {
 			}
 		}
 		$sc = new ilMatrixHeaderGUI();
-		$sc->setScale($block->getScale()->getUnitsAsArray()); // TODO this looks nasty. Why is the the scale of hte last block onyl?
+		$sc->setScale($block->getScale()->getUnitsAsArray());
 		$form->addItem($sc);
 		shuffle($questions);
 		foreach ($questions as $qst) {

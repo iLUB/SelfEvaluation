@@ -62,15 +62,15 @@ class ilKnobGUI {
 	/**
 	 * @var int
 	 */
-	protected $thickness = 0.5;
+	protected $thickness = 0.3;
 	/**
 	 * @var string
 	 */
 	protected $line_cap = self::CAP_BUTT;
 	/**
-	 * @var int
+	 * @var $height
 	 */
-	protected $width = 200;
+	protected $height = 50;
 	/**
 	 * @var bool
 	 */
@@ -112,7 +112,7 @@ class ilKnobGUI {
 		$knob->setVariable('STOPPER', $this->getStopper() ? 'true' : 'false');
 		$knob->setVariable('THICKNESS', $this->getThickness());
 		$knob->setVariable('LINECAP', $this->getLineCap());
-		$knob->setVariable('WIDTH', $this->getWidth());
+		$knob->setVariable('HEIGHT', $this->getHeight());
 		$knob->setVariable('DISPLAYINPUT', $this->getDisplayInput() ? 'true' : 'false');
 		$knob->setVariable('DISPLAYPREVIOUS', $this->getDisplayPrevious() ? 'true' : 'false');
 		$this->setHtml($knob->get());
@@ -378,18 +378,18 @@ class ilKnobGUI {
 
 
 	/**
-	 * @param int $width
+	 * @param int $height
 	 */
-	public function setWidth($width) {
-		$this->width = $width;
+	public function setHeight($height) {
+		$this->height = $height;
 	}
 
 
 	/**
 	 * @return int
 	 */
-	public function getWidth() {
-		return $this->width;
+	public function getHeight() {
+		return $this->height;
 	}
 }
 

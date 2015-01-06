@@ -1,7 +1,7 @@
 <?php
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilFormSectionHeaderGUIFixed.php');
+require_once(dirname(__FILE__) . '/../Presentation/class.ilFormSectionHeaderGUIFixed.php');
 
 
 /**
@@ -211,10 +211,6 @@ abstract class ilSelfEvaluationBlockGUI {
 			$form = $parent_form;
 		} else {
 			$form = new ilPropertyFormGUI();
-		}
-		if ($first) {
-			$h = new ilFormSectionHeaderGUIFixed();
-			$form->addItem($h);
 		}
 		$h = new ilFormSectionHeaderGUIFixed();
 		if ($this->parent->object->getShowBlockTitlesDuringEvaluation()) {

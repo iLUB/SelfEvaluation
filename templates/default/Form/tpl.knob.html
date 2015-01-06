@@ -1,32 +1,6 @@
-<style>
-	div.knob-small, div.knob {
-		float: right;
-	}
-	@media (min-width: 1024px) {
-		div.knob-small {
-			display: none;
-		}
-		div.knob {
-			width: 200px;
-		}
-	}
 
-	@media (max-width: 1023px) {
-		div.knob {
-			display: none;
-		}
-	}
-	@media (max-width: 850px) {
-		div.knob-small {
-			display: none;
-		}
-		div.knob {
-			display: none;
-		}
-	}
-</style>
 <div class="knob">
-	<input type='text' value='{VALUE}' id='{ID}'>
+	<input type='text' value='{VALUE}' id='{ID}' data-height="{HEIGHT}%">
 	<script>
 		$(function () {
 			$('#{ID}').knob({
@@ -34,37 +8,12 @@
 				'max': {MAX},
 				readOnly: {READONLY},
 				fgColor: 'rgb({FGCOLOR})',
-				inputColor: 'rgb({INCOLOR})',
 				bgColor:'rgb({BGCOLOR})',
 				angleOffset: {ANGLEOFFSET},
 				angleArc: {ANGLEARC},
 				stopper: {STOPPER},
 				thickness: {THICKNESS},
 				lineCap: {LINECAP},
-				width: {WIDTH},
-				displayInput: {DISPLAYINPUT},
-				displayPrevious: {DISPLAYPREVIOUS}
-			});
-		});
-	</script>
-</div>
-<div class="knob-small">
-	<input type='text' value='{VALUE}' id='{ID}-small'>
-	<script>
-		$(function () {
-			$('#{ID}-small').knob({
-				'min': {MIN},
-				'max': {MAX},
-				readOnly: {READONLY},
-				fgColor: 'rgb({FGCOLOR})',
-				inputColor: 'rgb({INCOLOR})',
-				bgColor:'rgb({BGCOLOR})',
-				angleOffset: {ANGLEOFFSET},
-				angleArc: {ANGLEARC},
-				stopper: {STOPPER},
-				thickness: {THICKNESS},
-				lineCap: {LINECAP},
-				width: {WIDTH}/2,
 				displayInput: {DISPLAYINPUT},
 				displayPrevious: {DISPLAYPREVIOUS}
 			});

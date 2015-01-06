@@ -1,35 +1,48 @@
+* {
+    box-sizing:  	content-box;
+}
+
 h4 {
   margin-top: 25px;
 }
-.row {
-  margin-bottom: 20px;
+
+.block-header{
+    border-bottom: 2px solid  #a1a1a1;
+    margin-bottom: 20px;
 }
-.row .row {
-  margin-top: 10px;
-  margin-bottom: 0;
-}
-[class*="col-"] {
-  padding-top: 15px;
-  padding-bottom: 15px;
-  background-color: #eee;
-  background-color: rgba(86,61,124,.15);
-  border: 1px solid #ddd;
-  border: 1px solid rgba(86,61,124,.2);
+.table > tbody > tr td.ilUnitEven,.table > tbody > tr td.ilUnitOdd{
+    text-align: center;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
-hr {
-  margin-top: 40px;
-  margin-bottom: 40px;
+.ilUnitEven {
+    background-color: #747474;
 }
 
+.ilUnitOdd {
+    background-color: #cbcbcb;
+}
+
+
+.block-question{
+    border-bottom:  1px solid  #a1a1a1;
+
+}
+
+.rating, .block-commands{
+    padding-right: 0px;
+    padding-left: 0px;
+}
 .table {
     margin-bottom: 0px;
     table-layout: fixed;
 }
 
-* {
-    box-sizing:  	content-box;
+.knob-col{
+    padding-right: 0;
 }
+
 .self-evaluation-presentation * {
     box-sizing:  	border-box;
 }
@@ -39,4 +52,8 @@ hr {
     border-top: 0px;
     witdh: 20%;
     word-wrap: normal;
+}
+
+.knob{
+    float: right;
 }

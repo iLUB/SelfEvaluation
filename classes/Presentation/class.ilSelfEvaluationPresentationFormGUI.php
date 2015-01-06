@@ -15,12 +15,22 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
     protected $copy_of_buttons = array();
 
     /**
+     * @var ilKnobGUI
+     */
+    protected $knob = null;
+
+    /**
+     * @var int
+     */
+    protected $question_field_size = 6;
+
+    /**
      * Add Command button
      *
      * @param	string	Command
      * @param	string	Text
      */
-    function addCommandButton($a_cmd, $a_text)
+    public function addCommandButton($a_cmd, $a_text)
     {
 
         $this->copy_of_buttons[] = array("cmd" => $a_cmd, "text" => $a_text);
@@ -36,12 +46,20 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
         parent::clearCommandButtons();
     }
 
+
+    public function addKnob($page,$last_page){
+        $this->knob = new ilKnobGUI();
+        $this->knob->setValue($page);
+        $this->knob->setMax($last_page);
+
+    }
+
     /**
      * Get Content.
      */
-    function getContent()
+    public function getContent()
     {
-        global $lng, $tpl, $ilUser;
+        global $lng, $tpl;
 
         include_once("./Services/YUI/classes/class.ilYuiUtil.php");
         ilYuiUtil::initEvent();
@@ -55,61 +73,24 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
 
         $this->tpl = new ilTemplate("tpl.presentation_form.html", true, true, "Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/");
 
-        // check if form has not title and first item is a section header
-        // -> use section header for title and remove section header
-        // -> command buttons are presented on top
-        $items = $this->getItems();
-        $fi = $items[0];
-        if ($this->getMode() == "std" &&
-            $this->getTitle() == "" &&
-            is_object($fi) && $fi->getType() == "section_header"
-        )
-        {
-            $this->setTitle($fi->getTitle());
-            unset($items[0]);
-        }
-
-
-        // title icon
-        if ($this->getTitleIcon() != "" && @is_file($this->getTitleIcon()))
-        {
-            $this->tpl->setCurrentBlock("title_icon");
-            $this->tpl->setVariable("IMG_ICON", $this->getTitleIcon());
-            $this->tpl->parseCurrentBlock();
-        }
-
-        // title
-        if ($this->getTitle() != "")
-        {
-            // commands on top
-            if (count($this->copy_of_buttons) > 0 && $this->getShowTopButtons())
-            {
-                // command buttons
-                foreach($this->copy_of_buttons as $button)
-                {
-                    $this->tpl->setCurrentBlock("cmd2");
-                    $this->tpl->setVariable("CMD", $button["cmd"]);
-                    $this->tpl->setVariable("CMD_TXT", $button["text"]);
-                    $this->tpl->parseCurrentBlock();
-                }
-                $this->tpl->setCurrentBlock("commands2");
-                $this->tpl->parseCurrentBlock();
-            }
-
-            $this->tpl->setCurrentBlock("header");
-            $this->tpl->setVariable("TXT_TITLE", $this->getTitle());
-            $this->tpl->setVariable("LABEL", $this->getTopAnchor());
-            $this->tpl->setVariable("TXT_DESCRIPTION", $this->getDescription());
-            $this->tpl->parseCurrentBlock();
-        }
-        $this->tpl->touchBlock("item");
-
         // properties
         $this->required_text = false;
         foreach($this->getItems() as $item)
         {
+
+            if($item->getType() == "section_header" && $this->knob){
+                $this->tpl->setVariable("PROGRESS_KNOB",$this->knob->getHtml());
+                //$this->tpl->setVariable("PROP_CLASS","block-header");
+            }
+            else{
+                //$this->tpl->setVariable("PROP_CLASS","block-question");
+            }
             if ($item->getType() != "hidden")
             {
+                $this->tpl->setVariable("RATING_SIZE",12-$this->getQuestionFieldSize());
+                $this->tpl->setVariable("QUESTION_SIZE",$this->getQuestionFieldSize());
+                $this->tpl->setVariable("RATING_SIZE_COMMAND",12-$this->getQuestionFieldSize());
+                $this->tpl->setVariable("QUESTION_SIZE_COMMAND",$this->getQuestionFieldSize());
                 $this->insertItem($item);
             }
         }
@@ -131,19 +112,6 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
             $this->tpl->parseCurrentBlock();
         }
 
-        // try to keep uploads even if checking input fails
-        if($this->getMultipart())
-        {
-            $hash = $_POST["ilfilehash"];
-            if(!$hash)
-            {
-                $hash = md5(uniqid(mt_rand(), true));
-            }
-            $fhash = new ilHiddenInputGUI("ilfilehash");
-            $fhash->setValue($hash);
-            $this->addItem($fhash);
-        }
-
         // hidden properties
         $hidden_fields = false;
         foreach($this->getItems() as $item)
@@ -163,6 +131,23 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
 
         return $this->tpl->get();
     }
-}
 
+    /**
+     * @param int $question_field_size
+     */
+    public function setQuestionFieldSize($question_field_size)
+    {
+        $this->question_field_size = $question_field_size;
+    }
+
+    /**
+     * @return int
+     */
+    public function getQuestionFieldSize()
+    {
+        return $this->question_field_size;
+    }
+
+
+}
 ?>

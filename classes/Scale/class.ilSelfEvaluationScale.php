@@ -18,10 +18,6 @@ class ilSelfEvaluationScale {
 	 * @var int
 	 */
 	protected $parent_id = 0;
-	/**
-	 * @var int
-	 */
-	protected $amount = 0;
 
 
 	/**
@@ -193,20 +189,11 @@ class ilSelfEvaluationScale {
 		return $this->id;
 	}
 
-
-	/**
-	 * @param int $amount
-	 */
-	public function setAmount($amount) {
-		$this->amount = $amount;
-	}
-
-
 	/**
 	 * @return int
 	 */
 	public function getAmount() {
-		return $this->amount;
+		return count($this->units);
 	}
 
 

@@ -24,10 +24,6 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 	 * @var array
 	 */
 	protected $scale = array();
-	/**
-	 * @var string
-	 */
-	protected $question = '';
 
 
 	public function getHtml() {
@@ -41,19 +37,17 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 	private function buildHTML() {
 		$pl = new ilSelfEvaluationPlugin();
 		$tpl = $pl->getTemplate('default/Form/tpl.matrix_input.html');
-		$css = ((count($this->getScale()) % 2) == 1) ? 1 : 2;
-		$tpl->setVariable('QUESTION', $this->getQuestion());
-		$width = floor(100 / count($this->getScale()));
+
+        $even = false;
 		foreach ($this->getScale() as $value => $title) {
 			$tpl->setCurrentBlock('item');
 			if ($this->getValue() == $value AND $this->getValue() !== NULL AND $this->getValue() !== '') {
 				$tpl->setVariable('SELECTED', 'checked="checked"');
 			}
-			$tpl->setVariable('CSS', 'col' . $css);
-			$tpl->setVariable('STYLE', $width . '%');
+            $tpl->setVariable('CLASS', $even ? "ilUnitEven":"ilUnitOdd");
+            $even = !$even;
 			$tpl->setVariable('VALUE', $value);
 			$tpl->setVariable('NAME', $this->getPostVar());
-			$css = $css == 1 ? 2 : 1;
 			$tpl->parseCurrentBlock();
 		}
 
@@ -115,22 +109,6 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 	 */
 	public function getValues() {
 		return $this->values;
-	}
-
-
-	/**
-	 * @param string $question
-	 */
-	public function setQuestion($question) {
-		$this->question = $question;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getQuestion() {
-		return $this->question;
 	}
 }
 

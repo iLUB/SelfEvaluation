@@ -111,13 +111,27 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	public function initHeader() {
-		$this->setLocator();
+        global $ilUser;
+        /**
+         * @var $ilUser ilObjUser
+         */
+
 		$this->tpl->getStandardTemplate();
 		$this->setTitleAndDescription();
 		$this->displayIdentifier();
 		$this->tpl->setTitleIcon($this->getPluginObject()->getDirectory() . '/templates/images/icon_xsev_b.png');
 		$this->tpl->addCss($this->getPluginObject()->getStyleSheetLocation('css/content.css'));
 		$this->tpl->addCss($this->getPluginObject()->getStyleSheetLocation('css/print.css'), 'print');
+
+        $is_in_survey = $this->ctrl->getCmd() == "showContent" || $this->ctrl->getCmd() == "show" || $this->ctrl->getNextClass($this)=="ilselfevaluationpresentationgui";
+        $is_not_logged_in = $ilUser->login == "anonymous";
+
+        if($is_in_survey && $is_not_logged_in){
+            $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/anonymous.css");
+        }
+        else{
+            $this->setLocator();
+        }
 		$this->tpl->addJavaScript($this->getPluginObject()->getDirectory() . '/templates/scripts.js');
 		$this->setTabs();
 	}
