@@ -3,7 +3,7 @@ require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationFeedback.php');
 require_once('class.ilSelfEvaluationFeedbackTableGUI.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilSliderInputGUI.php');
+require_once('class.ilSliderInputGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
@@ -170,28 +170,39 @@ class ilSelfEvaluationFeedbackGUI {
 		// Description
 		$te = new ilTextInputGUI($this->pl->txt('description'), 'description');
 		$this->form->addItem($te);
-		// StartValue
-		/*$se = new ilSelectInputGUI($this->pl->txt('start_value'), 'start_value');
-		for ($x = $max ? $max : 1; $x <= 100; $x ++) {
-			$opt[$x] = $x . '%';
-		}
-		$se->setRequired(true);
-		$se->setOptions($opt);
-		if (! $max) {
-			$se->setDisabled(true);
-		} else {
-			$se->setValue($max);
-		}
-		$this->form->addItem($se);
-		// EndValue
-		$se = new ilSelectInputGUI($this->pl->txt('end_value'), 'end_value');
-		$se->setRequired(true);
-		$se->setOptions($opt);
-		$this->form->addItem($se);*/
-		// Slider
-		$sl = new ilSliderInputGUI($this->pl->txt('slider'), 'slider', 0, 100, $this->ctrl->getLinkTarget($this, 'checkNextValue'));
-		$sl->setRequired(true);
-		$this->form->addItem($sl);
+
+        if($mode == 'create'){
+            $radio_options = new ilRadioGroupInputGUI($this->pl->txt('feedback_range_type'),'feedback_range_type');
+            $option_auto = new ilRadioOption($this->pl->txt("option_auto"),'option_auto');
+            $option_auto->setInfo($this->pl->txt("option_auto_info"));
+
+            $option_slider = new ilRadioOption($this->pl->txt("option_slider"),'option_slider');
+            $sl = new ilSliderInputGUI($this->pl->txt('slider'), 'slider', 0, 100, $this->ctrl->getLinkTarget($this, 'checkNextValue'));
+            $option_slider->addSubItem($sl);
+
+            if(ilSelfEvaluationFeedback::_isComplete($this->block->getId())){
+                $option_slider->setDisabled(true);
+            }
+
+            $radio_options->addOption($option_auto);
+            $radio_options->addOption($option_slider);
+
+            $radio_options->setRequired(true);
+            if(ilSelfEvaluationFeedback::_isComplete($this->block->getId())){
+                $radio_options->setValue('option_auto');
+            }
+            else{
+                $radio_options->setValue('option_slider');
+            }
+
+            $this->form->addItem($radio_options);
+        }
+
+        else{
+            $sl = new ilSliderInputGUI($this->pl->txt('slider'), 'slider', 0, 100, $this->ctrl->getLinkTarget($this, 'checkNextValue'));
+            $this->form->addItem($sl);
+        }
+
 		// Feedbacktext
 		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
 		$te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->pl->txt('feedback_text'), 'feedback_text');
@@ -206,9 +217,17 @@ class ilSelfEvaluationFeedbackGUI {
 			$obj = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
 			$obj->setTitle($this->form->getInput('title'));
 			$obj->setDescription($this->form->getInput('description'));
-			$slider = $this->form->getInput('slider');
-			$obj->setStartValue($slider[0]);
-			$obj->setEndValue($slider[1]);
+            if($this->form->getInput('feedback_range_type') == 'option_auto'){
+                $range = ilSelfEvaluationFeedback::_rearangeFeedbackLinear($this->block->getId());
+                $obj->setStartValue(100-$range);
+                $obj->setEndValue(100);
+            }
+            else{
+                $slider = $this->form->getInput('slider');
+                $obj->setStartValue($slider[0]);
+                $obj->setEndValue($slider[1]);
+            }
+
 			$obj->setFeedbackText($this->form->getInput('feedback_text'));
 			$obj->create();
 			ilUtil::sendSuccess($this->pl->txt('msg_feedback_created'));
@@ -238,7 +257,7 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	public function updateObject() {
-		$this->initForm();
+		$this->initForm('update');
 		if ($this->form->checkInput()) {
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('description'));

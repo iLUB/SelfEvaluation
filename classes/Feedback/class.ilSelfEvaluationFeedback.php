@@ -324,6 +324,35 @@ class ilSelfEvaluationFeedback {
 		return $obj;
 	}
 
+    /**
+     * @param $parent_id
+     * @return ilSelfEvaluationFeedback
+     */
+    public static function _rearangeFeedbackLinear($parent_id) {
+        $obj = new self();
+        $obj->setParentId($parent_id);
+
+        $feedbacks = self::_getAllInstancesForParentId($parent_id);
+        $nr_feedbacks = count($feedbacks)+1;
+        $range_per_feedback = (int)floor(100/$nr_feedbacks);
+        $remainder = 100-$range_per_feedback*$nr_feedbacks;
+
+        $start = 0;
+        foreach($feedbacks as $feedback){
+            $range = $range_per_feedback;
+            if($remainder>0){
+                $range++;
+                $remainder -= 1;
+            }
+            $feedback->setStartValue($start);
+            $end  = $start+$range;
+            $feedback->setEndValue($end);
+            $feedback->update();
+            $start = $end;
+        }
+
+        return $range_per_feedback;
+    }
 
 	//
 	// Setter & Getter
