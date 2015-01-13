@@ -5,8 +5,8 @@ require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
 require_once('class.ilSelfEvaluationQuestionTableGUI.php');
 require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationQuestionBlock.php');
-require_once(dirname(__FILE__) . '/../Presentation/class.ilMatrixFieldInputGUI.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
+
 /**
  * GUI-Class ilSelfEvaluationQuestionGUI
  *
@@ -216,54 +216,6 @@ class ilSelfEvaluationQuestionGUI {
 		$this->ctrl->redirect($this, 'showContent');
 	}
 
-
-	/**
-	 * @param ilPropertyFormGUI $parent_form
-	 *
-	 * @return ilPropertyFormGUI
-	 */
-	public function getQuestionForm(ilPropertyFormGUI $parent_form = NULL) {
-		if ($parent_form) {
-			$form = $parent_form;
-		} else {
-			$form = new ilPropertyFormGUI();
-		}
-		$te = new ilMatrixFieldInputGUI($this->object->getQuestionBody(), self::POSTVAR_PREFIX . $this->object->getId());
-		$te->setScale($this->block->getScale()->getUnitsAsArray($this->object->getIsInverse()));
-		$te->setRequired(true);
-		$form->addItem($te);
-
-		return $form;
-	}
-
-
-	/**
-	 * @param ilObjSelfEvaluationGUI $parent
-	 * @param ilPropertyFormGUI      $form
-	 *
-	 * @return ilPropertyFormGUI
-	 */
-	public static function getAllQuestionsForms(ilObjSelfEvaluationGUI $parent, ilPropertyFormGUI &$form) {
-		$parent_id = $parent->object->getId();
-		/** @var ilSelfEvaluationQuestion[] $questions */
-		$questions = array();
-
-		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($parent_id) as $block) {
-			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
-				$questions[] = $qst;
-			}
-		}
-		$sc = new ilMatrixHeaderGUI();
-		$sc->setScale($block->getScale()->getUnitsAsArray());
-		$form->addItem($sc);
-		shuffle($questions);
-		foreach ($questions as $qst) {
-			$qst_form = new self($parent, $qst->getId(), $block->getId());
-			$form = $qst_form->getQuestionForm($form);
-		}
-
-		return $form;
-	}
 }
 
 ?>

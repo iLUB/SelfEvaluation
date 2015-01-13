@@ -42,37 +42,6 @@ class ilSelfEvaluationQuestionBlockGUI extends ilSelfEvaluationBlockGUI {
 
 		return array_merge(parent::getObjectValuesAsArray(), $values);
 	}
-
-
-
-	/**
-	 * @param ilPropertyFormGUI $parent_form
-	 * @param bool              $first
-	 *
-	 * @return ilPropertyFormGUI
-	 */
-	public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
-		$form = parent::getBlockForm($parent_form, $first);
-
-		require_once(dirname(__FILE__) . '/../Presentation/class.ilMatrixHeaderGUI.php');
-		$sc = new ilMatrixHeaderGUI();
-		$sc->setScale($this->object->getScale()->getUnitsAsArray());
-		$form->addItem($sc);
-
-        $question_form_size = min(max(12 - ($this->object->getScale()->getAmount()+1),3),6);
-        $form->setQuestionFieldSize($question_form_size);
-
-		$questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->object->getId());
-		if ($this->parent->object->getSortType() == ilObjSelfEvaluation::SHUFFLE_IN_BLOCKS) {
-			shuffle($questions);
-		}
-		foreach ($questions as $qst) {
-			$qst_gui = new ilSelfEvaluationQuestionGUI($this->parent, $qst->getId(), $this->object->getId());
-			$qst_gui->getQuestionForm($form);
-		}
-
-		return $form;
-	}
 }
 
 ?>

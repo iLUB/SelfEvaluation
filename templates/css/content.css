@@ -134,3 +134,6 @@ td.feedback_ov_item_blank {
 	background-color: #D3D3D3;
 }
 
+.ilSubForm > .ilForm{
+    width: 100%;
+}

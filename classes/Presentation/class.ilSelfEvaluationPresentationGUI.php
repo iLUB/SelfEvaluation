@@ -1,14 +1,17 @@
 <?php
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
-require_once(dirname(__FILE__) . '/class.ilObjSelfEvaluationGUI.php');
-require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
-require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlockGUI.php');
-require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php');
-require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
-require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
-require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestionGUI.php');
-require_once(dirname(__FILE__) . '/Presentation/class.ilKnobGUI.php');
-require_once(dirname(__FILE__) . '/Presentation/class.ilSelfEvaluationPresentationFormGUI.php');
+require_once(dirname( dirname(__FILE__) ) . '/class.ilObjSelfEvaluationGUI.php');
+require_once(dirname( dirname(__FILE__) )  . '/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
+require_once(dirname( dirname(__FILE__) )  . '/Block/class.ilSelfEvaluationMetaBlockGUI.php');
+require_once(dirname( dirname(__FILE__) )  . '/Identity/class.ilSelfEvaluationIdentity.php');
+require_once(dirname( dirname(__FILE__) )  . '/Dataset/class.ilSelfEvaluationDataset.php');
+require_once(dirname( dirname(__FILE__) )  . '/Dataset/class.ilSelfEvaluationData.php');
+require_once(dirname( dirname(__FILE__) )  . '/Question/class.ilSelfEvaluationQuestionGUI.php');
+require_once(dirname( dirname(__FILE__) )  . '/Presentation/class.ilKnobGUI.php');
+require_once('class.ilSelfEvaluationPresentationFormGUI.php');
+require_once('Block/class.ilSelfEvaluationQuestionBlockPresentationGUI.php');
+require_once('Block/class.ilSelfEvaluationMetaBlockPresentationGUI.php');
+require_once(dirname(dirname(__FILE__) ) . '/Block/class.ilSelfEvaluationBlockFactory.php');
 
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
@@ -166,52 +169,17 @@ class ilSelfEvaluationPresentationGUI {
 
 
 	public function initPresentationForm($mode = 'new') {
-
 		$this->form = new ilSelfEvaluationPresentationFormGUI();
-
 		$this->form->setId('evaluation_form');
-		require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlockFactory.php');
-		$factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
-		$blocks = $factory->getAllBlocks();
 
 		switch ($this->parent->object->getDisplayType()) {
 			case ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE:
-                $first = true;
-				foreach ($blocks as $block) {
-					/**
-					 * @var ilSelfEvaluationBlockGUI $block_gui
-					 */
-					$gui_class = get_class($block) . 'GUI';
-					$block_gui = new $gui_class($this->parent, $block);
-					$this->form = $block_gui->getBlockForm($this->form, $first);
-                    $first = false;
-				}
-				$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
-				$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
+                $this->displayAllBlocks($mode);
 				break;
-			case ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES:
-				$page = $_GET['page'] ? $_GET['page'] : 1;
-				$last_page = count($blocks);
 
-				if ($last_page > 1) {
-					$this->form->addKnob($page,$last_page);
-				}
-				$this->ctrl->setParameter($this, 'page', $page);
-				if ($page < $last_page) {
-					$this->form->addCommandButton($mode . 'NextPage', $this->pl->txt('next_' . $mode));
-					$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
-				} else {
-					$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
-					$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
-				}
-				$block = $blocks[$page - 1];
-				/**
-				 * @var ilSelfEvaluationBlockGUI $block_gui
-				 */
-				$gui_class = get_class($block) . 'GUI';
-				$block_gui = new $gui_class($this->parent, $block);
-				$this->form = $block_gui->getBlockForm($this->form);
-				break;
+			case ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES:
+                $this->displaySingleBlock($mode);
+                break;
 			case ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED:
 				/*
 				 * TODO this is the draft of the "all questions shuffled" mode from Fabian Schmid.
@@ -225,8 +193,46 @@ class ilSelfEvaluationPresentationGUI {
 				$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 				break;
 		}
+        $this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 	}
+
+    protected function displaySingleBlockForm($mode = 'new'){
+        $factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
+        $page = $_GET['page'] ? $_GET['page'] : 1;
+        $blocks = $factory->getAllBlocks();
+        $last_page = count($blocks);
+
+        if ($last_page > 1) {
+            $this->form->addKnob($page,$last_page);
+        }
+        $this->ctrl->setParameter($this, 'page', $page);
+        if ($page < $last_page) {
+            $this->form->addCommandButton($mode . 'NextPage', $this->pl->txt('next_' . $mode));
+        } else {
+            $this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
+        }
+        $this->addBlockHtmlToForm($blocks[$page - 1]);
+
+    }
+
+    protected function displayAllBlocks($mode = 'new'){
+
+        $factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
+        foreach ($factory->getAllBlocks() as $block) {
+            $this->addBlockHtmlToForm($block);
+        }
+        $this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
+    }
+
+    protected function addBlockHtmlToForm($block){
+        /**
+         * @var ilSelfEvaluationBlockGUI $block_gui
+         */
+        $gui_class = get_class($block) . 'PresentationGUI';
+        $block_gui = new $gui_class($this->parent, $block);
+        $this->form = $block_gui->getBlockForm($this->form);
+    }
 
 
 	public function fillForm() {

@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
+require_once('int.ilSelfEvaluationQuestionBlockInterface.php');
 
 /**
  * Class ilSelfEvaluationQuestionBlock
@@ -9,12 +10,7 @@ require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
-
-	/**
-	 * @var ilSelfEvaluationScale
-	 */
-	protected $scale;
+class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilSelfEvaluationQuestionBlockInterface {
 	/**
 	 * @var string
 	 */
@@ -27,7 +23,6 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 	 */
 	protected function setObjectValuesFromRecord(ilSelfEvaluationQuestionBlock &$block, $rec) {
 		parent::setObjectValuesFromRecord($block, $rec);
-		$block->setScale(ilSelfEvaluationScale::_getInstanceByRefId($block->getParentId()));
 	}
 
 
@@ -37,23 +32,6 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 	protected function getNonDbFields() {
 		return array_merge(parent::getNonDbFields(), array('scale'));
 	}
-
-
-	/**
-	 * @param \ilSelfEvaluationScale $scale
-	 */
-	public function setScale($scale) {
-		$this->scale = $scale;
-	}
-
-
-	/**
-	 * @return \ilSelfEvaluationScale
-	 */
-	public function getScale() {
-		return $this->scale;
-	}
-
 
 	/**
 	 * @param string $abbreviation
@@ -88,6 +66,10 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock {
 
 		return $row;
 	}
+
+    public function getQuestions(){
+        return(ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->getId()));
+    }
 }
 
 ?>

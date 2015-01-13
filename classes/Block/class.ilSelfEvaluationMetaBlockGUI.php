@@ -28,6 +28,7 @@ require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockGUI.php');
  * @ilCtrl_isCalledBy ilSelfEvaluationMetaBlockGUI: ilObjSelfEvaluationGUI
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
+ * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
 class ilSelfEvaluationMetaBlockGUI extends ilSelfEvaluationBlockGUI {
@@ -36,21 +37,4 @@ class ilSelfEvaluationMetaBlockGUI extends ilSelfEvaluationBlockGUI {
 	 * @var ilSelfEvaluationMetaBlock
 	 */
 	protected $object;
-
-
-	/**
-	 * @param ilPropertyFormGUI $parent_form
-	 * @param bool              $first
-	 *
-	 * @return ilPropertyFormGUI
-	 */
-	public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
-		$form = parent::getBlockForm($parent_form, $first);
-
-		require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestionGUI.php');
-		$question_gui = new ilSelfEvaluationMetaQuestionGUI($this->object->getMetaContainer(),
-			$this->object->getTitle(), $this->parent->getPluginObject(), $this->parent->object->getRefId());
-
-		return $question_gui->getQuestionForm($form);
-	}
 }

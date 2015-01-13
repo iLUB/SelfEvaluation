@@ -188,12 +188,7 @@ class ilSelfEvaluationFeedbackGUI {
             $radio_options->addOption($option_slider);
 
             $radio_options->setRequired(true);
-            if(ilSelfEvaluationFeedback::_isComplete($this->block->getId())){
-                $radio_options->setValue('option_auto');
-            }
-            else{
-                $radio_options->setValue('option_slider');
-            }
+
 
             $this->form->addItem($radio_options);
         }
@@ -245,6 +240,12 @@ class ilSelfEvaluationFeedbackGUI {
 		$values['end_value'] = $this->object->getEndValue();
 		$values['feedback_text'] = $this->object->getFeedbackText();
 		$values['slider'] = array( $this->object->getStartValue(), $this->object->getEndValue() );
+        if(ilSelfEvaluationFeedback::_isComplete($this->block->getId())){
+            $values['feedback_range_type'] = 'option_auto';
+        }
+        else{
+            $values['feedback_range_type'] = 'option_slider';
+        }
 		$this->form->setValuesByArray($values);
 	}
 

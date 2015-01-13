@@ -47,6 +47,17 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	const DEV = false;
 	const DEBUG = false;
 	const RELOAD = false; // set to true or use the GET parameter rl=true to reload the plugin languages
+
+    const ORDER_QUESTIONS_STATIC = 1;
+    const ORDER_QUESTIONS_BLOCK_RANDOM = 2;
+    const ORDER_QUESTIONS_FULLY_RANDOM = 3;
+
+    const FIELD_ORDER_TYPE = 'block_presentation_type';
+    const FIELD_ORDER_FULLY_RANDOM = 'block_option_random';
+    const FIELD_ORDER_BLOCK = 'block_option_block';
+    const FIELD_ORDER_BLOCK_RANDOM = 'shuffle_in_blocks';
+
+
 	protected static $disabled_buttons = array(
 		'charmap',
 		'undo',
@@ -355,30 +366,47 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$te->setInfo($this->txt('identity_selection_info'));
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
-		// Sorting
-		$se = new ilSelectInputGUI($this->getPluginObject()->txt('sort_type'), 'sort_type');
-		$opt = array(
-			ilObjSelfEvaluation::SHUFFLE_OFF => $this->getPluginObject()->txt('shuffle_off'),
-			ilObjSelfEvaluation::SHUFFLE_IN_BLOCKS => $this->getPluginObject()->txt('shuffle_in_blocks'),
-			ilObjSelfEvaluation::SHUFFLE_ACROSS_BLOCKS => $this->getPluginObject()->txt('shuffle_across_blocks') // TODO add an option to enter the number of questions per page. How is this possible?
-		);
-		$se->setOptions($opt);
-		$this->form->addItem($se);
-		// DisplayType
-		$se = new ilSelectInputGUI($this->getPluginObject()->txt('display_type'), 'display_type');
-		$opt = array(
-			ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->getPluginObject()->txt('single_page'),
-			ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->getPluginObject()->txt('multiple_pages'),
-			//			ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->getPluginObject()->txt('all_questions_shuffled'),
-		);
-		$se->setOptions($opt);
-		$this->form->addItem($se);
-		// Show question block titles during evaluation
-		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_sev'), 'show_block_titles_sev');
-		$this->form->addItem($cb);
-		// Show question block descriptions during evaluation
-		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_sev'), 'show_block_desc_sev');
-		$this->form->addItem($cb);
+
+
+        //Ordering of Questions in Blocks
+        $radio_options = new ilRadioGroupInputGUI($this->getPluginObject()->txt(self::FIELD_ORDER_TYPE),self::FIELD_ORDER_TYPE);
+
+        $option_random = new ilRadioOption($this->getPluginObject()->txt(self::FIELD_ORDER_FULLY_RANDOM),self::FIELD_ORDER_FULLY_RANDOM);
+        $option_random->setInfo($this->getPluginObject()->txt("block_option_random_info"));
+
+        $nr_input = new ilNumberInputGUI($this->getPluginObject()->txt("sort_random_nr_items_block"),'sort_random_nr_items_block');
+        $option_random->addSubItem($nr_input);
+
+        $option_block = new ilRadioOption($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK),self::FIELD_ORDER_BLOCK);
+
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK_RANDOM), self::FIELD_ORDER_BLOCK_RANDOM);
+        $option_block->addSubItem($cb);
+
+        // Show question block titles during evaluation
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_sev'), 'show_block_titles_sev');
+        $option_block->addSubItem($cb);
+
+        // Show question block descriptions during evaluation
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_sev'), 'show_block_desc_sev');
+        $option_block->addSubItem($cb);
+
+        $radio_options->addOption($option_random);
+        $radio_options->addOption($option_block);
+        $radio_options->setRequired(true);
+
+        $this->form->addItem($radio_options);
+
+
+        // DisplayType
+        $se = new ilSelectInputGUI($this->getPluginObject()->txt('display_type'), 'display_type');
+        $opt = array(
+            ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->getPluginObject()->txt('single_page'),
+            ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->getPluginObject()->txt('multiple_pages'),
+            //			ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->getPluginObject()->txt('all_questions_shuffled'),
+        );
+        $se->setOptions($opt);
+        $this->form->addItem($se);
+
 		// Show question block titles during feedback
 		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_fb'), 'show_block_titles_fb');
 		$this->form->addItem($cb);
@@ -414,9 +442,20 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['desc'] = $this->object->getDescription();
 		$values['online'] = $this->object->getOnline();
 		$values['intro'] = $this->object->getIntro();
+
+        if($this->object->getSortType() == self::ORDER_QUESTIONS_FULLY_RANDOM){
+            $values[self::FIELD_ORDER_TYPE] =self::FIELD_ORDER_FULLY_RANDOM;
+        }
+        else{
+            $values[self::FIELD_ORDER_TYPE] =self::FIELD_ORDER_BLOCK;
+            if($this->object->getSortType() == self::ORDER_QUESTIONS_BLOCK_RANDOM){
+                $values[self::FIELD_ORDER_BLOCK_RANDOM] = 1;
+            }
+
+        }
+        $values['sort_random_nr_items_block'] = $this->object->getSortRandomNrItemBlock();
 		$values['outro'] = $this->object->getOutro();
 		$values['identity_selection_info'] = $this->object->getIdentitySelectionInfoText();
-		$values['sort_type'] = $this->object->getSortType();
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['show_fbs_overview'] = $this->object->getShowFeedbacksOverview();
@@ -437,19 +476,32 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			// Append
 			$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
 			$aform->updateObject();
+
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('desc'));
 			$this->object->setOnline($this->form->getInput('online'));
 			$this->object->setIntro($this->form->getInput('intro'));
 			$this->object->setOutro($this->form->getInput('outro'));
 			$this->object->setIdentitySelectionInfoText($this->form->getInput('identity_selection_info'));
-			$this->object->setSortType($this->form->getInput('sort_type'));
+
+            if($this->form->getInput(self::FIELD_ORDER_TYPE) == self::FIELD_ORDER_FULLY_RANDOM ){
+                $this->object->setSortType(self::ORDER_QUESTIONS_FULLY_RANDOM);
+            }
+			elseif($this->form->getInput(self::FIELD_ORDER_BLOCK_RANDOM)){
+                $this->object->setSortType(self::ORDER_QUESTIONS_BLOCK_RANDOM);
+            }
+            else{
+                $this->object->setSortType(self::ORDER_QUESTIONS_STATIC);
+            }
+
+            $this->object->setSortRandomNrItemBlock($this->form->getInput('sort_random_nr_items_block'));
+            $this->object->setShowBlockTitlesDuringEvaluation($this->form->getInput('show_block_titles_sev'));
+            $this->object->setShowBlockDescriptionsDuringEvaluation($this->form->getInput('show_block_desc_sev'));
+
 			$this->object->setDisplayType($this->form->getInput('display_type'));
 			$this->object->setShowFeedbacksOverview($this->form->getInput('show_fbs_overview'));
 			$this->object->setShowFeedbacks($this->form->getInput('show_fbs'));
 			$this->object->setShowFeedbacksCharts($this->form->getInput('show_fbs_charts'));
-			$this->object->setShowBlockTitlesDuringEvaluation($this->form->getInput('show_block_titles_sev'));
-			$this->object->setShowBlockDescriptionsDuringEvaluation($this->form->getInput('show_block_desc_sev'));
 			$this->object->setShowBlockTitlesDuringFeedback($this->form->getInput('show_block_titles_fb'));
 			$this->object->setShowBlockDescriptionsDuringFeedback($this->form->getInput('show_block_desc_fb'));
 			$this->object->update();

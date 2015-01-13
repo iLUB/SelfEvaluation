@@ -208,3 +208,17 @@ if (!$ilDB->tableColumnExists(ilSelfEvaluationData::TABLE_NAME, 'question_type')
 	$ilDB->modifyTableColumn(ilSelfEvaluationData::TABLE_NAME, 'value', array('type' => 'clob'));
 }
 ?>
+<#11>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+    $field = array(
+        'type' => 'integer',
+        'length' => 4,
+    );
+    $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'sort_random_nr_items_block', $field);
+}
+?>

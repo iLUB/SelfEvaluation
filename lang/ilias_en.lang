@@ -21,7 +21,7 @@ edit_properties#:#Einstellungen bearbeiten
 title#:#Titel
 short_title#:#Kurztitel
 description#:#Beschreibung
-abbreviation#:#Abbreviation
+abbreviation#:#Abkürzung
 save#:#Speichern
 cancel#:#Abbrechen
 edit#:#Bearbeiten
@@ -95,6 +95,10 @@ add_new_feedback#:#Feedback hinzufügen
 update_feedback_form#:#Feedback bearbeiten
 update_feedback_button#:#Speichern
 count_feedbacks#:#Anzahl Feedbacks
+option_auto#:#Lineare Bereichzuordnung
+option_auto_info#:#Der Prozentbereich wird linear auf die vorhandenen Feedbacks aufgeteilt. Achtung: Bereits vorhandene Bereiche werden dadurch angepasst!
+option_slider#:#Manuelle Zuordnung
+range_type#:#Prozentbereicht
 
 fb_title#:#Titel
 fb_body#:#Feedback
@@ -107,6 +111,9 @@ msg_feedback_deleted#:#Das Feedback wurde gelöscht
 delete_feedback#:#Feedback löschen
 slider#:#Prozentbereich
 start_new_button#:#Neuen Durchgang starten
+
+show_spider_chart#:#Spinnengrafik anzeigen
+show_bar_chart#:#Balkendiagramm anzeigen
 
 msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
@@ -140,11 +147,10 @@ multiple_pages#:#Eine Seite pro Block
 next_new#:#Weiter
 locked#:#Felder sind gesperrt
 feedback_status#:#Feedback-Block vollständig
-feedback_title
 
 async#:#Asynchrone Darstellung der Input-Masken
 identity_selection#:#Standardtext zu der Identitätsauswahl bei anonymen Selbstevaluationen
-identity_selection_info#:#identity_selection_info#:#Dieser Text wird den anonymen Nutzern des SelfEvaluation Plugins angezeigt.
+identity_selection_info#:#Dieser Text wird den anonymen Nutzern des SelfEvaluation Plugins angezeigt.
 configuration#:#Konfiguration
 
 identity_type_1#:#ILIAS-Benutzer

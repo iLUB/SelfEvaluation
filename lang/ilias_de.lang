@@ -95,6 +95,10 @@ add_new_feedback#:#Feedback hinzufügen
 update_feedback_form#:#Feedback bearbeiten
 update_feedback_button#:#Speichern
 count_feedbacks#:#Anzahl Feedbacks
+option_auto#:#Lineare Bereichzuordnung
+option_auto_info#:#Der Prozentbereich wird linear auf die vorhandenen Feedbacks aufgeteilt. Achtung: Bereits vorhandene Bereiche werden dadurch angepasst!
+option_slider#:#Manuelle Zuordnung
+feedback_range_type#:#Prozentbereicht
 
 fb_title#:#Titel
 fb_body#:#Feedback

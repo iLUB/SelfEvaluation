@@ -121,9 +121,12 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var bool
 	 */
 	protected $show_block_descriptions_during_feedback = true;
+    /**
+     * @var int
+     */
+    protected $sort_random_nr_item_block = 10;
 
-
-	/**
+    /**
 	 * @param int $a_ref_id
 	 */
 	function __construct($a_ref_id = 0) {
@@ -205,7 +208,11 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			'show_block_desc_fb' => array(
 				'integer',
 				$this->getShowBlockDescriptionsDuringFeedback()
-			)
+			),
+            'sort_random_nr_items_block' => array(
+                'integer',
+                $this->getSortRandomNrItemBlock()
+            ),
 		);
 	}
 
@@ -237,6 +244,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setShowBlockDescriptionsDuringEvaluation($rec->show_block_desc_sev);
 			$this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
 			$this->setShowBlockDescriptionsDuringFeedback($rec->show_block_desc_fb);
+            $this->setSortRandomNrItemBlock($rec->sort_random_nr_items_block);
 		}
 	}
 
@@ -302,6 +310,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setShowBlockDescriptionsDuringEvaluation($this->getShowBlockDescriptionsDuringEvaluation());
 		$new_obj->setShowBlockTitlesDuringFeedback($this->getShowBlockTitlesDuringFeedback());
 		$new_obj->setShowBlockDescriptionsDuringFeedback($this->getShowBlockDescriptionsDuringFeedback());
+        $new_obj->setSortRandomNrItemBlock($this->getSortRandomNrItemBlock());
 		// TODO clone meta blocks and questions?
 		$new_obj->update();
 	}
@@ -650,6 +659,24 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	public function getShowBlockDescriptionsDuringFeedback() {
 		return $this->show_block_descriptions_during_feedback;
 	}
+
+    /**
+     * @param int $sort_random_nr_item_block
+     */
+    public function setSortRandomNrItemBlock($sort_random_nr_item_block)
+    {
+        $this->sort_random_nr_item_block = $sort_random_nr_item_block;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortRandomNrItemBlock()
+    {
+        return $this->sort_random_nr_item_block;
+    }
+
+
 }
 
 ?>
