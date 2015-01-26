@@ -45,12 +45,13 @@ class ilObjSelfEvaluationListGUI extends ilObjectPluginListGUI {
 	 */
 	protected $obj_id;
 
-
 	/**
 	 *
 	 */
 	function initType() {
-		$this->setType('xsev');
+        $this->enableCopy(false);
+        $this->enableTimings(false);
+        $this->setType('xsev');
 	}
 
 
