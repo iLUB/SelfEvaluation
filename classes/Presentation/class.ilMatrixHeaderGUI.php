@@ -63,6 +63,7 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 		$tpl = $pl->getTemplate('default/Form/tpl.matrix_header.html');
 		//		$tpl->setVariable('BLOCKINFO', $this->getBlockInfo());
 		$width = floor(100 / count($this->getScale()));
+        $even = false;
 		foreach ($this->getScale() as $title) {
 		    if ($title == '' || $title == ' '){
                 $title = '&nbsp;';
@@ -72,6 +73,8 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 			$tpl->setCurrentBlock('item');
 			$tpl->setVariable('NAME', $title);
 			$tpl->setVariable('STYLE', $width . '%');
+            $tpl->setVariable('CLASS', $even ? "ilUnitEven":"ilUnitOdd");
+            $even = !$even;
 			$tpl->parseCurrentBlock();
 		}
 
@@ -89,7 +92,7 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 	}
 
 
-	public function insert(&$a_tpl) {
+	public function insert(ilTemplate &$a_tpl) {
 		$a_tpl->setCurrentBlock('prop_custom');
 		$a_tpl->setVariable('CUSTOM_CONTENT', $this->getHtml());
 		$a_tpl->parseCurrentBlock();

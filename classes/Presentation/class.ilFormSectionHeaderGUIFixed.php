@@ -30,23 +30,19 @@
  */
 class ilFormSectionHeaderGUIFixed extends ilFormSectionHeaderGUI
 {
-
-
     /**
      * Insert property html
      *
      */
-    function insert(&$a_tpl)
+    function insert(ilTemplate &$a_tpl)
     {
         $a_tpl->setCurrentBlock("header");
         $a_tpl->setVariable("TXT_TITLE", $this->getTitle());
         $a_tpl->setVariable("TXT_DESCRIPTION",$this->getInfo());
-        $a_tpl->setVariable('HEAD_COLSPAN', 2);
-        if (isset($this->section_anchor))
+        if (isset($this->section_anchor)){
             $a_tpl->setVariable('LABEL', $this->section_anchor);
+        }
+
         $a_tpl->parseCurrentBlock();
     }
-
-
-
 }

@@ -50,7 +50,7 @@ class ilSliderInputGUI extends ilCustomInputGUI {
 
 	private function buildHTML() {
 		$pl = new ilSelfEvaluationPlugin();
-		$tpl = $pl->getTemplate('default/Form/tpl.slider_input.html');
+		$tpl = $pl->getTemplate('default/Feedback/tpl.slider_input.html');
 		$values = $this->getValues();
 		$tpl->setVariable('VAL_FROM', $values[0]);
 		$tpl->setVariable('VAL_TO', $values[1]);
@@ -114,7 +114,7 @@ class ilSliderInputGUI extends ilCustomInputGUI {
 	/**
 	 * @return boolean
 	 */
-	public function getDisableOldFields() {
+	public function getDisableOldFields() { // TODO obsolete?
 		return $this->disableOldFields;
 	}
 

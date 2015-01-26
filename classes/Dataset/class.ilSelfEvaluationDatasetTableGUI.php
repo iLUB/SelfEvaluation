@@ -2,8 +2,6 @@
 require_once('./Services/Table/classes/class.ilTable2GUI.php');
 require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 require_once('class.ilSelfEvaluationDataset.php');
-//require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
-//require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedback.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * TableGUI ilSelfEvaluationDatasetTableGUI
@@ -15,18 +13,19 @@ require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 
 	/**
-	 * @param ilObjSelfEvaluationGUI $a_parent_obj
-	 * @param string                 $a_parent_cmd
-	 *
+	 * @param ilSelfEvaluationDatasetGUI $a_parent_obj
+	 * @param string                     $a_parent_cmd
+	 * @param ilSelfEvaluationPlugin     $plugin
+	 * @param int                        $obj_id
 	 */
-	function __construct(ilSelfEvaluationDatasetGUI $a_parent_obj, $a_parent_cmd, $obj_id=0) {
+	function __construct(ilSelfEvaluationDatasetGUI $a_parent_obj, $a_parent_cmd, $plugin, $obj_id = 0) {
 		global $ilCtrl, $ilTabs, $ilToolbar;
 		/**
 		 * @var $ilCtrl ilCtrl
 		 * @var $ilTabs ilTabsGUI
 		 * @var $ilToolbar ilToolbarGUI
 		 */
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $plugin;
 		$this->ctrl = $ilCtrl;
 		$this->tabs = $ilTabs;
 		$this->setId('');
@@ -43,6 +42,8 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationDatasetGUI'));
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Dataset/tpl.template_dataset_row.html');
 		$ilToolbar->addButton($this->pl->txt('delete_all_datasets'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDeleteAll'));
+        $ilToolbar->addButton($this->pl->txt('export_csv'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'exportCSV'));
+
 		switch ($a_parent_cmd) {
 			case 'index':
 				$this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id, true));
@@ -81,7 +82,6 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$ac->setId('dataset_' . $obj->getId());
 		$ac->addItem($this->pl->txt('show_feedback'), 'show_dataset', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'), true));
 		$ac->addItem($this->pl->txt('delete_dataset'), 'delete_dataset', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDelete')));
-		//		$ac->addItem($this->pl->txt('show_feedback'), 'show_dataset', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', 0);

@@ -35,8 +35,7 @@ class ilSelfEvaluationPlugin extends ilRepositoryObjectPlugin {
 	 * @return string
 	 */
 	public function getConfigTableName() {
-		return
-			$this->getSlotId() . substr(strtolower($this->getPluginName()), 0, 20 - strlen($this->getSlotId())) . '_c';
+		return 'rep_robj_xsev_c';
 	}
 }
 

@@ -23,6 +23,7 @@
 
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
 require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestion.php');
 require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScale.php');
 require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScaleUnit.php');
@@ -42,11 +43,12 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 	const TABLE_NAME = 'rep_robj_xsev_data';
 	const TYPE_GROUP = 1;
-	const SORT_MANUALLY = 1;
-	const SORT_SHUFFLE = 2;
+	const SHUFFLE_OFF = 1;
+	const SHUFFLE_IN_BLOCKS = 2;
+	const SHUFFLE_ACROSS_BLOCKS = 3;
+
 	const DISPLAY_TYPE_SINGLE_PAGE = 1; // Single Page
 	const DISPLAY_TYPE_MULTIPLE_PAGES = 2; // Multiple Pages
-	const DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED = 3; // All Questions on one Page, shuffled
 	/**
 	 * @var bool
 	 */
@@ -58,7 +60,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	/**
 	 * @var int
 	 */
-	protected $sort_type = self::SORT_MANUALLY;
+	protected $sort_type = self::SHUFFLE_OFF;
 	/**
 	 * @var int
 	 */
@@ -71,6 +73,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var string
 	 */
 	protected $outro = '';
+	/**
+	 * @var string
+	 */
+	protected $identity_selection_info_text = '';
 	/**
 	 * @var bool
 	 */
@@ -99,9 +105,28 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var bool
 	 */
 	protected $show_feedbacks_overview = true;
-
-
 	/**
+	 * @var bool
+	 */
+	protected $show_block_titles_during_evaluation = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_block_descriptions_during_evaluation = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_block_titles_during_feedback = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_block_descriptions_during_feedback = true;
+    /**
+     * @var int
+     */
+    protected $sort_random_nr_item_block = 10;
+
+    /**
 	 * @param int $a_ref_id
 	 */
 	function __construct($a_ref_id = 0) {
@@ -152,6 +177,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'text',
 				$this->getOutro()
 			),
+			'identity_selection_info' => array(
+				'text',
+				$this->getIdentitySelectionInfoText()
+			),
 			'show_fbs' => array(
 				'integer',
 				$this->getShowFeedbacks()
@@ -164,11 +193,35 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'integer',
 				$this->getShowFeedbacksOverview()
 			),
+			'show_block_titles_sev' => array(
+				'integer',
+				$this->getShowBlockTitlesDuringEvaluation()
+			),
+			'show_block_desc_sev' => array(
+				'integer',
+				$this->getShowBlockDescriptionsDuringEvaluation()
+			),
+			'show_block_titles_fb' => array(
+				'integer',
+				$this->getShowBlockTitlesDuringFeedback()
+			),
+			'show_block_desc_fb' => array(
+				'integer',
+				$this->getShowBlockDescriptionsDuringFeedback()
+			),
+            'sort_random_nr_items_block' => array(
+                'integer',
+                $this->getSortRandomNrItemBlock()
+            ),
 		);
 	}
 
 
 	function doCreate() {
+		/** @var ilSelfEvaluationPlugin $plugin */
+		$plugin = $this->plugin;
+		$config = new ilSelfEvaluationConfig($plugin->getConfigTableName());
+		$this->setIdentitySelectionInfoText($config->getValue('identity_selection'));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
 	}
 
@@ -183,9 +236,15 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setDisplayType($rec->display_type);
 			$this->setIntro($rec->intro);
 			$this->setOutro($rec->outro);
+			$this->setIdentitySelectionInfoText($rec->identity_selection_info);
 			$this->setShowFeedbacks($rec->show_fbs);
 			$this->setShowFeedbacksCharts($rec->show_fbs_charts);
 			$this->setShowFeedbacksOverview($rec->show_fbs_overview);
+			$this->setShowBlockTitlesDuringEvaluation($rec->show_block_titles_sev);
+			$this->setShowBlockDescriptionsDuringEvaluation($rec->show_block_desc_sev);
+			$this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
+			$this->setShowBlockDescriptionsDuringFeedback($rec->show_block_desc_fb);
+            $this->setSortRandomNrItemBlock($rec->sort_random_nr_items_block);
 		}
 	}
 
@@ -215,13 +274,16 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			}
 			$id->delete();
 		}
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
 			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
 				$qst->delete();
 			}
 			foreach (ilSelfEvaluationFeedback::_getAllInstancesForParentId($block->getId()) as $fb) {
 				$fb->delete();
 			}
+			$block->delete();
+		}
+		foreach (ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->getId()) as $block) {
 			$block->delete();
 		}
 		$this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . ' id = '
@@ -243,6 +305,13 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setDisplayType($this->getDisplayType());
 		$new_obj->setIntro($this->getIntro());
 		$new_obj->setOutro($this->getOutro());
+		$new_obj->setIdentitySelectionInfoText($this->getIdentitySelectionInfoText());
+		$new_obj->setShowBlockTitlesDuringEvaluation($this->getShowBlockTitlesDuringEvaluation());
+		$new_obj->setShowBlockDescriptionsDuringEvaluation($this->getShowBlockDescriptionsDuringEvaluation());
+		$new_obj->setShowBlockTitlesDuringFeedback($this->getShowBlockTitlesDuringFeedback());
+		$new_obj->setShowBlockDescriptionsDuringFeedback($this->getShowBlockDescriptionsDuringFeedback());
+        $new_obj->setSortRandomNrItemBlock($this->getSortRandomNrItemBlock());
+		// TODO clone meta blocks and questions?
 		$new_obj->update();
 	}
 
@@ -260,7 +329,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function hasDatasets() {
 		foreach (ilSelfEvaluationIdentity::_getAllInstancesByForForObjId($this->getId()) as $id) {
-			foreach (ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId()) as $ds) {
+			if (count(ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId())) > 0) {
 				return true;
 			}
 		}
@@ -270,11 +339,19 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 
 	/**
+	 * Return if there are any blocks with at least one question
+	 *
 	 * @return bool
 	 */
 	public function hasBLocks() {
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
-			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
+		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
+			if (count(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId())) > 0) {
+				return true;
+			}
+		}
+		foreach (ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->getId()) as $block) {
+			/** @var ilSelfEvaluationMetaBlock $block */
+			if (count($block->getMetaContainer()->getFieldDefinitions()) > 0) {
 				return true;
 			}
 		}
@@ -288,7 +365,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function areFeedbacksComplete() {
 		$return = true;
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($this->getId()) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
 			$return = ilSelfEvaluationFeedback::_isComplete($block->getId()) ? $return : false;
 		}
 
@@ -341,6 +418,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function getOutro() {
 		return $this->outro;
+	}
+
+
+	/**
+	 * @param string $info
+	 */
+	public function setIdentitySelectionInfoText($info) {
+		$this->identity_selection_info_text = $info;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getIdentitySelectionInfoText() {
+		return $this->identity_selection_info_text;
 	}
 
 
@@ -502,6 +595,88 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	public function getShowFeedbacksOverview() {
 		return $this->show_feedbacks_overview;
 	}
+
+
+	/**
+	 * @param boolean $show_block_titles_during_evaluation
+	 */
+	public function setShowBlockTitlesDuringEvaluation($show_block_titles_during_evaluation) {
+		$this->show_block_titles_during_evaluation = $show_block_titles_during_evaluation;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowBlockTitlesDuringEvaluation() {
+		return $this->show_block_titles_during_evaluation;
+	}
+
+
+	/**
+	 * @param boolean $show_block_descriptions_during_evaluation
+	 */
+	public function setShowBlockDescriptionsDuringEvaluation($show_block_descriptions_during_evaluation) {
+		$this->show_block_descriptions_during_evaluation = $show_block_descriptions_during_evaluation;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowBlockDescriptionsDuringEvaluation() {
+		return $this->show_block_descriptions_during_evaluation;
+	}
+
+
+	/**
+	 * @param boolean $show_block_titles_during_feedback
+	 */
+	public function setShowBlockTitlesDuringFeedback($show_block_titles_during_feedback) {
+		$this->show_block_titles_during_feedback = $show_block_titles_during_feedback;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowBlockTitlesDuringFeedback() {
+		return $this->show_block_titles_during_feedback;
+	}
+
+
+	/**
+	 * @param boolean $show_block_descriptions_during_feedback
+	 */
+	public function setShowBlockDescriptionsDuringFeedback($show_block_descriptions_during_feedback) {
+		$this->show_block_descriptions_during_feedback = $show_block_descriptions_during_feedback;
+	}
+
+
+	/**
+	 * @return boolean
+	 */
+	public function getShowBlockDescriptionsDuringFeedback() {
+		return $this->show_block_descriptions_during_feedback;
+	}
+
+    /**
+     * @param int $sort_random_nr_item_block
+     */
+    public function setSortRandomNrItemBlock($sort_random_nr_item_block)
+    {
+        $this->sort_random_nr_item_block = $sort_random_nr_item_block;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortRandomNrItemBlock()
+    {
+        return $this->sort_random_nr_item_block;
+    }
+
+
 }
 
 ?>

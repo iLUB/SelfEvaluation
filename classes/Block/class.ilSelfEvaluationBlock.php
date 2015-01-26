@@ -1,16 +1,13 @@
 <?php
-require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
-//error_reporting(E_ALL);
 /**
- * ilSelfEvaluationBlock
+ * Class ilSelfEvaluationBlock
  *
  * @author  Fabian Schmid <fs@studer-raimann.ch>
- *
- * @version
+ * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
+ * @version $Id$
  */
-class ilSelfEvaluationBlock {
+abstract class ilSelfEvaluationBlock {
 
-	const TABLE_NAME = 'rep_robj_xsev_block';
 	/**
 	 * @var int
 	 */
@@ -31,10 +28,6 @@ class ilSelfEvaluationBlock {
 	 * @var int
 	 */
 	protected $parent_id = 0;
-	/**
-	 * @var ilSelfEvaluationScale
-	 */
-	protected $scale;
 
 
 	/**
@@ -55,14 +48,11 @@ class ilSelfEvaluationBlock {
 
 
 	public function read() {
-		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
+		$set = $this->db->query('SELECT * FROM ' . $this->getTableName() . ' ' . ' WHERE id = '
 			. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
-			foreach ($this->getArrayForDb() as $k => $v) {
-				$this->{$k} = $rec->{$k};
-			}
+			$this->setObjectValuesFromRecord($this, $rec);
 		}
-		$this->setScale(ilSelfEvaluationScale::_getInstanceByRefId($this->getParentId()));
 	}
 
 
@@ -72,7 +62,7 @@ class ilSelfEvaluationBlock {
 	public function getArrayForDb() {
 		$e = array();
 		foreach (get_object_vars($this) as $k => $v) {
-			if (! in_array($k, array( 'db', 'scale' ))) {
+			if (! in_array($k, $this->getNonDbFields())) {
 				$e[$k] = array( self::_getType($v), $this->$k );
 			}
 		}
@@ -81,7 +71,22 @@ class ilSelfEvaluationBlock {
 	}
 
 
-	final function initDB() {
+	/**
+	 * @return array
+	 */
+	protected function getNonDbFields() {
+		return array( 'db' );
+	}
+
+
+	/**
+	 * @return string
+	 */
+	abstract public function getTableName();
+
+
+	public function initDB() {
+		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
 				'type' => $v[0],
@@ -98,22 +103,22 @@ class ilSelfEvaluationBlock {
 				$fields[$k]['notnull'] = true;
 			}
 		}
-		if (! $this->db->tableExists(self::TABLE_NAME)) {
-			$this->db->createTable(self::TABLE_NAME, $fields);
-			$this->db->addPrimaryKey(self::TABLE_NAME, array( 'id' ));
-			$this->db->createSequence(self::TABLE_NAME);
+		if (! $this->db->tableExists($this->getTableName())) {
+			$this->db->createTable($this->getTableName(), $fields);
+			$this->db->addPrimaryKey($this->getTableName(), array( 'id' ));
+			$this->db->createSequence($this->getTableName());
 		}
 	}
 
 
 	final function updateDB() {
-		if (! $this->db->tableExists(self::TABLE_NAME)) {
+		if (! $this->db->tableExists($this->getTableName())) {
 			$this->initDB();
 
-			return true;
+			return;
 		}
 		foreach ($this->getArrayForDb() as $k => $v) {
-			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
+			if (! $this->db->tableColumnExists($this->getTableName(), $k)) {
 				$field = array(
 					'type' => $v[0],
 				);
@@ -128,14 +133,25 @@ class ilSelfEvaluationBlock {
 				if ($k == 'id') {
 					$field['notnull'] = true;
 				}
-				$this->db->addTableColumn(self::TABLE_NAME, $k, $field);
+				$this->db->addTableColumn($this->getTableName(), $k, $field);
 			}
 		}
 	}
 
 
+	/**
+	 * @param ilSelfEvaluationBlock $block
+	 * @param stdClass $rec
+	 */
+	protected function setObjectValuesFromRecord(ilSelfEvaluationBlock &$block, $rec) {
+		foreach ($block->getArrayForDb() as $k => $v) {
+			$block->{$k} = $rec->{$k};
+		}
+	}
+
+
 	final private function resetDB() {
-		$this->db->dropTable(self::TABLE_NAME);
+		$this->db->dropTable($this->getTableName());
 		$this->initDB();
 	}
 
@@ -144,11 +160,12 @@ class ilSelfEvaluationBlock {
 		if ($this->getId() != 0) {
 			$this->update();
 
-			return true;
+			return;
 		}
-		$this->setId($this->db->nextID(self::TABLE_NAME));
-		$this->setPosition(self::_getNextPosition($this->getParentId()));
-		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
+		$this->setId($this->db->nextID($this->getTableName()));
+		require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockFactory.php');
+		$this->setPosition(ilSelfEvaluationBlockFactory::getNextPositionAcrossBlocks($this->getParentId()));
+		$this->db->insert($this->getTableName(), $this->getArrayForDb());
 	}
 
 
@@ -156,7 +173,7 @@ class ilSelfEvaluationBlock {
 	 * @return int
 	 */
 	public function delete() {
-		return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
+		return $this->db->manipulate('DELETE FROM ' . $this->getTableName() . ' WHERE id = '
 			. $this->db->quote($this->getId(), 'integer'));
 	}
 
@@ -165,9 +182,9 @@ class ilSelfEvaluationBlock {
 		if ($this->getId() == 0) {
 			$this->create();
 
-			return true;
+			return;
 		}
-		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
+		$this->db->update($this->getTableName(), $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
 				$this->getId()
@@ -183,11 +200,14 @@ class ilSelfEvaluationBlock {
 		/**
 		 * @var $parentObject ilObjSelfEvaluation
 		 */
-		$parentObject = ilObjectFactory::getInstanceByObjId($this->getParentId());
+		$object_factory = new ilObjectFactory();
+		$parentObject = $object_factory->getInstanceByObjId($this->getParentId());
 		switch ($parentObject->getSortType()) {
-			case ilObjSelfEvaluation::SORT_MANUALLY:
+			case ilObjSelfEvaluation::SHUFFLE_OFF:
 				return true;
-			case ilObjSelfEvaluation::SORT_SHUFFLE:
+			case ilObjSelfEvaluation::SHUFFLE_IN_BLOCKS:
+				return false;
+			default:
 				return false;
 		}
 	}
@@ -197,22 +217,20 @@ class ilSelfEvaluationBlock {
 	// Static
 	//
 	/**
-	 * @param      $parent_id
-	 * @param bool $as_array
+	 * @param int  $parent_id ilObjSelfEvaluation obj id
 	 *
 	 * @return ilSelfEvaluationBlock[]
 	 */
-	public static function _getAllInstancesByParentId($parent_id, $as_array = false) {
+	public static function getAllInstancesByParentId($parent_id) {
 		global $ilDB;
 		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
+		$set = $ilDB->query('SELECT * FROM ' . static::getTableName() . ' ' . ' WHERE parent_id = '
 			. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
-			if ($as_array) {
-				$return[] = (array)new self($rec->id);
-			} else {
-				$return[] = new self($rec->id);
-			}
+			/** @var ilSelfEvaluationBlock $block */
+			$block = new static();
+			static::setObjectValuesFromRecord($block, $rec);
+			$return[] = $block;
 		}
 
 		return $return;
@@ -224,9 +242,9 @@ class ilSelfEvaluationBlock {
 	 *
 	 * @return int
 	 */
-	public static function _getNextPosition($parent_id) {
+	public function getNextPosition($parent_id) {
 		global $ilDB;
-		$set = $ilDB->query('SELECT MAX(position) next_pos FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
+		$set = $ilDB->query('SELECT MAX(position) next_pos FROM ' . $this->getTableName() . ' ' . ' WHERE parent_id = '
 			. $ilDB->quote($parent_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return $rec->next_pos + 1;
@@ -301,22 +319,6 @@ class ilSelfEvaluationBlock {
 
 
 	/**
-	 * @param \ilSelfEvaluationScale $scale
-	 */
-	public function setScale($scale) {
-		$this->scale = $scale;
-	}
-
-
-	/**
-	 * @return \ilSelfEvaluationScale
-	 */
-	public function getScale() {
-		return $this->scale;
-	}
-
-
-	/**
 	 * @param string $title
 	 */
 	public function setTitle($title) {
@@ -329,6 +331,17 @@ class ilSelfEvaluationBlock {
 	 */
 	public function getTitle() {
 		return $this->title;
+	}
+
+
+	/**
+	 * @return ilSelfEvaluationBlockTableRow
+	 */
+	abstract public function getBlockTableRow();
+
+
+	public function getPositionId() {
+		return get_class($this) . '_' . $this->getId();
 	}
 
 

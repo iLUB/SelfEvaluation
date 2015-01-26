@@ -19,17 +19,17 @@ content#:#Selbstevaluation
 properties#:#Einstellungen
 edit_properties#:#Einstellungen bearbeiten
 title#:#Titel
+short_title#:#Kurztitel
 description#:#Beschreibung
+abbreviation#:#Abkürzung
 save#:#Speichern
 cancel#:#Abbrechen
 edit#:#Bearbeiten
 status#:#Status
 offline#:#Offline
 online#:#Online
-intro#:#Einleitungstext
-intro_header#:#Einleitung
-outro#:#Abschliessender Text
 start_button#:#Start
+intro_header#:#Einleitung
 administration#:#Fragen und Feedback bearbeiten
 actions#:#Aktionen
 edit_block#:#Blockinformationen bearbeiten
@@ -43,14 +43,57 @@ create_block_button#:#Block erstellen
 edit_questions#:#Fragen bearbeiten
 edit_feedback#:#Feedback bearbeiten
 
+help_text_section#:#Hilfstexte
+intro#:#Einleitungstext
+intro_info#:#Erster Text, welcher beim öffnen einer Selbstevaluation angezeigt wird.
+outro#:#Abschliessender Text
+outro_info#:#Text welcher nach beendigung der Selbstevaluation angezeigt wird.
+identity_selection#:#Standardtext zu der Identitätsauswahl bei anonymen Selbstevaluationen
+identity_selection_info#:#Dieser Text wird den anonymen Nutzern des SelfEvaluation Plugins angezeigt.
+
+block_section#:#Darstellung im Fragebogen
+block_presentation_type#:#Blockaufteilung der Fragen
+block_option_random#:#Fragen zufällig auf verschiedene Blocks aufteilen.
+block_option_random_info#:#Die Fragen werden während dem bearbeiten der Selbstevaluation zufällig auf künstliche Blocks aufgeteilt. </br>Die Reihenfolge dieser künstlichen Blocks ist zufällig. Es werden generische Titel und Beschreibungen für diese Blocks automatisch erstellt.</br> In der Auswertung werden die Antworten dann wieder den originalen Blocks zugeordnet.
+sort_random_nr_items_block#:#Anzahl der Fragen pro Block bei zufälliger Aufteilung
+block_option_block#:#Die Fragen werden in denselben Blocks dargestellt wie auch in der Auswertung.
+block_option_block_info#:#Reihenfolge, Titel und Beschreibugen werden in dieser Option aus den Einstellungen übernommen.
+display_type#:#Darstellung der Blocks
+single_page#:#Alle Blocks auf einer Seite
+multiple_pages#:#Eine Seite pro Block
+display_type_info#:#Darstellung der Blocks beim Ausfüllen der Selbstevaluation.
+show_block_titles_sev#:#Titel der Frageblöcke während der Selbstevaluation anzeigen
+show_block_desc_sev#:#Beschreibung der Frageblöcke während der Selbstevaluation anzeigen
+
+feedback_section#:#Darstellung in der Auswertung
+show_block_titles_fb#:#Titel der Frageblöcke im Feedback anzeigen
+show_block_desc_fb#:#Beschreibung der Frageblöcke im Feedback anzeigen
+show_fbs_overview#:#Feedback-Übersichtsgrafik anzeigen
+show_fbs#:#Einzelfeedback-Texte anzeigen
+show_fbs_charts#:#Einzelfeedback-Grafiken anzeigen
+
+multinput_value#:#Numerischer Wert
+multinput_title#:#Bezeichnung
+multinput_description#:#Es empfiehlt sich, den ersten numerischen Wert 0 nicht zu ändern, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
+sort_type#:#Sortierung
+
+shuffle_in_blocks#:#Fragen pro Block mischen
+no_questions_per_page#:#Anzahl Fragen pro Seite
+
+next_new#:#Weiter
+locked#:#Felder sind gesperrt
+feedback_status#:#Feedback-Block vollständig
+
 scale_form#:#Skalierung
 
 create_question#:#Frage erstellen
 create_question_button#:#Frage erstellen
-question_body#:#Fragetext
+question_body#:#Frage
+question_title_info#:#Der Titel wird für die Benennung der Feedback Grafiken verwendet.
 add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke
-add_new_block#:#Frageblock hinzufügen
+add_new_question_block#:#Frageblock hinzufügen
+add_new_meta_block#:#Metafrageblock hinzufügen
 edit_question#:#Frage bearbeiten
 delete_question#:#Frage löschen
 sorting_saved#:#Reihenfolge gespeichert
@@ -91,6 +134,10 @@ add_new_feedback#:#Feedback hinzufügen
 update_feedback_form#:#Feedback bearbeiten
 update_feedback_button#:#Speichern
 count_feedbacks#:#Anzahl Feedbacks
+option_auto#:#Lineare Bereichzuordnung
+option_auto_info#:#Der Prozentbereich wird linear auf die vorhandenen Feedbacks aufgeteilt. Achtung: Bereits vorhandene Bereiche werden dadurch angepasst!
+option_slider#:#Manuelle Zuordnung
+feedback_range_type#:#Prozentbereicht
 
 fb_title#:#Titel
 fb_body#:#Feedback
@@ -103,6 +150,9 @@ msg_feedback_deleted#:#Das Feedback wurde gelöscht
 delete_feedback#:#Feedback löschen
 slider#:#Prozentbereich
 start_new_button#:#Neuen Durchgang starten
+
+show_spider_chart#:#Spinnengrafik anzeigen
+show_bar_chart#:#Balkendiagramm anzeigen
 
 msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
@@ -122,20 +172,7 @@ uid_not_exists#:#Die eingegebene Identifikation existiert nicht
 question#:#Frage
 your_uid#:#Ihre Identifikation:
 
-multinput_value#:#Numerischer Wert
-multinput_title#:#Bezeichnung
-multinput_description#:#Es empfiehlt sich, den ersten numerischen Wert 0 nicht zu ändern, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
-sort_type#:#Sortierung
-sort_shuffle#:#Fragen pro Block mischen
-sort_manually#:#Festgelegte Reihenfolge
-display_type#:#Darstellung der Blocks
-single_page#:#Alle Blocks auf einer Seite
-multiple_pages#:#Eine Seite pro Block
-all_questions_shuffled#:#Alle Fragen blockübergreifend gemischt
-next_new#:#Weiter
-locked#:#Felder sind gesperrt
-feedback_status#:#Feedback-Block vollständig
-feedback_title
+
 
 async#:#Asynchrone Darstellung der Input-Masken
 configuration#:#Konfiguration
@@ -160,7 +197,8 @@ delete_all_datasets#:#Alle Datensätze löschen
 confirm_delete_all_datasets#:#Möchten Sie alle Datensätze löschen?
 all_datasets_deleted#:#Alle Datensätze wurden gelöscht
 
-show_fbs_overview#:#Feedback-Übersichtsgrafik anzeigen
-show_fbs#:#Einzelfeedback-Texte anzeigen
-show_fbs_charts#:#Einzelfeedback-Grafiken anzeigen
-feedback_title_intro#:#Feedback zu Ihrer Einschätzung
+export_csv#:#Als csv exportieren
+export_csv#:#Als csv exportieren
+starting_date#:#Startdatum
+ending_date#:#Enddatum
+duration#:#Bearbeitungsdauer

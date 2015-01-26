@@ -38,15 +38,26 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
  *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI, ilAdministrationGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationBlockGUI, ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationDatasetGUI, ilSelfEvaluationFeedbackGUI
- *
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationMetaQuestionGUI
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 	const DEV = false;
 	const DEBUG = false;
-	const RELOAD = false;
+	const RELOAD = false; // set to true or use the GET parameter rl=true to reload the plugin languages
+
+    const ORDER_QUESTIONS_STATIC = 1;
+    const ORDER_QUESTIONS_BLOCK_RANDOM = 2;
+    const ORDER_QUESTIONS_FULLY_RANDOM = 3;
+
+    const FIELD_ORDER_TYPE = 'block_presentation_type';
+    const FIELD_ORDER_FULLY_RANDOM = 'block_option_random';
+    const FIELD_ORDER_BLOCK = 'block_option_block';
+    const FIELD_ORDER_BLOCK_RANDOM = 'shuffle_in_blocks';
+
+
 	protected static $disabled_buttons = array(
 		'charmap',
 		'undo',
@@ -61,9 +72,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		'copy',
 		'paste',
 		'pastetext',
+		'pasteword',
 		'formatselect',
 		'imgupload',
-		'ilimgupload',
+		'ilimgupload'
 	);
 	/**
 	 * @var ilObjSelfEvaluation
@@ -85,6 +97,14 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	 * @var ilNavigationHistory
 	 */
 	protected $history;
+	/**
+	 * @var ilAccessHandler
+	 */
+	protected $access;
+	/**
+	 * @var ilTabsGUI
+	 */
+	public $tabs_gui; // Dirty type hinting fix for nasty implicit declaration by upstream code
 
 
 	public function displayIdentifier() {
@@ -95,25 +115,35 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$id = new ilSelfEvaluationIdentity($_GET['uid']);
 			if ($id->getType() == ilSelfEvaluationIdentity::TYPE_EXTERNAL) {
 				global $ilToolbar;
-				$ilToolbar->addText('<b>' . $this->pl->txt('your_uid') . ' ' . $id->getIdentifier() . '</b>');
+				$ilToolbar->addText('<b>' . $this->getPluginObject()->txt('your_uid') . ' ' . $id->getIdentifier() . '</b>');
 			}
 		}
 	}
 
 
 	public function initHeader() {
-		global $ilLocator;
-		/**
-		 * @var $ilLocator ilLocatorGUI
-		 */
-		$this->setLocator();
+        global $ilUser;
+        /**
+         * @var $ilUser ilObjUser
+         */
+
 		$this->tpl->getStandardTemplate();
 		$this->setTitleAndDescription();
 		$this->displayIdentifier();
-		$this->tpl->setTitleIcon($this->pl->getDirectory() . '/templates/images/icon_xsev_b.png');
-		$this->tpl->addCss($this->pl->getStyleSheetLocation('css/content.css'));
-		$this->tpl->addCss($this->pl->getStyleSheetLocation('css/print.css'), 'print');
-		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/scripts.js');
+		$this->tpl->setTitleIcon($this->getPluginObject()->getDirectory() . '/templates/images/icon_xsev_b.png');
+		$this->tpl->addCss($this->getPluginObject()->getStyleSheetLocation('css/content.css'));
+		$this->tpl->addCss($this->getPluginObject()->getStyleSheetLocation('css/print.css'), 'print');
+
+        $is_in_survey = $this->ctrl->getCmd() == "showContent" || $this->ctrl->getCmd() == "show" || $this->ctrl->getNextClass($this)=="ilselfevaluationpresentationgui";
+        $is_not_logged_in = $ilUser->login == "anonymous";
+
+        if($is_in_survey && $is_not_logged_in){
+            $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/anonymous.css");
+        }
+        else{
+            $this->setLocator();
+        }
+		$this->tpl->addJavaScript($this->getPluginObject()->getDirectory() . '/templates/scripts.js');
 		$this->setTabs();
 	}
 
@@ -130,7 +160,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$cmd = $this->ctrl->getCmd();
 			$next_class = $this->ctrl->getNextClass($this);
 			if (self::RELOAD OR $_GET['rl'] == 'true') {
-				$this->pl->updateLanguages();
+				$this->getPluginObject()->updateLanguages();
 			}
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $_GET['uid']);
 			$this->ctrl->saveParameterByClass('ilSelfEvaluationDatasetGUI', 'uid', $_GET['uid']);
@@ -146,14 +176,43 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 					include_once('Services/AccessControl/classes/class.ilPermissionGUI.php');
 					$perm_gui = new ilPermissionGUI($this);
 					$this->tabs_gui->setTabActive('perm_settings');
-					$ret = $this->ctrl->forwardCommand($perm_gui);
+					$this->ctrl->forwardCommand($perm_gui);
 					break;
                 case 'ilinfoscreengui':
-                    $this->tabs_gui->setTabActive('info_short');
-                    require_once($this->ctrl->lookupClassPath($next_class));
-                    $gui = new $next_class($this);
-                    $this->ctrl->forwardCommand($gui);
+	                include_once('Services/InfoScreen/classes/class.ilInfoScreenGUI.php');
+	                $gui = new ilInfoScreenGUI($this);
+	                $this->tabs_gui->setTabActive('info_short');
+	                $this->ctrl->forwardCommand($gui);
                     break;
+				case 'ilselfevaluationlistblocksgui':
+					require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationListBlocksGUI.php');
+					$gui = new ilSelfEvaluationListBlocksGUI($this);
+					$this->tabs_gui->setTabActive('administration');
+					$this->ctrl->forwardCommand($gui);
+					break;
+				case 'ilselfevaluationquestionblockgui':
+					require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
+					$block = new ilSelfEvaluationQuestionBlock((int)$_GET['block_id']);
+					$block->setParentId($this->object->getId());
+					$block_gui = new ilSelfEvaluationQuestionBlockGUI($this, $block);
+					$this->ctrl->forwardCommand($block_gui);
+					break;
+				case 'ilselfevaluationmetablockgui':
+					require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlockGUI.php');
+					require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
+					$block = new ilSelfEvaluationMetaBlock((int)$_GET['block_id']);
+					$block->setParentId($this->object->getId());
+					$block_gui = new ilSelfEvaluationMetaBlockGUI($this, $block);
+					$this->ctrl->forwardCommand($block_gui);
+					break;
+				case 'ilselfevaluationmetaquestiongui':
+					require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
+					require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationMetaQuestionGUI.php');
+					$block = new ilSelfEvaluationMetaBlock((int)$_GET['block_id']);
+					$container_gui = new ilSelfEvaluationMetaQuestionGUI($block->getMetaContainer(),
+						$block->getTitle(), $this->getPluginObject(), $this->object->getRefId());
+					$this->ctrl->forwardCommand($container_gui);
+					break;
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {
 						$this->performCommand($this->getStandardCmd());
@@ -180,7 +239,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 			return true;
 		} else {
-			parent::executeCommand();
+			return parent::executeCommand();
 		}
 	}
 
@@ -197,9 +256,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->history = $ilNavigationHistory;
 		$this->access = $ilAccess;
 		$this->ctrl = $ilCtrl;
-		$this->pl = new ilSelfEvaluationPlugin();
 		if (self::DEBUG OR $_GET['rl'] == 'true') {
-			$this->pl->updateLanguages();
+			$this->getPluginObject()->updateLanguages();
 		}
 	}
 
@@ -247,6 +305,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	function setTabs() {
+		/** @var ilAccessHandler $ilAccess */
 		global $ilAccess;
 		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
 			$this->object->setAllowShowResults(true);
@@ -257,7 +316,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->addInfoTab();
 		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab('properties', $this->txt('properties'), $this->ctrl->getLinkTarget($this, 'editProperties'));
-			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
+			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
 		}
 		if (($this->object->getAllowShowResults())
 			AND $this->object->hasDatasets()
@@ -272,7 +331,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 	function editProperties() {
 		if ($this->object->hasDatasets()) {
-			ilUtil::sendInfo($this->pl->txt('scale_cannot_be_edited'));
+			ilUtil::sendInfo($this->getPluginObject()->txt('scale_cannot_be_edited'));
 		}
 		$this->tabs_gui->activateTab('properties');
 		$this->initPropertiesForm();
@@ -293,52 +352,113 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		// online
 		$cb = new ilCheckboxInputGUI($this->txt('online'), 'online');
 		$this->form->addItem($cb);
+
+        $section = new ilFormSectionHeaderGUI();
+        $section->setTitle($this->txt('help_text_section'));
+        $this->form->addItem($section);
+
+        //////////////////////////////
+        /////////Text Section////////
+        //////////////////////////////
 		// intro
-		$te = new ilTextAreaInputGUI($this->txt('intro'), 'intro');
-		$te->setUseRte(true);
+		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
+		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('intro'), 'intro');
 		$te->disableButtons(self::$disabled_buttons);
+        $te->setInfo($this->txt('intro_info'));
 		$this->form->addItem($te);
 		// outro
-		$te = new ilTextAreaInputGUI($this->txt('outro'), 'outro');
-		$te->setUseRte(true);
+		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('outro'), 'outro');
+		$te->disableButtons(self::$disabled_buttons);
+        $te->setInfo($this->txt('outro_info'));
+		$this->form->addItem($te);
+		// identity selection info text for anonymous users
+		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('identity_selection'), 'identity_selection_info');
+		$te->setInfo($this->txt('identity_selection_info'));
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
-		// Sorting
-		$se = new ilSelectInputGUI($this->pl->txt('sort_type'), 'sort_type');
-		$opt = array(
-			ilObjSelfEvaluation::SORT_MANUALLY => $this->pl->txt('sort_manually'),
-			ilObjSelfEvaluation::SORT_SHUFFLE => $this->pl->txt('sort_shuffle'),
-		);
-		$se->setOptions($opt);
-		$this->form->addItem($se);
-		// DisplayType
-		$se = new ilSelectInputGUI($this->pl->txt('display_type'), 'display_type');
-		$opt = array(
-			ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->pl->txt('single_page'),
-			ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->pl->txt('multiple_pages'),
-			//			ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->pl->txt('all_questions_shuffled'),
-		);
-		$se->setOptions($opt);
-		$this->form->addItem($se);
+
+        //////////////////////////////
+        /////////Block Section////////
+        //////////////////////////////
+        $section = new ilFormSectionHeaderGUI();
+        $section->setTitle($this->txt('block_section'));
+        $this->form->addItem($section);
+
+        //Ordering of Questions in Blocks
+        $radio_options = new ilRadioGroupInputGUI($this->getPluginObject()->txt(self::FIELD_ORDER_TYPE),self::FIELD_ORDER_TYPE);
+
+        $option_random = new ilRadioOption($this->getPluginObject()->txt(self::FIELD_ORDER_FULLY_RANDOM),self::FIELD_ORDER_FULLY_RANDOM);
+        $option_random->setInfo($this->getPluginObject()->txt("block_option_random_info"));
+
+        $nr_input = new ilNumberInputGUI($this->getPluginObject()->txt("sort_random_nr_items_block"),'sort_random_nr_items_block');
+        $option_random->addSubItem($nr_input);
+
+        $option_block = new ilRadioOption($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK),self::FIELD_ORDER_BLOCK);
+        $option_block->setInfo($this->getPluginObject()->txt("block_option_block_info"));
+
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK_RANDOM), self::FIELD_ORDER_BLOCK_RANDOM);
+        $option_block->addSubItem($cb);
+
+        $radio_options->addOption($option_random);
+        $radio_options->addOption($option_block);
+        $radio_options->setRequired(true);
+        $this->form->addItem($radio_options);
+
+        // DisplayType
+        $se = new ilSelectInputGUI($this->getPluginObject()->txt('display_type'), 'display_type');
+        $se->setInfo($this->getPluginObject()->txt("display_type_info"));
+        $opt = array(
+            ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->getPluginObject()->txt('single_page'),
+            ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->getPluginObject()->txt('multiple_pages'),
+        );
+        $se->setOptions($opt);
+        $this->form->addItem($se);
+
+        // Show question block titles during evaluation
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_sev'), 'show_block_titles_sev');
+        $this->form->addItem($cb);
+
+        // Show question block descriptions during evaluation
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_sev'), 'show_block_desc_sev');
+        $this->form->addItem($cb);
+
+        //////////////////////////////
+        /////////Feedback Section/////
+        //////////////////////////////
+        $section = new ilFormSectionHeaderGUI();
+        $section->setTitle($this->txt('feedback_section'));
+        $this->form->addItem($section);
+
+		// Show question block titles during feedback
+		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_fb'), 'show_block_titles_fb');
+		$this->form->addItem($cb);
+		// Show question block descriptions during feedback
+		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_fb'), 'show_block_desc_fb');
+		$this->form->addItem($cb);
 		// Show Feedbacks
-		$cb = new ilCheckboxInputGUI($this->pl->txt('show_fbs_overview'), 'show_fbs_overview');
+		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview'), 'show_fbs_overview');
 		$cb->setValue(1);
 		$this->form->addItem($cb);
 		//
-		$cb = new ilCheckboxInputGUI($this->pl->txt('show_fbs'), 'show_fbs');
+		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs'), 'show_fbs');
 		$cb->setValue(1);
 		//
-		$cb_a = new ilCheckboxInputGUI($this->pl->txt('show_fbs_charts'), 'show_fbs_charts');
+		$cb_a = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_charts'), 'show_fbs_charts');
 		$cb_a->setValue(1);
 		$cb->addSubItem($cb_a);
 		$this->form->addItem($cb);
+
+        //////////////////////////////
+        /////////Scale Section////////
+        //////////////////////////////
+        // Append
+        $aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
+        $this->form = $aform->appendToForm($this->form);
+
 		// Buttons
 		$this->form->addCommandButton('updateProperties', $this->txt('save'));
 		$this->form->setTitle($this->txt('edit_properties'));
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
-		// Append
-		$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
-		$this->form = $aform->appendToForm($this->form);
 	}
 
 
@@ -349,13 +469,29 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['desc'] = $this->object->getDescription();
 		$values['online'] = $this->object->getOnline();
 		$values['intro'] = $this->object->getIntro();
+
+        if($this->object->getSortType() == self::ORDER_QUESTIONS_FULLY_RANDOM){
+            $values[self::FIELD_ORDER_TYPE] =self::FIELD_ORDER_FULLY_RANDOM;
+        }
+        else{
+            $values[self::FIELD_ORDER_TYPE] =self::FIELD_ORDER_BLOCK;
+            if($this->object->getSortType() == self::ORDER_QUESTIONS_BLOCK_RANDOM){
+                $values[self::FIELD_ORDER_BLOCK_RANDOM] = 1;
+            }
+
+        }
+        $values['sort_random_nr_items_block'] = $this->object->getSortRandomNrItemBlock();
 		$values['outro'] = $this->object->getOutro();
-		$values['sort_type'] = $this->object->getSortType();
+		$values['identity_selection_info'] = $this->object->getIdentitySelectionInfoText();
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['show_fbs_overview'] = $this->object->getShowFeedbacksOverview();
 		$values['show_fbs'] = $this->object->getShowFeedbacks();
 		$values['show_fbs_charts'] = $this->object->getShowFeedbacksCharts();
+		$values['show_block_titles_sev'] = $this->object->getShowBlockTitlesDuringEvaluation();
+		$values['show_block_desc_sev'] = $this->object->getShowBlockDescriptionsDuringEvaluation();
+		$values['show_block_titles_fb'] = $this->object->getShowBlockTitlesDuringFeedback();
+		$values['show_block_desc_fb'] = $this->object->getShowBlockTitlesDuringFeedback();
 		$this->form->setValuesByArray($values);
 	}
 
@@ -367,16 +503,34 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			// Append
 			$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
 			$aform->updateObject();
+
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('desc'));
 			$this->object->setOnline($this->form->getInput('online'));
 			$this->object->setIntro($this->form->getInput('intro'));
 			$this->object->setOutro($this->form->getInput('outro'));
-			$this->object->setSortType($this->form->getInput('sort_type'));
+			$this->object->setIdentitySelectionInfoText($this->form->getInput('identity_selection_info'));
+
+            if($this->form->getInput(self::FIELD_ORDER_TYPE) == self::FIELD_ORDER_FULLY_RANDOM ){
+                $this->object->setSortType(self::ORDER_QUESTIONS_FULLY_RANDOM);
+            }
+			elseif($this->form->getInput(self::FIELD_ORDER_BLOCK_RANDOM)){
+                $this->object->setSortType(self::ORDER_QUESTIONS_BLOCK_RANDOM);
+            }
+            else{
+                $this->object->setSortType(self::ORDER_QUESTIONS_STATIC);
+            }
+
+            $this->object->setSortRandomNrItemBlock($this->form->getInput('sort_random_nr_items_block'));
+            $this->object->setShowBlockTitlesDuringEvaluation($this->form->getInput('show_block_titles_sev'));
+            $this->object->setShowBlockDescriptionsDuringEvaluation($this->form->getInput('show_block_desc_sev'));
+
 			$this->object->setDisplayType($this->form->getInput('display_type'));
 			$this->object->setShowFeedbacksOverview($this->form->getInput('show_fbs_overview'));
 			$this->object->setShowFeedbacks($this->form->getInput('show_fbs'));
 			$this->object->setShowFeedbacksCharts($this->form->getInput('show_fbs_charts'));
+			$this->object->setShowBlockTitlesDuringFeedback($this->form->getInput('show_block_titles_fb'));
+			$this->object->setShowBlockDescriptionsDuringFeedback($this->form->getInput('show_block_desc_fb'));
 			$this->object->update();
 			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'editProperties');
@@ -418,6 +572,16 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	//
 	// Make important but unfortunately as 'final' declared methods available
 	//
+
+	/**
+	 * Get plugin object
+	 *
+	 * @return ilSelfEvaluationPlugin plugin object
+	 */
+	public function getPluginObject() {
+		return $this->plugin;
+	}
+
 
 	/**
 	 * @param string $permission

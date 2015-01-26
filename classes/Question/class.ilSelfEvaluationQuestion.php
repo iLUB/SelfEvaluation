@@ -80,6 +80,7 @@ class ilSelfEvaluationQuestion {
 
 
 	final function initDB() {
+		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
 				'type' => $v[0],
@@ -108,7 +109,7 @@ class ilSelfEvaluationQuestion {
 		if (! $this->db->tableExists(self::TABLE_NAME)) {
 			$this->initDB();
 
-			return true;
+			return;
 		}
 		foreach ($this->getArrayForDb() as $k => $v) {
 			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
@@ -142,7 +143,7 @@ class ilSelfEvaluationQuestion {
 		if ($this->getId() != 0) {
 			$this->update();
 
-			return true;
+			return;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->setPosition(self::_getNextPosition($this->getParentId()));
@@ -163,7 +164,7 @@ class ilSelfEvaluationQuestion {
 		if ($this->getId() == 0) {
 			$this->create();
 
-			return true;
+			return;
 		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
@@ -178,7 +179,7 @@ class ilSelfEvaluationQuestion {
 	// Static
 	//
 	/**
-	 * @param      $parent_id
+	 * @param int  $parent_id is a block id
 	 * @param bool $as_array
 	 *
 	 * @return ilSelfEvaluationQuestion[]
@@ -190,32 +191,9 @@ class ilSelfEvaluationQuestion {
 		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
 			if ($as_array) {
-				$return[] = (array)new self($rec->id);
+				$return[$rec->id] = (array)new self($rec->id);
 			} else {
-				$return[] = new self($rec->id);
-			}
-		}
-
-		return $return;
-	}
-
-
-	/**
-	 * @param      $parent_id
-	 * @param bool $as_array
-	 *
-	 * @return ilSelfEvaluationQuestion[]
-	 */
-	public static function _getInstancesForQuestionId($parent_id, $as_array = false) {
-		global $ilDB;
-		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
-		while ($rec = $ilDB->fetchObject($set)) {
-			if ($as_array) {
-				$return[] = (array)new self($rec->id);
-			} else {
-				$return[] = new self($rec->id);
+				$return[$rec->id] = new self($rec->id);
 			}
 		}
 
@@ -230,7 +208,7 @@ class ilSelfEvaluationQuestion {
 	 */
 	public static function _isObject($id) {
 		global $ilDB;
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = ' . $ilDB->quote($id, 'integer'));
+		$set = $ilDB->query('SELECT id FROM ' . self::TABLE_NAME . ' WHERE id = ' . $ilDB->quote($id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return true;
 		}

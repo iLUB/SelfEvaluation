@@ -19,7 +19,9 @@ content#:#Selbstevaluation
 properties#:#Einstellungen
 edit_properties#:#Einstellungen bearbeiten
 title#:#Titel
+short_title#:#Kurztitel
 description#:#Beschreibung
+abbreviation#:#Abkürzung
 save#:#Speichern
 cancel#:#Abbrechen
 edit#:#Bearbeiten
@@ -47,10 +49,12 @@ scale_form#:#Skalierung
 
 create_question#:#Frage erstellen
 create_question_button#:#Frage erstellen
-question_body#:#Fragetext
+question_body#:#Frage
+question_title_info#:#Der Titel wird für die Benennung der Feedback Grafiken verwendet.
 add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke
-add_new_block#:#Frageblock hinzufügen
+add_new_question_block#:#Frageblock hinzufügen
+add_new_meta_block#:#Metafrageblock hinzufügen
 edit_question#:#Frage bearbeiten
 delete_question#:#Frage löschen
 sorting_saved#:#Reihenfolge gespeichert
@@ -91,6 +95,10 @@ add_new_feedback#:#Feedback hinzufügen
 update_feedback_form#:#Feedback bearbeiten
 update_feedback_button#:#Speichern
 count_feedbacks#:#Anzahl Feedbacks
+option_auto#:#Lineare Bereichzuordnung
+option_auto_info#:#Der Prozentbereich wird linear auf die vorhandenen Feedbacks aufgeteilt. Achtung: Bereits vorhandene Bereiche werden dadurch angepasst!
+option_slider#:#Manuelle Zuordnung
+range_type#:#Prozentbereicht
 
 fb_title#:#Titel
 fb_body#:#Feedback
@@ -103,6 +111,9 @@ msg_feedback_deleted#:#Das Feedback wurde gelöscht
 delete_feedback#:#Feedback löschen
 slider#:#Prozentbereich
 start_new_button#:#Neuen Durchgang starten
+
+show_spider_chart#:#Spinnengrafik anzeigen
+show_bar_chart#:#Balkendiagramm anzeigen
 
 msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
@@ -126,18 +137,20 @@ multinput_value#:#Numerischer Wert
 multinput_title#:#Bezeichnung
 multinput_description#:#Es empfiehlt sich, den ersten numerischen Wert 0 nicht zu ändern, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
 sort_type#:#Sortierung
-sort_shuffle#:#Fragen pro Block mischen
-sort_manually#:#Festgelegte Reihenfolge
+shuffle_in_blocks#:#Fragen pro Block mischen
+shuffle_across_blocks#:#Alle Fragen blockübergreifend gemischt
+no_questions_per_page#:#Anzahl Fragen pro Seite
+shuffle_off#:#Festgelegte Reihenfolge
 display_type#:#Darstellung der Blocks
 single_page#:#Alle Blocks auf einer Seite
 multiple_pages#:#Eine Seite pro Block
-all_questions_shuffled#:#Alle Fragen blockübergreifend gemischt
 next_new#:#Weiter
 locked#:#Felder sind gesperrt
 feedback_status#:#Feedback-Block vollständig
-feedback_title
 
 async#:#Asynchrone Darstellung der Input-Masken
+identity_selection#:#Standardtext zu der Identitätsauswahl bei anonymen Selbstevaluationen
+identity_selection_info#:#Dieser Text wird den anonymen Nutzern des SelfEvaluation Plugins angezeigt.
 configuration#:#Konfiguration
 
 identity_type_1#:#ILIAS-Benutzer
@@ -160,7 +173,10 @@ delete_all_datasets#:#Alle Datensätze löschen
 confirm_delete_all_datasets#:#Möchten Sie alle Datensätze löschen?
 all_datasets_deleted#:#Alle Datensätze wurden gelöscht
 
+show_block_titles_sev#:#Titel der Frageblöcke während der Selbstevaluation anzeigen
+show_block_desc_sev#:#Beschreibung der Frageblöcke während der Selbstevaluation anzeigen
+show_block_titles_fb#:#Titel der Frageblöcke im Feedback anzeigen
+show_block_desc_fb#:#Beschreibung der Frageblöcke im Feedback anzeigen
 show_fbs_overview#:#Feedback-Übersichtsgrafik anzeigen
 show_fbs#:#Einzelfeedback-Texte anzeigen
 show_fbs_charts#:#Einzelfeedback-Grafiken anzeigen
-feedback_title_intro#:#Feedback zu Ihrer Einschätzung

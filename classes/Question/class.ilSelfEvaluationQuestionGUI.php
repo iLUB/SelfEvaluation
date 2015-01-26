@@ -4,17 +4,14 @@ require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
 require_once('class.ilSelfEvaluationQuestionTableGUI.php');
-require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationBlock.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilMatrixFieldInputGUI.php');
+require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationQuestionBlock.php');
 require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
+
 /**
  * GUI-Class ilSelfEvaluationQuestionGUI
  *
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * @version           $Id:
- *
- * @ilCtrl_Calls      ilSelfEvaluationQuestionGUI:
- * @ilCtrl_IsCalledBy ilSelfEvaluationQuestionGUI:
  */
 class ilSelfEvaluationQuestionGUI {
 
@@ -41,9 +38,9 @@ class ilSelfEvaluationQuestionGUI {
 		$this->ctrl = $ilCtrl;
 		$this->parent = $parent;
 		$this->tabs_gui = $this->parent->tabs_gui;
-		$this->pl = new ilSelfEvaluationPlugin();
-		$this->block = new ilSelfEvaluationBlock($block_id ? $block_id : $_GET['block_id']);
-		$this->object = new ilSelfEvaluationQuestion($question_id ? $question_id : $_GET['question_id']);
+		$this->pl = $parent->getPluginObject();
+		$this->block = new ilSelfEvaluationQuestionBlock($block_id ? $block_id : (int)$_GET['block_id']);
+		$this->object = new ilSelfEvaluationQuestion($question_id ? $question_id : (int)$_GET['question_id']);
 	}
 
 
@@ -118,16 +115,18 @@ class ilSelfEvaluationQuestionGUI {
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		$this->form->addCommandButton($mode . 'Object', $this->pl->txt($mode . '_question_button'));
 		$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
-		$te = new ilTextInputGUI($this->pl->txt('title'), 'title');
+		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
+		$te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->pl->txt('question_body'), 'question_body');
+		$te->setRequired(true);
+		$this->form->addItem($te);
+		$te = new ilTextInputGUI($this->pl->txt('short_title'), 'title');
+		$te->setInfo($this->pl->txt('question_title_info'));
+		$te->setMaxLength(8);
 		$te->setRequired(false);
 		$this->form->addItem($te);
-		$te = new ilTextAreaInputGUI($this->pl->txt('question_body'), 'question_body');
-		$te->setRequired(true);
-		$te->setUseRte(true);
 		$cb = new ilCheckboxInputGUI($this->pl->txt('is_inverse'), 'is_inverse');
 		$cb->setValue(1);
 		$this->form->addItem($cb);
-		$this->form->addItem($te);
 	}
 
 
@@ -200,7 +199,8 @@ class ilSelfEvaluationQuestionGUI {
 		}
 		$async = new ilOverlayRequestGUI();
 		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addQuestion'));
-		$this->toolbar->addButton('<b>&lt;&lt; '.$this->pl->txt('back_to_blocks').'</b>', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationBlockGUI', 'showContent'));
+		$this->toolbar->addButton('<b>&lt;&lt; '.$this->pl->txt('back_to_blocks').'</b>',
+			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
 		$table = new ilSelfEvaluationQuestionTableGUI($this, 'showContent', $this->block);
 		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 	}
@@ -216,53 +216,6 @@ class ilSelfEvaluationQuestionGUI {
 		$this->ctrl->redirect($this, 'showContent');
 	}
 
-
-	/**
-	 * @param ilPropertyFormGUI $parent_form
-	 *
-	 * @return ilPropertyFormGUI
-	 */
-	public function getQuestionForm(ilPropertyFormGUI $parent_form = NULL) {
-		if ($parent_form) {
-			$form = $parent_form;
-		} else {
-			$form = new ilPropertyFormGUI();
-		}
-		$te = new ilMatrixFieldInputGUI($this->object->getTitle(), self::POSTVAR_PREFIX . $this->object->getId());
-		$te->setScale($this->block->getScale()->getUnitsAsArray($this->object->getIsInverse()));
-		$te->setQuestion($this->object->getQuestionBody());
-		$te->setRequired(true);
-		$form->addItem($te);
-
-		return $form;
-	}
-
-
-	/**
-	 * @param ilObjSelfEvaluationGUI $parent
-	 * @param ilPropertyFormGUI      $form
-	 *
-	 * @return ilPropertyFormGUI
-	 */
-	public static function getAllQuestionsForms(ilObjSelfEvaluationGUI $parent, ilPropertyFormGUI &$form) {
-		$parent_id = $parent->object->getId();
-		$questions = array();
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($parent_id) as $block) {
-			foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
-				$questions[] = $qst;
-			}
-		}
-		$sc = new ilMatrixHeaderGUI();
-		$sc->setScale($block->getScale()->getUnitsAsArray());
-		$form->addItem($sc);
-		shuffle($questions);
-		foreach ($questions as $qst) {
-			$qst_form = new self($parent, $qst->getId(), $block->getId());
-			$form = $qst_form->getQuestionForm($form);
-		}
-
-		return $form;
-	}
 }
 
 ?>

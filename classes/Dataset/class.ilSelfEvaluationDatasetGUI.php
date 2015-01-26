@@ -3,6 +3,8 @@ require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedbackGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('class.ilSelfEvaluationDatasetTableGUI.php');
+require_once('class.ilSelfEvaluationCsvExport.php');
+
 /**
  * GUI-Class ilSelfEvaluationResultsGUI
  *
@@ -32,14 +34,13 @@ class ilSelfEvaluationDatasetGUI {
 		$this->parent = $parent;
 		$this->toolbar = $ilToolbar;
 		$this->tabs_gui = $this->parent->tabs_gui;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 		$this->dataset = new ilSelfEvaluationDataset($_GET['dataset_id'] ? $_GET['dataset_id'] : 0);
 	}
 
 
 	public function executeCommand() {
 		if ($_GET['rl'] == 'true') {
-			$this->pl = new ilSelfEvaluationPlugin();
 			$this->pl->updateLanguages();
 		}
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
@@ -82,7 +83,7 @@ class ilSelfEvaluationDatasetGUI {
 
 	public function index() {
 		$async = new ilOverlayRequestGUI();
-		$table = new ilSelfEvaluationDatasetTableGUI($this, 'index',$this->parent->object->getId());
+		$table = new ilSelfEvaluationDatasetTableGUI($this, 'index', $this->pl, $this->parent->object->getId());
 		$this->tpl->setContent($async->getHTML() . $table->getHTML());
 
 		return;
@@ -116,8 +117,13 @@ class ilSelfEvaluationDatasetGUI {
 		$content = $this->pl->getTemplate('default/Dataset/tpl.dataset_presentation.html');
 		$content->setVariable('INTRO_HEADER', $this->pl->txt('outro_header'));
 		$content->setVariable('INTRO_BODY', $this->parent->object->getOutro());
+		$feedback = '';
 		if ($this->parent->object->getAllowShowResults()) {
-			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset);
+			global $tpl;
+			$tpl->addJavaScript('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/bar_spider_chart_toggle.js');
+			require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Feedback/class.ilSelfEvaluationFeedbackChartGUI.php');
+			$charts = new ilSelfEvaluationFeedbackChartGUI();
+			$feedback = $charts->getPresentationOfFeedback($this->dataset);
 		}
 		$this->tpl->setContent($content->get() . $feedback);
 	}
@@ -156,6 +162,12 @@ class ilSelfEvaluationDatasetGUI {
 		ilUtil::sendSuccess($this->pl->txt('all_datasets_deleted'));
 		$this->ctrl->redirect($this, 'index');
 	}
+
+    public function exportCsv() {
+        $csvExport = new ilSelfEvaluationCsvExport($this->pl, ilObject2::_lookupObjectId($_GET['ref_id']));
+        $csvExport->getCsvExport();
+        exit;
+    }
 }
 
 ?>

@@ -26,7 +26,7 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI {
 
 
 	/**
-	 * @param      $parent_id
+	 * @param int  $parent_id
 	 * @param bool $locked
 	 */
 	public function __construct($parent_id, $locked = false) {
@@ -66,6 +66,7 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI {
 	 * @return array
 	 */
 	public function fillForm() {
+		$array = array();
 		foreach ($this->obj->units as $u) {
 			/**
 			 * @var $u ilSelfEvaluationScaleUnit

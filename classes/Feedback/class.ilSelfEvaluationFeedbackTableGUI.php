@@ -33,13 +33,10 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('fb_start'), 'start', 'auto');
 		$this->addColumn($this->pl->txt('fb_end'), 'end', 'auto');
 		$this->addColumn($this->pl->txt('actions'), 'asction', 'auto');
-		// Header
-		if (! ilSelfEvaluationFeedback::_isComplete($a_parent_obj->block->getId())) {
-			$this->ctrl->setParameter($this->parent_obj, 'feedback_id', NULL);
-			$this->addHeaderCommand($this->ctrl->getLinkTarget($a_parent_obj, 'addNew'), $this->pl->txt('add_new_feedback'));
-		} else {
-			ilUtil::sendInfo($this->pl->txt('feedback_complete'));
-		}
+
+        $this->ctrl->setParameter($this->parent_obj, 'feedback_id', NULL);
+        $this->addHeaderCommand($this->ctrl->getLinkTarget($a_parent_obj, 'addNew'), $this->pl->txt('add_new_feedback'));
+
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Feedback/tpl.template_feedback_row.html');
 		$this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->block->getId(), true));
 	}

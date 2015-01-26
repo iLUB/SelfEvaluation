@@ -37,6 +37,16 @@ include_once('./Services/Repository/classes/class.ilObjectPluginListGUI.php');
 class ilObjSelfEvaluationListGUI extends ilObjectPluginListGUI {
 
 	/**
+	 * @var ilSelfEvaluationPlugin
+	 */
+	protected $plugin;
+	/**
+	 * @var int
+	 */
+	protected $obj_id;
+
+
+	/**
 	 *
 	 */
 	function initType() {

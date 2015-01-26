@@ -18,10 +18,6 @@ class ilSelfEvaluationScale {
 	 * @var int
 	 */
 	protected $parent_id = 0;
-	/**
-	 * @var int
-	 */
-	protected $amount = 0;
 
 
 	/**
@@ -45,7 +41,7 @@ class ilSelfEvaluationScale {
 	/**
 	 * @param bool $flipped
 	 *
-	 * @return array
+	 * @return array (unit value => unit title)
 	 */
 	public function getUnitsAsArray($flipped = false) {
 		$return = array();
@@ -88,6 +84,7 @@ class ilSelfEvaluationScale {
 
 
 	final function initDB() {
+		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
 				'type' => $v[0],
@@ -125,12 +122,10 @@ class ilSelfEvaluationScale {
 		if ($this->getId() != 0) {
 			$this->update();
 
-			return true;
+			return;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-
-		return true;
 	}
 
 
@@ -140,8 +135,6 @@ class ilSelfEvaluationScale {
 	public function delete() {
 		$this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));
-
-		return true;
 	}
 
 
@@ -196,20 +189,11 @@ class ilSelfEvaluationScale {
 		return $this->id;
 	}
 
-
-	/**
-	 * @param int $amount
-	 */
-	public function setAmount($amount) {
-		$this->amount = $amount;
-	}
-
-
 	/**
 	 * @return int
 	 */
 	public function getAmount() {
-		return $this->amount;
+		return count($this->units);
 	}
 
 

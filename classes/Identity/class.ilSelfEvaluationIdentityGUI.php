@@ -1,6 +1,4 @@
 <?php
-require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
-require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('./Services/Accordion/classes/class.ilAccordionGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 /**
@@ -40,7 +38,7 @@ class ilSelfEvaluationIdentityGUI {
 		$this->parent = $parent;
 		$this->toolbar = $ilToolbar;
 		$this->tabs_gui = $this->parent->tabs_gui;
-		$this->pl = new ilSelfEvaluationPlugin();
+		$this->pl = $parent->getPluginObject();
 	}
 
 
@@ -86,11 +84,14 @@ class ilSelfEvaluationIdentityGUI {
 		$this->initExistingForm();
 		$this->initNewForm();
 		$this->pl->updateLanguages();
+		$template = $this->pl->getTemplate('default/Identity/tpl.identity_selection.html');
+		$template->setVariable('IDENTITY_INFO_TEXT', $this->parent->object->getIdentitySelectionInfoText());
 		$acc = new ilAccordionGUI();
 		$acc->setOrientation(ilAccordionGUI::VERTICAL);
 		$acc->addItem($this->pl->txt('start_with_new_identity'), $this->new->getHTML());
 		$acc->addItem($this->pl->txt('start_with_existing_identity'), $this->ex->getHTML());
-		$this->tpl->setContent($acc->getHTML());
+		$template->setVariable('IDENTITY_SELECTION', $acc->getHTML());
+		$this->tpl->setContent($template->get());
 	}
 
 

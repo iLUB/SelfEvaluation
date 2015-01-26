@@ -1,7 +1,6 @@
 @import url('print.css');
 
 div.new_block, div.block {
-	/*width: 60%;*/
 	clear: both;
 }
 
@@ -11,7 +10,6 @@ div.new_block:hover {
 }
 
 div.block {
-	/*background-color: red;*/
 	margin:     0;
 	height:     30px;
 	position:   relative;
@@ -20,7 +18,6 @@ div.block {
 }
 
 div.innerBlock {
-	/*background-color: blue;*/
 	float: left;
 }
 
@@ -28,56 +25,6 @@ div.blockActions {
 	margin-top: 15px;
 	position:   relative;
 	float:      right;
-}
-
-ul.matrix, ul.matrix li {
-	margin:      0px;
-	display:     block;
-	padding:     0px !important;
-	/*height:      25px;*/
-	/*line-height: 25px;*/
-
-}
-
-ul.matrix {
-	border-top:    1px dotted #E8E8E8;
-	border-bottom: 1px dotted #E8E8E8;
-	margin-bottom: 15px;
-	margin-top:    5px;
-	/*width: 800px;*/
-
-}
-
-ul.matrix li {
-	float:          left; 
-	list-style:     none;
-	text-align:     center;
-	vertical-align: middle;
-	word-wrap: normal;
-	line-height: 25px;
-	padding: 40px;
-	height: auto;
-	/*height: auto;*/
-}
-
-ul.matrix.header {
-	/*display: inline-block;*/
-	background-color: #E8E8E8;
-	min-width: 600px;
-	overflow:hidden;
-	
-}
-
-
-ul.matrix.header  li {
-	background-color: #E8E8E8;
-	font-weight: bold;
-
-
-}
-
-li.col2 {
-	background-color: #E8E8E8;
 }
 
 div.question {
@@ -88,31 +35,21 @@ div.blockInfo {
 	margin-bottom: 4px;
 }
 
-#form_evaluation_form div.ilForm {
-	width: 100%;
-}
-
-#form_evaluation_form div.ilFormOption {
-	width: 300px;
-	/*width: 100px;*/
-}
 
 div#feedback_overview {
-
 	width:    100%;
 	margin:   0;
 	padding:  0;
 	position: relative;
 	z-index:  100;
-
 }
 
 div.feedback {
-	margin-bottom: 30px;
-	margin-top: 10px;
-	background-color: #F4F4F4;
-	padding: 15px;
-	margin-left: -15px;
+	margin-bottom:      30px;
+	margin-top:         10px;
+	background-color:   #F4F4F4;
+	padding:            18px;
+	margin-left:        -18px;
 }
 
 div.feedback_ov_item, div.feedback_ov_item_blank {
@@ -124,7 +61,6 @@ div.feedback_ov_item, div.feedback_ov_item_blank {
 	z-index:          10;
 	float:            left;
 	margin-right:     -2px;
-
 }
 
 div.feedback_ov_item_blank {
@@ -142,23 +78,30 @@ div.fsx_slider {
 
 div.fsx_slider_warning {
 	margin-bottom: 12px;
+}
 
+.spider_chart {
+	display: none;
 }
 
 h1.feedback_block_title {
-	/*background-color: #D3D3D3;*/
 	border-bottom: 1px #808080 dotted;
 }
 
+.feedback_block_abbreviation:before {
+	content:"["
+}
+.feedback_block_abbreviation:after {
+	content:"]"
+}
+
 table#feedback_overview_table {
-	/*background-color: red;*/
 	width:       100%;
 	border-left: 1px solid #808080;
 }
 
 table#feedback_overview_table td {
 	width: 1%;
-
 }
 
 td.feedback_overview_line, td.feedback_overview_line_double {
@@ -184,11 +127,16 @@ td.feedback_ov_item, td.feedback_ov_item_blank {
 }
 
 td.feedback_ov_item, div.ui-slider-range {
-	background-color: rgb(208, 232, 255);
-	background-image: none;
+	background: rgb(208, 232, 255) none;
 }
 
 td.feedback_ov_item_blank {
 	background-color: #D3D3D3;
 }
 
+.ilSubForm > .ilForm{
+    width: 100%;
+}
+a.il_ContainerItemCommand{
+    padding-left: 20px;
+}

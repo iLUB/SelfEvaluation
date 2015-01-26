@@ -2,9 +2,10 @@
 require_once('class.ilSelfEvaluationData.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionGUI.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
+require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestionGUI.php');
 require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedback.php');
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
-require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Identity/class.ilSelfEvaluationIdentity.php');
+require_once(dirname(__FILE__) . '/../Identity/class.ilSelfEvaluationIdentity.php');
 /**
  * ilSelfEvaluationDataset
  *
@@ -49,9 +50,7 @@ class ilSelfEvaluationDataset {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
 			. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
-			foreach ($this->getArrayForDb() as $k => $v) {
-				$this->{$k} = $rec->{$k};
-			}
+			$this->setObjectValuesFromRecord($this, $rec);
 		}
 	}
 
@@ -68,6 +67,97 @@ class ilSelfEvaluationDataset {
 		}
 
 		return $e;
+	}
+
+
+	/**
+	 * @param ilSelfEvaluationDataset $data_set
+	 * @param stdClass                $rec
+	 */
+	protected function setObjectValuesFromRecord(ilSelfEvaluationDataset &$data_set, $rec) {
+		foreach ($this->getArrayForDb() as $k => $v) {
+			$data_set->{$k} = $rec->{$k};
+		}
+	}
+
+
+	/**
+	 * @param string $postvar_key
+	 *
+	 * @return string|false
+	 */
+	protected function determineQuestionType($postvar_key) {
+		$type = FALSE;
+
+		if (strpos($postvar_key, ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX) === 0) {
+			$type = ilSelfEvaluationData::QUESTION_TYPE;
+		} else if (strpos($postvar_key, ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX) === 0) {
+			$type = ilSelfEvaluationData::META_QUESTION_TYPE;
+		}
+
+		return $type;
+	}
+
+
+	/**
+	 * @param string $question_type
+	 * @param string $postvar_key
+	 *
+	 * @return int|false
+	 */
+	protected function getQuestionId($question_type, $postvar_key) {
+		$qid = FALSE;
+
+		if ($question_type == ilSelfEvaluationData::QUESTION_TYPE) {
+			$qid = (int)str_replace(ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
+		} else if ($question_type == ilSelfEvaluationData::META_QUESTION_TYPE) {
+			$qid = (int)str_replace(ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
+		}
+
+		return $qid;
+	}
+
+
+	/**
+	 * @param int $qid
+	 * @param string $question_type
+	 *
+	 * @return bool
+	 */
+	protected function questionExists($qid, $question_type) {
+		if ($question_type == ilSelfEvaluationData::QUESTION_TYPE) {
+			return ilSelfEvaluationQuestion::_isObject($qid);
+		} else if ($question_type == ilSelfEvaluationData::META_QUESTION_TYPE) {
+			return ilSelfEvaluationMetaQuestion::isObject($qid);
+		}
+
+		return FALSE;
+	}
+
+
+	/**
+	 * @param $post
+	 *
+	 * @return array
+	 */
+	protected function getDataFromPost($post) {
+		$data = array();
+		foreach ($post as $k => $v) {
+			$type = $this->determineQuestionType($k);
+			if ($type === false) {
+				continue;
+			}
+			$qid = $this->getQuestionId($type, $k);
+			if ($qid === false) {
+				continue;
+			}
+
+			if ($this->questionExists($qid, $type)) {
+				$data[] = array( 'qid' => $qid, 'value' => $v, 'type' => $type );
+			}
+		}
+
+		return $data;
 	}
 
 
@@ -107,12 +197,10 @@ class ilSelfEvaluationDataset {
 		if ($this->getId() != 0) {
 			$this->update();
 
-			return true;
+			return;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-
-		return true;
 	}
 
 
@@ -132,7 +220,7 @@ class ilSelfEvaluationDataset {
 		if ($this->getId() == 0) {
 			$this->create();
 
-			return true;
+			return;
 		}
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
@@ -140,50 +228,43 @@ class ilSelfEvaluationDataset {
 				$this->getId()
 			),
 		));
-
-		return true;
 	}
 
 
 	/**
-	 * @param $array
+	 * @param $array array (qid => int, value => string, type => string)
 	 */
 	public function saveValuesByArray($array) {
 		if ($this->getId() == 0) {
 			$this->create();
 		}
-		foreach ($array as $k => $v) {
+		foreach ($array as $item) {
 			$da = new ilSelfEvaluationData();
 			$da->setDatasetId($this->getId());
-			$da->setQuestionId($k);
-			$da->setValue($v);
+			$da->setQuestionId($item['qid']);
+			$da->setValue($item['value']);
+			$da->setQuestionType($item['type']);
+            $da->setCreationDate(time());
 			$da->create();
 		}
 	}
 
 
-	/**
-	 * @param $post
-	 */
-	public function saveValuesByPost($post) {
-		$data = array();
-		foreach ($post as $k => $v) {
-			$qid = str_replace(ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX, '', $k);
-			if (ilSelfEvaluationQuestion::_isObject($qid)) {
-				$data[$qid] = $v;
-			}
-		}
-		$this->saveValuesByArray($data);
+    /**
+     * @param $post
+     */
+    public function saveValuesByPost($post) {
+		$this->saveValuesByArray($this->getDataFromPost($post));
 	}
 
 
 	/**
-	 * @param $array
+	 * @param $array array (qid => int, value => string, type => string)
 	 */
 	public function updateValuesByArray($array) {
-		foreach ($array as $k => $v) {
-			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $k);
-			$da->setValue($v);
+		foreach ($array as $item) {
+			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $item['qid'], $item['type']);
+			$da->setValue($item['value']);
 			$da->update();
 		}
 	}
@@ -193,14 +274,7 @@ class ilSelfEvaluationDataset {
 	 * @param $post
 	 */
 	public function updateValuesByPost($post) {
-		$data = array();
-		foreach ($post as $k => $v) {
-			$qid = str_replace(ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX, '', $k);
-			if (ilSelfEvaluationQuestion::_isObject($qid)) {
-				$data[$qid] = $v;
-			}
-		}
-		$this->updateValuesByArray($data);
+		$this->updateValuesByArray($this->getDataFromPost($post));
 	}
 
 
@@ -209,7 +283,7 @@ class ilSelfEvaluationDataset {
 	 *
 	 * @return mixed
 	 */
-	public function getDataPerBlock($block_id) {
+	public function getDataPerBlock($block_id) { // TODO also fetch meta question data and display it in the feedback
 		$sum = array();
 		foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block_id) as $qst) {
 			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $qst->getId());
@@ -231,8 +305,11 @@ class ilSelfEvaluationDataset {
 		$sorted_scale = array_keys($scale);
 		sort($sorted_scale);
 		$highest = $sorted_scale[count($sorted_scale) - 1];
-		foreach (ilSelfEvaluationBlock::_getAllInstancesByParentId($obj_id) as $block) {
+		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
 			$answer_data = $this->getDataPerBlock($block->getId());
+			if (count($answer_data) == 0) {
+				continue;
+			}
 			$answer_total = array_sum($answer_data);
 			$anzahl_fragen = count($answer_data);
 			$possible_per_block = $anzahl_fragen * $highest;
@@ -262,7 +339,7 @@ class ilSelfEvaluationDataset {
 	/**
 	 * @param null $a_block_id
 	 *
-	 * @return array
+	 * @return ilSelfEvaluationFeedback[]
 	 */
 	public function getFeedbacksPerBlock($a_block_id = NULL) {
 		$return = array();
@@ -294,7 +371,9 @@ class ilSelfEvaluationDataset {
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
 			. $ilDB->quote($identifier_id, 'integer') . ' ORDER BY creation_date ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
-			$return[] = new self($rec->id);
+			$data_set = new ilSelfEvaluationDataset();
+			$data_set->setObjectValuesFromRecord($data_set, $rec);
+			$return[] = $data_set;
 		}
 
 		return $return;
@@ -318,9 +397,11 @@ class ilSelfEvaluationDataset {
 				. $ilDB->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
 			while ($rec = $ilDB->fetchObject($set)) {
 				if ($as_array) {
-					$return[] = (array)new self($rec->id);                                     
+					$return[] = (array)$rec;
 				} else {
-					$return[] = new self($rec->id);
+					$data_set = new ilSelfEvaluationDataset();
+					$data_set->setObjectValuesFromRecord($data_set, $rec);
+					$return[] = $data_set;
 				}
 			}
 		}
@@ -356,7 +437,9 @@ class ilSelfEvaluationDataset {
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
 			. $ilDB->quote($identifier_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
-			return new self($rec->id);
+			$data_set = new ilSelfEvaluationDataset();
+			$data_set->setObjectValuesFromRecord($data_set, $rec);
+			return $data_set;
 		}
 
 		return false;
@@ -371,7 +454,6 @@ class ilSelfEvaluationDataset {
 	public static function _getNewInstanceForIdentifierId($identifier_id) {
 		$obj = new self();
 		$obj->setIdentifierId($identifier_id);
-		$obj->setCreationDate(time());
 
 		return $obj;
 	}
@@ -384,7 +466,7 @@ class ilSelfEvaluationDataset {
 	 */
 	public static function _datasetExists($identifier_id) {
 		global $ilDB;
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+		$set = $ilDB->query('SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
 			. $ilDB->quote($identifier_id, 'integer'));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return true;
@@ -441,6 +523,20 @@ class ilSelfEvaluationDataset {
 		return $this->creation_date;
 	}
 
+    /**
+     * @return int
+     */
+    public function getSubmitDate(){
+        $latest_entry = ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId());
+        return $latest_entry->getCreationDate();
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration(){
+        return ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId())->getCreationDate()-$this->getCreationDate();
+    }
 
 	//
 	// Helper
