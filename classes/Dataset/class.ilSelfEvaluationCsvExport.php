@@ -83,6 +83,7 @@ class ilSelfEvaluationCsvExport extends csvExport{
         $blocks = ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getObjectId());
         foreach($blocks as $block){
             $this->addQuestions(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()));
+
         }
 
         $this->setDatasets(ilSelfEvaluationDataset::_getAllInstancesByObjectId($this->getObjectId()));
@@ -103,7 +104,7 @@ class ilSelfEvaluationCsvExport extends csvExport{
         }
 
         foreach($this->getQuestions() as $question){
-            $this->getTable()->addColumn(new csvExportColumn($question->getTitle(),$question->getTitle(),$position));
+            $this->getTable()->addColumn(new csvExportColumn($this->getTitleForQuestion($question),$this->getTitleForQuestion($question),$position));
             $position++;
         }
     }
@@ -124,13 +125,23 @@ class ilSelfEvaluationCsvExport extends csvExport{
                     $column_name = $this->getMetaQuestion($entry->getQuestionId())->getName();
                 }
                 else{
-                    $column_name = $this->getQuestion($entry->getQuestionId())->getTitle();
+                    $column_name = $this->getTitleForQuestion($this->getQuestion($entry->getQuestionId()));
                 }
                 $row->addValue(new csvExportValue($column_name,$entry->getValue()));
             }
             $this->getTable()->addRow($row);
 
         }
+    }
+
+    /**
+     * @param ilSelfEvaluationQuestion $question
+     * @return string
+     */
+    protected function getTitleForQuestion(ilSelfEvaluationQuestion $question){
+        $block = new ilSelfEvaluationQuestionBlock($question->getParentId());
+        $title = $question->getTitle() ? $question->getTitle() : $this->pl->txt('question') . ' ' . $block->getPosition() . '.' . $question->getPosition();
+        return $title;
     }
 
     /**
