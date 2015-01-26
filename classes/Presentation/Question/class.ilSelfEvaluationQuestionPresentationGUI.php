@@ -29,7 +29,7 @@ class ilSelfEvaluationQuestionPresentationGUI {
 			$form = new ilPropertyFormGUI();
 		}
 		$te = new ilMatrixFieldInputGUI($this->object->getQuestionBody(), ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX . $this->object->getId());
-		$te->setScale(ilSelfEvaluationScale::_getInstanceByRefId($this->block->getParentId())->getUnitsAsArray());
+		$te->setScale(ilSelfEvaluationScale::_getInstanceByRefId($this->block->getParentId())->getUnitsAsArray($this->object->getIsInverse()));
 		$te->setRequired(true);
 		$form->addItem($te);
 
