@@ -233,7 +233,8 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
 if ($this->db->tableExists(ilSelfEvaluationData::TABLE_NAME)) {
     if (!$ilDB->tableColumnExists(ilSelfEvaluationData::TABLE_NAME, 'creation_date')) {
         $field = array(
-            'type' => 'integer'
+            'type' => 'integer',
+            'length' => 4
         );
         $ilDB->addTableColumn(ilSelfEvaluationData::TABLE_NAME, 'creation_date', $field);
     }
