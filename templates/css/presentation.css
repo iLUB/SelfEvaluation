@@ -8,7 +8,6 @@ h4 {
 
 .block-header{
     border-bottom: 2px solid  #a1a1a1;
-    margin-bottom: 20px;
 }
 .table > tbody > tr td.ilUnitEven,.table > tbody > tr td.ilUnitOdd{
     text-align: center;
@@ -30,8 +29,12 @@ h4 {
 }
 .block-question div.question-text{
     padding-top: 4px;
+    padding-left: 0;
 }
 
+.block-title{
+    padding-left: 0;
+}
 .block-question .rating td{
     padding-top: 4px;
     padding-bottom: 4px;
@@ -71,4 +74,18 @@ h4 {
 
 .knob{
     float: right;
+}
+.sev-panel-body{
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.block-header {
+    padding-top: 20px;
+}
+.block-header + .block-question{
+    display: none;
+}
+.sev-commands{
+    margin-top: 20px;
 }
