@@ -137,3 +137,6 @@ td.feedback_ov_item_blank {
 .ilSubForm > .ilForm{
     width: 100%;
 }
+a.il_ContainerItemCommand{
+    padding-left: 20px;
+}

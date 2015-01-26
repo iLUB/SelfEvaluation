@@ -191,9 +191,9 @@ class ilSelfEvaluationQuestion {
 		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
 		while ($rec = $ilDB->fetchObject($set)) {
 			if ($as_array) {
-				$return[] = (array)new self($rec->id);
+				$return[$rec->id] = (array)new self($rec->id);
 			} else {
-				$return[] = new self($rec->id);
+				$return[$rec->id] = new self($rec->id);
 			}
 		}
 

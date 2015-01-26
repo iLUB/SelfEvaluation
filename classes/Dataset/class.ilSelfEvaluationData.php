@@ -28,6 +28,10 @@ class ilSelfEvaluationData {
 	 * @var string
 	 */
 	protected $question_type = '';
+    /**
+     * @var int
+     */
+    protected $creation_date = 0;
 	/**
 	 * @var string
 	 */
@@ -65,23 +69,24 @@ class ilSelfEvaluationData {
 	public function getArrayForDb() {
 		$e = array();
 		foreach (get_object_vars($this) as $k => $v) {
-			if (! in_array($k, array( 'db' ))) {
+			if (! in_array($k, array( 'db'))) {
 				$e[$k] = array( self::_getType($v), $this->$k );
 			}
 		}
-
 		return $e;
 	}
 
 
-	/**
-	 * @param ilSelfEvaluationData $data
-	 * @param stdClass             $rec
-	 */
-	protected function setObjectValuesFromRecord($data, $rec) {
+    /**
+     * @param $data
+     * @param $rec
+     * @return $this
+     */
+    protected function setObjectValuesFromRecord($data, $rec) {
 		foreach ($data->getArrayForDb() as $k => $v) {
 			$data->{$k} = $rec->{$k};
 		}
+        return $this;
 	}
 
 
@@ -178,6 +183,24 @@ class ilSelfEvaluationData {
 		return $return;
 	}
 
+    /**
+     * @param $dataset_id
+     *
+     * @return ilSelfEvaluationData
+     */
+    public static function _getLatestInstanceByDatasetId($dataset_id) {
+        global $ilDB;
+
+
+        $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = '
+            . $ilDB->quote($dataset_id, 'integer').' ORDER BY creation_date LIMIT 1');
+        while ($rec = $ilDB->fetchObject($set)) {
+            $data = new ilSelfEvaluationData();
+            return $data->setObjectValuesFromRecord($data, $rec);
+        }
+
+        return null;
+    }
 
 	/**
 	 * @param int $dataset_id
@@ -285,6 +308,23 @@ class ilSelfEvaluationData {
 	public function getValue() {
 		return $this->value;
 	}
+
+    /**
+     * @param int $creation_date
+     */
+    public function setCreationDate($creation_date)
+    {
+        $this->creation_date = $creation_date;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreationDate()
+    {
+        return $this->creation_date;
+    }
+
 
 
 	//

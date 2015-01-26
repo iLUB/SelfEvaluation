@@ -42,6 +42,8 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationDatasetGUI'));
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Dataset/tpl.template_dataset_row.html');
 		$ilToolbar->addButton($this->pl->txt('delete_all_datasets'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDeleteAll'));
+        $ilToolbar->addButton($this->pl->txt('export_csv'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'exportCSV'));
+
 		switch ($a_parent_cmd) {
 			case 'index':
 				$this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id, true));

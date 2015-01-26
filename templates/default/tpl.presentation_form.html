@@ -27,7 +27,7 @@
 
         <!-- BEGIN prop -->
         <div class="row block-question">
-            <div class="col-md-{QUESTION_SIZE}" id="il_prop_cont_{LAB_ID}">
+            <div class="col-md-{QUESTION_SIZE} question-text" id="il_prop_cont_{LAB_ID}" >
                 <label for="{LAB_ID}">{PROPERTY_TITLE}<!-- BEGIN std_hid_title --> <span class="ilAccHeadingHidden">{PHID_TITLE}</span><!-- END std_hid_title --><!-- BEGIN required --> <span class="asterisk">*</span><!-- END required --></label>
             </div>
             <div class="col-md-{RATING_SIZE} rating">
@@ -37,13 +37,15 @@
                 <!-- END prop_custom -->
 
                 <!-- BEGIN prop_generic -->
-                <!-- BEGIN multi_in -->
-                <div id="ilFormField~{ID}~0" style="margin-bottom:5px">
-                    <!-- END multi_in -->
-                    {PROP_GENERIC}
-                    <!-- BEGIN multi_out -->
+                <div class="inputs">
+                    <!-- BEGIN multi_in -->
+                    <div id="ilFormField~{ID}~0">
+                        <!-- END multi_in -->
+                        {PROP_GENERIC}
+                        <!-- BEGIN multi_out -->
+                    </div>
+                    <!-- END multi_out -->
                 </div>
-                <!-- END multi_out -->
                 <!-- END prop_generic -->
 
                 <!-- BEGIN description -->
@@ -74,7 +76,7 @@
                     <!-- END hidden -->
                     <div class="ilFormFooter ilFormCommands">
                         <!-- BEGIN cmd -->
-                        <input class="submit" type="SUBMIT" name="cmd[{CMD}]" value="{CMD_TXT}" />
+                        <input class="btn btn-sm btn-default" type="SUBMIT" name="cmd[{CMD}]" value="{CMD_TXT}" />
                         <!-- END cmd -->
                     </div>
                 </div>

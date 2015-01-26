@@ -5,7 +5,7 @@
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-abstract class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQuestionBlockInterface {
+class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQuestionBlockInterface {
 
     /**
      * @var int
@@ -31,6 +31,17 @@ abstract class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQ
      * @var string
      */
     protected $abbreviation = '';
+    /**
+     * @var ilSelfEvaluationQuestion[]
+     */
+    protected $questions = array();
+
+    /**
+     * @param $parent_id
+     */
+    function __construct($parent_id = 0) {
+        $this->setParentId($parent_id);
+    }
 
     /**
      * @param string $abbreviation
@@ -128,6 +139,19 @@ abstract class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQ
         return $this->title;
     }
 
+    /**
+     * @param ilSelfEvaluationQuestion $question
+     */
+    public function addQuestion(ilSelfEvaluationQuestion $question){
+        $this->questions[$question->getId()] = $question;
+    }
+
+    /**
+     * @return ilSelfEvaluationQuestion[]
+     */
+    public function getQuestions(){
+        return $this->questions;
+    }
 
 }
 ?>

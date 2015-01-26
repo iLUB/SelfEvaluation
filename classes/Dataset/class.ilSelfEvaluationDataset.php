@@ -244,15 +244,16 @@ class ilSelfEvaluationDataset {
 			$da->setQuestionId($item['qid']);
 			$da->setValue($item['value']);
 			$da->setQuestionType($item['type']);
+            $da->setCreationDate(time());
 			$da->create();
 		}
 	}
 
 
-	/**
-	 * @param $post
-	 */
-	public function saveValuesByPost($post) {
+    /**
+     * @param $post
+     */
+    public function saveValuesByPost($post) {
 		$this->saveValuesByArray($this->getDataFromPost($post));
 	}
 
@@ -453,7 +454,6 @@ class ilSelfEvaluationDataset {
 	public static function _getNewInstanceForIdentifierId($identifier_id) {
 		$obj = new self();
 		$obj->setIdentifierId($identifier_id);
-		$obj->setCreationDate(time());
 
 		return $obj;
 	}
@@ -523,6 +523,20 @@ class ilSelfEvaluationDataset {
 		return $this->creation_date;
 	}
 
+    /**
+     * @return int
+     */
+    public function getSubmitDate(){
+        $latest_entry = ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId());
+        return $latest_entry->getCreationDate();
+    }
+
+    /**
+     * @return int
+     */
+    public function getDuration(){
+        return ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId())->getCreationDate()-$this->getCreationDate();
+    }
 
 	//
 	// Helper

@@ -100,7 +100,6 @@ class ilSelfEvaluationMetaQuestionGUI extends iLubFieldDefinitionContainerGUI {
          * -> create new iLubFieldDefinitionTypeXYZ objects and add them here
          * @see http://ilublx3.unibe.ch:8080/mantis/view.php?id=514#c928
          */
-
         return $types;
     }
 } 

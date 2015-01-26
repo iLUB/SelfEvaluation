@@ -3,6 +3,7 @@ require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once(dirname( dirname(__FILE__) ) . '/class.ilObjSelfEvaluationGUI.php');
 require_once(dirname( dirname(__FILE__) )  . '/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
 require_once(dirname( dirname(__FILE__) )  . '/Block/class.ilSelfEvaluationMetaBlockGUI.php');
+require_once(dirname( dirname(__FILE__) )  . '/Block/class.ilSelfEvaluationVirtualQuestionBlock.php');
 require_once(dirname( dirname(__FILE__) )  . '/Identity/class.ilSelfEvaluationIdentity.php');
 require_once(dirname( dirname(__FILE__) )  . '/Dataset/class.ilSelfEvaluationDataset.php');
 require_once(dirname( dirname(__FILE__) )  . '/Dataset/class.ilSelfEvaluationData.php');
@@ -112,13 +113,14 @@ class ilSelfEvaluationPresentationGUI {
 		/**
 		 * @var $content ilTemplate
 		 */
-		$content = $this->pl->getTemplate('default/tpl.content.html');
+        $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/bootstrap.css");
+        $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/presentation.css");
+		$content = $this->pl->getTemplate('default/Dataset/tpl.dataset_presentation.html');
 		$content->setVariable('INTRO_HEADER', $this->pl->txt('intro_header'));
 		$content->setVariable('INTRO_BODY', $this->parent->object->getIntro());
 		if ($this->parent->object->isActive()) {
 			$content->setCurrentBlock('button');
-			switch (ilSelfEvaluationDataset::_datasetExists($this->identity->getId())) {
-				case true:
+			if (ilSelfEvaluationDataset::_datasetExists($this->identity->getId())) {
 					if ($this->parent->object->getAllowMultipleDatasets()) {
 						$content->setVariable('START_BUTTON', $this->pl->txt('start_new_button'));
 						$content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'startNewEvaluation'));
@@ -136,11 +138,11 @@ class ilSelfEvaluationPresentationGUI {
 					) {
 						ilUtil::sendInfo($this->pl->txt('msg_already_filled'));
 					}
-					break;
-				case false;
-					$content->setVariable('START_BUTTON', $this->pl->txt('start_button'));
-					$content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'startEvaluation'));
-					break;
+            }
+            else{
+                $content->setVariable('START_BUTTON', $this->pl->txt('start_button'));
+                $content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'startEvaluation'));
+
 			}
 			$content->parseCurrentBlock();
 		} else {
@@ -151,6 +153,8 @@ class ilSelfEvaluationPresentationGUI {
 
 
 	public function startNewEvaluation() {
+        unset($_SESSION['shuffled_blocks']);
+        $_SESSION['xsev_data']['creation_date_dataset'] = time();
 		$this->startEvaluation();
 	}
 
@@ -172,35 +176,91 @@ class ilSelfEvaluationPresentationGUI {
 		$this->form = new ilSelfEvaluationPresentationFormGUI();
 		$this->form->setId('evaluation_form');
 
-		switch ($this->parent->object->getDisplayType()) {
-			case ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE:
-                $this->displayAllBlocks($mode);
-				break;
+        $factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
+        $blocks = $factory->getAllBlocks();
 
-			case ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES:
-                $this->displaySingleBlock($mode);
-                break;
-			case ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED:
-				/*
-				 * TODO this is the draft of the "all questions shuffled" mode from Fabian Schmid.
-				 * Ideally, make a general blockRenderGUI and feed it the questions you want displayed,
-				 */
-				$h = new ilFormSectionHeaderGUI();
-				$h->setTitle($this->parent->object->getTitle());
-				$this->form->addItem($h);
-				$this->form = ilSelfEvaluationQuestionGUI::getAllQuestionsForms($this->parent, $this->form);
-				$this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
-				$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
-				break;
-		}
+        if($this->parent->object->getSortType()==ilObjSelfEvaluation::SHUFFLE_ACROSS_BLOCKS){
+            if(empty($_SESSION['shuffled_blocks'])){
+                $_SESSION['shuffled_blocks'] = serialize($this->orderMixedBlocks($blocks));
+            }
+            $blocks = unserialize($_SESSION['shuffled_blocks']);
+        }
+
+        if($this->parent->object->getDisplayType() == ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE){
+            $this->displayAllBlocks($blocks,$mode);
+        }
+        else{
+            $this->displaySingleBlock($blocks,$mode);
+        }
+
         $this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 	}
 
-    protected function displaySingleBlockForm($mode = 'new'){
-        $factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
+    /**
+     * @param $blocks
+     * @return mixed
+     */
+    protected function orderMixedBlocks($blocks){
+        $return_blocks = array();
+        /**
+         * ilSelfEvaluationVirtualQuestionBlock[]
+         */
+        $virtual_blocks = array();
+        $questions = array();
+
+        $meta_blocks_end_form = array();
+        $meta_block_beginning = true;
+
+        foreach ($blocks as $block) {
+            if(get_class($block) == 'ilSelfEvaluationMetaBlock'){
+                if($meta_block_beginning){
+                    $return_blocks[] = $block;
+                }
+                else{
+                    $meta_blocks_end_form[] = $block;
+                }
+            }
+            else{
+                $meta_block_beginning = false;
+                foreach(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $question){
+                    $questions[] = $question;
+                }
+            }
+        }
+        shuffle($questions);
+
+        $questions_in_block = 0;
+        $block_nr = 0;
+        $virtual_blocks[0] = new ilSelfEvaluationVirtualQuestionBlock($this->parent->object->getId());
+        $virtual_blocks[$block_nr]->setTitle($this->pl->txt("mixed_block_title").$block_nr);
+        $virtual_blocks[$block_nr]->setDescription($this->pl->txt("mixed_block_title").$block_nr);
+
+        foreach($questions as $question){
+            if($questions_in_block>=$this->parent->object->getSortRandomNrItemBlock()){
+                $questions_in_block = 0;
+                $block_nr++;
+                $virtual_blocks[$block_nr] = new ilSelfEvaluationVirtualQuestionBlock($this->parent->object->getId());
+                $virtual_blocks[$block_nr]->setTitle($this->pl->txt("mixed_block_title").$block_nr);
+                $virtual_blocks[$block_nr]->setDescription($this->pl->txt("mixed_block_title").$block_nr);
+            }
+            $virtual_blocks[$block_nr]->addQuestion($question);
+            $questions_in_block++;
+        }
+
+        foreach($virtual_blocks as $virtual_block){
+            $return_blocks[] = $virtual_block;
+        }
+
+        foreach($meta_blocks_end_form as $meta_block){
+            $return_blocks[] = $meta_block;
+        }
+
+        return $return_blocks;
+    }
+
+    protected function displaySingleBlock($blocks, $mode = 'new'){
         $page = $_GET['page'] ? $_GET['page'] : 1;
-        $blocks = $factory->getAllBlocks();
         $last_page = count($blocks);
 
         if ($last_page > 1) {
@@ -216,20 +276,27 @@ class ilSelfEvaluationPresentationGUI {
 
     }
 
-    protected function displayAllBlocks($mode = 'new'){
-
-        $factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
-        foreach ($factory->getAllBlocks() as $block) {
+    protected function displayAllBlocks($blocks, $mode = 'new'){
+        foreach ($blocks as $block) {
             $this->addBlockHtmlToForm($block);
         }
         $this->form->addCommandButton($mode . 'Data', $this->pl->txt('send_' . $mode));
     }
 
     protected function addBlockHtmlToForm($block){
+        $gui_class = "";
+        switch(get_class($block)){
+            case 'ilSelfEvaluationQuestionBlock':
+            case 'ilSelfEvaluationVirtualQuestionBlock':
+                $gui_class = 'ilSelfEvaluationQuestionBlockPresentationGUI';
+                break;
+            case 'ilSelfEvaluationMetaBlock':
+                $gui_class = 'ilSelfEvaluationMetaBlockPresentationGUI';
+                break;
+        }
         /**
-         * @var ilSelfEvaluationBlockGUI $block_gui
+         * @var $block_gui ilSelfEvaluationBlockPresentationGUI
          */
-        $gui_class = get_class($block) . 'PresentationGUI';
         $block_gui = new $gui_class($this->parent, $block);
         $this->form = $block_gui->getBlockForm($this->form);
     }
@@ -265,12 +332,10 @@ class ilSelfEvaluationPresentationGUI {
 	public function newData() {
 		$this->initPresentationForm();
 		if ($this->form->checkinput()) {
-			if (is_array($_SESSION['xsev_data'])) {
-				$_POST = array_merge($_SESSION['xsev_data'], $_POST);
-				$_SESSION['xsev_data'] = '';
-			}
-			$dataset = ilSelfEvaluationDataset::_getNewInstanceForIdentifierId($this->identity->getId());
-			$dataset->saveValuesByPost($_POST);
+            $dataset = ilSelfEvaluationDataset::_getNewInstanceForIdentifierId($this->identity->getId());
+            $dataset->setCreationDate($_SESSION['xsev_data']['creation_date_dataset']);
+			$dataset->saveValuesByPost(array_merge($_SESSION['xsev_data'], $_POST));
+            $_SESSION['xsev_data'] = '';
 			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
 			$this->redirectToResults($dataset);
 		}

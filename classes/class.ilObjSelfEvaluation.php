@@ -46,9 +46,9 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	const SHUFFLE_OFF = 1;
 	const SHUFFLE_IN_BLOCKS = 2;
 	const SHUFFLE_ACROSS_BLOCKS = 3;
+
 	const DISPLAY_TYPE_SINGLE_PAGE = 1; // Single Page
 	const DISPLAY_TYPE_MULTIPLE_PAGES = 2; // Multiple Pages
-	const DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED = 3; // All Questions on one Page, shuffled
 	/**
 	 * @var bool
 	 */

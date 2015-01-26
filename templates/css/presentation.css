@@ -17,19 +17,29 @@ h4 {
 }
 
 .ilUnitEven {
-    background-color: #747474;
+    background-color: #dedede;
 }
 
 .ilUnitOdd {
-    background-color: #cbcbcb;
+    background-color: #eff2ff;
 }
 
 
 .block-question{
     border-bottom:  1px solid  #a1a1a1;
-
+}
+.block-question div.question-text{
+    padding-top: 4px;
 }
 
+.block-question .rating td{
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+.block-question .rating .inputs{
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
 .rating, .block-commands{
     padding-right: 0px;
     padding-left: 0px;
@@ -37,6 +47,11 @@ h4 {
 .table {
     margin-bottom: 0px;
     table-layout: fixed;
+}
+
+.row div.ilFormFooter{
+    padding-left: 0;
+    background-color: transparent;
 }
 
 .knob-col{

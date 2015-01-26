@@ -352,14 +352,24 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		// online
 		$cb = new ilCheckboxInputGUI($this->txt('online'), 'online');
 		$this->form->addItem($cb);
+
+        $section = new ilFormSectionHeaderGUI();
+        $section->setTitle($this->txt('help_text_section'));
+        $this->form->addItem($section);
+
+        //////////////////////////////
+        /////////Text Section////////
+        //////////////////////////////
 		// intro
 		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('intro'), 'intro');
 		$te->disableButtons(self::$disabled_buttons);
+        $te->setInfo($this->txt('intro_info'));
 		$this->form->addItem($te);
 		// outro
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('outro'), 'outro');
 		$te->disableButtons(self::$disabled_buttons);
+        $te->setInfo($this->txt('outro_info'));
 		$this->form->addItem($te);
 		// identity selection info text for anonymous users
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('identity_selection'), 'identity_selection_info');
@@ -367,6 +377,12 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
 
+        //////////////////////////////
+        /////////Block Section////////
+        //////////////////////////////
+        $section = new ilFormSectionHeaderGUI();
+        $section->setTitle($this->txt('block_section'));
+        $this->form->addItem($section);
 
         //Ordering of Questions in Blocks
         $radio_options = new ilRadioGroupInputGUI($this->getPluginObject()->txt(self::FIELD_ORDER_TYPE),self::FIELD_ORDER_TYPE);
@@ -378,34 +394,40 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         $option_random->addSubItem($nr_input);
 
         $option_block = new ilRadioOption($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK),self::FIELD_ORDER_BLOCK);
+        $option_block->setInfo($this->getPluginObject()->txt("block_option_block_info"));
 
         $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK_RANDOM), self::FIELD_ORDER_BLOCK_RANDOM);
-        $option_block->addSubItem($cb);
-
-        // Show question block titles during evaluation
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_sev'), 'show_block_titles_sev');
-        $option_block->addSubItem($cb);
-
-        // Show question block descriptions during evaluation
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_sev'), 'show_block_desc_sev');
         $option_block->addSubItem($cb);
 
         $radio_options->addOption($option_random);
         $radio_options->addOption($option_block);
         $radio_options->setRequired(true);
-
         $this->form->addItem($radio_options);
-
 
         // DisplayType
         $se = new ilSelectInputGUI($this->getPluginObject()->txt('display_type'), 'display_type');
+        $se->setInfo($this->getPluginObject()->txt("display_type_info"));
         $opt = array(
             ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->getPluginObject()->txt('single_page'),
             ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->getPluginObject()->txt('multiple_pages'),
-            //			ilObjSelfEvaluation::DISPLAY_TYPE_ALL_QUESTIONS_SHUFFLED => $this->getPluginObject()->txt('all_questions_shuffled'),
         );
         $se->setOptions($opt);
         $this->form->addItem($se);
+
+        // Show question block titles during evaluation
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_sev'), 'show_block_titles_sev');
+        $this->form->addItem($cb);
+
+        // Show question block descriptions during evaluation
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_sev'), 'show_block_desc_sev');
+        $this->form->addItem($cb);
+
+        //////////////////////////////
+        /////////Feedback Section/////
+        //////////////////////////////
+        $section = new ilFormSectionHeaderGUI();
+        $section->setTitle($this->txt('feedback_section'));
+        $this->form->addItem($section);
 
 		// Show question block titles during feedback
 		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_fb'), 'show_block_titles_fb');
@@ -425,13 +447,18 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$cb_a->setValue(1);
 		$cb->addSubItem($cb_a);
 		$this->form->addItem($cb);
+
+        //////////////////////////////
+        /////////Scale Section////////
+        //////////////////////////////
+        // Append
+        $aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
+        $this->form = $aform->appendToForm($this->form);
+
 		// Buttons
 		$this->form->addCommandButton('updateProperties', $this->txt('save'));
 		$this->form->setTitle($this->txt('edit_properties'));
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
-		// Append
-		$aform = new ilSelfEvaluationScaleFormGUI($this->object->getId(), $this->object->hasDatasets());
-		$this->form = $aform->appendToForm($this->form);
 	}
 
 

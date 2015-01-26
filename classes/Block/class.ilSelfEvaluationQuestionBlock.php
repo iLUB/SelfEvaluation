@@ -16,7 +16,6 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
 	 */
 	protected $abbreviation = '';
 
-
 	/**
 	 * @param ilSelfEvaluationQuestionBlock $block
 	 * @param stdClass                      $rec
@@ -56,7 +55,6 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
 		return 'rep_robj_xsev_block';
 	}
 
-
 	/**
 	 * @return ilSelfEvaluationBlockTableRow
 	 */
@@ -67,6 +65,9 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
 		return $row;
 	}
 
+    /**
+     * @return ilSelfEvaluationQuestion[]
+     */
     public function getQuestions(){
         return(ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->getId()));
     }

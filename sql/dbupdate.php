@@ -215,10 +215,27 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
-        'type' => 'integer',
-        'length' => 4,
-    );
-    $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'sort_random_nr_items_block', $field);
+    if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'sort_random_nr_items_block')) {
+        $field = array(
+            'type' => 'integer',
+            'length' => 4,
+        );
+        $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'sort_random_nr_items_block', $field);
+    }
+}
+?>
+<#12>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilSelfEvaluationData::TABLE_NAME)) {
+    if (!$ilDB->tableColumnExists(ilSelfEvaluationData::TABLE_NAME, 'creation_date')) {
+        $field = array(
+            'type' => 'integer'
+        );
+        $ilDB->addTableColumn(ilSelfEvaluationData::TABLE_NAME, 'creation_date', $field);
+    }
 }
 ?>

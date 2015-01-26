@@ -16,6 +16,15 @@ class ilSelfEvaluationQuestionBlockPresentationGUI extends ilSelfEvaluationBlock
     protected $object;
 
     /**
+     * @param ilObjSelfEvaluationGUI $parent
+     * @param ilSelfEvaluationQuestionBlockInterface  $block
+     */
+    function __construct(ilObjSelfEvaluationGUI $parent,ilSelfEvaluationQuestionBlockInterface $block) {
+        $this->object = $block;
+        $this->parent = $parent;
+    }
+
+    /**
      * @param ilSelfEvaluationPresentationFormGUI $parent_form
      * @param bool              $first
      *

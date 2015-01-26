@@ -14,7 +14,14 @@ class ilSelfEvaluationMetaBlockPresentationGUI  extends ilSelfEvaluationBlockPre
      */
     protected $object;
 
-
+    /**
+     * @param ilObjSelfEvaluationGUI $parent
+     * @param ilSelfEvaluationMetaBlock  $block
+     */
+    function __construct(ilObjSelfEvaluationGUI $parent,ilSelfEvaluationMetaBlock $block) {
+        $this->object = $block;
+        $this->parent = $parent;
+    }
     /**
      * @param ilPropertyFormGUI $parent_form
      * @param bool              $first

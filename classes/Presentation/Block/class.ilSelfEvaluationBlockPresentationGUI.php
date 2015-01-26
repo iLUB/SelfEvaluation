@@ -17,15 +17,6 @@ abstract class ilSelfEvaluationBlockPresentationGUI {
     protected $parent;
 
     /**
-     * @param ilObjSelfEvaluationGUI $parent
-     * @param ilSelfEvaluationBlock  $block
-     */
-    function __construct(ilObjSelfEvaluationGUI $parent,ilSelfEvaluationBlock $block) {
-        $this->object = $block;
-        $this->parent = $parent;
-    }
-
-    /**
      * @param ilSelfEvaluationPresentationFormGUI $parent_form
      * @return ilPropertyFormGUI|ilSelfEvaluationPresentationFormGUI
      */

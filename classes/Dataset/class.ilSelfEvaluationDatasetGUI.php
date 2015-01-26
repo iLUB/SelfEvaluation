@@ -3,6 +3,8 @@ require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedbackGUI.php');
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once('class.ilSelfEvaluationDatasetTableGUI.php');
+require_once('class.ilSelfEvaluationCsvExport.php');
+
 /**
  * GUI-Class ilSelfEvaluationResultsGUI
  *
@@ -160,6 +162,12 @@ class ilSelfEvaluationDatasetGUI {
 		ilUtil::sendSuccess($this->pl->txt('all_datasets_deleted'));
 		$this->ctrl->redirect($this, 'index');
 	}
+
+    public function exportCsv() {
+        $csvExport = new ilSelfEvaluationCsvExport($this->pl, ilObject2::_lookupObjectId($_GET['ref_id']));
+        $csvExport->getCsvExport();
+        exit;
+    }
 }
 
 ?>

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * interface ilSerlfEvaluationQuestionBlock
+ * interface ilSelfEvaluationQuestionBlockInterface
  *
  * @author       Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  *
  * @version 2.0.6
  */
-interface ilSerlfEvaluationQuestionBlock {
+interface ilSelfEvaluationQuestionBlockInterface {
     /**
      * @return int
      */
@@ -36,6 +36,10 @@ interface ilSerlfEvaluationQuestionBlock {
      * @return string
      */
     public function getAbbreviation();
+    /**
+     * @return ilSelfEvaluationQuestion[]
+     */
+    public function getQuestions();
 }
 
 ?>
