@@ -161,6 +161,9 @@ class ilSelfEvaluationPresentationGUI {
 
 	public function startEvaluation() {
 		$this->initPresentationForm();
+        if(!is_array($_SESSION['xsev_data']) || !array_key_exists('creation_date_dataset',$_SESSION['xsev_data'] )){
+            $_SESSION['xsev_data']['creation_date_dataset'] = time();
+        }
 		$this->tpl->setContent($this->form->getHTML());
 	}
 

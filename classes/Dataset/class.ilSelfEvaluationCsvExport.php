@@ -113,11 +113,15 @@ class ilSelfEvaluationCsvExport extends csvExport{
         foreach($this->getDatasets() as $dataset)
         {
             $row = new csvExportRow();
-            ;
             $row->addValue(new csvExportValue("identity", substr(md5($dataset->getIdentifierId()), 0, 8)));
-            $row->addValue(new csvExportValue("starting_date", date($this->getDateFormat(),$dataset->getCreationDate())));
-            $row->addValue(new csvExportValue("ending_date", date($this->getDateFormat(),$dataset->getSubmitDate())));
-            $row->addValue(new csvExportValue("duration", $dataset->getDuration()));
+            try{
+                $row->addValue(new csvExportValue("starting_date", date($this->getDateFormat(),$dataset->getCreationDate())));
+                $row->addValue(new csvExportValue("ending_date", date($this->getDateFormat(),$dataset->getSubmitDate())));
+                $row->addValue(new csvExportValue("duration", $dataset->getDuration()));
+            }catch(Exception $e){
+                $row->addValue(new csvExportValue("Error", "Invalid Date"));
+            }
+
 
             $entries = ilSelfEvaluationData::_getAllInstancesByDatasetId($dataset->getId());
             foreach($entries as $entry){

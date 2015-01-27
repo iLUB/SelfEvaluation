@@ -525,17 +525,28 @@ class ilSelfEvaluationDataset {
 
     /**
      * @return int
+     * @throws Exception
      */
     public function getSubmitDate(){
         $latest_entry = ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId());
-        return $latest_entry->getCreationDate();
+        if($latest_entry){
+            return $latest_entry->getCreationDate();
+        } else {
+            throw new Exception("Invalid Date");
+        }
     }
 
     /**
      * @return int
+     * @throws Exception
      */
     public function getDuration(){
-        return ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId())->getCreationDate()-$this->getCreationDate();
+        $latest_entry = ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId());
+        if($latest_entry){
+            return $latest_entry->getCreationDate()-$this->getCreationDate();
+        } else {
+            throw new Exception("Invalid Date");
+        }
     }
 
 	//
