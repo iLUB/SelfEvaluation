@@ -45,23 +45,23 @@ edit_feedback#:#Feedback bearbeiten
 
 help_text_section#:#Hilfstexte
 intro#:#Einleitungstext
-intro_info#:#Erster Text, welcher beim öffnen einer Selbstevaluation angezeigt wird.
+intro_info#:#Erster Text, welcher beim Öffnen einer Selbstevaluation angezeigt wird.
 outro#:#Abschliessender Text
 outro_info#:#Text welcher nach beendigung der Selbstevaluation angezeigt wird.
-identity_selection#:#Standardtext zu der Identitätsauswahl bei anonymen Selbstevaluationen
-identity_selection_info#:#Dieser Text wird den anonymen Nutzern des SelfEvaluation Plugins angezeigt.
+identity_selection#:#Standardtext zur Identitätsauswahl bei anonymen Selbstevaluationen
+identity_selection_info#:#Dieser Text wird den anonymen Nutzern des Selbstevaluations Plugins angezeigt.
 
 block_section#:#Darstellung im Fragebogen
 block_presentation_type#:#Blockaufteilung der Fragen
-block_option_random#:#Fragen zufällig auf verschiedene Blocks aufteilen.
-block_option_random_info#:#Die Fragen werden während dem bearbeiten der Selbstevaluation zufällig auf künstliche Blocks aufgeteilt. </br>Die Reihenfolge dieser künstlichen Blocks ist zufällig. Es werden generische Titel und Beschreibungen für diese Blocks automatisch erstellt.</br> In der Auswertung werden die Antworten dann wieder den originalen Blocks zugeordnet.
+block_option_random#:#Fragen zufällig auf verschiedene Blöcke aufteilen.
+block_option_random_info#:#Die Fragen werden während dem Bearbeiten der Selbstevaluation zufällig auf auf künstliche Blöcke aufgeteilt. </br>Die Reihenfolge dieser künstlichen Blöcke ist zufällig. Es werden generische Titel und Beschreibungen für diese Blöcke automatisch erstellt.</br> In der Auswertung werden die Antworten dann wieder den originalen Blöcken zugeordnet.
 sort_random_nr_items_block#:#Anzahl der Fragen pro Block bei zufälliger Aufteilung
-block_option_block#:#Die Fragen werden in denselben Blocks dargestellt wie auch in der Auswertung.
+block_option_block#:#Fragendarstellung und Fragenauswertung in denselben Blöcken.
 block_option_block_info#:#Reihenfolge, Titel und Beschreibugen werden in dieser Option aus den Einstellungen übernommen.
-display_type#:#Darstellung der Blocks
-single_page#:#Alle Blocks auf einer Seite
+display_type#:#Darstellung der Blöcke
+single_page#:#Alle Blöcke auf einer Seite
 multiple_pages#:#Eine Seite pro Block
-display_type_info#:#Darstellung der Blocks beim Ausfüllen der Selbstevaluation.
+display_type_info#:#Darstellung der Blöcke beim Ausfüllen der Selbstevaluation.
 show_block_titles_sev#:#Titel der Frageblöcke während der Selbstevaluation anzeigen
 show_block_desc_sev#:#Beschreibung der Frageblöcke während der Selbstevaluation anzeigen
 
@@ -108,7 +108,7 @@ msg_obj_modified#:#Änderungen gespeichert
 scale#:#Skala
 send_new#:#Speichern
 anonymous_access_failed#:#Kein Zugriff. Bitte loggen sie sich ein.
-back_to_blocks#:#Zurück zu den Frageblocks
+back_to_blocks#:#Zurück zu den Frageblöcken
 is_inverse#:#Skala umkehren
 update_question#:#Frage bearbeiten
 resume_button#:#Antworten bearbeiten
