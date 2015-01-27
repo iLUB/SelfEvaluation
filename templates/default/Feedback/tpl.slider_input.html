@@ -1,6 +1,7 @@
 <div class="fsx_slider">
 	<script type="text/javascript">
 		$(document).ready(function () {
+            var autocorrect = false;
 			$('div#{POSTVAR}').slider({
 				range: true,
 				min: {MIN},
@@ -22,15 +23,23 @@
 
 					$.getJSON(link, function (data) {
 						if (!data.check) {
+                            console.log("hit");
 							$('#warn_{POSTVAR}').slideDown(200);
 							$('#warn_{POSTVAR}').parent('div.fsx_slider').addClass('slider_warning', 400);
 							$('#{POSTVAR}').slider('values', [data.next_from, data.next_to]);
 							$('#{POSTVAR}_from').val(data.next_from);
 							$('#{POSTVAR}_to').val(data.next_to);
 							$('#amount').val('' + data.next_from + '{UNIT}' + ' - ' + data.next_to + '{UNIT}');
-						} else {
-							$('#warn_{POSTVAR}').delay(3000).slideUp(200);
-							$('#warn_{POSTVAR}').parent('div.fsx_slider').delay(1000).removeClass('slider_warning', 400);
+                            autocorrect = true;
+                            console.log("hit");
+
+                        } else {
+                            if(autocorrect){
+                                $('#warn_{POSTVAR}').delay(7000).slideUp(200);
+                                $('#warn_{POSTVAR}').parent('div.fsx_slider').delay(7000).removeClass('slider_warning', 400);
+                                autocorrect = false;
+                            }
+
 						}
 					});
 
