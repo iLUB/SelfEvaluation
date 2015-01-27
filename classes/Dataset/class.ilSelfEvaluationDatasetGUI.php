@@ -82,37 +82,12 @@ class ilSelfEvaluationDatasetGUI {
 
 
 	public function index() {
-		$async = new ilOverlayRequestGUI();
 		$table = new ilSelfEvaluationDatasetTableGUI($this, 'index', $this->pl, $this->parent->object->getId());
-		$this->tpl->setContent($async->getHTML() . $table->getHTML());
+		$this->tpl->setContent($table->getHTML());
 
 		return;
 	}
 
-
-	/*public function listMyObjects() {
-		if ($this->i) {
-			$this->tabs_gui->setTabActive('my_results');
-		}
-		$se = new ilSelectInputGUI($this->pl->txt('select_result'), 'select_result');
-		foreach (ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($_GET['uid']) as $ds) {
-			$opt[$ds->getId()] = $this->pl->txt('dataset_from') . ' ' . date('d.m.Y - H:i:s', $ds->getCreationDate());
-		}
-		$se->setOptions($opt);
-		$this->toolbar->setFormAction($this->ctrl->getFormAction($this));
-		$this->toolbar->addInputItem($se);
-		$this->toolbar->addFormButton($this->pl->txt('select_result_button'), 'selectResult');
-		if ($this->parent->object->getAllowShowResults() AND $this->dataset->getId() != 0) {
-			$feedback = ilSelfEvaluationFeedbackGUI::_getPresentationOfFeedback($this->dataset, $this->parent->object->getAllowShowQuestions());
-			$header = '<h1>' . $this->pl->txt('dataset_from') . ' '
-				. date('d.m.Y - H:i:s', $this->dataset->getCreationDate()) . '</h1>';
-			$this->tpl->setContent($header . $feedback);
-		}
-		if (! $this->parent->object->getAllowShowResults()) {
-			ilUtil::sendFailure($this->pl->txt('msg_not_allowd_view_results'), true);
-			$this->ctrl->redirect($this->parent);
-		}
-	}*/
 	public function show() {
 		$content = $this->pl->getTemplate('default/Dataset/tpl.dataset_presentation.html');
 		$content->setVariable('INTRO_HEADER', $this->pl->txt('outro_header'));

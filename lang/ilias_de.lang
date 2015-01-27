@@ -89,7 +89,7 @@ scale_form#:#Skalierung
 create_question#:#Frage erstellen
 create_question_button#:#Frage erstellen
 question_body#:#Frage
-question_title_info#:#Der Titel wird für die Benennung der Feedback Grafiken verwendet.
+question_title_info#:#Der Titel wird für die Benennung der Feedback Grafiken verwendet (max. 8 Zeichen).
 add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke
 add_new_question_block#:#Frageblock hinzufügen

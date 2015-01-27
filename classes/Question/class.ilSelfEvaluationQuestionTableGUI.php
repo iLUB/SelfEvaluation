@@ -2,7 +2,6 @@
 require_once('./Services/Table/classes/class.ilTable2GUI.php');
 require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * TableGUI ilSelfEvaluationQuestionTableGUI
  *
@@ -48,7 +47,6 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		// Header
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', NULL);
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $block->getId());
-		$this->addHeaderCommand(ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'addQuestion')), $this->pl->txt('add_new_question'));
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Question/tpl.template_question_row.html');
 		$this->setData(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId(), true));
 	}
@@ -65,14 +63,14 @@ class ilSelfEvaluationQuestionTableGUI extends ilTable2GUI {
 		}
 		$this->tpl->setVariable('TITLE', $obj->getTitle() ? $obj->getTitle() :
 			$this->pl->txt('question') . ' ' . $this->block->getPosition() . '.' . $obj->getPosition());
-		$this->tpl->setVariable('EDIT_LINK', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
+		$this->tpl->setVariable('EDIT_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion'));
 		$this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
 		$this->tpl->setVariable('IS_INVERTED', $obj->getIsInverse() ? './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/ok.png' : './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/blank.png');
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('question_' . $obj->getId());
-		$ac->addItem($this->pl->txt('edit_question'), 'edit_question', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion')));
-		$ac->addItem($this->pl->txt('delete_question'), 'delete_question', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'deleteQuestion')));
+		$ac->addItem($this->pl->txt('edit_question'), 'edit_question', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion'));
+		$ac->addItem($this->pl->txt('delete_question'), 'delete_question', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'deleteQuestion'));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//
 		$this->tpl->setVariable('ACTIONS', $ac->getHTML());

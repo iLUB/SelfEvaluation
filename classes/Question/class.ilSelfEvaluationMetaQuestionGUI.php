@@ -75,7 +75,6 @@ class ilSelfEvaluationMetaQuestionGUI extends iLubFieldDefinitionContainerGUI {
 			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
 		parent::listFields();
 		$this->tpl->addJavaScript($this->plugin->getDirectory() . '/templates/sortable.js');
-		// TODO consider showing the question form as ilOverlayRequestGUI
 	}
 
 

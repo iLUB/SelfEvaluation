@@ -2,7 +2,6 @@
 require_once('./Services/Table/classes/class.ilTable2GUI.php');
 require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 require_once('class.ilSelfEvaluationDataset.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * TableGUI ilSelfEvaluationDatasetTableGUI
  *
@@ -80,8 +79,8 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		// Actions
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('dataset_' . $obj->getId());
-		$ac->addItem($this->pl->txt('show_feedback'), 'show_dataset', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'), true));
-		$ac->addItem($this->pl->txt('delete_dataset'), 'delete_dataset', ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDelete')));
+		$ac->addItem($this->pl->txt('show_feedback'), 'show_dataset', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'), true);
+		$ac->addItem($this->pl->txt('delete_dataset'), 'delete_dataset', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDelete'));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', 0);

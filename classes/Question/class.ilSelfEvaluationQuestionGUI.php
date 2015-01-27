@@ -5,7 +5,6 @@ require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
 require_once('class.ilSelfEvaluationQuestion.php');
 require_once('class.ilSelfEvaluationQuestionTableGUI.php');
 require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationQuestionBlock.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 
 /**
  * GUI-Class ilSelfEvaluationQuestionGUI
@@ -115,8 +114,7 @@ class ilSelfEvaluationQuestionGUI {
 		$this->form->setFormAction($this->ctrl->getFormAction($this));
 		$this->form->addCommandButton($mode . 'Object', $this->pl->txt($mode . '_question_button'));
 		$this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
-		$te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->pl->txt('question_body'), 'question_body');
+		$te = new ilTextAreaInputGUI($this->pl->txt('question_body'), 'question_body');
 		$te->setRequired(true);
 		$this->form->addItem($te);
 		$te = new ilTextInputGUI($this->pl->txt('short_title'), 'title');
@@ -197,12 +195,12 @@ class ilSelfEvaluationQuestionGUI {
 		if ($this->block->isBlockSortable()) {
 			$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
 		}
-		$async = new ilOverlayRequestGUI();
-		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addQuestion'));
-		$this->toolbar->addButton('<b>&lt;&lt; '.$this->pl->txt('back_to_blocks').'</b>',
-			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
+
+		$this->toolbar->addButton('&lt;&lt; '.$this->pl->txt('back_to_blocks'),$this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
+        $this->toolbar->addButton($this->pl->txt('add_new_question'),$this->ctrl->getLinkTarget($this, 'addQuestion'));
+
 		$table = new ilSelfEvaluationQuestionTableGUI($this, 'showContent', $this->block);
-		$this->tpl->setContent($async->getHTML() . $table->getHTML());
+		$this->tpl->setContent($table->getHTML());
 	}
 
 

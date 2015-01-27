@@ -348,7 +348,7 @@ class ilSelfEvaluationBlockTableRow {
 	 */
 	protected function getEditAction() {
 		$title = $this->pl->txt('edit_block');
-		$link = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass($this->block_gui_class, 'editBlock'));
+		$link = $this->ctrl->getLinkTargetByClass($this->block_gui_class, 'editBlock');
 		$cmd = 'edit_block';
 
 		return new ilSelfEvaluationTableAction($title, $cmd, $link);
@@ -360,7 +360,7 @@ class ilSelfEvaluationBlockTableRow {
 	 */
 	protected function getDeleteAction() {
 		$title = $this->pl->txt('delete_block');
-		$link = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTargetByClass($this->block_gui_class, 'deleteBlock'));
+		$link = $this->ctrl->getLinkTargetByClass($this->block_gui_class, 'deleteBlock');
 		$cmd = 'delete_block';
 
 		return new ilSelfEvaluationTableAction($title, $cmd, $link);

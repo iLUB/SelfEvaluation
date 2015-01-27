@@ -35,7 +35,6 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('actions'), 'asction', 'auto');
 
         $this->ctrl->setParameter($this->parent_obj, 'feedback_id', NULL);
-        $this->addHeaderCommand($this->ctrl->getLinkTarget($a_parent_obj, 'addNew'), $this->pl->txt('add_new_feedback'));
 
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Feedback/tpl.template_feedback_row.html');
 		$this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->block->getId(), true));

@@ -5,7 +5,6 @@ require_once('class.ilSelfEvaluationFeedback.php');
 require_once('class.ilSelfEvaluationFeedbackTableGUI.php');
 require_once('class.ilSliderInputGUI.php');
 require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilOverlayRequestGUI.php');
 /**
  * GUI-Class ilSelfEvaluationFeedbackGUI
  *
@@ -117,13 +116,12 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	public function listObjects() {
-		$async = new ilOverlayRequestGUI();
-		$async->setAddNewLink($this->ctrl->getLinkTarget($this, 'addNew'));
-		$this->toolbar->addButton('<b>&lt;&lt; ' . $this->pl->txt('back_to_blocks') . '</b>',
-			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
+        $this->toolbar->addButton('&lt;&lt; ' . $this->pl->txt('back_to_blocks'),$this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
+        $this->toolbar->addButton($this->pl->txt('add_new_feedback'),$this->ctrl->getLinkTarget($this, 'addNew'));
+
 		$ov = $this->getOverview();
 		$table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects', $this->block);
-		$this->tpl->setContent($async->getHTML() . $ov->get() . '<br><br>' . $table->getHTML());
+		$this->tpl->setContent($ov->get() . '<br><br>' . $table->getHTML());
 	}
 
 
@@ -343,21 +341,19 @@ class ilSelfEvaluationFeedbackGUI {
 	 * @param int    $value
 	 * @param string $title
 	 */
-	public function parseOverviewBlock($type, $width, $value, $title = '') { //$width, $title, $href, $css = '', $start_value = NULL) {
+	public function parseOverviewBlock($type, $width, $value, $title = '') {
 		$href = '';
 		$css = '';
 		switch ($type) {
 			case 'blank':
 				$this->ctrl->setParameter($this, 'feedback_id', NULL);
 				$this->ctrl->setParameter($this, 'start_value', $value);
-//				$href = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTarget($this, 'addNew')); // auskommentiert da es unsinng scheint. TODO remove
 				$href = ($this->ctrl->getLinkTarget($this, 'addNew'));
 				$css = '_blank';
 				$title = $this->pl->txt('insert_feedback');
 				break;
 			case 'fb':
 				$this->ctrl->setParameter($this, 'feedback_id', $value);
-//				$href = ilOverlayRequestGUI::getLink($this->ctrl->getLinkTarget($this, 'editFeedback')); // auskommentiert da es unsinng scheint. TODO remove
 				$href = ($this->ctrl->getLinkTarget($this, 'editFeedback'));
 				break;
 		}

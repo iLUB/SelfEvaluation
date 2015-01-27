@@ -42,15 +42,24 @@ class ilSelfEvaluationListBlocksGUI {
 	 */
 	protected $parent;
 
+    /**
+     * @var ilToolbarGUI
+     */
+    protected $toolbar;
+
 
 	/**
 	 * @param ilObjSelfEvaluationGUI $parent
 	 */
 	public function __construct(ilObjSelfEvaluationGUI $parent) {
-		global $ilCtrl;
-
+		global $ilCtrl,$ilToolbar;
+        /**
+         * @var $ilCtrl    ilCtrl
+         * @var $ilToolbar ilToolbarGUI
+         */
 		$this->ctrl = $ilCtrl;
 		$this->parent = $parent;
+        $this->toolbar = $ilToolbar;
 	}
 
 
@@ -94,19 +103,13 @@ class ilSelfEvaluationListBlocksGUI {
 		global $tpl;
 
 		$tpl->addJavaScript($this->parent->getPluginObject()->getDirectory() . '/templates/js/sortable.js');
-		$async = new ilOverlayRequestGUI();
-//		$async->setAddNewLink($this->ctrl->getLinkTargetByClass('ilselfevaluationquestionblockgui', 'addBlock')); // TODO is this needed?
 		$table = new ilSelfEvaluationBlockTableGUI($this->parent, 'showContent');
 
 		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI', 'block_id', NULL);
-		$question_block_link = ilOverlayRequestGUI::getLink(
-			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionBlockGUI', 'addBlock'));
-		$table->addHeaderCommand($question_block_link, $this->txt('add_new_question_block'));
+        $this->toolbar->addButton($this->txt('add_new_question_block'),$this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionBlockGUI', 'addBlock'));
 
 		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', NULL);
-		$meta_block_link = ilOverlayRequestGUI::getLink(
-			$this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaBlockGUI', 'addBlock'));
-		$table->addHeaderCommand($meta_block_link, $this->txt('add_new_meta_block'));
+        $this->toolbar->addButton($this->txt('add_new_meta_block'),$this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaBlockGUI', 'addBlock'));
 
 		$factory = new ilSelfEvaluationBlockFactory($this->getSelfEvalId());
 		$blocks = $factory->getAllBlocks();
@@ -117,7 +120,7 @@ class ilSelfEvaluationListBlocksGUI {
 		}
 
 		$table->setData($table_data);
-		$tpl->setContent($async->getHTML() . $table->getHTML());
+		$tpl->setContent($table->getHTML());
 	}
 
 
