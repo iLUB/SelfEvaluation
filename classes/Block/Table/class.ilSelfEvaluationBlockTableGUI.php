@@ -73,12 +73,13 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		} else {
 			$this->tpl->setCurrentBlock('feedback_count_with_link');
 			$this->tpl->setVariable('COUNT_FEEDBACKS', $a_set['feedback_count']);
+            $this->tpl->setVariable('FEEDBACK_LINK', $a_set['feedback_link']);
 			$this->tpl->parseCurrentBlock();
 			$this->tpl->setCurrentBlock('status_img_with_link');
 			$this->tpl->setVariable('FEEDBACK_STATUS', $a_set['status_img']);
-			$this->tpl->parseCurrentBlock();
 			$this->tpl->setVariable('FEEDBACK_LINK', $a_set['feedback_link']);
-		}
+            $this->tpl->parseCurrentBlock();
+        }
 		// Actions
 		require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
 		$ac = new ilAdvancedSelectionListGUI();
