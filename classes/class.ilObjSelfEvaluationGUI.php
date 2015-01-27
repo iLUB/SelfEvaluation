@@ -535,6 +535,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'editProperties');
 		}
+        $this->tabs_gui->activateTab('properties');
 		$this->form->setValuesByPost();
 		$this->tpl->setContent($this->form->getHtml());
 	}
