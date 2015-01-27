@@ -26,7 +26,7 @@ class ilTinyMceTextAreaInputGUI extends ilTextAreaInputGUI {
 	public function __construct(ilObjSelfEvaluation $object, $a_title = "", $a_postvar = "") {
 		parent::__construct($a_title, $a_postvar);
 		$this->setUseRte(true);
-		$this->setRTESupport($object->getRefId(), "plugin", $object->getType(), NULL, FALSE, '3.4.7');
+		$this->setRTESupport($object->getRefId(), $object->getType(), '', NULL, FALSE, '3.4.7');
 		$this->setRteTagSet('extended_img');
 	}
 }

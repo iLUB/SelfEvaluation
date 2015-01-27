@@ -32,6 +32,7 @@ require_once('class.ilObjSelfEvaluation.php');
  *
  * @author        Alex Killing <alex.killing@gmx.de>
  * @author        fabian Schmid <fabian.schmid@ilub.unibe.ch>
+ * @author       Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version       $Id$
  */
 class ilObjSelfEvaluationAccess extends ilObjectPluginAccess {
@@ -46,7 +47,7 @@ class ilObjSelfEvaluationAccess extends ilObjectPluginAccess {
 	 * @return bool
 	 */
 	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = '') {
-		/** @var ilAccessHandler $ilAccess */
+		/** @var ilAccessHandler $ilAccess
 		global $ilUser, $ilAccess;
 		if ($a_user_id == '') {
 			$a_user_id = $ilUser->getId();
@@ -59,7 +60,7 @@ class ilObjSelfEvaluationAccess extends ilObjectPluginAccess {
 					return true;
 				}
 				break;
-		}
+		}*/
 
 		return true;
 	}
@@ -78,6 +79,20 @@ class ilObjSelfEvaluationAccess extends ilObjectPluginAccess {
 
 		return (boolean)$rec['is_online'];
 	}
+
+    static function checkWebAccess($a_ref_id){
+        global $ilUser, $ilAccess;
+
+        $a_user_id = $ilUser->getId();
+        $a_obj_id = ilObject::_lookupObjectId($a_ref_id);
+
+        if (! ilObjSelfEvaluationAccess::checkOnline($a_obj_id)
+            AND ! $ilAccess->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id)
+        ) {
+            return false;
+        }
+        return true;
+    }
 
 }
 
