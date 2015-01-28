@@ -47,20 +47,24 @@ class ilObjSelfEvaluationAccess extends ilObjectPluginAccess {
 	 * @return bool
 	 */
 	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = '') {
-		/** @var ilAccessHandler $ilAccess
-		global $ilUser, $ilAccess;
+        global $ilUser, $ilAccess;
+        /**
+         * @var ilAccessHandler $ilAccess
+         * */
+
 		if ($a_user_id == '') {
 			$a_user_id = $ilUser->getId();
 		}
 		switch ($a_permission) {
 			case 'read':
+            case 'visible':
 				if (! ilObjSelfEvaluationAccess::checkOnline($a_obj_id)
 					AND ! $ilAccess->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id)
 				) {
-					return true;
+					return false;
 				}
 				break;
-		}*/
+		}
 
 		return true;
 	}
