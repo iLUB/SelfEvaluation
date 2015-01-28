@@ -39,6 +39,7 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 		$tpl = $pl->getTemplate('default/Form/tpl.matrix_input.html');
 
         $even = false;
+        $tpl->setVariable('ROW_NAME', $this->getPostVar());
 		foreach ($this->getScale() as $value => $title) {
 			$tpl->setCurrentBlock('item');
 			if ($this->getValue() == $value AND $this->getValue() !== NULL AND $this->getValue() !== '') {

@@ -21,12 +21,20 @@ function scaleUnits(){
         });
     }
 
+    this.scaleMatrix = function() {
+        $(".matrix-row-input").each(function() {
+            parent = $(this).parents(".block-question");
+            $(this).height(parent.children(".question-text").outerHeight());
+        });
+    }
+
     $( window ).resize(function() {
         self.updateScaleUnits();
+        self.scaleMatrix();
+
     });
 
     $( window ).load(function() {
-        console.log(self);
         var self = this;
         $(".scale-units td div").each(function() {
             var id = $(this).attr("id");
@@ -34,5 +42,6 @@ function scaleUnits(){
         });
 
         self.updateScaleUnits();
+        self.scaleMatrix();
     });
 }
