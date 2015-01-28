@@ -131,6 +131,7 @@ class ilSelfEvaluationQuestionGUI {
 	public function createObject() {
 		$this->initQuestionForm();
 		if ($this->form->checkInput()) {
+            $this->object = new ilSelfEvaluationQuestion();
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setQuestionBody($this->form->getInput('question_body'));
 			$this->object->setIsInverse($this->form->getInput('is_inverse'));
