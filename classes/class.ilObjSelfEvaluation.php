@@ -320,9 +320,14 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @return bool
 	 */
 	public function isActive() {
-		return ((boolean)$this->getOnline() AND $this->hasBlocks() AND $this->areFeedbacksComplete()) ? true : false;
+		return ((boolean)$this->getOnline() AND $this->hasBlocks() AND $this->areFeedbacksComplete() AND $this->hasScale()) ? true : false;
 	}
-
+    /**
+     * @return bool
+     */
+    public function hasScale() {
+        return count(ilSelfEvaluationScale::_getInstanceByRefId($this->getId())->getUnitsAsArray())==0 ? false: true;
+    }
 
 	/**
 	 * @return bool
