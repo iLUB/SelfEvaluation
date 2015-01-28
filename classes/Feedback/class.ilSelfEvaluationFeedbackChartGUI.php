@@ -61,7 +61,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 		$blocks = array();
 		foreach ($data_set->getFeedbacksPerBlock() as $block_id => $fb) {
             $block = new ilSelfEvaluationQuestionBlock($block_id);
-            
+
             if($obj->getShowFeedbacksCharts() || $obj->getShowBlockTitlesDuringFeedback() || $obj->getShowBlockDescriptionsDuringFeedback() || $obj->getShowFeedbacks()){
                 $tpl->setCurrentBlock('feedback');
 
