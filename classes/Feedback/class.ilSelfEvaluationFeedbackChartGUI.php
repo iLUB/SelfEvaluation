@@ -60,48 +60,59 @@ class ilSelfEvaluationFeedbackChartGUI {
 		$percentages = $data_set->getPercentagePerBlock();
 		$blocks = array();
 		foreach ($data_set->getFeedbacksPerBlock() as $block_id => $fb) {
-			// Chart
-			$tpl->setCurrentBlock('feedback');
-			if ($obj->getShowFeedbacksCharts()) {
-				$scale = ilSelfEvaluationScale::_getInstanceByRefId($obj->getId());
-				$units = $scale->getUnitsAsArray();
-				$max_cnt = max(array_keys($units));
+            $block = new ilSelfEvaluationQuestionBlock($block_id);
+            
+            if($obj->getShowFeedbacksCharts() || $obj->getShowBlockTitlesDuringFeedback() || $obj->getShowBlockDescriptionsDuringFeedback() || $obj->getShowFeedbacks()){
+                $tpl->setCurrentBlock('feedback');
 
-				$bar_chart = $this->getFeedbackBlockBarChart($data_set, $block_id, $color_id, $units);
-				$tpl->setVariable('BAR_CHART', $bar_chart->getHTML());
-				$tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
+                $tpl->setVariable('FEEDBACK_ID', 'xsev_fb_id_' . $fb->getId());
 
-				$spider_chart = $this->getFeedbackBlockSpiderChart($data_set, $block_id, $color_id, $max_cnt);
-				$tpl->setVariable('SPIDER_CHART', $spider_chart->getHTML());
-				$tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
-			}
-			$block = new ilSelfEvaluationQuestionBlock($block_id);
-			$abbreviation = $block->getAbbreviation();
-			$block_label = $abbreviation == '' ? $block->getTitle() : $abbreviation;
-			if ($obj->getShowFeedbacks()) {
-				// Template
-				if ($obj->getShowBlockTitlesDuringFeedback()) {
-					$tpl->setVariable('BLOCK_TITLE', $block->getTitle());
-					if ($abbreviation != '') {
-						$tpl->setCurrentBlock('block_abbreviation');
-						$tpl->setVariable('BLOCK_ABBREVIATION', $abbreviation);
-						$tpl->parseCurrentBlock();
-						$tpl->setCurrentBlock('feedback');
-					}
-				} else if ($obj->getShowFeedbacksOverview()) {
-					// Display a generic title when titles are not allowed but a mapping from overview to block is needed
-					$block_label = $this->pl->txt('block') . ' ' . ($color_id + 1);
-					$tpl->setVariable('BLOCK_TITLE', $block_label);
-				}
-				if ($obj->getShowBlockDescriptionsDuringFeedback()) {
-					$tpl->setVariable('BLOCK_DESCRIPTION', $block->getDescription());
-				}
-				$tpl->setVariable('WIDTH', self::WIDTH);
-				$tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
-				$tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
-				$tpl->setVariable('FEEDBACK_ID', 'xsev_fb_id_' . $fb->getId());
-				$tpl->parseCurrentBlock();
-			}
+                if ($obj->getShowBlockTitlesDuringFeedback()) {
+                    $abbreviation = $block->getAbbreviation();
+                    $tpl->setVariable('BLOCK_TITLE', $block->getTitle());
+                    if ($abbreviation != '') {
+                        $tpl->setCurrentBlock('block_abbreviation');
+                        $tpl->setVariable('BLOCK_ABBREVIATION', $abbreviation);
+                        $tpl->parseCurrentBlock();
+                        $tpl->setCurrentBlock('feedback');
+                    }
+                } else {
+                    // Display a generic title when titles are not allowed but a mapping from overview to block is needed
+                    $block_label = $this->pl->txt('block') . ' ' . ($color_id + 1);
+                    $tpl->setVariable('BLOCK_TITLE', $block_label);
+                }
+                if ($obj->getShowBlockDescriptionsDuringFeedback()) {
+                    $tpl->setVariable('BLOCK_DESCRIPTION', $block->getDescription());
+                }
+
+                if ($obj->getShowFeedbacksCharts()) {
+                    $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj->getId());
+                    $units = $scale->getUnitsAsArray();
+                    $max_cnt = max(array_keys($units));
+
+                    $bar_chart = $this->getFeedbackBlockBarChart($data_set, $block_id, $color_id, $units);
+                    $tpl->setVariable('BAR_CHART', $bar_chart->getHTML());
+                    $tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
+
+                    $spider_chart = $this->getFeedbackBlockSpiderChart($data_set, $block_id, $color_id, $max_cnt);
+                    $tpl->setVariable('SPIDER_CHART', $spider_chart->getHTML());
+                    $tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
+                }
+
+
+                $block_label = $abbreviation == '' ? $block->getTitle() : $abbreviation;
+                if ($obj->getShowFeedbacks()) {
+                    // Template
+
+                    $tpl->setVariable('WIDTH', self::WIDTH);
+                    $tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
+                    $tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
+
+                }
+                $tpl->parseCurrentBlock();
+            }
+
+
 			$blocks[] = array(
 				'block_id' => $block->getId(),
 				'percentage' => $percentages[$block->getId()],

@@ -313,7 +313,13 @@ class ilSelfEvaluationDataset {
 			$answer_total = array_sum($answer_data);
 			$anzahl_fragen = count($answer_data);
 			$possible_per_block = $anzahl_fragen * $highest;
-			$percentage = $answer_total / $possible_per_block * 100;
+            if($possible_per_block != 0)
+            {
+                $percentage = $answer_total / $possible_per_block * 100;
+            } else{
+                $percentage = 0;
+            }
+
 			$return[$block->getId()] = $percentage;
 		}
 

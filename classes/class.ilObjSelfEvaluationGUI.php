@@ -446,24 +446,25 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         $section->setTitle($this->txt('feedback_section'));
         $this->form->addItem($section);
 
+        // Show Feedbacks overview graphics
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview'), 'show_fbs_overview');
+        $cb->setValue(1);
+        $this->form->addItem($cb);
 		// Show question block titles during feedback
 		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_fb'), 'show_block_titles_fb');
 		$this->form->addItem($cb);
 		// Show question block descriptions during feedback
 		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_fb'), 'show_block_desc_fb');
 		$this->form->addItem($cb);
-		// Show Feedbacks
-		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview'), 'show_fbs_overview');
-		$cb->setValue(1);
-		$this->form->addItem($cb);
 		//
 		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs'), 'show_fbs');
 		$cb->setValue(1);
+        $this->form->addItem($cb);
 		//
-		$cb_a = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_charts'), 'show_fbs_charts');
-		$cb_a->setValue(1);
-		$cb->addSubItem($cb_a);
-		$this->form->addItem($cb);
+        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_charts'), 'show_fbs_charts');
+        $cb->setValue(1);
+        $this->form->addItem($cb);
+
 
         //////////////////////////////
         /////////Scale Section////////
