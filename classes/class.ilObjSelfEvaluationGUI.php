@@ -329,6 +329,23 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	}
 
 
+    /**
+     * Init creation froms
+     *
+     * this will create the default creation forms: new, import, clone
+     *
+     * @param	string	$a_new_type
+     * @return	array
+     */
+    protected function initCreationForms($a_new_type)
+    {
+        $forms = array(
+            self::CFORM_NEW => $this->initCreateForm($a_new_type),
+        );
+
+        return $forms;
+    }
+
 	function editProperties() {
 		if ($this->object->hasDatasets()) {
 			ilUtil::sendInfo($this->getPluginObject()->txt('scale_cannot_be_edited'));
