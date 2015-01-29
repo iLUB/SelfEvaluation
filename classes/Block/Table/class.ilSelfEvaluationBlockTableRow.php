@@ -350,8 +350,8 @@ class ilSelfEvaluationBlockTableRow {
 		$title = $this->pl->txt('edit_block');
 		$link = $this->ctrl->getLinkTargetByClass($this->block_gui_class, 'editBlock');
 		$cmd = 'edit_block';
-
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+        $position = 3;
+		return new ilSelfEvaluationTableAction($title, $cmd, $link,$position);
 	}
 
 
@@ -362,7 +362,8 @@ class ilSelfEvaluationBlockTableRow {
 		$title = $this->pl->txt('delete_block');
 		$link = $this->ctrl->getLinkTargetByClass($this->block_gui_class, 'deleteBlock');
 		$cmd = 'delete_block';
+        $position = 4;
 
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+		return new ilSelfEvaluationTableAction($title, $cmd, $link,$position);
 	}
 }

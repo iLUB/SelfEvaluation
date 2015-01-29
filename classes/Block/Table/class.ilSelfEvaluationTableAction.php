@@ -42,16 +42,23 @@ class ilSelfEvaluationTableAction {
 	 */
 	protected $link;
 
+    /**
+     * @var int
+     */
+    protected $position = 0;
 
-	/**
-	 * @param string $title
-	 * @param string $cmd
-	 * @param string $link
-	 */
-	public function __construct($title, $cmd, $link) {
+
+    /**
+     * @param $title
+     * @param $cmd
+     * @param $link
+     * @param int $position
+     */
+    public function __construct($title, $cmd, $link, $position = 0) {
 		$this->title = $title;
 		$this->cmd = $cmd;
 		$this->link = $link;
+        $this->setPosition($position);
 	}
 
 
@@ -77,4 +84,22 @@ class ilSelfEvaluationTableAction {
 	public function getTitle() {
 		return $this->title;
 	}
+
+    /**
+     * @param int $position
+     */
+    public function setPosition($position)
+    {
+        $this->position = $position;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+
 }

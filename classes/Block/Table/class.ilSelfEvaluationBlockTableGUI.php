@@ -89,6 +89,10 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI {
 		 * @var ilSelfEvaluationTableAction[] $actions
 		 */
 		$actions = unserialize($a_set['actions']);
+        usort($actions, function($action_a, $action_b)
+        {
+            return $action_a->getPosition() > $action_b->getPosition();
+        });
 		foreach ($actions as $action) {
 			$ac->addItem($action->getTitle(), $action->getCmd(), $action->getLink());
 		}

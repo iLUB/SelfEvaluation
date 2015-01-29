@@ -85,7 +85,7 @@ class ilSelfEvaluationQuestionBlockTableRow extends ilSelfEvaluationBlockTableRo
 		$title = $this->pl->txt('edit_feedback');
 		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects');
 		$cmd = 'listObjects';
-
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+        $position = 2;
+        return new ilSelfEvaluationTableAction($title, $cmd, $link,$position);
 	}
 }
