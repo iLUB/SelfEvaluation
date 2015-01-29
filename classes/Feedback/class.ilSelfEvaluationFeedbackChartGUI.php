@@ -40,6 +40,12 @@ class ilSelfEvaluationFeedbackChartGUI {
 
 
 	public function __construct() {
+        global $tpl;
+        /**
+         * @var $tpl    ilTemplate
+         */
+        $this->tpl = $tpl;
+
 		$this->pl = new ilSelfEvaluationPlugin();
 	}
 
@@ -56,7 +62,11 @@ class ilSelfEvaluationFeedbackChartGUI {
 		$factory = new ilObjectFactory();
 		$obj = $factory->getInstanceByRefId($_GET['ref_id']);
 		$tpl = $this->pl->getTemplate('default/Feedback/tpl.feedback.html');
-		$color_id = 0;
+        $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/bootstrap.css");
+        $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/feedback.css");
+
+
+        $color_id = 0;
 		$percentages = $data_set->getPercentagePerBlock();
 		$blocks = array();
 		foreach ($data_set->getFeedbacksPerBlock() as $block_id => $fb) {

@@ -1,0 +1,11 @@
+* {
+    box-sizing:  	content-box;
+}
+
+a.chart_toggle{
+    padding-top: 5px;
+}
+
+.bar_chart{
+    padding-top: 15px;
+}
