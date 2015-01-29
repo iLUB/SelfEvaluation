@@ -25,6 +25,7 @@
  * Class ilSelfEvaluationTableAction
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
+ * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
 class ilSelfEvaluationTableAction {

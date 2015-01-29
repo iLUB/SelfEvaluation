@@ -27,6 +27,7 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
  * Class ilSelfEvaluationFeedbackChartGUI
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
+ * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
 class ilSelfEvaluationFeedbackChartGUI {

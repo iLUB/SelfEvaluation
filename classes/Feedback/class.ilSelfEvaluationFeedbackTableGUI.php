@@ -5,6 +5,7 @@ require_once('class.ilSelfEvaluationFeedback.php');
  * TableGUI ilSelfEvaluationFeedbackTableGUI
  *
  * @author  Fabian Schmid <fs@studer-raimann.ch>
+ * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id:
  *
  */

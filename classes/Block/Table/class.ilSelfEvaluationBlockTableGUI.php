@@ -4,6 +4,7 @@ require_once('./Services/Table/classes/class.ilTable2GUI.php');
  * TableGUI ilSelfEvaluationBlockTableGUI
  *
  * @author  Fabian Schmid <fs@studer-raimann.ch>
+ * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id:
  *
  */

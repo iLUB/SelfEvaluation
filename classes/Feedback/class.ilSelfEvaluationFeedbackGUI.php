@@ -9,6 +9,7 @@ require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
  * GUI-Class ilSelfEvaluationFeedbackGUI
  *
  * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
+ * @author            Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @author            Fabio Heer
  * @version           $Id:
  *
