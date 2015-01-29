@@ -106,7 +106,8 @@ class ilSelfEvaluationDatasetGUI {
 
 	public function confirmDelete() {
 		$conf = new ilConfirmationGUI();
-		$conf->setFormAction($this->ctrl->getFormAction($this));
+        ilUtil::sendQuestion($this->pl->txt('qst_delete_dataset'));
+        $conf->setFormAction($this->ctrl->getFormAction($this));
 		$conf->setCancel($this->pl->txt('cancel'), 'index');
 		$conf->setConfirm($this->pl->txt('delete_dataset'), 'delete');
 		$conf->addItem('dataset_id', $this->dataset->getId(), date('d.m.Y - H:i:s', $this->dataset->getCreationDate()));

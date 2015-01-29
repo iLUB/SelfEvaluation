@@ -180,7 +180,7 @@ abstract class ilSelfEvaluationBlockGUI {
 	 * Show the delete block GUI
 	 */
 	public function deleteBlock() {
-		//		ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
+		ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
 		$conf = new ilConfirmationGUI();
 		$conf->setFormAction($this->ctrl->getFormAction($this));
 		$conf->setCancel($this->pl->txt('cancel'), 'cancel');

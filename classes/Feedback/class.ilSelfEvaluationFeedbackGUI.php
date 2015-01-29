@@ -274,7 +274,7 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	public function deleteFeedback() {
-		//		ilUtil::sendQuestion($this->pl->txt('qst_delete_feedback'));
+		ilUtil::sendQuestion($this->pl->txt('qst_delete_feedback'));
 		$conf = new ilConfirmationGUI();
 		$conf->setFormAction($this->ctrl->getFormAction($this));
 		$conf->setCancel($this->pl->txt('cancel'), 'cancel');

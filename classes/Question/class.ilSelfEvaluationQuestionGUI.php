@@ -175,7 +175,7 @@ class ilSelfEvaluationQuestionGUI {
 
 
 	public function deleteQuestion() {
-//		ilUtil::sendQuestion($this->pl->txt('qst_delete_question'));
+		ilUtil::sendQuestion($this->pl->txt('qst_delete_question'));
 		$conf = new ilConfirmationGUI();
 		$conf->setFormAction($this->ctrl->getFormAction($this));
 		$conf->setCancel($this->pl->txt('cancel'), 'cancel');
