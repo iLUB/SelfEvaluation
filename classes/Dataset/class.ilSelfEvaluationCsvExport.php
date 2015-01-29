@@ -95,7 +95,7 @@ class ilSelfEvaluationCsvExport extends csvExport{
         $this->getTable()->addColumn(new csvExportColumn("ending_date", $this->pl->txt("ending_date"),-3));
         $this->getTable()->addColumn(new csvExportColumn("duration", $this->pl->txt("duration"),-2));
 
-        $this->getTable()->setSortColumn("ending_date");
+        $this->getTable()->setSortColumn("starting_date");
 
         foreach($this->getMetaQuestions() as $meta_question){
             $this->getTable()->addColumn(new csvExportColumn($meta_question->getName(),$meta_question->getName(),$position));
