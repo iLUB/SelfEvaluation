@@ -36,7 +36,7 @@ edit_block#:#Blockinformationen bearbeiten
 delete_block#:#Block löschen
 update_block#:#Block bearbeiten
 update_block_button#:#Speichern
-qst_delete_block#:#Möchten Sie den folgenden Frageblock mit allen Fragen löschen?
+qst_delete_block#:#Sind Sie sicher, dass folgender Fragenblock mit allen dazugehörigen Fragen aus der Selbstevaluation entfernt werden soll?
 msg_block_deleted#:#Block wurde gelöscht
 create_block#:#Block erstellen
 create_block_button#:#Block erstellen
@@ -102,7 +102,7 @@ msg_block_updated#:#Änderungen gespeichert
 msg_question_updated#:#Änderungen gespeichert
 question_table_title#:#Fragen bearbeiten
 update_question_button#:#Speichern
-qst_delete_question#:#Möchten Sie die folgende Frage löschen?
+qst_delete_question#:#Sind Sie sicher, dass folgende Frage aus der Selbstevaluation entfernt werden soll?
 msg_question_deleted#:#Frage wurde gelöscht
 msg_obj_modified#:#Änderungen gespeichert
 scale#:#Skala
@@ -130,6 +130,7 @@ feedback_text#:#Feedbacktext
 msg_feedback_created#:#Feedback angelegt
 edit_feedbacks#:#Feedbacks bearbeiten
 delete_feedback#:#Feedback löschen
+qst_delete_feedback#:#Sind Sie sicher, dass folgendes Feedback aus der Selbstevaluation entfernt werden soll?
 add_new_feedback#:#Feedback hinzufügen
 update_feedback_form#:#Feedback bearbeiten
 update_feedback_button#:#Speichern
@@ -192,6 +193,7 @@ date#:#Datum
 delete_dataset#:#Datensatz löschen
 show_feedback#:#Feedback anzeigen
 qst_delete_dataset#:#Möchten Sie den Datensatz wirklich löschen?
+qst_delete_dataset#:#Sind Sie sicher, dass folgender Datensatz entfernt werden soll?
 msg_dataset_deleted#:#Datensatz gelöscht
 show_questions#:#Grafiken für einzelne Fragen anzeigen
 
