@@ -538,7 +538,7 @@ class ilSelfEvaluationDataset {
         if($latest_entry){
             return $latest_entry->getCreationDate();
         } else {
-            throw new Exception("Invalid Date");
+            throw new Exception("Invalid Entry");
         }
     }
 
@@ -551,7 +551,7 @@ class ilSelfEvaluationDataset {
         if($latest_entry){
             return $latest_entry->getCreationDate()-$this->getCreationDate();
         } else {
-            throw new Exception("Invalid Date");
+            throw new Exception("Invalid Entry");
         }
     }
 

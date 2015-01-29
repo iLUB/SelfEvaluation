@@ -83,7 +83,6 @@ class ilSelfEvaluationCsvExport extends csvExport{
         $blocks = ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getObjectId());
         foreach($blocks as $block){
             $this->addQuestions(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()));
-
         }
 
         $this->setDatasets(ilSelfEvaluationDataset::_getAllInstancesByObjectId($this->getObjectId()));
@@ -115,9 +114,24 @@ class ilSelfEvaluationCsvExport extends csvExport{
             $row = new csvExportRow();
             $row->addValue(new csvExportValue("identity", substr(md5($dataset->getIdentifierId()), 0, 8)));
             try{
-                $row->addValue(new csvExportValue("starting_date", date($this->getDateFormat(),$dataset->getCreationDate())));
-                $row->addValue(new csvExportValue("ending_date", date($this->getDateFormat(),$dataset->getSubmitDate())));
-                $row->addValue(new csvExportValue("duration", $dataset->getDuration()));
+                $invalid = false;
+                if($dataset->getCreationDate()){
+                    $row->addValue(new csvExportValue("starting_date", date($this->getDateFormat(),$dataset->getCreationDate())));
+                }else{
+                    $row->addValue(new csvExportValue("starting_date", "Invalid"));
+                    $invalid = true;
+                }
+                if($dataset->getSubmitDate()){
+                    $row->addValue(new csvExportValue("ending_date", date($this->getDateFormat(),$dataset->getSubmitDate())));
+                }else{
+                    $row->addValue(new csvExportValue("ending_date", "Invalid"));
+                    $invalid = true;
+                }
+                if($invalid){
+                    $row->addValue(new csvExportValue("duration", "Invalid"));
+                }else{
+                    $row->addValue(new csvExportValue("duration", $dataset->getDuration()));
+                }
             }catch(Exception $e){
                 $row->addValue(new csvExportValue("Error", "Invalid Date"));
             }
@@ -125,13 +139,16 @@ class ilSelfEvaluationCsvExport extends csvExport{
 
             $entries = ilSelfEvaluationData::_getAllInstancesByDatasetId($dataset->getId());
             foreach($entries as $entry){
-                if($entry->getQuestionType() == ilSelfEvaluationData::META_QUESTION_TYPE){
-                    $column_name = $this->getMetaQuestion($entry->getQuestionId())->getName();
+                if($this->getMetaQuestion($entry->getQuestionId()) || $this->getQuestion($entry->getQuestionId()))
+                {
+                    if($entry->getQuestionType() == ilSelfEvaluationData::META_QUESTION_TYPE){
+                        $column_name = $this->getMetaQuestion($entry->getQuestionId())->getName();
+                    }
+                    else{
+                        $column_name = $this->getTitleForQuestion($this->getQuestion($entry->getQuestionId()));
+                    }
+                    $row->addValue(new csvExportValue($column_name,$entry->getValue()));
                 }
-                else{
-                    $column_name = $this->getTitleForQuestion($this->getQuestion($entry->getQuestionId()));
-                }
-                $row->addValue(new csvExportValue($column_name,$entry->getValue()));
             }
             $this->getTable()->addRow($row);
 
