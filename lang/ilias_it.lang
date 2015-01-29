@@ -47,17 +47,17 @@ help_text_section#:#Hilfstexte
 intro#:#Einleitungstext
 intro_info#:#Erster Text, welcher beim Öffnen einer Selbstevaluation angezeigt wird.
 outro#:#Abschliessender Text
-outro_info#:#Text welcher nach beendigung der Selbstevaluation angezeigt wird.
+outro_info#:#Text welcher nach Beendigung der Selbstevaluation angezeigt wird.
 identity_selection#:#Standardtext zur Identitätsauswahl bei anonymen Selbstevaluationen
 identity_selection_info#:#Dieser Text wird den anonymen Nutzern des Selbstevaluations Plugins angezeigt.
 
 block_section#:#Darstellung im Fragebogen
 block_presentation_type#:#Blockaufteilung der Fragen
 block_option_random#:#Fragen zufällig auf verschiedene Blöcke aufteilen.
-block_option_random_info#:#Die Fragen werden während dem Bearbeiten der Selbstevaluation zufällig auf auf künstliche Blöcke aufgeteilt. </br>Die Reihenfolge dieser künstlichen Blöcke ist zufällig. Es werden generische Titel und Beschreibungen für diese Blöcke automatisch erstellt.</br> In der Auswertung werden die Antworten dann wieder den originalen Blöcken zugeordnet.
+block_option_random_info#:#Die Fragen werden während dem Bearbeiten der Selbstevaluation zufällig auf künstliche Blöcke aufgeteilt. </br>Die Reihenfolge dieser künstlichen Blöcke ist zufällig. Generische Titel und Beschreibungen für diese Blöcke werden automatisch erstellt.</br> In der Auswertung werden die Antworten dann wieder den originalen Blöcken zugeordnet.
 sort_random_nr_items_block#:#Anzahl der Fragen pro Block bei zufälliger Aufteilung
 block_option_block#:#Fragendarstellung und Fragenauswertung in denselben Blöcken.
-block_option_block_info#:#Reihenfolge, Titel und Beschreibugen werden in dieser Option aus den Einstellungen übernommen.
+block_option_block_info#:#Reihenfolge, Titel und Beschreibungen der Blöcke werden übernommen.
 display_type#:#Darstellung der Blöcke
 single_page#:#Alle Blöcke auf einer Seite
 multiple_pages#:#Eine Seite pro Block
@@ -74,7 +74,7 @@ show_fbs_charts#:#Einzelfeedback-Grafiken anzeigen
 
 multinput_value#:#Numerischer Wert
 multinput_title#:#Bezeichnung
-multinput_description#:#Es empfiehlt sich, den ersten numerischen Wert 0 nicht zu ändern, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
+multinput_description#:#Es empfiehlt sich, als ersten numerischen Wert die 0 zu wählen, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
 sort_type#:#Sortierung
 
 shuffle_in_blocks#:#Fragen pro Block mischen
