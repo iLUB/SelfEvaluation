@@ -23,8 +23,8 @@ function scaleUnits(){
 
     this.scaleMatrix = function() {
         $(".matrix-row-input").each(function() {
-            parent = $(this).parents(".block-question");
-            $(this).height(parent.children(".question-text").outerHeight());
+            parent_object = $(this).parents(".block-question");
+            $(this).height(parent_object.children(".question-text").outerHeight());
         });
     }
 
