@@ -93,6 +93,7 @@ question_title_info#:#Die Abkürzung wird für die Benennung der Feedback Grafik
 add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke
 add_new_question_block#:#Frageblock hinzufügen
+block_abbreviation_info#:#Die Abkürzung wird für die Benennung der Feedback Grafiken verwendet (max. 8 Zeichen).
 add_new_meta_block#:#Stammdatenblock hinzufügen
 edit_question#:#Frage bearbeiten
 delete_question#:#Frage löschen
