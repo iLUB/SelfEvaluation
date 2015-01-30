@@ -147,7 +147,15 @@ class ilSelfEvaluationCsvExport extends csvExport{
                     else{
                         $column_name = $this->getTitleForQuestion($this->getQuestion($entry->getQuestionId()));
                     }
-                    $row->addValue(new csvExportValue($column_name,$entry->getValue()));
+
+                    while($row->getColumns()->columnIdExists($column_name)){
+                        $column_name = $column_name."_duplicate";
+                    }
+                    $value = $entry->getValue();
+                    if($value == "ilsel_dummy"){
+                        $value = "übersprungen";
+                    }
+                    $row->addValue(new csvExportValue($column_name,$value));
                 }
             }
             $this->getTable()->addRow($row);
