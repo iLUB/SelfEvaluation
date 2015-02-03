@@ -1,6 +1,9 @@
 function scaleUnits(){
+    /** Fix bootstrap naming collision with tooltip in ILIAS 4.3 **/
+    il.Tooltip.add = function (el_id, cfg) {};
+    /** End Fix **/
+    
     this.full_unit_titels = new Array();
-
     this.updateScaleUnits = function() {
         var self = this;
         $(".scale-units td div").each(function() {
