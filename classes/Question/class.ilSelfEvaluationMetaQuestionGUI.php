@@ -20,7 +20,7 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-require_once('Customizing/global/plugins/Libraries/iLubFieldDefiniton/classes/class.iLubFieldDefinitionContainerGUI.php');
+require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
 
 /**
  * Class ilSelfEvaluationMetaQuestionGUI
@@ -52,7 +52,7 @@ class ilSelfEvaluationMetaQuestionGUI extends iLubFieldDefinitionContainerGUI {
 		$this->plugin = $plugin;
 		$this->block_title = $block_title;
 
-		require_once('Customizing/global/plugins/Libraries/iLubFieldDefiniton/classes/class.iLubFieldDefinitionLng.php');
+		require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/class.iLubFieldDefinitionLng.php');
 		$lng = new iLubFieldDefinitionLng();
 		parent::__construct($container, self::getTypesArray(), $lng, $self_eval_id);
 	}
@@ -90,8 +90,8 @@ class ilSelfEvaluationMetaQuestionGUI extends iLubFieldDefinitionContainerGUI {
 
     static function getTypesArray(){
         // Add the allowed types here
-        require_once('Customizing/global/plugins/Libraries/iLubFieldDefiniton/classes/types/class.iLubFieldDefinitionTypeText.php');
-        require_once('Customizing/global/plugins/Libraries/iLubFieldDefiniton/classes/types/class.iLubFieldDefinitionTypeSelect.php');
+        require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeText.php');
+        require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSelect.php');
         $types[] = new iLubFieldDefinitionTypeText();
         $types[] = new iLubFieldDefinitionTypeSelect();
         /*
