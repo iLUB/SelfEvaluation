@@ -29,7 +29,6 @@ h4 {
 }
 .block-question div.question-text{
     padding-top: 4px;
-    padding-left: 0;
 }
 
 .block-title{
@@ -43,7 +42,7 @@ h4 {
     padding-top: 4px;
     padding-bottom: 4px;
 }
-.rating, .block-commands{
+.self-evaluation-presentation .rating{
     padding-right: 0px;
     padding-left: 0px;
 }
@@ -68,7 +67,6 @@ h4 {
 }
 .table > tbody > tr > td{
     padding: 0px;
-    padding-right: 5px;
     border-top: 0px;
     word-wrap: normal;
 }
