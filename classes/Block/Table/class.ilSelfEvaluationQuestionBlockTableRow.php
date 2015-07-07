@@ -50,9 +50,9 @@ class ilSelfEvaluationQuestionBlockTableRow extends ilSelfEvaluationBlockTableRo
 		$this->addAction($feedback_action);
 
 		if (ilSelfEvaluationFeedback::_isComplete($block->getId())) {
-			$img_path = ilUtil::getImagePath('icon_ok.png');
+			$img_path = ilUtil::getImagePath('icon_ok.svg');
 		} else {
-			$img_path = ilUtil::getImagePath('icon_not_ok.png');
+			$img_path = ilUtil::getImagePath('icon_not_ok.svg');
 		}
 		$this->setStatusImg($img_path);
 
