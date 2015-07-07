@@ -68,6 +68,9 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
 
         $tpl->addJavaScript("./Services/JavaScript/js/Basic.js");
         $tpl->addJavaScript("Services/Form/js/Form.js");
+        $tpl->addJavascript("./Services/UIComponent/Tooltip/js/ilTooltip.js");
+        $tpl->addOnLoadCode('il.Tooltip.init();', 3);
+
         $tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/bootstrap.css");
         $tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/presentation.css");
 
