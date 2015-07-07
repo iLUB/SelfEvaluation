@@ -2,7 +2,6 @@ function scaleUnits(){
     this.full_unit_titels = new Array();
     /** Fix bootstrap naming collision with tooltip in ILIAS 4.3 **/
     il.Tooltip.add = function (el_id, cfg) {};
-    il.Help.switchTooltips = function(e) {};
     $("#help_tt").remove();
     /** End Fix **/
 
