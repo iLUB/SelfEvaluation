@@ -20,8 +20,8 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Feedback/Chart/classes/class.ilChartGrid.php');
-require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Feedback/Chart/classes/class.ilChartSpider.php');
+require_once('Services/Chart/classes/class.ilChartGrid.php');
+require_once('Services/Chart/classes/class.ilChartSpider.php');
 
 /**
  * Class ilSelfEvaluationFeedbackChartGUI
@@ -33,7 +33,8 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
 class ilSelfEvaluationFeedbackChartGUI {
 
 	const BAR_WIDTH = 0.5;
-	const WIDTH = 900;
+	const WIDTH = "100%";
+    const HEIGHT = "450px";
 	/**
 	 * @var ilSelfEvaluationPlugin
 	 */
@@ -114,8 +115,6 @@ class ilSelfEvaluationFeedbackChartGUI {
                 $block_label = $abbreviation == '' ? $block->getTitle() : $abbreviation;
                 if ($obj->getShowFeedbacks()) {
                     // Template
-
-                    $tpl->setVariable('WIDTH', self::WIDTH);
                     $tpl->setVariable('FEEDBACK_TITLE', $fb->getTitle());
                     $tpl->setVariable('FEEDBACK_BODY', $fb->getFeedbackText());
 
@@ -148,11 +147,11 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @param string $chart_id  unique identifier for a feedback chart
 	 * @param array  $colors    array of used color values
 	 *
-	 * @return ilChartGrid50
+	 * @return ilChartGrid
 	 */
 	protected function initBarChart($chart_id, $colors) {
-		/** @var ilChartGrid50 $chart */
-		$chart = $this->initChart(ilChart50::TYPE_GRID, $chart_id . '_blk', $colors);
+		/** @var ilChartGrid $chart */
+		$chart = $this->initChart(ilChart::TYPE_GRID, $chart_id . '_blk', $colors);
 		$chart->setYAxisToInteger(true);
 
 		return $chart;
@@ -163,27 +162,28 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @param string $chart_id  unique identifier for a feedback chart
 	 * @param array  $colors    array of used color values
 	 *
-	 * @return ilChartSpider50
+	 * @return ilChartSpider
 	 */
 	protected function initSpiderChart($chart_id, $colors) {
-		return $this->initChart(ilChart50::TYPE_SPIDER, $chart_id . '_sdr', $colors);
+		return $this->initChart(ilChart::TYPE_SPIDER, $chart_id . '_sdr', $colors);
 	}
 
 
 	/**
-	 * @param int    $chart_type    the chart type (see ilChart50 constants)
+	 * @param int    $chart_type    the chart type (see ilChart constants)
 	 * @param string $chart_id      the unique identifier for this chart
 	 * @param array  $colors        the array of used color values
 	 *
-	 * @return ilChart50
+	 * @return ilChart
 	 */
 	protected function initChart($chart_type, $chart_id, $colors) {
-		$chart = ilChart50::getInstanceByType($chart_type, $chart_id);
-		$chart->setSize(self::WIDTH - 15, round((self::WIDTH - 50) / 4));
-		$legend = new ilChartLegend50();
+		$chart = ilChart::getInstanceByType($chart_type, $chart_id);
+		$chart->setSize(self::WIDTH, self::HEIGHT);
+		$legend = new ilChartLegend();
 		$legend->setBackground($colors[0]);
 		$chart->setColors($colors);
 		$chart->setLegend($legend);
+        $chart->setAutoResize(true);
 
 		return $chart;
 	}
@@ -195,12 +195,12 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @param int                     $color_id index of the used color
 	 * @param array                   $scale_units
 	 *
-	 * @return ilChart50
+	 * @return ilChart
 	 */
 	protected function getFeedbackBlockBarChart(ilSelfEvaluationDataset $data_set, $block_id, $color_id, $scale_units) {
 		$colors = $this->getChartColors();
 		$chart = self::initBarChart($block_id, array($colors[$color_id]));
-		$data = $chart->getDataInstance(ilChartGrid50::DATA_BARS);
+		$data = $chart->getDataInstance(ilChartGrid::DATA_BARS);
 		//$chart->setXAxisToInteger(false);
 		$data->setBarOptions(self::BAR_WIDTH, 'center');
 		$ticks = array();
@@ -213,8 +213,6 @@ class ilSelfEvaluationFeedbackChartGUI {
 		}
 		self::setUnusedLegendLabels($scale_units);
 		$chart->setTicks($ticks, $scale_units, true);
-		$chart->setYAxisMin(min(array_keys($scale_units)));
-		$chart->setYAxisMax(max(array_keys($scale_units)));
 		$chart->addData($data);
 
 		return $chart;
@@ -240,7 +238,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @param int                     $color_id     index of the used color
 	 * @param int                     $max_level    the number of displayed levels in the spider chart
 	 *
-	 * @return ilChart50
+	 * @return ilChart
 	 */
 	protected function getFeedbackBlockSpiderChart(ilSelfEvaluationDataset $data_set, $block_id, $color_id, $max_level) {
 		$colors = $this->getChartColors();
@@ -265,15 +263,15 @@ class ilSelfEvaluationFeedbackChartGUI {
 	/**
 	 * @param array $block_data
 	 *
-	 * @return ilChart50
+	 * @return ilChart
 	 */
 	protected function getOverviewBlockChart(array $block_data) {
 		$chart = $this->initBarChart('fb_overview', $this->getChartColors());
-		$chart->setSize(self::WIDTH - 15, round((self::WIDTH - 50) / 2));
+		$chart->setSize(self::WIDTH, self::HEIGHT);
 
 		$x_axis = array();
 		foreach ($block_data as $block_d) {
-			$data = $chart->getDataInstance(ilChartGrid50::DATA_BARS);
+			$data = $chart->getDataInstance(ilChartGrid::DATA_BARS);
 			$data->setBarOptions(self::BAR_WIDTH, 'center');
 			$block = new ilSelfEvaluationQuestionBlock($block_d['block_id']);
 			$data->addPoint($block->getPosition(), $block_d['percentage']);
@@ -294,13 +292,13 @@ class ilSelfEvaluationFeedbackChartGUI {
 	/**
 	 * @param array $block_data
 	 *
-	 * @return ilChart50
+	 * @return ilChart
 	 */
 	protected function getOverviewSpiderChart(array $block_data) {
-		/** @var ilChartSpider50 $chart $chart */
+		/** @var ilChartSpider $chart $chart */
 		$colors = $this->getChartColors();
 		$chart = $this->initSpiderChart('fb_overview', array($colors[count($colors)-1]));
-		$chart->setSize(self::WIDTH - 15, round((self::WIDTH - 50) / 2));
+        $chart->setSize(self::WIDTH, self::HEIGHT);
 		$data = $chart->getDataInstance();
 
 		$cnt = 0;
