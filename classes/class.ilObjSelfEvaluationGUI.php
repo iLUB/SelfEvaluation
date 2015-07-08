@@ -130,7 +130,6 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->tpl->getStandardTemplate();
 		$this->setTitleAndDescription();
 		$this->displayIdentifier();
-		$this->tpl->setTitleIcon($this->getPluginObject()->getDirectory() . '/templates/images/icon_xsev_b.png');
 		$this->tpl->addCss($this->getPluginObject()->getStyleSheetLocation('css/content.css'));
 		$this->tpl->addCss($this->getPluginObject()->getStyleSheetLocation('css/print.css'), 'print');
 
