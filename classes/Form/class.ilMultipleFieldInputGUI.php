@@ -65,7 +65,6 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 		if (count($this->getValues()) > 0) {
 			foreach ($this->getValues() as $id => $value) {
 				$tpl->setCurrentBlock('input');
-				$tpl->setVariable('DELETE_BUTTON', $pl->getDirectory() . '/templates/images/edit_remove.png');
 				$tpl->setVariable('VALUE_N', $this->getFieldName() . '_old[value][' . $id . ']');
 				$tpl->setVariable('VALUE_V', $value['value']);
 				$tpl->setVariable('TITLE_N', $this->getFieldName() . '_old[title][' . $id . ']');
@@ -79,7 +78,6 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI {
 		}
 		if (! $this->getDisabled()) {
 			$tpl->setCurrentBlock('new_input');
-			$tpl->setVariable('ADD_BUTTON', $pl->getDirectory() . '/templates/images/edit_add.png');
 			$tpl->setVariable('VALUE_N_NEW', $this->getFieldName() . '_new[value][]');
 			$tpl->setVariable('TITLE_N_NEW', $this->getFieldName() . '_new[title][]');
 			$tpl->setVariable('DISABLED_N', $this->getDisabled() ? 'disabled' : '');

@@ -15,10 +15,9 @@
 			return false;
 		}
 
-		$('img.add_button').live("click", handler);
-		$('img.delete_button').click(function () {
-			var mydiff = $(this).parent().parent();
-			console.log(mydiff);
+		$('span.add_button').live("click", handler);
+		$('span.delete_button').click(function () {
+			var mydiff = $(this).parent().parent().parent();
 			mydiff.find('input').each(function () {
 				$(this).val('');
 			});
@@ -58,7 +57,7 @@
 			name='{VALUE_N}' value='{VALUE_V}'>
 		</td>
 		<td><input {DISABLED} style='float: left;' type='text' name='{TITLE_N}' value='{TITLE_V}'></td>
-		<td class="{LOCK_CSS}"><img style="display:block; float: left;" class='delete_button' src='{DELETE_BUTTON}'>
+		<td class="{LOCK_CSS}"><a><span class="glyphicon glyphicon-minus delete_button" aria-hidden="true"></span></a>
 		</td>
 	</tr>
 	<!-- END input -->
@@ -71,7 +70,7 @@
 		<td><input {DISABLED_N} style='float: left' type='text' name='{TITLE_N_NEW}' value=''
 			placeholder="{PLACEHOLDER_TITLE}">
 		</td>
-		<td class="{LOCK_CSS}"><img style="display:block; float: left;" class='add_button' src='{ADD_BUTTON}'></td>
+		<td class="{LOCK_CSS}"><a><span class="glyphicon glyphicon-plus add_button" aria-hidden="true"></span></a></td>
 	</tr>
 	<!-- END new_input -->
 </table>

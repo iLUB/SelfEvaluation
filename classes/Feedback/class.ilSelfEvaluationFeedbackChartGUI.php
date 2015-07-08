@@ -33,7 +33,7 @@ require_once('Services/Chart/classes/class.ilChartSpider.php');
 class ilSelfEvaluationFeedbackChartGUI {
 
 	const BAR_WIDTH = 0.5;
-	const WIDTH = "100%";
+	const WIDTH = "99%";
     const HEIGHT = "450px";
 	/**
 	 * @var ilSelfEvaluationPlugin

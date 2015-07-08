@@ -8,10 +8,13 @@
 		page-break-before: always;
 	}
 
+    .bar_chart, .spider_chart{
+        height: 10cm;
+    }
 	.feedback_block_abbreviation:before { content:"[" }
 	.feedback_block_abbreviation:after { content:"]" }
 
-	div.ilMainHeader, div.il_HeaderOuter, div.ilPermaLink, div.il_Footer {
+	div.ilMainHeader, div.il_HeaderOuter, div.ilPermaLink, div.il_Footer, div.ilTopBar, .breadcrumb, ul#ilTab {
 		display: none;
 	}
 

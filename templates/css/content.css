@@ -140,3 +140,6 @@ td.feedback_ov_item_blank {
 a.il_ContainerItemCommand{
     padding-left: 20px;
 }
+.add_button, .delete_button{
+    padding-left: 4px;
+}
