@@ -283,6 +283,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 				$this->checkPermission('read');
 				$this->$cmd();
 				break;
+			default:
+				$this->$cmd();
+				break;
 		}
 	}
 
@@ -508,7 +511,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['show_block_titles_sev'] = $this->object->getShowBlockTitlesDuringEvaluation();
 		$values['show_block_desc_sev'] = $this->object->getShowBlockDescriptionsDuringEvaluation();
 		$values['show_block_titles_fb'] = $this->object->getShowBlockTitlesDuringFeedback();
-		$values['show_block_desc_fb'] = $this->object->getShowBlockTitlesDuringFeedback();
+		$values['show_block_desc_fb'] = $this->object->getShowBlockDescriptionsDuringFeedback();
 		$this->form->setValuesByArray($values);
 	}
 
