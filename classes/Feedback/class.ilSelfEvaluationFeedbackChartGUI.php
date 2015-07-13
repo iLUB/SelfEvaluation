@@ -63,10 +63,10 @@ class ilSelfEvaluationFeedbackChartGUI {
 		 */
 		$factory = new ilObjectFactory();
 		$obj = $factory->getInstanceByRefId($_GET['ref_id']);
+		
 		$tpl = $this->pl->getTemplate('default/Feedback/tpl.feedback.html');
         $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/bootstrap.css");
         $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/feedback.css");
-
 
         $color_id = 0;
 		$percentages = $data_set->getPercentagePerBlock();
@@ -109,6 +109,8 @@ class ilSelfEvaluationFeedbackChartGUI {
                     $spider_chart = $this->getFeedbackBlockSpiderChart($data_set, $block_id, $color_id, $max_cnt);
                     $tpl->setVariable('SPIDER_CHART', $spider_chart->getHTML());
                     $tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
+                } else {
+                	$tpl->setVariable('VISIBILITY_SINGLE_BLOCK', "hidden");
                 }
 
 
@@ -135,6 +137,9 @@ class ilSelfEvaluationFeedbackChartGUI {
 			$tpl->setVariable('OVERVIEW_SPIDER_CHART', $this->getOverviewSpiderChart($blocks)->getHTML());
 			$tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
 			$tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
+		}
+		if(!$obj->getShowFeedbacksOverview()) {
+			$tpl->setVariable('VISIBILITY_OVERVIEW', "hidden");
 		}
 
 		return $tpl->get();
