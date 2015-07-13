@@ -283,6 +283,12 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 				$this->checkPermission('read');
 				$this->$cmd();
 				break;
+            case 'infoScreen':
+                $this->checkPermission('visible');
+                $this->ctrl->setCmd("showSummary");
+                $this->ctrl->setCmdClass("ilinfoscreengui");
+                $this->infoScreen();
+                break;
 		}
 	}
 
