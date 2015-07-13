@@ -110,7 +110,7 @@ class ilSelfEvaluationFeedbackChartGUI {
                     $tpl->setVariable('SPIDER_CHART', $spider_chart->getHTML());
                     $tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
                 } else {
-                	$tpl->setVariable('VISIBILITY_SINGLE_BLOCK', "hidden");
+                	$tpl->setVariable('VISIBILITY_GRAPH', "visibility: hidden");
                 }
 
 
