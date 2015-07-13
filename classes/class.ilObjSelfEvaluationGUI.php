@@ -283,9 +283,6 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 				$this->checkPermission('read');
 				$this->$cmd();
 				break;
-			default:
-				$this->$cmd();
-				break;
 		}
 	}
 
