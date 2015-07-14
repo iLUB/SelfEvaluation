@@ -43,7 +43,7 @@ class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
 		$this->addAction($question_action);
 
 		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.png');
+		$img_path = ilUtil::getImagePath('icon_ok.svg');
 		$this->setStatusImg($img_path);
 	}
 
