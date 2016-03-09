@@ -37,6 +37,10 @@ class ilSelfEvaluationPlugin extends ilRepositoryObjectPlugin {
 	public function getConfigTableName() {
 		return 'rep_robj_xsev_c';
 	}
+
+	protected function uninstallCustom() {
+		return;
+	}
 }
 
 ?>
