@@ -43,7 +43,7 @@ Then checkout the correct branch of Export otherwise you will run into errors.
 
 ## Installation of the SelfEvaluation Plugin
 
-Clone the SelfEvaluation repository to (or create folder path if it does not exist): Customizing/global/plugins/Services/UIComponent/UserInterfaceHook/
+Clone the SelfEvaluation repository to (or create folder path if it does not exist): Customizing/global/plugins/Services/Repository/RepositoryObject/
 	
 	git clone git@github.com:iLUB/SelfEvaluation.git
 
