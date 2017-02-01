@@ -20,7 +20,8 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
 	 * @param ilSelfEvaluationQuestionBlock $block
 	 * @param stdClass                      $rec
 	 */
-	protected function setObjectValuesFromRecord(ilSelfEvaluationQuestionBlock &$block, $rec) {
+	protected static function setObjectValuesFromRecord(ilSelfEvaluationBlock
+&$block = NULL, $rec = NULL) {
 		parent::setObjectValuesFromRecord($block, $rec);
 	}
 
@@ -40,7 +41,7 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
 	}
 
 
-	/**
+	/**f
 	 * @return string
 	 */
 	public function getAbbreviation() {
@@ -51,7 +52,7 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
 	/**
 	 * @return string
 	 */
-	public function getTableName() {
+	public static function getTableName() {
 		return 'rep_robj_xsev_block';
 	}
 

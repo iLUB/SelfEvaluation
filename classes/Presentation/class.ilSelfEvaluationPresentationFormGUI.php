@@ -30,7 +30,7 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
      * @param	string	Command
      * @param	string	Text
      */
-    public function addCommandButton($a_cmd, $a_text)
+    public function addCommandButton($a_cmd, $a_text, $a_id = '')
     {
 
         $this->copy_of_buttons[] = array("cmd" => $a_cmd, "text" => $a_text);

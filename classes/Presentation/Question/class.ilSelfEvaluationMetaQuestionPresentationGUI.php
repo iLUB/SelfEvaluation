@@ -30,14 +30,24 @@ class ilSelfEvaluationMetaQuestionPresentationGUI{
 
 		foreach ($fields as $field) {
 			$type = iLubFieldDefinitionType::getTypeByTypeId($field->getTypeId(),ilSelfEvaluationMetaQuestionGUI::getTypesArray());
-			$item = $type->getPresentationInputGUI($field->getName(), ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX . $field->getId(),
+			$items = [];
+			$item = $type->getPresentationInputGUI($field->getName(),
+					ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX . $field->getId(),
 				$field->getValues());
 
-			if ($field->isRequired()) {
-				$item->setRequired(true);
+			if(is_array($item)){
+				$items = $item;
+			}else{
+				$items[] = $item;
 			}
 
-			$form->addItem($item);
+			foreach($items as $item){
+				if ($field->isRequired()) {
+					$item->setRequired(true);
+				}
+				$form->addItem($item);
+			}
+
 		}
 
 		return $form;

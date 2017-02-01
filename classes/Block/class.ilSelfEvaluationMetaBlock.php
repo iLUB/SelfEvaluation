@@ -39,10 +39,11 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock {
 
 
 	/**
-	 * @param ilSelfEvaluationMetaBlock $block
+	 * @param ilSelfEvaluationBlock $block
 	 * @param stdClass                  $rec
 	 */
-	protected function setObjectValuesFromRecord(ilSelfEvaluationMetaBlock &$block, $rec) {
+	protected static function setObjectValuesFromRecord(ilSelfEvaluationBlock
+	                                             &$block = null, $rec = null) {
 		parent::setObjectValuesFromRecord($block, $rec);
 		$block->initMetaContainer();
 	}
@@ -59,7 +60,7 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock {
 	/**
 	 * @return string
 	 */
-	public function getTableName() {
+	public static function getTableName() {
 		return 'rep_robj_xsev_mblock';
 	}
 

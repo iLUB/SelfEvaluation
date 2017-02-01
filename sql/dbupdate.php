@@ -240,3 +240,22 @@ if ($this->db->tableExists(ilSelfEvaluationData::TABLE_NAME)) {
     }
 }
 ?>
+<#13>
+<?php
+	require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Question/class.ilSelfEvaluationMetaQuestion.php');
+	/**
+	 * @var $ilDB ilDB
+	 */
+	if ($this->db->tableExists(ilSelfEvaluationMetaQuestion::TABLE_NAME)) {
+
+		if(!$ilDB->tableColumnExists(ilSelfEvaluationMetaQuestion::TABLE_NAME,
+				'short_title')){
+			$field = array(
+					'type' => 'text',
+					'length' => 1024,
+					'notnull' => true
+			);
+			$ilDB->addTableColumn(ilSelfEvaluationMetaQuestion::TABLE_NAME, 'short_title', $field);
+		}
+	}
+?>

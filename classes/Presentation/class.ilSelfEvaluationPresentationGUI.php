@@ -318,6 +318,7 @@ class ilSelfEvaluationPresentationGUI {
 
 	public function newNextPage() {
 		$this->initPresentationForm();
+
 		if ($this->form->checkinput()) {
 			if (is_array($_SESSION['xsev_data'])) {
 				$_SESSION['xsev_data'] = array_merge($_SESSION['xsev_data'], $_POST);
@@ -334,6 +335,7 @@ class ilSelfEvaluationPresentationGUI {
 
 	public function newData() {
 		$this->initPresentationForm();
+
 		if ($this->form->checkinput()) {
             $dataset = ilSelfEvaluationDataset::_getNewInstanceForIdentifierId($this->identity->getId());
             $dataset->setCreationDate($_SESSION['xsev_data']['creation_date_dataset']);
@@ -349,6 +351,7 @@ class ilSelfEvaluationPresentationGUI {
 
 	public function updateData() {
 		$this->initPresentationForm();
+
 		if ($this->form->checkinput()) {
 			$dataset = ilSelfEvaluationDataset::_getInstanceByIdentifierId($this->identity->getId());
 			$dataset->updateValuesByPost($_POST);
