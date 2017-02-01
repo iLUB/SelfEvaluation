@@ -190,10 +190,11 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 */
 	protected function initLeftRightChart($chart_id, $colors) {
 		/** @var ilChartGrid $chart */
-		$chart = $this->initChart(ilChart::TYPE_GRID, $chart_id . '_lr', $colors);
+		$chart = $this->initChart(ilLeftRightChart::TYPE_LEFT_RIGHT, $chart_id . '_lr', $colors);
 		$chart->setYAxisToInteger(true);
 
-		return $chart;	}
+		return $chart;
+	}
 
 	/**
 	 * @param int    $chart_type    the chart type (see ilChart constants)
@@ -203,7 +204,9 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @return ilChart
 	 */
 	protected function initChart($chart_type, $chart_id, $colors) {
-		$chart = ilChart::getInstanceByType($chart_type, $chart_id);
+		include_once("class.ilLeftRightChart.php");
+		$chart = ilLeftRightChart::getInstanceByType($chart_type, $chart_id);
+
 		$chart->setSize(self::WIDTH, self::HEIGHT);
 		$legend = new ilChartLegend();
 		$legend->setBackground($colors[0]);
@@ -234,7 +237,8 @@ class ilSelfEvaluationFeedbackChartGUI {
 		foreach ($data_set->getDataPerBlock($block_id) as $qst_id => $value) {
 			$qst = new ilSelfEvaluationQuestion($qst_id);
 			$data->addPoint($x, $value);
-			$ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $this->pl->txt('question') . ' ' . $x;
+			$ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $this->pl->txt
+					('question') . ' ' . $x;
 			$x ++;
 		}
 		self::setUnusedLegendLabels($scale_units);
@@ -253,22 +257,27 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @return ilChart
 	 */
 	protected function getFeedbackLeftRightChart(ilSelfEvaluationDataset $data_set,
-	                                          $block_id, $color_id, $scale_units) {
+	                                             $block_id, $color_id, $scale_units) {
+
 		$colors = $this->getChartColors();
 		$chart = self::initLeftRightChart($block_id, array($colors[$color_id]));
-		$data = $chart->getDataInstance(ilChartGrid::DATA_BARS);
-		//$chart->setXAxisToInteger(false);
-		$data->setBarOptions(self::BAR_WIDTH, 'center');
+		include_once "class.ilChartDataLeftRight.php";
+		$data = new ilChartDataLeftRight();
+		$chart->setXAxisToInteger(false);
 		$ticks = array();
-		$x = 1;
+
+		$x = 99999;
 		foreach ($data_set->getDataPerBlock($block_id) as $qst_id => $value) {
 			$qst = new ilSelfEvaluationQuestion($qst_id);
-			$data->addPoint($x, $value);
-			$ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $this->pl->txt('question') . ' ' . $x;
-			$x ++;
+			$data->addPoint($value, $x);
+			$ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $this->pl->txt
+					('question') . ' ' . $qst_id;
+			$x --;
+
 		}
+
 		self::setUnusedLegendLabels($scale_units);
-		$chart->setTicks($ticks, $scale_units, true);
+		$chart->setTicks( $scale_units,$ticks, true);
 		$chart->addData($data);
 
 		return $chart;
@@ -354,8 +363,9 @@ class ilSelfEvaluationFeedbackChartGUI {
 
 		$x_axis = array();
 		foreach ($block_data as $block_d) {
-			$data = $chart->getDataInstance(ilChartGrid::DATA_BARS);
-			$data->setBarOptions(self::BAR_WIDTH, 'center');
+			include_once "class.ilChartDataLeftRight.php";
+			$data = new ilChartDataLeftRight();
+
 			$block = new ilSelfEvaluationQuestionBlock($block_d['block_id']);
 			$data->addPoint($block->getPosition(), $block_d['percentage']);
 			$x_axis[$block->getPosition()] = $block_d['label'];

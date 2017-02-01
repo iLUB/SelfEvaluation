@@ -155,6 +155,7 @@ start_new_button#:#Neuen Durchgang starten
 
 show_spider_chart#:#Spinnengrafik anzeigen
 show_bar_chart#:#Balkendiagramm anzeigen
+show_left_right_chart#:#Links-Rechts-Profil anzeigen
 
 msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.

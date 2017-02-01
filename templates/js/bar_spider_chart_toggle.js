@@ -9,11 +9,23 @@ xsevChartToggle = function(parent_id) {
 	this.left_right_chart = this.parent.find('.left_right_chart');
 	var self = this;
 
-	self.spider_chart.hide();
-	self.left_right_chart.hide();
+	console.log(self.spider_chart.find(".flot-overlay"));
+
+
+	this.hideIfLoaded = function(depth) {
+		if((self.spider_chart.find("canvas").length && self.left_right_chart.find("canvas").length) ||
+				depth > 100){
+
+			self.spider_chart.hide();
+			self.left_right_chart.hide();
+		}else{
+			setTimeout(function() {self.hideIfLoaded(++depth)}, 50);
+		}
+	};
+
+	this.hideIfLoaded(0);
 
 	this.deactivateButtons = function(){
-		console.log(self);
 		self.bar_chart_button.removeClass("active");
 		self.spider_chart_button.removeClass("active");
 		self.left_right_chart_button.removeClass("active");
