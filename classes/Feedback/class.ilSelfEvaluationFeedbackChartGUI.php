@@ -23,6 +23,9 @@
 require_once('Services/Chart/classes/class.ilChartGrid.php');
 require_once('Services/Chart/classes/class.ilChartSpider.php');
 
+require_once("class.ilChartDataLeftRight.php");
+require_once("class.ilLeftRightChart.php");
+
 /**
  * Class ilSelfEvaluationFeedbackChartGUI
  *
@@ -74,7 +77,15 @@ class ilSelfEvaluationFeedbackChartGUI {
 		foreach ($data_set->getFeedbacksPerBlock() as $block_id => $fb) {
             $block = new ilSelfEvaluationQuestionBlock($block_id);
 
-            if($obj->getShowFeedbacksCharts() || $obj->getShowBlockTitlesDuringFeedback() || $obj->getShowBlockDescriptionsDuringFeedback() || $obj->getShowFeedbacks()){
+			$show_feedback_charts = $obj->getShowFeedbacksCharts() &&
+					($obj->isShowFbsChartBar() || $obj->isShowFbsChartSpider() ||
+							$obj->isShowFbsChartLeftRight());
+			$show_feedback_overview = $obj->getShowFeedbacksOverview() &&
+					($obj->isShowFbsOverviewBar() || $obj->isShowFbsOverviewSpider() ||
+							$obj->isShowFbsOverviewLeftRight());
+
+            if($show_feedback_charts || $obj->getShowBlockTitlesDuringFeedback() ||
+		            $obj->getShowBlockDescriptionsDuringFeedback() || $obj->getShowFeedbacks()){
                 $tpl->setCurrentBlock('feedback');
 
                 $tpl->setVariable('FEEDBACK_ID', 'xsev_fb_id_' . $fb->getId());
@@ -97,24 +108,29 @@ class ilSelfEvaluationFeedbackChartGUI {
                     $tpl->setVariable('BLOCK_DESCRIPTION', $block->getDescription());
                 }
 
-                if ($obj->getShowFeedbacksCharts()) {
+                if ($show_feedback_charts) {
                     $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj->getId());
                     $units = $scale->getUnitsAsArray();
                     $max_cnt = max(array_keys($units));
 
-                    $bar_chart = $this->getFeedbackBlockBarChart($data_set, $block_id, $color_id, $units);
-                    $tpl->setVariable('BAR_CHART', $bar_chart->getHTML());
-                    $tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
+	                if($obj->isShowFbsChartBar()){
+		                $bar_chart = $this->getFeedbackBlockBarChart($data_set, $block_id, $color_id, $units);
+		                $tpl->setVariable('BAR_CHART', $bar_chart->getHTML());
+		                $tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
+	                }
 
-	                $left_right_chart = $this->getFeedbackLeftRightChart($data_set,
-			                $block_id, $color_id, $units);
-	                $tpl->setVariable('LEFT_RIGHT_CHART', $left_right_chart->getHTML());
-	                $tpl->setVariable('SHOW_LEFT_RIGHT_CHART', $this->pl->txt
-	                ('show_left_right_chart'));
+	                if($obj->isShowFbsChartLeftRight()) {
+		                $left_right_chart = $this->getFeedbackLeftRightChart($data_set, $block_id, $color_id, $units);
+		                $tpl->setVariable('LEFT_RIGHT_CHART', $left_right_chart->getHTML());
+		                $tpl->setVariable('SHOW_LEFT_RIGHT_CHART', $this->pl->txt('show_left_right_chart'));
+	                }
 
-                    $spider_chart = $this->getFeedbackBlockSpiderChart($data_set, $block_id, $color_id, $max_cnt);
-                    $tpl->setVariable('SPIDER_CHART', $spider_chart->getHTML());
-                    $tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
+	                if($obj->isShowFbsChartSpider()){
+		                $spider_chart = $this->getFeedbackBlockSpiderChart($data_set, $block_id, $color_id, $max_cnt);
+		                $tpl->setVariable('SPIDER_CHART', $spider_chart->getHTML());
+		                $tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
+	                }
+
                 } else {
                 	$tpl->setVariable('VISIBILITY_GRAPH', "visibility: hidden");
                 }
@@ -138,14 +154,19 @@ class ilSelfEvaluationFeedbackChartGUI {
 			);
 			$color_id ++;
 		}
-		if (count($data_set->getFeedbacksPerBlock()) > 0 AND $obj->getShowFeedbacksOverview()) {
-			$tpl->setVariable('OVERVIEW_BAR_CHART', $this->getOverviewBlockChart($blocks)->getHTML());
-			$tpl->setVariable('OVERVIEW_LEFT_RIGHT_CHART', $this->getOverviewLeftRightChart($blocks)->getHTML());
-			$tpl->setVariable('OVERVIEW_SPIDER_CHART', $this->getOverviewSpiderChart($blocks)->getHTML());
-			$tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
-			$tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
-			$tpl->setVariable('SHOW_LEFT_RIGHT_CHART', $this->pl->txt('show_left_right_chart'));
-
+		if (count($data_set->getFeedbacksPerBlock()) > 0 AND $show_feedback_overview) {
+			if($obj->isShowFbsOverviewBar()) {
+				$tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
+				$tpl->setVariable('OVERVIEW_BAR_CHART', $this->getOverviewBlockChart($blocks)->getHTML());
+			}
+			if($obj->isShowFbsOverviewSpider()) {
+				$tpl->setVariable('OVERVIEW_SPIDER_CHART', $this->getOverviewSpiderChart($blocks)->getHTML());
+				$tpl->setVariable('SHOW_SPIDER_CHART', $this->pl->txt('show_spider_chart'));
+			}
+			if($obj->isShowFbsOverviewLeftRight()){
+				$tpl->setVariable('OVERVIEW_LEFT_RIGHT_CHART', $this->getOverviewLeftRightChart($blocks)->getHTML());
+				$tpl->setVariable('SHOW_LEFT_RIGHT_CHART', $this->pl->txt('show_left_right_chart'));
+			}
 		}
 		if(!$obj->getShowFeedbacksOverview()) {
 			$tpl->setVariable('VISIBILITY_OVERVIEW', "hidden");
@@ -186,7 +207,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @param string $chart_id  unique identifier for a feedback chart
 	 * @param array  $colors    array of used color values
 	 *
-	 * @return ilChartSpider
+	 * @return ilLeftRightChart
 	 */
 	protected function initLeftRightChart($chart_id, $colors) {
 		/** @var ilChartGrid $chart */
@@ -204,7 +225,6 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @return ilChart
 	 */
 	protected function initChart($chart_type, $chart_id, $colors) {
-		include_once("class.ilLeftRightChart.php");
 		$chart = ilLeftRightChart::getInstanceByType($chart_type, $chart_id);
 
 		$chart->setSize(self::WIDTH, self::HEIGHT);
@@ -261,7 +281,6 @@ class ilSelfEvaluationFeedbackChartGUI {
 
 		$colors = $this->getChartColors();
 		$chart = self::initLeftRightChart($block_id, array($colors[$color_id]));
-		include_once "class.ilChartDataLeftRight.php";
 		$data = new ilChartDataLeftRight();
 		$chart->setXAxisToInteger(false);
 		$ticks = array();
@@ -358,23 +377,23 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @return ilChart
 	 */
 	protected function getOverviewLeftRightChart(array $block_data) {
+
 		$chart = $this->initLeftRightChart('fb_overview', $this->getChartColors());
-		$chart->setSize(self::WIDTH, self::HEIGHT);
+		$data = new ilChartDataLeftRight();
+		$chart->setXAxisToInteger(false);
+		$y_axis = [];
+		$y = 999999;
 
-		$x_axis = array();
 		foreach ($block_data as $block_d) {
-			include_once "class.ilChartDataLeftRight.php";
-			$data = new ilChartDataLeftRight();
-
 			$block = new ilSelfEvaluationQuestionBlock($block_d['block_id']);
-			$data->addPoint($block->getPosition(), $block_d['percentage']);
-			$x_axis[$block->getPosition()] = $block_d['label'];
+			$data->addPoint($block_d['percentage'],$y-$block->getPosition());
+			$y_axis[$y-$block->getPosition()] = $block_d['label'];
 			$chart->addData($data);
 		}
 		// display y-axis in 10% steps
-		$y_axis = array();
+		$x_axis = array();
 		for ($i = 0; $i <= 10; $i++) {
-			$y_axis[$i * 10] = $i * 10 . '%';
+			$x_axis[$i * 10] = $i * 10 . '%';
 		}
 		$chart->setTicks($x_axis, $y_axis, true);
 

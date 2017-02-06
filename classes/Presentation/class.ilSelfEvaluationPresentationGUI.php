@@ -320,14 +320,19 @@ class ilSelfEvaluationPresentationGUI {
 		$this->initPresentationForm();
 
 		if ($this->form->checkinput()) {
+
 			if (is_array($_SESSION['xsev_data'])) {
 				$_SESSION['xsev_data'] = array_merge($_SESSION['xsev_data'], $_POST);
 			} else {
 				$_SESSION['xsev_data'] = $_POST;
 			}
+
+
 			$this->ctrl->setParameter($this, 'page', $_GET['page'] + 1);
 			$this->ctrl->redirect($this, 'startEvaluation');
 		}
+
+
 		$this->form->setValuesByPost();
 		$this->tpl->setContent($this->form->getHTML());
 	}

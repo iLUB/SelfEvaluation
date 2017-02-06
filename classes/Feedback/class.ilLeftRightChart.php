@@ -12,6 +12,11 @@ class ilLeftRightChart extends ilChartGrid
 {
 	const TYPE_LEFT_RIGHT = 99;
 
+	/**
+	 * @param int $a_type
+	 * @param string $a_id
+	 * @return ilChart|ilLeftRightChart
+	 */
 	public static function getInstanceByType($a_type, $a_id)
 	{
 		switch($a_type)
@@ -23,6 +28,10 @@ class ilLeftRightChart extends ilChartGrid
 		return parent::getInstanceByType($a_type, $a_id);
 	}
 
+	/**
+	 * @param ilChartData $a_series
+	 * @return bool
+	 */
 	protected function isValidDataType(ilChartData $a_series)
 	{
 		if($a_series instanceof ilChartDataLeftRight)
@@ -32,6 +41,9 @@ class ilLeftRightChart extends ilChartGrid
 		return false;
 	}
 
+	/**
+	 * @param stdClass $a_options
+	 */
 	public function parseGlobalOptions(stdClass $a_options)
 	{
 		parent::parseGlobalOptions($a_options);
@@ -40,8 +52,7 @@ class ilLeftRightChart extends ilChartGrid
 		$a_options->{"yaxis"}->min = min(array_keys($this->getTicks()["y"]));
 		$a_options->{"yaxis"}->max = max(array_keys($this->getTicks()["y"]));
 
-
+		$a_options->{"xaxis"}->min = min(array_keys($this->getTicks()["x"]));
+		$a_options->{"xaxis"}->max = max(array_keys($this->getTicks()["x"]));
 	}
 }
-	
-?>

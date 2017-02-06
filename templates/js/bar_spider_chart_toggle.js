@@ -1,5 +1,11 @@
 xsevChartToggle = function(parent_id) {
 	this.parent = $('#' + parent_id);
+
+	if(this.parent.find('button').length == 1){
+		this.parent.find('.btn-group').hide();
+		return;
+	}
+
 	this.bar_chart_button = this.parent.find('.bar_chart_button');
 	this.spider_chart_button = this.parent.find('.spider_chart_button');
 	this.left_right_chart_button = this.parent.find('.left_right_chart_button');
@@ -9,20 +15,31 @@ xsevChartToggle = function(parent_id) {
 	this.left_right_chart = this.parent.find('.left_right_chart');
 	var self = this;
 
-	console.log(self.spider_chart.find(".flot-overlay"));
+	this.first_button = null;
 
+	if(this.bar_chart_button.length){
+		this.first_button = this.bar_chart_button;
+	}else if(this.spider_chart_button.length){
+		this.first_button = this.spider_chart_button;
+	}else{
+		this.first_button = this.left_right_chart_button;
+	}
 
 	this.hideIfLoaded = function(depth) {
 		if((self.spider_chart.find("canvas").length && self.left_right_chart.find("canvas").length) ||
 				depth > 100){
 
-			self.spider_chart.hide();
+			if(self.spider_chart_button != self.first_button){
+				self.spider_chart.hide();
+			}
 			self.left_right_chart.hide();
 		}else{
 			setTimeout(function() {self.hideIfLoaded(++depth)}, 50);
 		}
+		return self;
 	};
 
+	this.first_button.addClass("active");
 	this.hideIfLoaded(0);
 
 	this.deactivateButtons = function(){

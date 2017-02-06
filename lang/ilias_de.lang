@@ -69,6 +69,9 @@ feedback_section#:#Darstellung in der Auswertung
 show_block_titles_fb#:#Titel der Frageblöcke im Feedback anzeigen
 show_block_desc_fb#:#Beschreibung der Frageblöcke im Feedback anzeigen
 show_fbs_overview#:#Feedback-Übersichtsgrafik anzeigen
+show_bar#:#Balkendiagramm anzeigen
+show_spider#:#Spinnengrafik anzeigen
+show_left_right#:#Links-Rechts-Profil anzeigen
 show_fbs#:#Einzelfeedback-Texte anzeigen
 show_fbs_charts#:#Einzelfeedback-Grafiken anzeigen
 

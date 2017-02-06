@@ -240,8 +240,9 @@ class ilSelfEvaluationDataset {
 		}
 
 		$qids = [];
+
 		foreach ($array as $item) {
-			if(!array_key_exists($item['qid'],$qids))
+			if(!array_key_exists($item['type'].$item['qid'],$qids))
 			{
 				$da = new ilSelfEvaluationData();
 				$da->setDatasetId($this->getId());
@@ -250,7 +251,7 @@ class ilSelfEvaluationDataset {
 				$da->setQuestionType($item['type']);
 				$da->setCreationDate(time());
 				$da->create();
-				$qids[$item['qid']] = true;
+				$qids[$item['type'].$item['qid']] = true;
 			}
 		}
 	}

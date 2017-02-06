@@ -1,15 +1,24 @@
 
 <div id="fb_overview" class="feedback" {VISIBILITY_OVERVIEW}>
 	<div class="btn-group" role="group" aria-label="Visualization Swith">
+		<!-- BEGIN overview_bar_button -->
 		<button type="button" class="btn btn-default bar_chart_button active">
 			{SHOW_BAR_CHART}
 		</button>
+		<!-- END overview_bar_button -->
+
+		<!-- BEGIN overview_spider_button -->
 		<button type="button" class="btn btn-default spider_chart_button">
 			{SHOW_SPIDER_CHART}
 		</button>
+		<!-- END overview_spider_button -->
+
+		<!-- BEGIN overview_left_right_button -->
 		<button type="button" class="btn btn-default left_right_chart_button">
 			{SHOW_LEFT_RIGHT_CHART}
 		</button>
+		<!-- END overview_left_right_button -->
+
 	</div>
 
 	<div class="bar_chart">{OVERVIEW_BAR_CHART}</div>
@@ -23,20 +32,31 @@
 
 <!-- BEGIN feedback -->
 <div class="feedback" id="{FEEDBACK_ID}" >
-	<h1 class="feedback_block_title">{BLOCK_TITLE}<!-- BEGIN block_abbreviation -->
-        <span class="feedback_block_abbreviation">{BLOCK_ABBREVIATION}</span><!-- END block_abbreviation -->
+	<h1 class="feedback_block_title">{BLOCK_TITLE}
+		<!-- BEGIN block_abbreviation -->
+        <span class="feedback_block_abbreviation">{BLOCK_ABBREVIATION}</span>
+		<!-- END block_abbreviation -->
     </h1>
 	<p>{BLOCK_DESCRIPTION}</p>
 	<div class="btn-group" role="group" aria-label="Visualization Swith">
+
+		<!-- BEGIN chart_bar_button -->
 		<button type="button" class="btn btn-default bar_chart_button active">
 			{SHOW_BAR_CHART}
 		</button>
+		<!-- END chart_bar_button -->
+
+		<!-- BEGIN chart_spider_button -->
 		<button type="button" class="btn btn-default spider_chart_button">
 			{SHOW_SPIDER_CHART}
 		</button>
+		<!-- END chart_spider_button -->
+
+		<!-- BEGIN chart_left_right_button -->
 		<button type="button" class="btn btn-default left_right_chart_button">
 			{SHOW_LEFT_RIGHT_CHART}
 		</button>
+		<!-- END chart_left_right_button -->
 	</div>
 
 	<div class="bar_chart">{BAR_CHART}</div>
