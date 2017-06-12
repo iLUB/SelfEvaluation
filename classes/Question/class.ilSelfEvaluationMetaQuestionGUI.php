@@ -92,13 +92,19 @@ class ilSelfEvaluationMetaQuestionGUI extends iLubFieldDefinitionContainerGUI {
         // Add the allowed types here
         require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeText.php');
         require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSelect.php');
-        $types[] = new iLubFieldDefinitionTypeText();
+	    require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSingleChoice.php');
+	    require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeMatrix.php');
+
+	    $types[] = new iLubFieldDefinitionTypeText();
         $types[] = new iLubFieldDefinitionTypeSelect();
-        /*
-         * TODO add a radio button type for the gender, a text-area type for arbitrarily long text and a select-year-of-birth type
-         * -> create new iLubFieldDefinitionTypeXYZ objects and add them here
-         * @see http://ilublx3.unibe.ch:8080/mantis/view.php?id=514#c928
-         */
+	    $types[] = new iLubFieldDefinitionTypeSingleChoice();
+	    $types[] = new iLubFieldDefinitionTypeMatrix();
+
+	    /*
+		 * TODO add a radio button type for the gender, a text-area type for arbitrarily long text and a select-year-of-birth type
+		 * -> create new iLubFieldDefinitionTypeXYZ objects and add them here
+		 * @see http://ilublx3.unibe.ch:8080/mantis/view.php?id=514#c928
+		 */
         return $types;
     }
 } 

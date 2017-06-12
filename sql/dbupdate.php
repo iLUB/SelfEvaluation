@@ -240,3 +240,65 @@ if ($this->db->tableExists(ilSelfEvaluationData::TABLE_NAME)) {
     }
 }
 ?>
+<#13>
+<?php
+	require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Question/class.ilSelfEvaluationMetaQuestion.php');
+	/**
+	 * @var $ilDB ilDB
+	 */
+	if ($this->db->tableExists(ilSelfEvaluationMetaQuestion::TABLE_NAME)) {
+
+		if(!$ilDB->tableColumnExists(ilSelfEvaluationMetaQuestion::TABLE_NAME,
+				'short_title')){
+			$field = array(
+					'type' => 'text',
+					'length' => 1024,
+					'notnull' => true
+			);
+			$ilDB->addTableColumn(ilSelfEvaluationMetaQuestion::TABLE_NAME, 'short_title', $field);
+		}
+	}
+?>
+<#14>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+	$field = array(
+			'type' => 'integer',
+			'length' => 4
+	);
+	if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_bar')){
+		$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_bar', $field);
+	}
+	if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_spider')){
+		$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_spider', $field);
+	}
+	if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_left_right')){
+		$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_left_right', $field);
+	}
+
+	if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_chart_bar')){
+		$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_chart_bar', $field);
+	}
+	if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_chart_spider')){
+		$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_chart_spider', $field);
+	}
+	if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_chart_left_right')){
+		$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_chart_left_right', $field);
+	}
+
+	$ilDB->manipulate('UPDATE ' . ilObjSelfEvaluation::TABLE_NAME .
+			' SET
+			`show_fbs_overview_bar` = 1,
+			`show_fbs_overview_spider` = 1,
+			`show_fbs_overview_left_right` = 1,
+			`show_fbs_chart_bar` = 1,
+			`show_fbs_chart_spider` = 1,
+			`show_fbs_chart_left_right` = 1
+			;');
+
+}
+?>

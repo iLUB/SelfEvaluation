@@ -238,14 +238,21 @@ class ilSelfEvaluationDataset {
 		if ($this->getId() == 0) {
 			$this->create();
 		}
+
+		$qids = [];
+
 		foreach ($array as $item) {
-			$da = new ilSelfEvaluationData();
-			$da->setDatasetId($this->getId());
-			$da->setQuestionId($item['qid']);
-			$da->setValue($item['value']);
-			$da->setQuestionType($item['type']);
-            $da->setCreationDate(time());
-			$da->create();
+			if(!array_key_exists($item['type'].$item['qid'],$qids))
+			{
+				$da = new ilSelfEvaluationData();
+				$da->setDatasetId($this->getId());
+				$da->setQuestionId($item['qid']);
+				$da->setValue($item['value']);
+				$da->setQuestionType($item['type']);
+				$da->setCreationDate(time());
+				$da->create();
+				$qids[$item['type'].$item['qid']] = true;
+			}
 		}
 	}
 

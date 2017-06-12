@@ -52,4 +52,3 @@ You have a new folder SelfEvaluation. Cd into that folder and be sure to check o
 In ILIAS go to Administration -> Plugins then click on the Actions button to the right of the plugin. Update the plugin first, after that activate it through the Actions button.
 
 You can now add the SelfEvaluation to your course. 
-

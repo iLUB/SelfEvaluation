@@ -15,7 +15,7 @@
 			return false;
 		}
 
-		$('span.add_button').live("click", handler);
+		$('span.add_button').on("click", handler);
 		$('span.delete_button').click(function () {
 			var mydiff = $(this).parent().parent().parent();
 			mydiff.find('input').each(function () {

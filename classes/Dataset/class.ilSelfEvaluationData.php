@@ -35,7 +35,7 @@ class ilSelfEvaluationData {
 	/**
 	 * @var string
 	 */
-	protected $value = NULL;
+	protected $value = '';
 
 
 	/**
@@ -129,6 +129,7 @@ class ilSelfEvaluationData {
 			return;
 		}
 		$this->setId($this->db->nextID(self::TABLE_NAME));
+
 		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
 	}
 
@@ -215,8 +216,8 @@ class ilSelfEvaluationData {
 		global $ilDB;
 		$stmt = $ilDB->prepare('SELECT * FROM ' . self::TABLE_NAME .
 			' WHERE dataset_id = ? AND question_id = ? AND question_type = ?;', array('integer', 'integer', 'text'));
-		$set = $ilDB->execute($stmt, array($dataset_id, $question_id, $question_type));
-		while ($rec = $ilDB->fetchObject($set)) {
+		$ilDB->execute($stmt, array($dataset_id, $question_id, $question_type));
+		while ($rec = $ilDB->fetchObject($stmt)) {
 			$data = new ilSelfEvaluationData();
 			$data->setObjectValuesFromRecord($data, $rec);
 
@@ -298,7 +299,7 @@ class ilSelfEvaluationData {
 	 * @param string $value
 	 */
 	public function setValue($value) {
-		$this->value = $value;
+		$this->value = serialize($value);
 	}
 
 
@@ -306,6 +307,10 @@ class ilSelfEvaluationData {
 	 * @return string
 	 */
 	public function getValue() {
+		$unserialized = unserialize($this->value);
+		if($unserialized !== false){
+			return $unserialized;
+		}
 		return $this->value;
 	}
 
