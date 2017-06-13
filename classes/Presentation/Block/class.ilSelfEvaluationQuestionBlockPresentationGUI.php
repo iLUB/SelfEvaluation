@@ -1,7 +1,7 @@
 <?php
 require_once('class.ilSelfEvaluationBlockPresentationGUI.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionPresentationGUI.php');
-require_once('./Customizing/global/plugins/Libraries/InputGUIs/classes/class.ilMatrixHeaderGUI.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilMatrixHeaderGUI.php');
 
 /**
  * GUI-Class SelfEvaluation

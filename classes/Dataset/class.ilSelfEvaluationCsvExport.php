@@ -20,10 +20,10 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-require_once('./Customizing/global/plugins/Libraries/Export/class.csvExport.php');
-require_once('./Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeMatrix.php');
-require_once('./Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSelect.php');
-require_once('./Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSingleChoice.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Export/class.csvExport.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeMatrix.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSelect.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSingleChoice.php');
 
 /**
  * Class ilSelfEvaluationCsvExport

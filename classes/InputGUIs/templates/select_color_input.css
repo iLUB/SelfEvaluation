@@ -1,0 +1,10 @@
+/* Custom styling of Menucool Color Picker v2012.8.30. http://www.menucool.com/color-picker (customcolorpicker.css) */
+
+span.colorpicker {
+	display:inline-block;
+	/*max-width: 25em;*/
+}
+
+span.colorpicker span.hexbox, .colorpicker span.bgbox {
+	height: 20px;
+}

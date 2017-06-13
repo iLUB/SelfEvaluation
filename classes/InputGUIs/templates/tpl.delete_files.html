@@ -1,0 +1,33 @@
+<table class="ilFileUploadEntry" id="ilFileDeleteList" datatable="0">
+	<tbody>
+	<!-- BEGIN file -->
+		<tr class="ilFileUploadEntryHeader{ROW_CLASS}">
+			<td class="ilFileUploadEntryFileName ilFileDeleteList">
+				<!-- BEGIN icon -->
+				<span class="ilDownloadIcon">
+					<a href="{LINK}">
+						<img src="{SRC_ICON}" alt="{ALT_ICON}" title="{TITLE_ICON}" />
+					</a>
+				</span>
+				<!-- END icon -->
+				<span class="ilFileName">
+					<!-- BEGIN file_link -->
+					<a href="{LINK}">{TITLE}</a>
+					<!-- END file_link -->
+					{TITLE}
+				</span>
+			</td>
+			<td class="ilFileUploadEntryCancel">
+				<input id="il_delete_file_{FILE_ID}" class="submit" type="button" src="{FILE_CANCEL_ICON}" value="{BUTTON_TEXT}"{DISABLED} />
+			</td>
+		</tr>
+	<!-- END file -->
+	</tbody>
+</table>
+<input type="hidden" id="{ID}" name="{NAME}" value="{VALUE}" />
+<script type="text/javascript">
+(function () {
+	var ilFileDeleteList = new ilFileDeleteClass('{ID}', 'il_delete_file_');
+	ilFileDeleteList.init();
+}());
+</script>

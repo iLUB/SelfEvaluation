@@ -20,49 +20,47 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
+require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilSelectInputGUIwrapper.php');
 
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
 /**
- * Class ilSelfEvaluationBlockTableRow
+ * Class ilSelectInputGUIwrapper
+ * Improve input validation check: allowed POST values should match one of the set options.
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class ilSelectInputGUIwithDefaultText extends ilSelectInputGUIwrapper {
+
+	const IGNORE_KEY = 'ilsel_dummy';
+
 
 	/**
-	 * @param ilSelfEvaluationMetaBlock $block
+	 * Prepends the options with an information text "select an item"
+	 *
+	 * @param array $a_options
 	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
+	function setOptions($a_options) {
+		global $lng;
 
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
-
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
-
-
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
+		parent::setOptions(array(self::IGNORE_KEY => $lng->txt('select_one')) + $a_options);
 	}
 
 
 	/**
-	 * @return ilSelfEvaluationTableAction
+	 * Check input, strip slashes etc. set alert, if input is not ok.
+	 *
+	 * @return	boolean		Input ok, true/false
 	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
+	function checkInput() {
+		global $lng;
 
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+		$ok = parent::checkInput();
+		if ($ok AND $this->getRequired() AND $_POST[$this->getPostVar()] == self::IGNORE_KEY) {
+			$this->setAlert($lng->txt('msg_input_is_required'));
+
+			return FALSE;
+		}
+
+		return $ok;
 	}
 }

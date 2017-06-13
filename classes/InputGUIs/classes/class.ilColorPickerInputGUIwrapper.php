@@ -21,48 +21,34 @@
 	+-----------------------------------------------------------------------------+
 */
 
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
 /**
- * Class ilSelfEvaluationBlockTableRow
+ * Class ilColorPickerInputGUIwrapper
+ * This class extends the ilColorPickerInputGUI's JavaScript such that set color is already displayed by default.
+ * Further, entering a hex code into the text input field updates the displayed color.
+ * These changes are included in Ilias since version 4.4.5. This wrapper provides these changes to older versions of
+ * Ilias
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
+ * @uses    ilColorPickerInputGUI
  */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
-
-	/**
-	 * @param ilSelfEvaluationMetaBlock $block
-	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
-
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
-
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
-
-
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
-	}
+class ilColorPickerInputGUIwrapper extends ilColorPickerInputGUI {
 
 
 	/**
-	 * @return ilSelfEvaluationTableAction
+	 * @param ilTemplate $a_tpl
+	 *
+	 * @return int|void
 	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
+	function insert(&$a_tpl) {
+		parent::insert($a_tpl);
+		$a_tpl->setCurrentBlock('prop_custom');
 
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+		$js_tpl = new ilTemplate('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/templates/tpl.il_color_picker_wrapper.html', TRUE, TRUE);
+		$js_tpl->setVariable('INIT_COLOR','#'.$this->getHexcode());
+		$js_tpl->setVariable('POST_VAR', $this->getPostVar());
+
+		$a_tpl->setVariable('CUSTOM_CONTENT', $js_tpl->get());
+		$a_tpl->parseCurrentBlock();
 	}
 }

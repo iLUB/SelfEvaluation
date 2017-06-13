@@ -21,48 +21,61 @@
 	+-----------------------------------------------------------------------------+
 */
 
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
 /**
- * Class ilSelfEvaluationBlockTableRow
+ * Class csvExportValue
  *
- * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class csvExportValue {
+    /**
+     * @var csvExportColumn
+     */
+    protected $column = null;
+    /**
+     * @var string
+     */
+    protected $value = "";
 
-	/**
-	 * @param ilSelfEvaluationMetaBlock $block
-	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
+    /**
+     * @param string $column_name
+     * @param string $value
+     */
+    function __construct($column_name, $value){
+        $this->column = new csvExportColumn($column_name);
+        $this->value = $value;
+    }
 
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
+    /**
+     * @param \csvExportColumn $column
+     */
+    public function setColumn($column)
+    {
+        $this->column = $column;
+    }
 
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
+    /**
+     * @return \csvExportColumn
+     */
+    public function getColumn()
+    {
+        return $this->column;
+    }
 
 
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
-	}
+    /**
+     * @param string $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-
-	/**
-	 * @return ilSelfEvaluationTableAction
-	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
-
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
-	}
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 }

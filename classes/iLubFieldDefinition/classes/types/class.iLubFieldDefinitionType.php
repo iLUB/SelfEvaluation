@@ -20,69 +20,86 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinition.php');
+require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeOption.php');
 
 /**
- * Class ilSelfEvaluationMetaQuestion
+ * Class iLubFieldDefinitionType
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition {
+abstract class iLubFieldDefinitionType {
 
-	const TABLE_NAME = 'rep_robj_xsev_mqst';
+	/**
+	 * Make sure the type id is unique (at least within the container)
+	 * @return int
+	 */
+	abstract public function getId();
 
 
 	/**
-	 * @param string $container_id
-	 * @param int    $id
+	 * Return a title in the users translation
+	 * @return string
 	 */
-	public function __construct($container_id, $id = 0) {
-		parent::__construct(self::TABLE_NAME, $container_id, $id);
+	abstract public function getTypeName();
+
+
+	/**
+	 * @param iLubFieldDefinitionTypeOption $option
+	 *
+	 * @return iLubFieldDefinitionTypeOption
+	 */
+	abstract public function getValueDefinitionInputGUI(iLubFieldDefinitionTypeOption &$option);
+
+
+	/**
+	 * @param iLubFieldDefinitionTypeOption $item
+	 * @param array                         $values
+	 */
+	abstract public function setValues(iLubFieldDefinitionTypeOption $item, $values = array());
+
+
+	/**
+	 * @param ilPropertyFormGUI $form
+	 *
+	 * @return array
+	 */
+	abstract public function getValues(ilPropertyFormGUI $form);
+
+
+	/**
+	 * Define how this type is displayed in an ilFormPropertyGUI
+	 *
+	 * @param string $title
+	 * @param string $postvar
+	 * @param array  $values
+	 *
+	 * @return ilFormPropertyGUI
+	 */
+	abstract public function getPresentationInputGUI($title, $postvar, $values);
+
+
+	/**
+	 * @return string
+	 */
+	public function __toString() {
+		return 'type_id=' . $this->getId();
 	}
 
 
 	/**
-	 * @param int $field_id
+	 * @param int $type_id
+	 * @param \iLubFieldDefinitionType[]
 	 *
-	 * @return bool
+	 * @return bool|\iLubFieldDefinitionType
 	 */
-	public static function isObject($field_id) {
-		global $ilDB;
-
-		$set = $ilDB->query('SELECT field_id FROM ' . self::TABLE_NAME . ' WHERE field_id = '
-			. $ilDB->quote($field_id, 'integer'));
-
-		while ($rec = $ilDB->fetchObject($set)) {
-			return true;
+	public static function getTypeByTypeId($type_id, $types) {
+		foreach ($types as $type) {
+			if ($type instanceof iLubFieldDefinitionType AND $type->getId() == $type_id) {
+				return $type;
+			}
 		}
 
 		return false;
 	}
-
-    //
-    // Static
-    //
-    /**
-     * @param int  $parent_id is a meta_block id
-     * @param bool $as_array
-     *
-     * @return ilSelfEvaluationMetaQuestion[]
-     */
-    public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
-        global $ilDB;
-        $return = array();
-        $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE container_id = '
-            . $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
-
-        while ($rec = $ilDB->fetchObject($set)) {
-            if ($as_array) {
-                $return[$rec->field_id] = (array)new self($parent_id, $rec->field_id);
-            } else {
-                $return[$rec->field_id] = new self($parent_id, $rec->field_id);
-            }
-        }
-
-        return $return;
-    }
 } 

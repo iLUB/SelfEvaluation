@@ -20,49 +20,37 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
+require_once('Services/Form/classes/class.ilRadioOption.php');
 
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
 /**
- * Class ilSelfEvaluationBlockTableRow
+ * Class xbgRadioOptionWithImage
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class xbgRadioOptionWithImage extends ilRadioOption {
 
 	/**
-	 * @param ilSelfEvaluationMetaBlock $block
+	 * @param string $radio_group_field_id  use ilRadioGroupInputGUI->getFieldId()
+	 * @param string $title                 text of the radio option
+	 * @param string $value                 value of the radio option
+	 * @param string $image_path            path to the image
+	 * @param string $image_alt_text        alternative text
+	 * @param string $class                 this class is set to the image element
 	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
+	function __construct($radio_group_field_id, $title, $value, $image_path, $image_alt_text = '', $class = 'radio_img') {
+		$this->setTitle($title);
+		$this->setValue($value);
+		if ($image_alt_text = '') {
+			$image_alt_text = $value;
+		}
 
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
+		$template = new ilTemplate('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/templates/tpl.radio_option_with_images.html', TRUE, TRUE);
+		$template->setVariable('OP_ID', $radio_group_field_id . '_' . $value);
+		$template->setVariable('IMG_PATH', $image_path);
+		$template->setVariable('IMG_CLASS', $class);
+		$template->setVariable('ALT_TXT', $image_alt_text);
 
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
-
-
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
-	}
-
-
-	/**
-	 * @return ilSelfEvaluationTableAction
-	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
-
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+		$this->setInfo($template->get());
 	}
 }

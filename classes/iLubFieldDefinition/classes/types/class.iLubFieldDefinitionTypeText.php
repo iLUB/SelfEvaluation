@@ -20,49 +20,79 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
+require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionType.php');
 
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
 /**
- * Class ilSelfEvaluationBlockTableRow
+ * Class iLubFieldDefinitionTypeText
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class iLubFieldDefinitionTypeText extends iLubFieldDefinitionType {
+
+
+	const TYPE_ID = 1;
 
 	/**
-	 * @param ilSelfEvaluationMetaBlock $block
+	 * @return int
 	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
-
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
-
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
-
-
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
+	public function getId() {
+		return self::TYPE_ID;
 	}
 
 
 	/**
-	 * @return ilSelfEvaluationTableAction
+	 * Return a title in the users translation
+	 *
+	 * @return string
 	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
+	public function getTypeName() {
+		global $lng;
+		$lng->loadLanguageModule('ps');
 
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+		return $lng->txt('ps_type_txt_long');
+	}
+
+
+	/**
+	 * @param iLubFieldDefinitionTypeOption $option
+	 *
+	 * @return iLubFieldDefinitionTypeOption
+	 */
+	public function getValueDefinitionInputGUI(iLubFieldDefinitionTypeOption &$option) {
+		return $option;
+	}
+
+
+	/**
+	 * @param iLubFieldDefinitionTypeOption $item
+	 * @param array                         $values
+	 */
+	public function setValues(iLubFieldDefinitionTypeOption $item, $values = array()) {}
+
+
+	/**
+	 * @param ilPropertyFormGUI $form
+	 *
+	 * @return array
+	 */
+	public function getValues(ilPropertyFormGUI $form) {
+		return array();
+	}
+
+
+	/**
+	 * @param string $title
+	 * @param string $postvar
+	 * @param array  $values
+	 *
+	 * @return ilFormPropertyGUI
+	 */
+	public function getPresentationInputGUI($title, $postvar, $values) {
+		$text = new ilTextInputGUI($title, $postvar);
+		$text->setSize(32);
+		$text->setMaxLength(255);
+
+		return $text;
 	}
 }

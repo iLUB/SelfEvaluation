@@ -1,5 +1,5 @@
 <?php
-require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionType.php');
+require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionType.php');
 /**
  * Class ilSelfEvaluationMetaQuestionGUI
  *

@@ -21,48 +21,40 @@
 	+-----------------------------------------------------------------------------+
 */
 
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
 /**
- * Class ilSelfEvaluationBlockTableRow
+ * Class ilMultiSelectInputGUIwrapper
+ * Improve input validation check: allowed POST values should match one of the set options.
+ * Make width and height setting configurable.
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
+ * @see https://www.ilias.de/mantis/view.php?id=13499
  */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
-
+class ilMultiSelectInputGUIwrapper extends ilMultiSelectInputGUI {
 	/**
-	 * @param ilSelfEvaluationMetaBlock $block
+	 * Check input, strip slashes etc. set alert, if input is not ok.
+	 *
+	 * @return	boolean		Input ok, true/false
 	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
+	function checkInput() {
+		global $lng;
 
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
+		$ok = parent::checkInput();
+		if ($ok) {
+			foreach ($_POST[$this->getPostVar()] as $k => $v) {
+				// Ignore 'select all'
+				if ($this->select_all AND $k == 0 AND $_POST[$this->getPostVar()][$k] == '') {
+					continue;
+				}
+				// Alert on invalid option
+				if (!array_key_exists($_POST[$this->getPostVar()][$k], $this->getOptions()))
+				{
+					$this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
+					return FALSE;
+				}
+			}
+		}
 
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
-
-
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
-	}
-
-
-	/**
-	 * @return ilSelfEvaluationTableAction
-	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
-
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+		return $ok;
 	}
 }

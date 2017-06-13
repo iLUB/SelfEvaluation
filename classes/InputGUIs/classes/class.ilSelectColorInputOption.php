@@ -20,49 +20,111 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
-/**
- * Class ilSelfEvaluationBlockTableRow
- *
- * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- * @version $Id$
- */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class ilSelectColorInputOption {
 
 	/**
-	 * @param ilSelfEvaluationMetaBlock $block
+	 * @var int
 	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
+	protected $id;
+	/**
+	 * @var string
+	 */
+	protected $color;
+	/**
+	 * @var string
+	 */
+	protected $title;
+	/**
+	 * @var array
+	 */
+	protected $style_properties = array();
 
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
 
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
-
-
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
+	/**
+	 * @param int    $id        color id
+	 * @param string $color     color code
+	 * @param string $title     name of the color
+	 */
+	public function __construct($id, $color, $title = '') {
+		$this->setId($id);
+		$this->setColor($color);
+		$this->setTitle($title);
 	}
 
 
 	/**
-	 * @return ilSelfEvaluationTableAction
+	 * @param string $color
 	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
+	public function setColor($color) {
+		if ($color == 'transparent') {
+			$this->color = $color;
+		} else {
+			require_once('Services/Form/classes/class.ilColorPickerInputGUI.php');
+			$hex_code = '#' . ilColorPickerInputGUI::determineHexcode($color);
+			$this->color = $hex_code;
+		}
+	}
 
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+
+	/**
+	 * @return string
+	 */
+	public function getColor() {
+		return $this->color;
+	}
+
+
+	/**
+	 * @param int $id
+	 */
+	public function setId($id) {
+		$this->id = $id;
+	}
+
+
+	/**
+	 * @return int
+	 */
+	public function getId() {
+		return $this->id;
+	}
+
+
+	/**
+	 * @param string $title
+	 */
+	public function setTitle($title) {
+		$this->title = $title;
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function getTitle() {
+		return $this->title;
+	}
+
+
+	/**
+	 * @param array $property
+	 */
+	public function setStyleProperties($property) {
+		$this->style_properties = $property;
+	}
+
+
+	/**
+	 * @param string $property
+	 */
+	public function addStyleProperty($property) {
+		$this->style_properties[] = $property;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getStyleProperties() {
+		return $this->style_properties;
 	}
 }

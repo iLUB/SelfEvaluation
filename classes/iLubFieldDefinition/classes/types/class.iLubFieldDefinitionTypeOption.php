@@ -21,48 +21,52 @@
 	+-----------------------------------------------------------------------------+
 */
 
-require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
 /**
- * Class ilSelfEvaluationBlockTableRow
+ * Class iLubFieldDefinitionTypeOption
  *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class iLubFieldDefinitionTypeOption extends ilRadioOption {
 
 	/**
-	 * @param ilSelfEvaluationMetaBlock $block
+	 * @param string $info
 	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
-
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
-
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
-
-
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
+	public function __construct($info = '') {
+		parent::__construct('', '', $info);
 	}
 
 
 	/**
-	 * @return ilSelfEvaluationTableAction
+	 * @param bool $disabled
 	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
+	public function setDisabled($disabled) {
+		$this->disabled = $disabled;
 
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
+		foreach($this->getSubItems() as $sub_item) {
+			$this->disable($sub_item, $disabled);
+		}
 	}
+
+
+	/**
+	 * Disable items recursively
+	 *
+	 * @param object $item
+	 * @param bool   $disabled
+	 */
+	protected function disable($item, $disabled) {
+		if (method_exists($item , 'getSubItems')) {
+			foreach ($item->getSubItems() as $sub_item) {
+				$this->disable($sub_item, $disabled);
+			}
+		}
+
+		if (method_exists($item, 'setDisabled')) {
+			$item->setDisabled($disabled);
+		}
+	}
+
+
+
 }

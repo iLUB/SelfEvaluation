@@ -22,7 +22,7 @@
 */
 require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestionFactory.php');
-require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainer.php');
+require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainer.php');
 
 /**
  * Class ilSelfEvaluationMetaBlock
