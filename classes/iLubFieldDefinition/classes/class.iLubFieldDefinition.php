@@ -293,7 +293,8 @@ class iLubFieldDefinition {
 			array('integer'));
 		$this->db->execute($stmt, array($this->getId()));
 
-		$row = $stmt->fetch(PDO::FETCH_OBJ);
+		$row = $stmt->fetch(ilDBConstants::FETCHMODE_OBJECT);
+
 		$this->setValuesFromRecord($row);
 	}
 

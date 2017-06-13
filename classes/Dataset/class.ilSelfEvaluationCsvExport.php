@@ -76,7 +76,7 @@ class ilSelfEvaluationCsvExport extends csvExport{
         $this->getData();
         $this->setColumns();
         $this->setRows();
-        parent::getCsvExport(";");
+        parent::getCsvExport($delimiter);
     }
 
     protected function getData(){
