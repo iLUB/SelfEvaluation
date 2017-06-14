@@ -61,16 +61,18 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 	public function setValueByArray($value) {
 		parent::setValueByArray($value);
 
+
 		$post_var_parts = explode("[", str_replace("]", "", $this->getPostVar()));
 
 		$value = $_POST;
 		foreach ($post_var_parts as $part) {
-			if (array_key_exists($part,$value)) {
+			if (is_array($value) && array_key_exists($part,$value)) {
 				$value = $value[$part];
 			}else{
 				return;
 			}
 		}
+
 		$this->setValue($value);
 	}
 
@@ -137,16 +139,20 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 			$post_var_parts = explode("[", str_replace("]", "", $this->getPostVar()));
 
 			$value = $_POST;
-			foreach ($post_var_parts as $part) {
-				if (!array_key_exists($part,$value)) {
-					$this->setAlert($DIC->language()->txt('msg_input_is_required'));
-					return false;
-				}
-				$value = $value[$part];
 
+
+			$pass = true;
+			foreach ($post_var_parts as $part) {
+				if (!is_array($value) || !array_key_exists($part,$value)) {
+					$pass = false;
+					$this->setAlert($DIC->language()->txt('msg_input_is_required'));
+
+				}else{
+					$value = $value[$part];
+				}
 			}
 
-			if (trim($value) == '') {
+			if (!$pass || trim($value) == '') {
 				$this->setAlert($DIC->language()->txt('msg_input_is_required'));
 				return false;
 			}
