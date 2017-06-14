@@ -198,4 +198,11 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 	public function getBlockInfo() {
 		return $this->block_info;
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getRequired() {
+		return false;
+	}
 }
