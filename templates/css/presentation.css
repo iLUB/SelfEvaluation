@@ -35,7 +35,7 @@ h4 {
     padding-left: 0;
 }
 .block-question .rating td{
-    padding-top: 4px;
+    padding-top: 6px;
     padding-bottom: 4px;
 }
 .block-question .rating .inputs{
@@ -87,4 +87,11 @@ h4 {
 }
 .sev-commands{
     margin-top: 20px;
+}
+.self-matrix_header, .self-matrix_field{
+    border-bottom: 1px solid #eee;
+}
+.block-question + :not(.self-matrix_field ){
+    margin-top: -1px;
+    border-top: 1px solid #a1a1a1;
 }

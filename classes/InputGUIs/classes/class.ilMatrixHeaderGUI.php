@@ -51,7 +51,7 @@ class ilMatrixHeaderGUI extends ilCustomInputGUI {
 	 */
 	public function __construct($a_title = '', $a_postvar = '') {
 		parent::__construct($a_title, $a_postvar);
-		$this->setType('marix_header');
+		$this->setType('matrix_header');
 	}
 
 

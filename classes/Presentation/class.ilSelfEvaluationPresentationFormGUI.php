@@ -94,6 +94,8 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
                 $this->tpl->setVariable("QUESTION_SIZE",$this->getQuestionFieldSize());
                 $this->tpl->setVariable("RATING_SIZE_COMMAND",12-$this->getQuestionFieldSize());
                 $this->tpl->setVariable("QUESTION_SIZE_COMMAND",$this->getQuestionFieldSize());
+                $this->tpl->setVariable("TYPE",$item->getType());
+
                 $this->insertItem($item);
             }
         }

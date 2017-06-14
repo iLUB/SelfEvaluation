@@ -25,6 +25,14 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI {
 	 */
 	protected $scale = array();
 
+	/**
+	 * @param string $a_title
+	 * @param string $a_postvar
+	 */
+	public function __construct($a_title = '', $a_postvar = '') {
+		parent::__construct($a_title, $a_postvar);
+		$this->setType('matrix_field');
+	}
 
 	public function getHtml() {
 		return $this->buildHTML();
