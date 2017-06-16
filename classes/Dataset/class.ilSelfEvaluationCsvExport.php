@@ -264,6 +264,15 @@ class ilSelfEvaluationCsvExport extends csvExport{
                 if(is_array($question_values) && array_key_exists($key, $question_values)){
                     $entry_value = $question_values[$key];
                     $meta_csv_values[] = new csvExportValue($column_name, $entry_value);
+                }else{
+                    //legacy issue, get ID from time with none JSON-Save of values.
+                    foreach($question_values as $qkey => $qvalue){
+                        if($qvalue == $key){
+                            $key = $qkey;
+                            break;
+                        }
+                    }
+                    $meta_csv_values[] = new csvExportValue($column_name,$key);
                 }
             }else{
                 $meta_csv_values[] = new csvExportValue($column_name,$key);
