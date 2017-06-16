@@ -85,7 +85,6 @@ class csvExampleTest extends PHPUnit_Framework_TestCase
             2=>Array (0 => "be1r3c1",1=>"e1r3c2",2=>"e1r3c3"),
             3=>Array (0 => "ce1r1c1",1=>"e1r1c2",2=>"e1r1c3"));
         $this->assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
-        return $this->csvExport->getTable();
 
     }
 

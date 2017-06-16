@@ -79,7 +79,11 @@ class csvExportRow {
      */
     public function getValue(csvExportColumn $column)
     {
-        return $this->values[$column->getColumnId()];
+        if(array_key_exists($column->getColumnId(),$this->values)){
+            return $this->values[$column->getColumnId()];
+        }else{
+            return null;
+        }
     }
 
     /**

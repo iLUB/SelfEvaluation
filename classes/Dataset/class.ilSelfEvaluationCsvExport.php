@@ -102,6 +102,7 @@ class ilSelfEvaluationCsvExport extends csvExport{
         $this->getTable()->setSortColumn("starting_date");
 
 
+
         foreach($this->getMetaQuestions() as $meta_question){
 
             if($meta_question->getTypeId() == iLubFieldDefinitionTypeMatrix::TYPE_ID){
@@ -120,9 +121,10 @@ class ilSelfEvaluationCsvExport extends csvExport{
                             $question." ID",
                             $position
                         ));
+                    $position++;
                 }
 
-                $position++;
+
             }else{
                 if($meta_question->getShortTitle()){
                     $column_name = $meta_question->getShortTitle();
@@ -146,6 +148,7 @@ class ilSelfEvaluationCsvExport extends csvExport{
                             $position
                         ));
                 }
+                $position++;
             }
 
         }
