@@ -345,6 +345,9 @@ class ilSelfEvaluationDataset {
 			$x ++;
 		}
 
+		if($x == 0){
+			return 100;
+		}
 		return round($sum / $x, 2);
 	}
 
