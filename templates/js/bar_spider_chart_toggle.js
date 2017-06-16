@@ -26,15 +26,17 @@ xsevChartToggle = function(parent_id) {
 	}
 
 	this.hideIfLoaded = function(depth) {
-		if((self.spider_chart.find("canvas").length && self.left_right_chart.find("canvas").length) ||
-				depth > 100){
+		if((self.spider_chart.find("canvas").length ||
+				self.left_right_chart.find("canvas").length)
+				|| depth > 100){
 
 			if(self.spider_chart_button != self.first_button){
 				self.spider_chart.hide();
 			}
+			console.log();
 			self.left_right_chart.hide();
 		}else{
-			setTimeout(function() {self.hideIfLoaded(++depth)}, 50);
+			setTimeout(function() {self.hideIfLoaded(++depth)}, 100);
 		}
 		return self;
 	};
