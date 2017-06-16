@@ -346,7 +346,8 @@ class ilSelfEvaluationPresentationGUI {
             $dataset->setCreationDate($_SESSION['xsev_data']['creation_date_dataset']);
 			$dataset->saveValuesByPost(array_merge($_SESSION['xsev_data'], $_POST));
             $_SESSION['xsev_data'] = '';
-			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
+			//See #1017
+			//ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
 			$this->redirectToResults($dataset);
 		}
 		$this->form->setValuesByPost();
@@ -360,7 +361,8 @@ class ilSelfEvaluationPresentationGUI {
 		if ($this->form->checkinput()) {
 			$dataset = ilSelfEvaluationDataset::_getInstanceByIdentifierId($this->identity->getId());
 			$dataset->updateValuesByPost($_POST);
-			ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
+			//See #1017
+			//ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
 			$this->redirectToResults($dataset);
 		}
 		$this->form->setValuesByPost();
