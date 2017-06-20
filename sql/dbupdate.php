@@ -302,3 +302,10 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 
 }
 ?>
+<#15>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Feedback/class.ilSelfEvaluationFeedback.php');
+$ilDB->modifyTableColumn(ilSelfEvaluationFeedback::TABLE_NAME, 'feedback_text', array(
+		'type' => 'clob'
+));
+?>
