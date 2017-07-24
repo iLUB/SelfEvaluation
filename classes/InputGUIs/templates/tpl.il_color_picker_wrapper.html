@@ -1,0 +1,12 @@
+<script type="text/javascript">
+	// Init color label
+	YAHOO.util.Event.onContentReady("{POST_VAR}-current-color", function () {
+		YAHOO.util.Dom.setStyle("{POST_VAR}-current-color", "backgroundColor", "{INIT_COLOR}");
+	});
+
+	// Update color label on key up
+	YAHOO.util.Event.on('{POST_VAR}', 'keyup', function (e) {
+		var field = document.getElementById("{POST_VAR}");
+		YAHOO.util.Dom.setStyle("{POST_VAR}-current-color", "backgroundColor", '#' + field.value);
+	});
+</script>

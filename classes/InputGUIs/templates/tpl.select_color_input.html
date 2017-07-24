@@ -1,0 +1,22 @@
+<div id="color_input">
+	<span class="colorpicker">
+	    <span class="bgbox"<!-- BEGIN default_color --> style="background-color:{DEFAULT_CODE}"<!-- END default_color -->></span>
+	    <span class="hexbox"><!-- BEGIN default_title -->{DEFAULT_TITLE}<!-- END default_title --></span>
+	    <span class="clear"></span>
+	    <span class="colorbox">
+	        <b style="background-color:transparent; display:none" title="{TRANSPARENT_TITLE}" id="color_" class="{TRANSPARENT_CLASS}"></b>
+	    <!-- BEGIN color -->
+	        <b style="background-color:{COLOR_CODE}<!-- BEGIN style_propperty -->;{STYLE}<!-- END style_propperty -->" title="{COLOR_TITLE}" id="color_{ID}" class="{CLASS}"></b>
+	    <!-- END color -->
+	    </span>
+	</span>
+	<input type="hidden" name="{POSTVAR}" id="{POSTVAR}" value="{VALUE}" />
+</div>
+<script type="text/javascript">
+	function OnCustomColorChanged(selectedColor, selectedColorTitle, colorPickerIndex) {
+		//here we use only one of the passed in parameters: selectedColorTitle
+		var input = $("#{POSTVAR}");
+		var color = $("#color_input").find('.selected');
+		input.val(color.attr('id').substring(6));
+	}
+</script>
