@@ -121,6 +121,32 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var bool
 	 */
 	protected $show_block_descriptions_during_feedback = true;
+
+	/**
+	 * @var bool
+	 */
+	protected $show_fbs_overview_bar = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_fbs_overview_spider = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_fbs_overview_left_right = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_fbs_chart_bar = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_fbs_chart_spider = true;
+	/**
+	 * @var bool
+	 */
+	protected $show_fbs_chart_left_right = true;
+
     /**
      * @var int
      */
@@ -213,6 +239,30 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
                 'integer',
                 $this->getSortRandomNrItemBlock()
             ),
+				'show_fbs_overview_bar' => array(
+						'integer',
+						$this->isShowFbsOverviewBar()
+				),
+				'show_fbs_overview_spider' => array(
+						'integer',
+						$this->isShowFbsOverviewSpider()
+				),
+				'show_fbs_overview_left_right' => array(
+						'integer',
+						$this->isShowFbsOverviewLeftRight()
+				),
+				'show_fbs_chart_bar' => array(
+						'integer',
+						$this->isShowFbsChartBar()
+				),
+				'show_fbs_chart_spider' => array(
+						'integer',
+						$this->isShowFbsChartSpider()
+				),
+				'show_fbs_chart_left_right' => array(
+						'integer',
+						$this->isShowFbsChartLeftRight()
+				),
 		);
 	}
 
@@ -245,6 +295,13 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
 			$this->setShowBlockDescriptionsDuringFeedback($rec->show_block_desc_fb);
             $this->setSortRandomNrItemBlock($rec->sort_random_nr_items_block);
+			$this->setShowFbsOverviewBar($rec->show_fbs_overview_bar);
+			$this->setShowFbsOverviewSpider($rec->show_fbs_overview_spider);
+			$this->setShowFbsOverviewLeftRight($rec->show_fbs_overview_left_right);
+			$this->setShowFbsChartBar($rec->show_fbs_chart_bar);
+			$this->setShowFbsChartSpider($rec->show_fbs_chart_spider);
+			$this->setShowFbsChartLeftRight($rec->show_fbs_chart_left_right);
+
 		}
 	}
 
@@ -311,6 +368,12 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setShowBlockTitlesDuringFeedback($this->getShowBlockTitlesDuringFeedback());
 		$new_obj->setShowBlockDescriptionsDuringFeedback($this->getShowBlockDescriptionsDuringFeedback());
         $new_obj->setSortRandomNrItemBlock($this->getSortRandomNrItemBlock());
+		$new_obj->setShowFbsOverviewBar($this->isShowFbsOverviewBar());
+		$new_obj->setShowFbsOverviewSpider($this->isShowFbsOverviewSpider());
+		$new_obj->setShowFbsOverviewLeftRight($this->isShowFbsOverviewLeftRight());
+		$new_obj->setShowFbsChartBar($this->isShowFbsChartBar());
+		$new_obj->setShowFbsChartSpider($this->isShowFbsChartSpider());
+		$new_obj->setShowFbsChartLeftRight($this->isShowFbsChartLeftRight());
 		// TODO clone meta blocks and questions?
 		$new_obj->update();
 	}
@@ -681,7 +744,101 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
         return $this->sort_random_nr_item_block;
     }
 
+	/**
+	 * @return boolean
+	 */
+	public function isShowFbsOverviewBar()
+	{
+		return $this->show_fbs_overview_bar;
+	}
 
+	/**
+	 * @param boolean $show_fbs_overview_bar
+	 */
+	public function setShowFbsOverviewBar($show_fbs_overview_bar)
+	{
+		$this->show_fbs_overview_bar = $show_fbs_overview_bar;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isShowFbsOverviewSpider()
+	{
+		return $this->show_fbs_overview_spider;
+	}
+
+	/**
+	 * @param boolean $show_fbs_overview_spider
+	 */
+	public function setShowFbsOverviewSpider($show_fbs_overview_spider)
+	{
+		$this->show_fbs_overview_spider = $show_fbs_overview_spider;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isShowFbsOverviewLeftRight()
+	{
+		return $this->show_fbs_overview_left_right;
+	}
+
+	/**
+	 * @param boolean $show_fbs_overview_left_right
+	 */
+	public function setShowFbsOverviewLeftRight($show_fbs_overview_left_right)
+	{
+		$this->show_fbs_overview_left_right = $show_fbs_overview_left_right;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isShowFbsChartBar()
+	{
+		return $this->show_fbs_chart_bar;
+	}
+
+	/**
+	 * @param boolean $show_fbs_chart_bar
+	 */
+	public function setShowFbsChartBar($show_fbs_chart_bar)
+	{
+		$this->show_fbs_chart_bar = $show_fbs_chart_bar;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isShowFbsChartSpider()
+	{
+		return $this->show_fbs_chart_spider;
+	}
+
+	/**
+	 * @param boolean $show_fbs_chart_spider
+	 */
+	public function setShowFbsChartSpider($show_fbs_chart_spider)
+	{
+		$this->show_fbs_chart_spider = $show_fbs_chart_spider;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isShowFbsChartLeftRight()
+	{
+		return $this->show_fbs_chart_left_right;
+	}
+
+	/**
+	 * @param boolean $show_fbs_chart_left_right
+	 */
+	public function setShowFbsChartLeftRight($show_fbs_chart_left_right)
+	{
+		$this->show_fbs_chart_left_right = $show_fbs_chart_left_right;
+	}
 }
 
 ?>

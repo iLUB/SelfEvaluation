@@ -20,7 +20,7 @@ abstract class ilSelfEvaluationBlockPresentationGUI {
      * @param ilSelfEvaluationPresentationFormGUI $parent_form
      * @return ilPropertyFormGUI|ilSelfEvaluationPresentationFormGUI
      */
-    public function getBlockForm(ilSelfEvaluationPresentationFormGUI $parent_form = NULL) {
+    public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
         if ($parent_form) {
             $form = $parent_form;
         } else {

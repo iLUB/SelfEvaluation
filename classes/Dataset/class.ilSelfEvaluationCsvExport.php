@@ -20,7 +20,11 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-require_once('./Customizing/global/plugins/Libraries/Export/class.csvExport.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Export/class.csvExport.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeMatrix.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSelect.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSingleChoice.php');
+
 /**
  * Class ilSelfEvaluationCsvExport
  *
@@ -68,11 +72,11 @@ class ilSelfEvaluationCsvExport extends csvExport{
 
     }
 
-    public function getCsvExport(){
+    public function getCsvExport($delimiter = ";",$enclosure = '"'){
         $this->getData();
         $this->setColumns();
         $this->setRows();
-        parent::getCsvExport(";");
+        parent::getCsvExport($delimiter);
     }
 
     protected function getData(){
@@ -97,9 +101,56 @@ class ilSelfEvaluationCsvExport extends csvExport{
 
         $this->getTable()->setSortColumn("starting_date");
 
+
+
         foreach($this->getMetaQuestions() as $meta_question){
-            $this->getTable()->addColumn(new csvExportColumn($meta_question->getName(),$meta_question->getName(),$position));
-            $position++;
+
+            if($meta_question->getTypeId() == iLubFieldDefinitionTypeMatrix::TYPE_ID){
+                $questions = iLubFieldDefinitionTypeMatrix::getQuestionsFromArray(
+                    $meta_question->getValues());
+                foreach($questions as $question){
+                    $this->getTable()->addColumn(
+                        new csvExportColumn(
+                            $question,
+                            $question,
+                            $position
+                        ));
+                    $this->getTable()->addColumn(
+                        new csvExportColumn(
+                            $question." ID",
+                            $question." ID",
+                            $position
+                        ));
+                    $position++;
+                }
+
+
+            }else{
+                if($meta_question->getShortTitle()){
+                    $column_name = $meta_question->getShortTitle();
+
+                }else{
+                    $column_name = $meta_question->getName();
+                }
+                $this->getTable()->addColumn(
+                    new csvExportColumn(
+                        $column_name,
+                        $column_name,
+                        $position
+                    ));
+
+                if($meta_question->getTypeId() == iLubFieldDefinitionTypeSelect::TYPE_ID ||
+                    $meta_question->getTypeId() == iLubFieldDefinitionTypeSingleChoice::TYPE_ID) {
+                    $this->getTable()->addColumn(
+                        new csvExportColumn(
+                            $column_name . " ID",
+                            $column_name . " ID",
+                            $position
+                        ));
+                }
+                $position++;
+            }
+
         }
 
         foreach($this->getQuestions() as $question){
@@ -108,54 +159,158 @@ class ilSelfEvaluationCsvExport extends csvExport{
         }
     }
 
+    /**
+     * @param $dataset
+     * @return csvExportValue
+     */
+    protected function getIdentity($dataset){
+        return new csvExportValue("identity", substr(md5($dataset->getIdentifierId()), 0, 8));
+    }
+
+    protected function getDateValues($dataset){
+        $meta_csv_values = [];
+
+        try{
+            $invalid = false;
+            if($dataset->getCreationDate()){
+                $meta_csv_values[] = new csvExportValue("starting_date", date($this->getDateFormat(),$dataset->getCreationDate()));
+            }else{
+                $invalid = true;
+                $meta_csv_values[] = new csvExportValue("starting_date", "Invalid");
+            }
+            if($dataset->getSubmitDate()){
+                $meta_csv_values[] = new csvExportValue("ending_date", date($this->getDateFormat(),$dataset->getSubmitDate()));
+            }else{
+                $invalid = true;
+                $meta_csv_values[] = new csvExportValue("ending_date", "Invalid");
+            }
+            if($invalid){
+                $meta_csv_values[] = new csvExportValue("duration", "Invalid");
+            }else{
+                $meta_csv_values[] = new csvExportValue("duration", $dataset->getDuration());
+            }
+        }catch(Exception $e){
+            $meta_csv_values[] = new csvExportValue("Error", "Invalid Date");
+        }
+        return $meta_csv_values;
+    }
+
+    protected function getQuestionValues($row, $entry){
+
+        $column_name = $this->getTitleForQuestion($this->getQuestion($entry->getQuestionId()));
+
+        $column_name = $this->generateUniqueName($row,$column_name);
+
+        $value = $this->handledSkipped($entry->getValue());
+
+        return new csvExportValue($column_name,$value);
+    }
+
+
+    protected function generateUniqueName($row,$column_name){
+        while($row->getColumns()->columnIdExists($column_name)){
+            $column_name = $column_name."_duplicate";
+        }
+        return $column_name;
+    }
+
+    protected function handledSkipped($value){
+        if($value == "ilsel_dummy"){
+            $value = "übersprungen";
+        }
+        return $value;
+    }
+
+    /**
+     * @param $row
+     * @param $entry
+     * @param $meta_question
+     * @return array
+     */
+    protected function getMetaQuestionValues($row,$entry, $meta_question){
+        $meta_csv_values = [];
+
+        if($meta_question->getTypeId() == iLubFieldDefinitionTypeMatrix::TYPE_ID){
+
+            $question_values = $meta_question->getValues();
+            $questions = iLubFieldDefinitionTypeMatrix::getQuestionsFromArray($question_values);
+            foreach($questions as $key => $question){
+                $entry_keys = $entry->getValue();
+                if(is_array($entry_keys) && array_key_exists($key, $entry_keys)){
+                    $entry_key = $entry_keys[$key];
+                    $entry_content = $question_values[$entry_key];
+
+                    $meta_csv_values[] = new csvExportValue($question, $entry_content);
+                    $meta_csv_values[] = new csvExportValue($question." ID",
+                        str_replace("scale_","",$entry_key));
+                }
+            }
+
+        }else{
+
+            if($meta_question->getShortTitle()){
+                $column_name = $meta_question->getShortTitle();
+
+            }else{
+                $column_name = $meta_question->getName();
+            }
+            $column_name = $this->generateUniqueName($row,$column_name);
+            $key = $this->handledSkipped($entry->getValue());
+
+            if($meta_question->getTypeId() == iLubFieldDefinitionTypeSelect::TYPE_ID ||
+                $meta_question->getTypeId() == iLubFieldDefinitionTypeSingleChoice::TYPE_ID) {
+                $meta_csv_values[] = new csvExportValue($column_name." ID",$key);
+                $question_values = $meta_question->getValues();
+                if(is_array($question_values) && array_key_exists($key, $question_values)){
+                    $entry_value = $question_values[$key];
+                    $meta_csv_values[] = new csvExportValue($column_name, $entry_value);
+                }else{
+                    //legacy issue, get ID from time with none JSON-Save of values.
+                    foreach($question_values as $qkey => $qvalue){
+                        if($qvalue == $key){
+                            $key = $qkey;
+                            break;
+                        }
+                    }
+                    $meta_csv_values[] = new csvExportValue($column_name,$key);
+                }
+            }else{
+                $meta_csv_values[] = new csvExportValue($column_name,$key);
+            }
+        }
+        return $meta_csv_values;
+    }
+
+    protected function getMetaQuestionValueForSelections(){
+
+    }
+
     protected function setRows(){
         foreach($this->getDatasets() as $dataset)
         {
             $row = new csvExportRow();
-            $row->addValue(new csvExportValue("identity", substr(md5($dataset->getIdentifierId()), 0, 8)));
-            try{
-                $invalid = false;
-                if($dataset->getCreationDate()){
-                    $row->addValue(new csvExportValue("starting_date", date($this->getDateFormat(),$dataset->getCreationDate())));
-                }else{
-                    $row->addValue(new csvExportValue("starting_date", "Invalid"));
-                    $invalid = true;
-                }
-                if($dataset->getSubmitDate()){
-                    $row->addValue(new csvExportValue("ending_date", date($this->getDateFormat(),$dataset->getSubmitDate())));
-                }else{
-                    $row->addValue(new csvExportValue("ending_date", "Invalid"));
-                    $invalid = true;
-                }
-                if($invalid){
-                    $row->addValue(new csvExportValue("duration", "Invalid"));
-                }else{
-                    $row->addValue(new csvExportValue("duration", $dataset->getDuration()));
-                }
-            }catch(Exception $e){
-                $row->addValue(new csvExportValue("Error", "Invalid Date"));
+            $row->addValue($this->getIdentity($dataset));
+            $values = $this->getDateValues($dataset);
+            foreach($values as $value){
+                $row->addValue($value);
             }
-
 
             $entries = ilSelfEvaluationData::_getAllInstancesByDatasetId($dataset->getId());
             foreach($entries as $entry){
                 if($this->getMetaQuestion($entry->getQuestionId()) || $this->getQuestion($entry->getQuestionId()))
                 {
                     if($entry->getQuestionType() == ilSelfEvaluationData::META_QUESTION_TYPE){
-                        $column_name = $this->getMetaQuestion($entry->getQuestionId())->getName();
-                    }
-                    else{
-                        $column_name = $this->getTitleForQuestion($this->getQuestion($entry->getQuestionId()));
+                        $meta_question = $this->getMetaQuestion($entry->getQuestionId());
+                        $values = $this->getMetaQuestionValues($row,$entry,
+                            $meta_question);
+                        foreach($values as $value){
+                            $row->addValue($value);
+                        }
+                    }else{
+                        $row->addValue($this->getQuestionValues($row,$entry));
+
                     }
 
-                    while($row->getColumns()->columnIdExists($column_name)){
-                        $column_name = $column_name."_duplicate";
-                    }
-                    $value = $entry->getValue();
-                    if($value == "ilsel_dummy"){
-                        $value = "übersprungen";
-                    }
-                    $row->addValue(new csvExportValue($column_name,$value));
                 }
             }
             $this->getTable()->addRow($row);

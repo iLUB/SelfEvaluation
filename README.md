@@ -3,43 +3,6 @@
 ## Requirements
 
 1. ilias 5.0 or higher
-2. Library ilubFieldDefinition
-3. Library InputGUIs
-4. Library Export
-
-
-## Installation of the iLubFiledDefinition Library
-
-Be sure to have the iLubFieldDefinition Library installed in ILIAS library folder. If it is not installed yet, follow the steps below in order to install it.
-
-Go to yourILIASInstallation/Customizing/global/plugins/Libraries
-
-    git clone https://github.com/iLUB/iLubFieldDefinition.git
-
-Then checkout the correct branch of iLubFieldDefinition otherwise you will run into errors.
-
-
-## Installation of the InputGUIs Library
-
-Be sure to have the InputGUIs Library installed in ILIAS library folder. If it is not installed yet, follow the steps below in order to install it.
-
-Go to yourILIASInstallation/Customizing/global/plugins/Libraries
-
-    git clone https://github.com/iLUB/InputGUIs.git
-
-Then checkout the correct branch of InputGUIs otherwise you will run into errors.
-
-
-## Installation of the Export Library
-
-Be sure to have the Export Library installed in ILIAS library folder. If it is not installed yet, follow the steps below in order to install it.
-
-Go to yourILIASInstallation/Customizing/global/plugins/Libraries
-
-    git clone https://github.com/iLUB/Export.git
-
-Then checkout the correct branch of Export otherwise you will run into errors.
-
 
 ## Installation of the SelfEvaluation Plugin
 

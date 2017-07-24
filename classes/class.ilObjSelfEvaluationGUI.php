@@ -454,6 +454,20 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         // Show Feedbacks overview graphics
         $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview'), 'show_fbs_overview');
         $cb->setValue(1);
+
+		$sub_cb_1 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_bar'),'show_fbs_overview_bar');
+		$sub_cb_1->setValue(1);
+
+		$sub_cb_2 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_spider'),'show_fbs_overview_spider');
+		$sub_cb_2->setValue(1);
+
+		$sub_cb_3 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_left_right'), 'show_fbs_overview_left_right');
+		$sub_cb_3->setValue(1);
+
+		$cb->addSubItem($sub_cb_1);
+		$cb->addSubItem($sub_cb_2);
+		$cb->addSubItem($sub_cb_3);
+
         $this->form->addItem($cb);
 		// Show question block titles during feedback
 		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_fb'), 'show_block_titles_fb');
@@ -468,6 +482,20 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		//
         $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_charts'), 'show_fbs_charts');
         $cb->setValue(1);
+
+		$sub_cb_1 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_bar'),'show_fbs_chart_bar');
+		$sub_cb_1->setValue(1);
+
+		$sub_cb_2 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_spider'),'show_fbs_chart_spider');
+		$sub_cb_2->setValue(1);
+
+		$sub_cb_3 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_left_right'), 'show_fbs_chart_left_right');
+		$sub_cb_3->setValue(1);
+
+		$cb->addSubItem($sub_cb_1);
+		$cb->addSubItem($sub_cb_2);
+		$cb->addSubItem($sub_cb_3);
+
         $this->form->addItem($cb);
 
 
@@ -515,6 +543,15 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['show_block_desc_sev'] = $this->object->getShowBlockDescriptionsDuringEvaluation();
 		$values['show_block_titles_fb'] = $this->object->getShowBlockTitlesDuringFeedback();
 		$values['show_block_desc_fb'] = $this->object->getShowBlockDescriptionsDuringFeedback();
+
+		$values['show_fbs_overview_bar'] = $this->object->isShowFbsOverviewBar();
+		$values['show_fbs_overview_spider'] = $this->object->isShowFbsOverviewSpider();
+		$values['show_fbs_overview_left_right'] = $this->object->isShowFbsOverviewLeftRight();
+
+		$values['show_fbs_chart_bar'] = $this->object->isShowFbsChartBar();
+		$values['show_fbs_chart_spider'] = $this->object->isShowFbsChartSpider();
+		$values['show_fbs_chart_left_right'] = $this->object->isShowFbsChartLeftRight();
+
 		$this->form->setValuesByArray($values);
 	}
 
@@ -554,6 +591,15 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setShowFeedbacksCharts($this->form->getInput('show_fbs_charts'));
 			$this->object->setShowBlockTitlesDuringFeedback($this->form->getInput('show_block_titles_fb'));
 			$this->object->setShowBlockDescriptionsDuringFeedback($this->form->getInput('show_block_desc_fb'));
+
+			$this->object->setShowFbsOverviewBar($this->form->getInput('show_fbs_overview_bar'));
+			$this->object->setShowFbsOverviewSpider($this->form->getInput('show_fbs_overview_spider'));
+			$this->object->setShowFbsOverviewLeftRight($this->form->getInput('show_fbs_overview_left_right'));
+
+			$this->object->setShowFbsChartBar($this->form->getInput('show_fbs_chart_bar'));
+			$this->object->setShowFbsChartSpider($this->form->getInput('show_fbs_chart_spider'));
+			$this->object->setShowFbsChartLeftRight($this->form->getInput('show_fbs_chart_left_right'));
+
 			$this->object->update();
 			ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
 			$this->ctrl->redirect($this, 'editProperties');

@@ -2,7 +2,7 @@
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once(dirname(__FILE__) . '/../../Question/class.ilSelfEvaluationQuestion.php');
 require_once(dirname(__FILE__) . '/../../Block/class.ilSelfEvaluationQuestionBlock.php');
-require_once('class.ilMatrixFieldInputGUI.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilMatrixFieldInputGUI.php');
 
 /**
  * GUI-Class ilSelfEvaluationQuestionPresentationGUI

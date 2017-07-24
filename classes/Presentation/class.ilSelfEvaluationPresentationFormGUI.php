@@ -30,7 +30,7 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
      * @param	string	Command
      * @param	string	Text
      */
-    public function addCommandButton($a_cmd, $a_text)
+    public function addCommandButton($a_cmd, $a_text, $a_id = '')
     {
 
         $this->copy_of_buttons[] = array("cmd" => $a_cmd, "text" => $a_text);
@@ -94,6 +94,8 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
                 $this->tpl->setVariable("QUESTION_SIZE",$this->getQuestionFieldSize());
                 $this->tpl->setVariable("RATING_SIZE_COMMAND",12-$this->getQuestionFieldSize());
                 $this->tpl->setVariable("QUESTION_SIZE_COMMAND",$this->getQuestionFieldSize());
+                $this->tpl->setVariable("TYPE",$item->getType());
+
                 $this->insertItem($item);
             }
         }

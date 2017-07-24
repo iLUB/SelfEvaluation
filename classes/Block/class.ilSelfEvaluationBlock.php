@@ -51,7 +51,7 @@ abstract class ilSelfEvaluationBlock {
 		$set = $this->db->query('SELECT * FROM ' . $this->getTableName() . ' ' . ' WHERE id = '
 			. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
-			$this->setObjectValuesFromRecord($this, $rec);
+			static::setObjectValuesFromRecord($this, $rec);
 		}
 	}
 
@@ -82,7 +82,7 @@ abstract class ilSelfEvaluationBlock {
 	/**
 	 * @return string
 	 */
-	abstract public function getTableName();
+	abstract static public function getTableName();
 
 
 	public function initDB() {
@@ -143,7 +143,8 @@ abstract class ilSelfEvaluationBlock {
 	 * @param ilSelfEvaluationBlock $block
 	 * @param stdClass $rec
 	 */
-	protected function setObjectValuesFromRecord(ilSelfEvaluationBlock &$block, $rec) {
+	protected static function setObjectValuesFromRecord(ilSelfEvaluationBlock
+	                                             &$block = null, $rec = null) {
 		foreach ($block->getArrayForDb() as $k => $v) {
 			$block->{$k} = $rec->{$k};
 		}

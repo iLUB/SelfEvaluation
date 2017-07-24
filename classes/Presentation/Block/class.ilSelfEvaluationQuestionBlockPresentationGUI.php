@@ -1,7 +1,7 @@
 <?php
 require_once('class.ilSelfEvaluationBlockPresentationGUI.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionPresentationGUI.php');
-require_once(dirname(__FILE__) . '/../class.ilMatrixHeaderGUI.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilMatrixHeaderGUI.php');
 
 /**
  * GUI-Class SelfEvaluation
@@ -30,7 +30,7 @@ class ilSelfEvaluationQuestionBlockPresentationGUI extends ilSelfEvaluationBlock
      *
      * @return ilSelfEvaluationPresentationFormGUI
      */
-    public function getBlockForm(ilSelfEvaluationPresentationFormGUI $parent_form = NULL, $first = true) {
+    public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
         $form = parent::getBlockForm($parent_form, $first);
 
         $scale = ilSelfEvaluationScale::_getInstanceByRefId($this->object->getParentId());

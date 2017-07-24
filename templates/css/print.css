@@ -4,13 +4,11 @@
 		background-image: none;
 	}
 
-	div.feedback {
-		page-break-before: always;
+	.bar_chart, .spider_chart, .spider_chart {
+		page-break-after: always;
 	}
 
-    .bar_chart, .spider_chart{
-        height: 10cm;
-    }
+
 	.feedback_block_abbreviation:before { content:"[" }
 	.feedback_block_abbreviation:after { content:"]" }
 
@@ -30,6 +28,6 @@
 
 	@page {
 		size:   29.7cm 21.00cm;
-		margin: 4cm 3cm 3cm 4cm;
+		margin: 2cm;
 	}
 }

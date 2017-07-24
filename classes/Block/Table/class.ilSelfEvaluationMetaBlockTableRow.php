@@ -59,7 +59,7 @@ class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
 	 */
 	protected function getQuestionAction() {
 		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Libraries/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
+		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
 		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
 		$cmd = 'edit_questions';
 
