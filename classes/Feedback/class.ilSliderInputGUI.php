@@ -49,8 +49,13 @@ class ilSliderInputGUI extends ilCustomInputGUI {
 
 
 	private function buildHTML() {
+		global $tpl;
+		$tpl->addCss("./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/jquery-ui-1.12.1.custom/jquery-ui.min.css");
+		$tpl->addJavaScript("./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/jquery-ui-1.12.1.custom/jquery-ui.min.js");
+
 		$pl = new ilSelfEvaluationPlugin();
 		$tpl = $pl->getTemplate('default/Feedback/tpl.slider_input.html');
+
 		$values = $this->getValues();
 		$tpl->setVariable('VAL_FROM', $values[0]);
 		$tpl->setVariable('VAL_TO', $values[1]);
