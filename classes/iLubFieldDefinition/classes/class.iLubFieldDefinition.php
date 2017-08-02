@@ -28,11 +28,6 @@
  * @version $Id$
  */
 class iLubFieldDefinition {
-
-	/**
-	 * @var ilDB
-	 */
-	protected $db;
 	/**
 	 * @var int
 	 */
@@ -79,9 +74,6 @@ class iLubFieldDefinition {
 	 * @param int    $id
 	 */
 	public function __construct($table_name, $container_id, $id = 0) {
-		global $ilDB;
-
-		$this->db = $ilDB;
 		$this->setId($id);
 		$this->setContainerId($container_id);
 		$this->setTableName($table_name);
@@ -93,10 +85,15 @@ class iLubFieldDefinition {
 
 
 	public function initDB() {
-		if ($this->getTableName() != '' AND !$this->db->tableExists($this->getTableName())) {
-			$this->db->createTable($this->getTableName(), $this->getDbFields());
-			$this->db->createSequence($this->getTableName());
-			$this->db->addPrimaryKey($this->getTableName(), array( 'field_id' ));
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		if ($this->getTableName() != '' AND !$DIC->database()->tableExists($this->getTableName())) {
+			$DIC->database()->createTable($this->getTableName(), $this->getDbFields());
+			$DIC->database()->createSequence($this->getTableName());
+			$DIC->database()->addPrimaryKey($this->getTableName(), array( 'field_id' ));
 		}
 	}
 
@@ -232,10 +229,15 @@ class iLubFieldDefinition {
 	 * @return int
 	 */
 	protected function getNextPosition() {
-		$stmt = $this->db->prepare('SELECT MAX(position) next_pos FROM ' . $this->getTableName() .
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$stmt = $DIC->database()->prepare('SELECT MAX(position) next_pos FROM ' . $this->getTableName() .
 			' WHERE container_id = ?;', array('integer'));
-		$this->db->execute($stmt, array($this->getContainerId()));
-		while ($rec = $this->db->fetchObject($stmt)) {
+		$DIC->database()->execute($stmt, array($this->getContainerId()));
+		while ($rec = $DIC->database()->fetchObject($stmt)) {
 			return $rec->next_pos + 1;
 		}
 
@@ -247,13 +249,18 @@ class iLubFieldDefinition {
 	 * Save
 	 */
 	public function save() {
-		$stmt = $this->db->prepare('INSERT INTO ' . $this->getTableName() .
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$stmt = $DIC->database()->prepare('INSERT INTO ' . $this->getTableName() .
 			' (field_id, container_id, field_name, short_title,field_type, field_values, field_required, position) ' .
 			' VALUES(?, ?, ?, ?, ?, ?, ?, ?);',
 			array('integer', 'integer', 'text', 'text','integer', 'text', 'integer', 'integer'));
-		$this->setId($this->db->nextId($this->getTableName()));
+		$this->setId($DIC->database()->nextId($this->getTableName()));
 		$this->setPosition($this->getNextPosition());
-		$this->db->execute($stmt,
+		$DIC->database()->execute($stmt,
 			array($this->getId(), $this->getContainerId(), $this->getName(),
 					$this->getShortTitle(), $this->getTypeId(),
 				serialize($this->getValues()), $this->isRequired(), $this->getPosition()));
@@ -264,13 +271,18 @@ class iLubFieldDefinition {
 	 * Update a field
 	 */
 	public function update() {
-		$stmt = $this->db->prepare('UPDATE ' . $this->getTableName() . ' SET ' .
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$stmt = $DIC->database()->prepare('UPDATE ' . $this->getTableName() . ' SET ' .
 			'container_id = ?, field_name = ?, short_title = ?,field_type = ?,
 			field_values = ?, field_required = ?, position = ? ' .
 			'WHERE field_id = ?',
 			array('integer', 'text', 'integer', 'text', 'integer', 'integer', 'integer'));
 
-		$this->db->execute($stmt, array($this->getContainerId(), $this->getName(),
+		$DIC->database()->execute($stmt, array($this->getContainerId(), $this->getName(),
 				$this->getShortTitle(), $this->getTypeId(),
 			serialize($this->getValues()), $this->isRequired(), $this->getPosition(), $this->getId()));
 	}
@@ -280,8 +292,13 @@ class iLubFieldDefinition {
 	 * Delete a field
 	 */
 	public function delete() {
-		$stmt = $this->db->prepare('DELETE FROM ' . $this->getTableName() . ' WHERE field_id = ?;', array('integer'));
-		$this->db->execute($stmt, array($this->getId()));
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$stmt = $DIC->database()->prepare('DELETE FROM ' . $this->getTableName() . ' WHERE field_id = ?;', array('integer'));
+		$DIC->database()->execute($stmt, array($this->getId()));
 	}
 
 
@@ -289,9 +306,14 @@ class iLubFieldDefinition {
 	 * Read DB entries
 	 */
 	protected function read() {
-		$stmt = $this->db->prepare('SELECT * FROM ' . $this->getTableName() . ' WHERE field_id = ? ORDER BY position ASC;',
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$stmt = $DIC->database()->prepare('SELECT * FROM ' . $this->getTableName() . ' WHERE field_id = ? ORDER BY position ASC;',
 			array('integer'));
-		$this->db->execute($stmt, array($this->getId()));
+		$DIC->database()->execute($stmt, array($this->getId()));
 
 		$row = $stmt->fetch(ilDBConstants::FETCHMODE_OBJECT);
 

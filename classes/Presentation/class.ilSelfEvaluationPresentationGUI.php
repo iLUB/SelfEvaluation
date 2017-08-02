@@ -182,10 +182,12 @@ class ilSelfEvaluationPresentationGUI {
         $factory = new ilSelfEvaluationBlockFactory($this->parent->object->getId());
         $blocks = $factory->getAllBlocks();
 
+
         if($this->parent->object->getSortType()==ilObjSelfEvaluation::SHUFFLE_ACROSS_BLOCKS){
             if(empty($_SESSION['shuffled_blocks'])){
                 $_SESSION['shuffled_blocks'] = serialize($this->orderMixedBlocks($blocks));
             }
+
             $blocks = unserialize($_SESSION['shuffled_blocks']);
         }
 

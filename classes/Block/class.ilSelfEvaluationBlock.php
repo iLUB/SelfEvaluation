@@ -34,12 +34,8 @@ abstract class ilSelfEvaluationBlock {
 	 * @param $id
 	 */
 	function __construct($id = 0) {
-		global $ilDB;
-		/**
-		 * @var $ilDB ilDB
-		 */
 		$this->id = $id;
-		$this->db = $ilDB;
+
 		//		 $this->updateDB();
 		if ($id != 0) {
 			$this->read();
@@ -48,9 +44,14 @@ abstract class ilSelfEvaluationBlock {
 
 
 	public function read() {
-		$set = $this->db->query('SELECT * FROM ' . $this->getTableName() . ' ' . ' WHERE id = '
-			. $this->db->quote($this->getId(), 'integer'));
-		while ($rec = $this->db->fetchObject($set)) {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$set = $DIC->database()->query('SELECT * FROM ' . $this->getTableName() . ' ' . ' WHERE id = '
+			. $DIC->database()->quote($this->getId(), 'integer'));
+		while ($rec = $DIC->database()->fetchObject($set)) {
 			static::setObjectValuesFromRecord($this, $rec);
 		}
 	}
@@ -82,10 +83,15 @@ abstract class ilSelfEvaluationBlock {
 	/**
 	 * @return string
 	 */
-	abstract static public function getTableName();
+	static public function getTableName(){}
 
 
 	public function initDB() {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
 		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
@@ -103,22 +109,27 @@ abstract class ilSelfEvaluationBlock {
 				$fields[$k]['notnull'] = true;
 			}
 		}
-		if (! $this->db->tableExists($this->getTableName())) {
-			$this->db->createTable($this->getTableName(), $fields);
-			$this->db->addPrimaryKey($this->getTableName(), array( 'id' ));
-			$this->db->createSequence($this->getTableName());
+		if (! $DIC->database()->tableExists($this->getTableName())) {
+			$DIC->database()->createTable($this->getTableName(), $fields);
+			$DIC->database()->addPrimaryKey($this->getTableName(), array( 'id' ));
+			$DIC->database()->createSequence($this->getTableName());
 		}
 	}
 
 
 	final function updateDB() {
-		if (! $this->db->tableExists($this->getTableName())) {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		if (! $DIC->database()->tableExists($this->getTableName())) {
 			$this->initDB();
 
 			return;
 		}
 		foreach ($this->getArrayForDb() as $k => $v) {
-			if (! $this->db->tableColumnExists($this->getTableName(), $k)) {
+			if (! $DIC->database()->tableColumnExists($this->getTableName(), $k)) {
 				$field = array(
 					'type' => $v[0],
 				);
@@ -133,7 +144,7 @@ abstract class ilSelfEvaluationBlock {
 				if ($k == 'id') {
 					$field['notnull'] = true;
 				}
-				$this->db->addTableColumn($this->getTableName(), $k, $field);
+				$DIC->database()->addTableColumn($this->getTableName(), $k, $field);
 			}
 		}
 	}
@@ -152,21 +163,31 @@ abstract class ilSelfEvaluationBlock {
 
 
 	final private function resetDB() {
-		$this->db->dropTable($this->getTableName());
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$DIC->database()->dropTable($this->getTableName());
 		$this->initDB();
 	}
 
 
 	public function create() {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
 		if ($this->getId() != 0) {
 			$this->update();
 
 			return;
 		}
-		$this->setId($this->db->nextID($this->getTableName()));
+		$this->setId($DIC->database()->nextID($this->getTableName()));
 		require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockFactory.php');
 		$this->setPosition(ilSelfEvaluationBlockFactory::getNextPositionAcrossBlocks($this->getParentId()));
-		$this->db->insert($this->getTableName(), $this->getArrayForDb());
+		$DIC->database()->insert($this->getTableName(), $this->getArrayForDb());
 	}
 
 
@@ -174,18 +195,28 @@ abstract class ilSelfEvaluationBlock {
 	 * @return int
 	 */
 	public function delete() {
-		return $this->db->manipulate('DELETE FROM ' . $this->getTableName() . ' WHERE id = '
-			. $this->db->quote($this->getId(), 'integer'));
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		return $DIC->database()->manipulate('DELETE FROM ' . $this->getTableName() . ' WHERE id = '
+			. $DIC->database()->quote($this->getId(), 'integer'));
 	}
 
 
 	public function update() {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
 		if ($this->getId() == 0) {
 			$this->create();
 
 			return;
 		}
-		$this->db->update($this->getTableName(), $this->getArrayForDb(), array(
+		$DIC->database()->update($this->getTableName(), $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
 				$this->getId()

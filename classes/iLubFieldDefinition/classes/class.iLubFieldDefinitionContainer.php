@@ -43,10 +43,6 @@ class iLubFieldDefinitionContainer {
 	 * @var iLubFieldDefinitionFactory
 	 */
 	protected $factory;
-	/**
-	 * @var ilDB
-	 */
-	protected $db;
 
 
 	/**
@@ -56,9 +52,6 @@ class iLubFieldDefinitionContainer {
 	 * @param int                        $id
 	 */
 	public function __construct(iLubFieldDefinitionFactory $factory, $id = 0) {
-		global $ilDB;
-
-		$this->db = $ilDB;
 		$this->factory = $factory;
 		$this->setId($id);
 
@@ -81,12 +74,18 @@ class iLubFieldDefinitionContainer {
 	 * Read DB entries
 	 */
 	protected function read() {
-		$field = $this->factory->createILubFieldDefinition();
-		$stmt = $this->db->prepare('SELECT * FROM ' . $field->getTableName() . ' WHERE container_id = ? ORDER BY position ASC;',
-			array('integer'));
-		$this->db->execute($stmt, array($this->getId()));
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
 
-		while ($row = $this->db->fetchObject($stmt)) {
+		$field = $this->factory->createILubFieldDefinition();
+		$stmt = $DIC->database()->prepare('SELECT * FROM ' . $field->getTableName() . ' WHERE
+		container_id = ? ORDER BY position ASC;',
+			array('integer'));
+		$DIC->database()->execute($stmt, array($this->getId()));
+
+		while ($row = $DIC->database()->fetchObject($stmt)) {
 			$field = $this->factory->createILubFieldDefinition();
 			$field->setId($row->field_id);
 			$field->setContainerId($this->getId());

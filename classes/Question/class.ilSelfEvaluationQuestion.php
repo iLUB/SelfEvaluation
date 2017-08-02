@@ -40,12 +40,7 @@ class ilSelfEvaluationQuestion {
 	 * @param $id
 	 */
 	function __construct($id = 0) {
-		global $ilDB;
-		/**
-		 * @var $ilDB ilDB
-		 */
 		$this->id = $id;
-		$this->db = $ilDB;
 		// $this->updateDB();
 		if ($id != 0) {
 			$this->read();
@@ -54,9 +49,14 @@ class ilSelfEvaluationQuestion {
 
 
 	public function read() {
-		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
-		. $this->db->quote($this->getId(), 'integer'));
-		while ($rec = $this->db->fetchObject($set)) {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
+		. $DIC->database()->quote($this->getId(), 'integer'));
+		while ($rec = $DIC->database()->fetchObject($set)) {
 			foreach ($this->getArrayForDb() as $k => $v) {
 				$this->{$k} = $rec->{$k};
 			}
@@ -68,6 +68,7 @@ class ilSelfEvaluationQuestion {
 	 * @return array
 	 */
 	public function getArrayForDb() {
+		
 		$e = array();
 		foreach (get_object_vars($this) as $k => $v) {
 			if (! in_array($k, array( 'db' ))) {
@@ -80,6 +81,11 @@ class ilSelfEvaluationQuestion {
 
 
 	final function initDB() {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
 		$fields = array();
 		foreach ($this->getArrayForDb() as $k => $v) {
 			$fields[$k] = array(
@@ -97,22 +103,27 @@ class ilSelfEvaluationQuestion {
 				$fields[$k]['notnull'] = true;
 			}
 		}
-		if (! $this->db->tableExists(self::TABLE_NAME)) {
-			$this->db->createTable(self::TABLE_NAME, $fields);
-			$this->db->addPrimaryKey(self::TABLE_NAME, array( 'id' ));
-			$this->db->createSequence(self::TABLE_NAME);
+		if (! $DIC->database()->tableExists(self::TABLE_NAME)) {
+			$DIC->database()->createTable(self::TABLE_NAME, $fields);
+			$DIC->database()->addPrimaryKey(self::TABLE_NAME, array( 'id' ));
+			$DIC->database()->createSequence(self::TABLE_NAME);
 		}
 	}
 
 
 	final function updateDB() {
-		if (! $this->db->tableExists(self::TABLE_NAME)) {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		if (! $DIC->database()->tableExists(self::TABLE_NAME)) {
 			$this->initDB();
 
 			return;
 		}
 		foreach ($this->getArrayForDb() as $k => $v) {
-			if (! $this->db->tableColumnExists(self::TABLE_NAME, $k)) {
+			if (! $DIC->database()->tableColumnExists(self::TABLE_NAME, $k)) {
 				$field = array(
 					'type' => $v[0],
 				);
@@ -127,27 +138,37 @@ class ilSelfEvaluationQuestion {
 				if ($k == 'id') {
 					$field['notnull'] = true;
 				}
-				$this->db->addTableColumn(self::TABLE_NAME, $k, $field);
+				$DIC->database()->addTableColumn(self::TABLE_NAME, $k, $field);
 			}
 		}
 	}
 
 
 	final private function resetDB() {
-		$this->db->dropTable(self::TABLE_NAME);
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		$DIC->database()->dropTable(self::TABLE_NAME);
 		$this->initDB();
 	}
 
 
 	public function create() {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
 		if ($this->getId() != 0) {
 			$this->update();
 
 			return;
 		}
-		$this->setId($this->db->nextID(self::TABLE_NAME));
+		$this->setId($DIC->database()->nextID(self::TABLE_NAME));
 		$this->setPosition(self::_getNextPosition($this->getParentId()));
-		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
+		$DIC->database()->insert(self::TABLE_NAME, $this->getArrayForDb());
 	}
 
 
@@ -155,18 +176,28 @@ class ilSelfEvaluationQuestion {
 	 * @return int
 	 */
 	public function delete() {
-		return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
-		. $this->db->quote($this->getId(), 'integer'));
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
+		return $DIC->database()->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
+		. $DIC->database()->quote($this->getId(), 'integer'));
 	}
 
 
 	public function update() {
+		global $DIC;
+		/**
+		 * @var $DIC ILIAS\DI\Container
+		 */
+		
 		if ($this->getId() == 0) {
 			$this->create();
 
 			return;
 		}
-		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
+		$DIC->database()->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
 				$this->getId()
@@ -185,6 +216,7 @@ class ilSelfEvaluationQuestion {
 	 * @return ilSelfEvaluationQuestion[]
 	 */
 	public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
+		
 		global $ilDB;
 		$return = array();
 		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
