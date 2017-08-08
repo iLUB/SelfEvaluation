@@ -4,10 +4,9 @@
 		background-image: none;
 	}
 
-	.bar_chart, .spider_chart, .spider_chart {
-		page-break-after: always;
+	.feedback_block_title{
+		page-break-before: always;
 	}
-
 
 	.feedback_block_abbreviation:before { content:"[" }
 	.feedback_block_abbreviation:after { content:"]" }
