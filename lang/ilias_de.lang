@@ -210,4 +210,4 @@ export_csv#:#Als csv exportieren
 export_csv#:#Als csv exportieren
 starting_date#:#Startdatum
 ending_date#:#Enddatum
-duration#:#Bearbeitungsdauer
+duration#:#Bearbeitungsdauer (s)
