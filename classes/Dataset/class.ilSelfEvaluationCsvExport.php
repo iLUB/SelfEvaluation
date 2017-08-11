@@ -259,9 +259,9 @@ class ilSelfEvaluationCsvExport extends csvExport{
 
             if($meta_question->getTypeId() == iLubFieldDefinitionTypeSelect::TYPE_ID ||
                 $meta_question->getTypeId() == iLubFieldDefinitionTypeSingleChoice::TYPE_ID) {
-                $meta_csv_values[] = new csvExportValue($column_name." ID",$key);
                 $question_values = $meta_question->getValues();
                 if(is_array($question_values) && array_key_exists($key, $question_values)){
+                    $meta_csv_values[] = new csvExportValue($column_name." ID",$key);
                     $entry_value = $question_values[$key];
                     $meta_csv_values[] = new csvExportValue($column_name, $entry_value);
                 }else{
@@ -269,10 +269,12 @@ class ilSelfEvaluationCsvExport extends csvExport{
                     foreach($question_values as $qkey => $qvalue){
                         if($qvalue == $key){
                             $key = $qkey;
+                            $value = $qvalue;
                             break;
                         }
                     }
-                    $meta_csv_values[] = new csvExportValue($column_name,$key);
+                    $meta_csv_values[] = new csvExportValue($column_name,$value);
+                    $meta_csv_values[] = new csvExportValue($column_name." ID",$key);
                 }
             }else{
                 $meta_csv_values[] = new csvExportValue($column_name,$key);
