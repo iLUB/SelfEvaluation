@@ -77,7 +77,7 @@ class iLubFieldDefinitionTypeMatrix extends iLubFieldDefinitionType {
 				'question_' .
 				$this->getId());
 		$ty_se_mu->setRequired(true);
-		$ty_se_mu->setSize(12);
+		$ty_se_mu->setSize(64);
 		$ty_se_mu->setMaxLength(4096);
 		$ty_se_mu->setValues(array(''));
 		$ty_se_mu->setInfo($lng->getMatrixQuestionDescription());
