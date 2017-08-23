@@ -5,7 +5,7 @@
 	}
 
 	.feedback_block_title{
-		page-break-before: always;
+		/** page-break-before: always;**/
 	}
 
 	.feedback_block_abbreviation:before { content:"[" }
