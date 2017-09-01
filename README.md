@@ -2,7 +2,7 @@
 
 ## Requirements
 
-1. ilias 5.0 or higher
+1. ilias 5.2 or higher
 
 ## Installation of the SelfEvaluation Plugin
 
