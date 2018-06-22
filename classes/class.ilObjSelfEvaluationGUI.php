@@ -395,6 +395,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$this->form->addItem($te);
 		// identity selection info text for anonymous users
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('identity_selection'), 'identity_selection_info');
+		// $te->setRTESupport($this->object->getId(), $this->object->getType(), '', NULL, FALSE, '3.4.7');
 		$te->setInfo($this->txt('identity_selection_info'));
 		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
