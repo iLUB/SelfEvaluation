@@ -10,7 +10,7 @@ function scaleUnits(){
         $(".scale-units td div").each(function() {
             var id = $(this).attr("id");
             $(this).text(self.full_unit_titels[id]);
-            if ($(this).prop('scrollWidth') > $(this).width()) {
+            if ($(this).prop('scrollWidth') > ($(this).width() + 1)) {
                 $(this).attr("data-toggle", "tooltip");
                 $(this).text(function () {
                     return $(this).text().substring(0,3)+"...";
