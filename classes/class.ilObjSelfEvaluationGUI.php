@@ -397,6 +397,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         $nr_input = new ilNumberInputGUI($this->getPluginObject()->txt("sort_random_nr_items_block"),'sort_random_nr_items_block');
         $option_random->addSubItem($nr_input);
 
+        $te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('block_option_random_desc'), 'block_option_random_desc');
+        $te->setInfo($this->txt('block_option_random_desc_info'));
+        $option_random->addSubItem($te);
+
         $option_block = new ilRadioOption($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK),self::FIELD_ORDER_BLOCK);
         $option_block->setInfo($this->getPluginObject()->txt("block_option_block_info"));
 
@@ -518,6 +522,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
         }
         $values['sort_random_nr_items_block'] = $this->object->getSortRandomNrItemBlock();
+        $values['block_option_random_desc'] = $this->object->getBlockOptionRandomDesc();
         $values['outro_title'] = $this->object->getOutroTitle();
         $values['outro'] = $this->object->getOutro();
 		$values['identity_selection_info'] = $this->object->getIdentitySelectionInfoText();
@@ -571,6 +576,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
             }
 
             $this->object->setSortRandomNrItemBlock($this->form->getInput('sort_random_nr_items_block'));
+            $this->object->setBlockOptionRandomDesc($this->form->getInput('block_option_random_desc'));
             $this->object->setShowBlockTitlesDuringEvaluation($this->form->getInput('show_block_titles_sev'));
             $this->object->setShowBlockDescriptionsDuringEvaluation($this->form->getInput('show_block_desc_sev'));
 

@@ -56,8 +56,10 @@ identity_selection_info#:#Dieser Text wird den anonymen Nutzern des Selbstevalua
 block_section#:#Darstellung im Fragebogen
 block_presentation_type#:#Blockaufteilung der Fragen
 block_option_random#:#Fragen zufällig auf verschiedene Blöcke aufteilen.
-block_option_random_info#:#Die Fragen werden während dem Bearbeiten der Selbstevaluation zufällig auf künstliche Blöcke aufgeteilt. </br>Die Reihenfolge dieser künstlichen Blöcke ist zufällig. Generische Titel und Beschreibungen für diese Blöcke werden automatisch erstellt.</br> In der Auswertung werden die Antworten dann wieder den originalen Blöcken zugeordnet.
+block_option_random_info#:#Die Fragen werden während dem Bearbeiten der Selbstevaluation zufällig auf künstliche Blöcke aufgeteilt. </br>Die Reihenfolge dieser künstlichen Blöcke ist zufällig. Generische Titel für diese Blöcke werden automatisch erstellt.</br> In der Auswertung werden die Antworten dann wieder den originalen Blöcken zugeordnet.
 sort_random_nr_items_block#:#Anzahl der Fragen pro Block bei zufälliger Aufteilung
+block_option_random_desc#:#Blockbeschreibung
+block_option_random_desc_info#:#Beschreibung welche unterhalb des generischen Titel der künstlichen Blöcke angezeigt wird.
 block_option_block#:#Fragendarstellung und Fragenauswertung in denselben Blöcken.
 block_option_block_info#:#Reihenfolge, Titel und Beschreibungen der Blöcke werden übernommen.
 display_type#:#Darstellung der Blöcke
@@ -171,7 +173,6 @@ dataset_from#:#Datensatz vom
 
 block#:#Block
 mixed_block_title#:#Gemischter Block
-mixed_block_description#:#Block:
 
 insert_feedback#:#Neu
 start_with_new_identity#:#Mit neuer Identifikation starten

@@ -238,16 +238,16 @@ class ilSelfEvaluationPresentationGUI {
         $questions_in_block = 0;
         $block_nr = 0;
         $virtual_blocks[0] = new ilSelfEvaluationVirtualQuestionBlock($this->parent->object->getId());
-        $virtual_blocks[$block_nr]->setTitle($this->pl->txt("mixed_block_title"));
-        $virtual_blocks[$block_nr]->setDescription($this->pl->txt("mixed_block_description").($block_nr+1));
+        $virtual_blocks[$block_nr]->setTitle($this->pl->txt("mixed_block_title")." ".($block_nr+1));
+        $virtual_blocks[$block_nr]->setDescription($this->parent->object->getBlockOptionRandomDesc());
 
         foreach($questions as $question){
             if($questions_in_block>=$this->parent->object->getSortRandomNrItemBlock()){
                 $questions_in_block = 0;
                 $block_nr++;
                 $virtual_blocks[$block_nr] = new ilSelfEvaluationVirtualQuestionBlock($this->parent->object->getId());
-                $virtual_blocks[$block_nr]->setTitle($this->pl->txt("mixed_block_title"));
-                $virtual_blocks[$block_nr]->setDescription($this->pl->txt("mixed_block_description").($block_nr+1));
+                $virtual_blocks[$block_nr]->setTitle($this->pl->txt("mixed_block_title")." ".($block_nr+1));
+                $virtual_blocks[$block_nr]->setDescription($this->parent->object->getBlockOptionRandomDesc());
             }
             $virtual_blocks[$block_nr]->addQuestion($question);
             $questions_in_block++;

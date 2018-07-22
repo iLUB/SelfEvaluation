@@ -342,3 +342,18 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
     }
 }
 ?>
+<#18>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+    $field = array(
+        'type' => 'clob'
+    );
+    if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'block_option_random_desc')){
+        $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'block_option_random_desc', $field);
+    }
+}
+?>

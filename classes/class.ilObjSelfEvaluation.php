@@ -156,7 +156,15 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
      */
     protected $sort_random_nr_item_block = 10;
 
+    /**
+     * @var bool
+     */
     protected $overview_bar_show_label_as_percentage = false;
+
+    /**
+     * @var string
+     */
+    protected $block_option_random_desc = "";
 
     /**
 	 * @param int $a_ref_id
@@ -249,6 +257,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
                 'integer',
                 $this->getSortRandomNrItemBlock()
             ),
+            'block_option_random_desc' => array(
+                'text',
+                $this->getBlockOptionRandomDesc()
+            ),
 				'show_fbs_overview_bar' => array(
 						'integer',
 						$this->isShowFbsOverviewBar()
@@ -311,7 +323,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
 			$this->setShowBlockDescriptionsDuringFeedback($rec->show_block_desc_fb);
             $this->setSortRandomNrItemBlock($rec->sort_random_nr_items_block);
-			$this->setShowFbsOverviewBar($rec->show_fbs_overview_bar);
+            $this->setBlockOptionRandomDesc($rec->block_option_random_desc);
+            $this->setShowFbsOverviewBar($rec->show_fbs_overview_bar);
 			$this->setOverviewBarShowLabelAsPercentage($rec->bar_show_label_as_percentage);
 			$this->setShowFbsOverviewSpider($rec->show_fbs_overview_spider);
 			$this->setShowFbsOverviewLeftRight($rec->show_fbs_overview_left_right);
@@ -386,7 +399,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setShowBlockTitlesDuringFeedback($this->getShowBlockTitlesDuringFeedback());
 		$new_obj->setShowBlockDescriptionsDuringFeedback($this->getShowBlockDescriptionsDuringFeedback());
         $new_obj->setSortRandomNrItemBlock($this->getSortRandomNrItemBlock());
-		$new_obj->setShowFbsOverviewBar($this->isShowFbsOverviewBar());
+        $new_obj->setBlockOptionRandomDesc($this->getBlockOptionRandomDesc());
+        $new_obj->setShowFbsOverviewBar($this->isShowFbsOverviewBar());
 		$new_obj->setOverviewBarShowLabelAsPercentage($this->isOverviewBarShowLabelAsPercentage());
 		$new_obj->setShowFbsOverviewSpider($this->isShowFbsOverviewSpider());
 		$new_obj->setShowFbsOverviewLeftRight($this->isShowFbsOverviewLeftRight());
@@ -890,6 +904,21 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
     {
         $this->overview_bar_show_label_as_percentage = $overview_bar_show_label_as_percentage;
     }
-}
 
+    /**
+     * @return string
+     */
+    public function getBlockOptionRandomDesc()
+    {
+        return $this->block_option_random_desc;
+    }
+
+    /**
+     * @param string $block_option_random_desc
+     */
+    public function setBlockOptionRandomDesc($block_option_random_desc)
+    {
+        $this->block_option_random_desc = $block_option_random_desc;
+    }
+}
 ?>
