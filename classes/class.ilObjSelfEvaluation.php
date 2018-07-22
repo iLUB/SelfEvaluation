@@ -69,10 +69,14 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var string
 	 */
 	protected $intro = '';
-	/**
-	 * @var string
-	 */
-	protected $outro = '';
+    /**
+     * @var string
+     */
+    protected $outro_title = '';
+    /**
+     * @var string
+     */
+    protected $outro = '';
 	/**
 	 * @var string
 	 */
@@ -199,6 +203,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'text',
 				$this->getIntro()
 			),
+            'outro_title' => array(
+                'text',
+                $this->getOutroTitle()
+            ),
 			'outro' => array(
 				'text',
 				$this->getOutro()
@@ -272,7 +280,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$plugin = $this->plugin;
 		$config = new ilSelfEvaluationConfig($plugin->getConfigTableName());
 		$this->setIdentitySelectionInfoText($config->getValue('identity_selection'));
-		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
+        $this->setOutroTitle($this->txt('outro_header'));
+        $this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
 	}
 
 
@@ -286,6 +295,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setDisplayType($rec->display_type);
 			$this->setIntro($rec->intro);
 			$this->setOutro($rec->outro);
+			$this->setOutroTitle($rec->outro_title);
 			$this->setIdentitySelectionInfoText($rec->identity_selection_info);
 			$this->setShowFeedbacks($rec->show_fbs);
 			$this->setShowFeedbacksCharts($rec->show_fbs_charts);
@@ -362,6 +372,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setDisplayType($this->getDisplayType());
 		$new_obj->setIntro($this->getIntro());
 		$new_obj->setOutro($this->getOutro());
+		$new_obj->setOutroTitle($this->getOutroTitle());
 		$new_obj->setIdentitySelectionInfoText($this->getIdentitySelectionInfoText());
 		$new_obj->setShowBlockTitlesDuringEvaluation($this->getShowBlockTitlesDuringEvaluation());
 		$new_obj->setShowBlockDescriptionsDuringEvaluation($this->getShowBlockDescriptionsDuringEvaluation());
@@ -471,6 +482,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	public function getOnline() {
 		return $this->online;
 	}
+
+    /**
+     * @return string
+     */
+    public function getOutroTitle()
+    {
+        return $this->outro_title;
+    }
+
+    /**
+     * @param string $outro_title
+     */
+    public function setOutroTitle($outro_title)
+    {
+        $this->outro_title = $outro_title;
+    }
 
 
 	/**

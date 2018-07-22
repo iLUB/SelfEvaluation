@@ -309,3 +309,21 @@ $ilDB->modifyTableColumn(ilSelfEvaluationFeedback::TABLE_NAME, 'feedback_text', 
 		'type' => 'clob'
 ));
 ?>
+<#16>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+    $field = array(
+        'type' => 'text',
+        'length' => 1024,
+        'notnull' => true
+    );
+    if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'outro_title')){
+        $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'outro_title', $field);
+    }
+}
+
+?>

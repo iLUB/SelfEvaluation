@@ -45,9 +45,11 @@ edit_feedback#:#Feedback bearbeiten
 
 help_text_section#:#Hilfstexte
 intro#:#Einleitungstext
-intro_info#:#Erster Text, welcher beim Öffnen einer Selbstevaluation angezeigt wird.
-outro#:#Abschliessender Text
-outro_info#:#Text welcher nach Beendigung der Selbstevaluation angezeigt wird.
+intro_info#:#Erster Text, der beim Öffnen einer Selbstevaluation angezeigt wird.
+outro_title#:#Abschliessender Titel
+outro_title_info#:#Titel, der nach Beendigung der Selbstevaluation angezeigt wird.
+outro#:#Abschliessende Beschreibung
+outro_info#:#Beschreibung, die nach Beendigung der Selbstevaluation angezeigt wird.
 identity_selection#:#Standardtext zur Identitätsauswahl bei anonymen Selbstevaluationen
 identity_selection_info#:#Dieser Text wird den anonymen Nutzern des Selbstevaluations Plugins angezeigt.
 

@@ -90,7 +90,7 @@ class ilSelfEvaluationDatasetGUI {
 
 	public function show() {
 		$content = $this->pl->getTemplate('default/Dataset/tpl.dataset_presentation.html');
-		$content->setVariable('INTRO_HEADER', $this->pl->txt('outro_header'));
+        $content->setVariable('INTRO_HEADER', $this->parent->object->getOutroTitle());
 		$content->setVariable('INTRO_BODY', $this->parent->object->getOutro());
 		$feedback = '';
 		if ($this->parent->object->getAllowShowResults()) {

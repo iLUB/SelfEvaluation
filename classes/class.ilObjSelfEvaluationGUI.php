@@ -368,6 +368,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         $te->setInfo($this->txt('intro_info'));
 		$this->form->addItem($te);
 		// outro
+        $te = new ilTextInputGUI( $this->txt('outro_title'), 'outro_title');
+        $te->setInfo($this->txt('outro_title_info'));
+        $this->form->addItem($te);
+
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('outro'), 'outro');
         $te->setInfo($this->txt('outro_info'));
 		$this->form->addItem($te);
@@ -510,7 +514,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
         }
         $values['sort_random_nr_items_block'] = $this->object->getSortRandomNrItemBlock();
-		$values['outro'] = $this->object->getOutro();
+        $values['outro_title'] = $this->object->getOutroTitle();
+        $values['outro'] = $this->object->getOutro();
 		$values['identity_selection_info'] = $this->object->getIdentitySelectionInfoText();
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['display_type'] = $this->object->getDisplayType();
@@ -546,7 +551,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setDescription($this->form->getInput('desc'));
 			$this->object->setOnline($this->form->getInput('online'));
 			$this->object->setIntro($this->form->getInput('intro'));
-			$this->object->setOutro($this->form->getInput('outro'));
+            $this->object->setOutroTitle($this->form->getInput('outro_title'));
+            $this->object->setOutro($this->form->getInput('outro'));
 			$this->object->setIdentitySelectionInfoText($this->form->getInput('identity_selection_info'));
 
             if($this->form->getInput(self::FIELD_ORDER_TYPE) == self::FIELD_ORDER_FULLY_RANDOM ){
