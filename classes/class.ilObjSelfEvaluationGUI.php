@@ -57,26 +57,6 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
     const FIELD_ORDER_BLOCK = 'block_option_block';
     const FIELD_ORDER_BLOCK_RANDOM = 'shuffle_in_blocks';
 
-
-	protected static $disabled_buttons = array(
-		'charmap',
-		'undo',
-		'redo',
-		'justifyleft',
-		'justifycenter',
-		'justifyright',
-		'justifyfull',
-		'anchor',
-		'fullscreen',
-		'cut',
-		'copy',
-		'paste',
-		'pastetext',
-		'pasteword',
-		'formatselect',
-		'imgupload',
-		'ilimgupload'
-	);
 	/**
 	 * @var ilObjSelfEvaluation
 	 */
@@ -385,19 +365,16 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		// intro
 		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('intro'), 'intro');
-		$te->disableButtons(self::$disabled_buttons);
         $te->setInfo($this->txt('intro_info'));
 		$this->form->addItem($te);
 		// outro
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('outro'), 'outro');
-		$te->disableButtons(self::$disabled_buttons);
         $te->setInfo($this->txt('outro_info'));
 		$this->form->addItem($te);
 		// identity selection info text for anonymous users
 		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('identity_selection'), 'identity_selection_info');
 		// $te->setRTESupport($this->object->getId(), $this->object->getType(), '', NULL, FALSE, '3.4.7');
 		$te->setInfo($this->txt('identity_selection_info'));
-		$te->disableButtons(self::$disabled_buttons);
 		$this->form->addItem($te);
 
         //////////////////////////////
