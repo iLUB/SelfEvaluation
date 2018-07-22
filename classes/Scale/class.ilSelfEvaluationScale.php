@@ -56,8 +56,41 @@ class ilSelfEvaluationScale {
 		return $return;
 	}
 
+    /**
+     * @return array
+     */
+    public function getUnitsAsRelativeArray() {
+        $return = array();
+        $min_max = $this->getMinMaxValue();
+        $max = $min_max['max'];
 
-	public function read() {
+        foreach ($this->units as $k => $u) {
+        	$return[$u->getValue()*100/$max] = $u->getTitle(). " (".$u->getValue().")";
+        }
+
+        return $return;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMinMaxValue() {
+        $min = 999999;
+        $max = 0;
+        foreach ($this->units as $k => $u) {
+        	if($u->getValue() > $max){
+        		$max = $u->getValue();
+			}
+            if($u->getValue() < $min){
+                $min = $u->getValue();
+            }
+        }
+
+        return ['min'=>$min,'max'=>$max];
+    }
+
+
+    public function read() {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {

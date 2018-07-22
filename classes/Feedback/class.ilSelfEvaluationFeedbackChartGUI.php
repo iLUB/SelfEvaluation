@@ -261,7 +261,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 					('question') . ' ' . $x;
 			$x ++;
 		}
-		self::setUnusedLegendLabels($scale_units);
+		$this->setUnusedLegendLabels($scale_units);
 		$chart->setTicks($ticks, $scale_units, true);
 		$chart->addData($data);
 
@@ -295,7 +295,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 
 		}
 
-		self::setUnusedLegendLabels($scale_units);
+		$this->setUnusedLegendLabels($scale_units);
 		$chart->setTicks( $scale_units,$ticks, true);
 		$chart->addData($data);
 
@@ -352,6 +352,12 @@ class ilSelfEvaluationFeedbackChartGUI {
 		$chart = $this->initBarChart('fb_overview', $this->getChartColors());
 		$chart->setSize(self::WIDTH, self::HEIGHT);
 
+        /**
+         * @var $obj ilObjSelfEvaluation
+         */
+        $factory = new ilObjectFactory();
+        $obj = $factory->getInstanceByRefId($_GET['ref_id']);
+
 		$x_axis = array();
 		foreach ($block_data as $block_d) {
 			$data = $chart->getDataInstance(ilChartGrid::DATA_BARS);
@@ -361,14 +367,22 @@ class ilSelfEvaluationFeedbackChartGUI {
 			$x_axis[$block->getPosition()] = $block_d['label'];
 			$chart->addData($data);
 		}
-		// display y-axis in 10% steps
-		$y_axis = array();
-		for ($i = 0; $i <= 10; $i++) {
-			$y_axis[$i * 10] = $i * 10 . '%';
-		}
-		$chart->setTicks($x_axis, $y_axis, true);
 
-		return $chart;
+        if($obj->isOverviewBarShowLabelAsPercentage()){
+            // display y-axis in 10% steps
+            $y_axis = array();
+            for ($i = 0; $i <= 10; $i++) {
+                $y_axis[$i * 10] = $i * 10 . '%';
+            }
+            $chart->setTicks($x_axis, $y_axis, true);
+        }else{
+            $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj->getId());
+            $units = $scale->getUnitsAsRelativeArray();
+            $this->setUnusedLegendLabels($units);
+            $chart->setTicks($x_axis, $units, true);
+        }
+
+        return $chart;
 	}
 
 	/**

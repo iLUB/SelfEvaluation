@@ -440,6 +440,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$sub_cb_1 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_bar'),'show_fbs_overview_bar');
 		$sub_cb_1->setValue(1);
 
+        $sub_sub_cb_1 = new ilCheckboxInputGUI($this->getPluginObject()->txt('overview_bar_show_label_as_percentage'),'overview_bar_show_label_as_percentage');
+        $sub_sub_cb_1->setValue(1);
+        $sub_cb_1->addSubItem($sub_sub_cb_1);
+
 		$sub_cb_2 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_spider'),'show_fbs_overview_spider');
 		$sub_cb_2->setValue(1);
 
@@ -528,7 +532,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['show_block_desc_fb'] = $this->object->getShowBlockDescriptionsDuringFeedback();
 
 		$values['show_fbs_overview_bar'] = $this->object->isShowFbsOverviewBar();
-		$values['show_fbs_overview_spider'] = $this->object->isShowFbsOverviewSpider();
+        $values['overview_bar_show_label_as_percentage'] = $this->object->isOverviewBarShowLabelAsPercentage();
+        $values['show_fbs_overview_spider'] = $this->object->isShowFbsOverviewSpider();
 		$values['show_fbs_overview_left_right'] = $this->object->isShowFbsOverviewLeftRight();
 
 		$values['show_fbs_chart_bar'] = $this->object->isShowFbsChartBar();
@@ -577,7 +582,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setShowBlockDescriptionsDuringFeedback($this->form->getInput('show_block_desc_fb'));
 
 			$this->object->setShowFbsOverviewBar($this->form->getInput('show_fbs_overview_bar'));
-			$this->object->setShowFbsOverviewSpider($this->form->getInput('show_fbs_overview_spider'));
+            $this->object->setOverviewBarShowLabelAsPercentage($this->form->getInput('overview_bar_show_label_as_percentage'));
+            $this->object->setShowFbsOverviewSpider($this->form->getInput('show_fbs_overview_spider'));
 			$this->object->setShowFbsOverviewLeftRight($this->form->getInput('show_fbs_overview_left_right'));
 
 			$this->object->setShowFbsChartBar($this->form->getInput('show_fbs_chart_bar'));

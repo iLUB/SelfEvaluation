@@ -156,6 +156,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
      */
     protected $sort_random_nr_item_block = 10;
 
+    protected $overview_bar_show_label_as_percentage = false;
+
     /**
 	 * @param int $a_ref_id
 	 */
@@ -251,6 +253,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 						'integer',
 						$this->isShowFbsOverviewBar()
 				),
+            'bar_show_label_as_percentage' => array(
+                'integer',
+                $this->isOverviewBarShowLabelAsPercentage()
+            ),
 				'show_fbs_overview_spider' => array(
 						'integer',
 						$this->isShowFbsOverviewSpider()
@@ -306,6 +312,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setShowBlockDescriptionsDuringFeedback($rec->show_block_desc_fb);
             $this->setSortRandomNrItemBlock($rec->sort_random_nr_items_block);
 			$this->setShowFbsOverviewBar($rec->show_fbs_overview_bar);
+			$this->setOverviewBarShowLabelAsPercentage($rec->bar_show_label_as_percentage);
 			$this->setShowFbsOverviewSpider($rec->show_fbs_overview_spider);
 			$this->setShowFbsOverviewLeftRight($rec->show_fbs_overview_left_right);
 			$this->setShowFbsChartBar($rec->show_fbs_chart_bar);
@@ -380,6 +387,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setShowBlockDescriptionsDuringFeedback($this->getShowBlockDescriptionsDuringFeedback());
         $new_obj->setSortRandomNrItemBlock($this->getSortRandomNrItemBlock());
 		$new_obj->setShowFbsOverviewBar($this->isShowFbsOverviewBar());
+		$new_obj->setOverviewBarShowLabelAsPercentage($this->isOverviewBarShowLabelAsPercentage());
 		$new_obj->setShowFbsOverviewSpider($this->isShowFbsOverviewSpider());
 		$new_obj->setShowFbsOverviewLeftRight($this->isShowFbsOverviewLeftRight());
 		$new_obj->setShowFbsChartBar($this->isShowFbsChartBar());
@@ -866,6 +874,22 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	{
 		$this->show_fbs_chart_left_right = $show_fbs_chart_left_right;
 	}
+
+    /**
+     * @return bool
+     */
+    public function isOverviewBarShowLabelAsPercentage()
+    {
+        return $this->overview_bar_show_label_as_percentage;
+    }
+
+    /**
+     * @param bool $overview_bar_show_label_as_percentage
+     */
+    public function setOverviewBarShowLabelAsPercentage($overview_bar_show_label_as_percentage)
+    {
+        $this->overview_bar_show_label_as_percentage = $overview_bar_show_label_as_percentage;
+    }
 }
 
 ?>

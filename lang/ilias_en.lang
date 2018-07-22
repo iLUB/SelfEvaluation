@@ -44,6 +44,8 @@ edit_questions#:#Fragen bearbeiten
 edit_feedback#:#Feedback bearbeiten
 
 help_text_section#:#Hilfstexte
+intro#:#Einleitungstext
+intro_info#:#Erster Text, der beim Öffnen einer Selbstevaluation angezeigt wird.
 outro_title#:#Abschliessender Titel
 outro_title_info#:#Titel, der nach Beendigung der Selbstevaluation angezeigt wird.
 outro#:#Abschliessende Beschreibung
@@ -70,6 +72,7 @@ show_block_titles_fb#:#Titel der Frageblöcke im Feedback anzeigen
 show_block_desc_fb#:#Beschreibung der Frageblöcke im Feedback anzeigen
 show_fbs_overview#:#Feedback-Übersichtsgrafik anzeigen
 show_bar#:#Balkendiagramm anzeigen
+overview_bar_show_label_as_percentage#:#Werte in %
 show_spider#:#Spinnengrafik anzeigen
 show_left_right#:#Links-Rechts-Profil anzeigen
 show_fbs#:#Einzelfeedback-Texte anzeigen

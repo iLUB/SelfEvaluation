@@ -44,6 +44,8 @@ edit_questions#:#Fragen bearbeiten
 edit_feedback#:#Feedback bearbeiten
 
 help_text_section#:#Hilfstexte
+intro#:#Einleitungstext
+intro_info#:#Erster Text, der beim Öffnen einer Selbstevaluation angezeigt wird.
 outro_title#:#Abschliessender Titel
 outro_title_info#:#Titel, der nach Beendigung der Selbstevaluation angezeigt wird.
 outro#:#Abschliessende Beschreibung
@@ -69,6 +71,10 @@ feedback_section#:#Darstellung in der Auswertung
 show_block_titles_fb#:#Titel der Frageblöcke im Feedback anzeigen
 show_block_desc_fb#:#Beschreibung der Frageblöcke im Feedback anzeigen
 show_fbs_overview#:#Feedback-Übersichtsgrafik anzeigen
+show_bar#:#Balkendiagramm anzeigen
+overview_bar_show_label_as_percentage#:#Werte in %
+show_spider#:#Spinnengrafik anzeigen
+show_left_right#:#Links-Rechts-Profil anzeigen
 show_fbs#:#Einzelfeedback-Texte anzeigen
 show_fbs_charts#:#Einzelfeedback-Grafiken anzeigen
 
@@ -93,6 +99,7 @@ question_title_info#:#Die Abkürzung wird für die Benennung der Feedback Grafik
 add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke
 add_new_question_block#:#Frageblock hinzufügen
+block_abbreviation_info#:#Die Abkürzung wird für die Benennung der Feedback Grafiken verwendet (max. 8 Zeichen).
 add_new_meta_block#:#Stammdatenblock hinzufügen
 edit_question#:#Frage bearbeiten
 delete_question#:#Frage löschen
@@ -138,7 +145,7 @@ count_feedbacks#:#Anzahl Feedbacks
 option_auto#:#Lineare Bereichzuordnung
 option_auto_info#:#Der Prozentbereich wird linear auf die vorhandenen Feedbacks aufgeteilt. Achtung: Bereits vorhandene Bereiche werden dadurch angepasst!
 option_slider#:#Manuelle Zuordnung
-feedback_range_type#:#Prozentbereicht
+feedback_range_type#:#Prozentbereich
 
 fb_title#:#Titel
 fb_body#:#Feedback
@@ -154,6 +161,7 @@ start_new_button#:#Neuen Durchgang starten
 
 show_spider_chart#:#Spinnengrafik anzeigen
 show_bar_chart#:#Balkendiagramm anzeigen
+show_left_right_chart#:#Links-Rechts-Profil anzeigen
 
 msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
