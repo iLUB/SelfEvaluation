@@ -1,45 +1,32 @@
 <?php
 /* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
 
-include_once "Services/Chart/classes/class.ilChart.php";
+include_once "Services/Chart/classes/class.ilChartGrid.php";
+include_once "Services/Chart/classes/class.ilChartDataBars.php";
+include_once "trait.ilSelfEvalChartTrait.php";
 
 /**
- * Generator for grid-based charts
- *
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
+ * Class ilSelfEvalChart
  */
-class ilLeftRightChart extends ilChartGrid
+class ilSelfEvalLeftRightChart extends ilChartGrid
 {
-	const TYPE_LEFT_RIGHT = 99;
+    use ilSelfEvalChartTrait;
 
-	/**
-	 * @param int $a_type
-	 * @param string $a_id
-	 * @return ilChart|ilLeftRightChart
-	 */
-	public static function getInstanceByType($a_type, $a_id)
-	{
-		switch($a_type)
-		{
-			case self::TYPE_LEFT_RIGHT:
-				include_once "Services/Chart/classes/class.ilChartSpider.php";
-				return new self($a_id);
-		}
-		return parent::getInstanceByType($a_type, $a_id);
-	}
+    public function __construct($a_id){
+        parent::__construct($a_id);
+        $this->setSize($this->getCanvasWidth(), $this->getCanvasHeight());
+        $this->setColors($this->getChartColors());
+        $this->setLegend($this->getLegend());
+        $this->setAutoResize(true);
 
-	/**
-	 * @param ilChartData $a_series
-	 * @return bool
-	 */
-	protected function isValidDataType(ilChartData $a_series)
-	{
-		if($a_series instanceof ilChartDataLeftRight)
-		{
-			return true;
-		}
-		return false;
-	}
+        $this->setXAxisToInteger(false);
+        $this->setYAxisToInteger(true);
+    }
+
+    public function getDataInstance($type = null)
+    {
+        return new ilChartDataLines();
+    }
 
 	/**
 	 * @param stdClass $a_options

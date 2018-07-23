@@ -35,7 +35,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('identity_type'), false, '100px');
 		$this->addColumn($this->pl->txt('date'), false, 'auto');
 		$this->addColumn($this->pl->txt('identity'), false, 'auto');
-		$this->addColumn($this->pl->txt('percentage'), false, 'auto');
+		$this->addColumn($this->pl->txt('average_all'), false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), false, 'auto');
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', NULL);
 		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationDatasetGUI'));

@@ -301,6 +301,43 @@ class ilSelfEvaluationDataset {
 	}
 
 
+    /**
+     * @return array
+     */
+	public function getMinPercentageBlock(){
+		$min = 100;
+        $min_block_id = null;
+
+		$blocks_percentage = $this->getPercentagePerBlock();
+
+		foreach ($blocks_percentage as $block_id => $percentage){
+			if($percentage <= $min){
+				$min = $percentage;
+                $min_block_id = $block_id;
+			}
+		}
+        return ['block'=>$this->getBlockById($min_block_id),'percentage'=>$min];
+	}
+
+    /**
+     * @return ilSelfEvaluationBlock[]
+     */
+    public function getMaxPercentageBlock(){
+        $max = 0;
+        $max_block_id = null;
+
+        $blocks_percentage = $this->getPercentagePerBlock();
+
+        foreach ($blocks_percentage as $block_id => $percentage){
+            if($percentage >= $max){
+                $max = $percentage;
+                $max_block_id = $block_id;
+            }
+        }
+
+        return ['block'=>$this->getBlockById($max_block_id),'percentage'=>$max];
+    }
+
 	/**
 	 * @return array
 	 * @description return array(block_id => percentage)
@@ -332,6 +369,20 @@ class ilSelfEvaluationDataset {
 
 		return $return;
 	}
+
+    /**
+     * @param $block_id
+     * @return ilSelfEvaluationBlock
+     */
+    public function getBlockById($block_id){
+        $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+
+        foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
+            if($block->getId() == $block_id){
+            	return $block;
+			}
+        }
+    }
 
 
 	/**

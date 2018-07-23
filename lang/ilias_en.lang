@@ -149,6 +149,10 @@ option_auto_info#:#Der Prozentbereich wird linear auf die vorhandenen Feedbacks 
 option_slider#:#Manuelle Zuordnung
 feedback_range_type#:#Prozentbereich
 
+block_overview_title#:#Übersicht
+overview_statistics_median#:#Arithmetisches Mittel über alle Fragenblöcke hinweg:
+overview_statistics_max#:#Höchste Einschätzung Frageblock
+overview_statistics_min#:#Tiefste Einschätzung Frageblock
 fb_title#:#Titel
 fb_body#:#Feedback
 fb_start#:#Ab
@@ -198,6 +202,7 @@ identity#:#Benutzer-Kennung
 show_my_results#:#Meine Resultate
 show_all_results#:#Alle Resultate
 percentage#:#Prozent
+average_all#:#Arithmetisches Mittel in %
 date#:#Datum
 delete_dataset#:#Datensatz löschen
 show_feedback#:#Feedback anzeigen
