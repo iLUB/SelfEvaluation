@@ -150,9 +150,10 @@ class ilSelfEvaluationFeedbackChartGUI {
 		if (count($data_set->getFeedbacksPerBlock()) > 0 AND $show_feedback_overview) {
             $tpl->setVariable('BLOCK_OVERVIEW_TITLE', $this->pl->txt('block_overview_title'));
 
+            $median = $data_set->getOverallPercentage();
             $min = $data_set->getMinPercentageBlock();
             $max = $data_set->getMaxPercentageBlock();
-            $statistics_median = $this->pl->txt("overview_statistics_median")." ".$data_set->getOverallPercentage()."%";
+            $statistics_median = $this->pl->txt("overview_statistics_median")." ".$median."%";
             $statistics_max = $this->pl->txt("overview_statistics_max")." ".$max['block']->getTitle().": ".$max['percentage']."%";
             $statistics_min = $this->pl->txt("overview_statistics_min")." ".$min['block']->getTitle().": ".$min['percentage']."%";
 
@@ -174,9 +175,14 @@ class ilSelfEvaluationFeedbackChartGUI {
 				$tpl->setVariable('SHOW_LEFT_RIGHT_CHART', $this->pl->txt('show_left_right_chart'));
 			}
 
-            $tpl->setVariable('FEEDBACK_OVERVIEW_TITLE', $this->pl->txt('block_overview_title'));
-            $tpl->setVariable('FEEDBACK_OVERVIEW_BODY', $this->pl->txt('block_overview_title'));
 
+            if($obj->isShowFbsOverviewText()) {
+                $feedback = ilSelfEvaluationFeedback::_getFeedbackForPercentage($obj->ref_id, $median);;
+                if($feedback){
+                    $tpl->setVariable('FEEDBACK_OVERVIEW_TITLE', $feedback->getTitle());
+                    $tpl->setVariable('FEEDBACK_OVERVIEW_BODY', $feedback->getFeedbackText());
+                }
+            }
         }
 		if(!$obj->getShowFeedbacksOverview()) {
 			$tpl->setVariable('FEEDBACK_OVERVIEW_TITLE', "hidden");

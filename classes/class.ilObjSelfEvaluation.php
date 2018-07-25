@@ -130,6 +130,11 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @var bool
 	 */
 	protected $show_fbs_overview_bar = true;
+    /**
+     * @var bool
+     */
+    protected $show_fbs_overview_text = true;
+    
 	/**
 	 * @var bool
 	 */
@@ -237,6 +242,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'integer',
 				$this->getShowFeedbacksOverview()
 			),
+            'show_fbs_overview_text' => array(
+                'integer',
+                $this->isShowFbsOverviewText()
+            ),
 			'show_block_titles_sev' => array(
 				'integer',
 				$this->getShowBlockTitlesDuringEvaluation()
@@ -318,7 +327,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setShowFeedbacks($rec->show_fbs);
 			$this->setShowFeedbacksCharts($rec->show_fbs_charts);
 			$this->setShowFeedbacksOverview($rec->show_fbs_overview);
-			$this->setShowBlockTitlesDuringEvaluation($rec->show_block_titles_sev);
+            $this->setShowFbsOverviewText($rec->show_fbs_overview_text);
+            $this->setShowBlockTitlesDuringEvaluation($rec->show_block_titles_sev);
 			$this->setShowBlockDescriptionsDuringEvaluation($rec->show_block_desc_sev);
 			$this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
 			$this->setShowBlockDescriptionsDuringFeedback($rec->show_block_desc_fb);
@@ -401,7 +411,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
         $new_obj->setSortRandomNrItemBlock($this->getSortRandomNrItemBlock());
         $new_obj->setBlockOptionRandomDesc($this->getBlockOptionRandomDesc());
         $new_obj->setShowFbsOverviewBar($this->isShowFbsOverviewBar());
-		$new_obj->setOverviewBarShowLabelAsPercentage($this->isOverviewBarShowLabelAsPercentage());
+        $new_obj->setShowFbsOverviewText($this->isShowFbsOverviewText());
+        $new_obj->setOverviewBarShowLabelAsPercentage($this->isOverviewBarShowLabelAsPercentage());
 		$new_obj->setShowFbsOverviewSpider($this->isShowFbsOverviewSpider());
 		$new_obj->setShowFbsOverviewLeftRight($this->isShowFbsOverviewLeftRight());
 		$new_obj->setShowFbsChartBar($this->isShowFbsChartBar());
@@ -920,5 +931,23 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
     {
         $this->block_option_random_desc = $block_option_random_desc;
     }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsOverviewText()
+    {
+        return $this->show_fbs_overview_text;
+    }
+
+    /**
+     * @param bool $show_fbs_overview_text
+     */
+    public function setShowFbsOverviewText( $show_fbs_overview_text)
+    {
+        $this->show_fbs_overview_text = $show_fbs_overview_text;
+    }
+
+
 }
 ?>

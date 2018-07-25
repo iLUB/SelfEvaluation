@@ -357,3 +357,35 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
     }
 }
 ?>
+<#19>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilSelfEvaluationFeedback::TABLE_NAME)) {
+    $field = array(
+        'type' => 'integer',
+        'length' => 4
+    );
+    if(!$ilDB->tableColumnExists(ilSelfEvaluationFeedback::TABLE_NAME, 'parent_type_overall')){
+        $ilDB->addTableColumn(ilSelfEvaluationFeedback::TABLE_NAME, 'parent_type_overall', $field);
+    }
+}
+?>
+<#20>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+    $field = array(
+        'type' => 'integer',
+        'length' => 4
+    );
+    if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_text')){
+        $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_text', $field);
+    }
+}
+?>

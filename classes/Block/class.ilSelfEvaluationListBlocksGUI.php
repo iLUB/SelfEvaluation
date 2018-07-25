@@ -84,7 +84,8 @@ class ilSelfEvaluationListBlocksGUI {
 		switch ($cmd) {
 			case 'showContent':
 			case 'saveSorting':
-			$this->parent->permissionCheck('write');
+			case 'editOverall':
+			    $this->parent->permissionCheck('write');
 				$this->$cmd();
 				break;
 		}
@@ -111,7 +112,11 @@ class ilSelfEvaluationListBlocksGUI {
 		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', NULL);
         $this->toolbar->addButton($this->txt('add_new_meta_block'),$this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaBlockGUI', 'addBlock'));
 
-		$factory = new ilSelfEvaluationBlockFactory($this->getSelfEvalId());
+        $this->ctrl->setParameterByClass('ilSelfEvaluationFeedbackGUI', 'parent_overall', 1);
+        $this->toolbar->addButton($this->txt('edit_overal_feedback'),$this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects'));
+        $this->ctrl->setParameterByClass('ilSelfEvaluationFeedbackGUI', 'parent_overall', 0);
+
+        $factory = new ilSelfEvaluationBlockFactory($this->getSelfEvalId());
 		$blocks = $factory->getAllBlocks();
 
 		$table_data = array();
@@ -140,6 +145,12 @@ class ilSelfEvaluationListBlocksGUI {
 		$this->ctrl->redirect($this, 'showContent');
 	}
 
+    public function editOverall() {
+	    global $DIC;
+
+        $DIC['tpl']->setContent("hello World");
+
+    }
 
 	/**
 	 * @return int

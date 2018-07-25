@@ -1,6 +1,7 @@
 <?php
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
 require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
+require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationVirtualOverallBlock.php');
 require_once('class.ilSelfEvaluationFeedback.php');
 require_once('class.ilSelfEvaluationFeedbackTableGUI.php');
 require_once('class.ilSliderInputGUI.php');
@@ -49,15 +50,24 @@ class ilSelfEvaluationFeedbackGUI {
 		$this->tpl = $tpl;
 		$this->ctrl = $ilCtrl;
 		$this->parent = $parent;
-		$this->toolbar = $ilToolbar;
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = $parent->getPluginObject();
-		$this->block = new ilSelfEvaluationQuestionBlock($_GET['block_id']);
+		$this->toolbar = $ilToolbar;
+
+		if($_GET['parent_overall']){
+            $this->block = new ilSelfEvaluationVirtualOverallBlock($this->parent);
+            $_GET['block_id'] = $this->parent->ref_id;
+        }else{
+            $this->block = new ilSelfEvaluationQuestionBlock($_GET['block_id']);
+        }
 		if ($_GET['feedback_id']) {
 			$this->object = new ilSelfEvaluationFeedback($_GET['feedback_id']);
 		} else {
 			$this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
 		}
+        if($_GET['parent_overall']){
+            $this->object->setParentTypeOverall(true);
+        }
 
 	}
 
@@ -65,7 +75,8 @@ class ilSelfEvaluationFeedbackGUI {
 	public function executeCommand() {
 		$this->tabs_gui->setTabActive('administration');
 		$this->ctrl->saveParameter($this, 'block_id');
-		$this->ctrl->saveParameter($this, 'feedback_id');
+        $this->ctrl->saveParameter($this, 'parent_overall');
+        $this->ctrl->saveParameter($this, 'feedback_id');
 		$this->ctrl->saveParameterByClass('ilSelfEvaluationBlockGUI', 'block_id');
 		$cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
 		switch ($cmd) {
@@ -125,8 +136,8 @@ class ilSelfEvaluationFeedbackGUI {
 
 	public function addNew() {
 		$this->initForm();
-		$this->object->setStartValue(ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $_GET['start_value'] ? $_GET['start_value'] : 0));
-		$this->object->setEndValue(ilSelfEvaluationFeedback::_getNextMaxValueForParentId($this->block->getId(), $this->object->getStartValue()));
+		$this->object->setStartValue(ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $_GET['start_value'] ? $_GET['start_value'] : 0),0,$this->object->isParentTypeOverall());
+		$this->object->setEndValue(ilSelfEvaluationFeedback::_getNextMaxValueForParentId($this->block->getId(), $this->object->getStartValue()),0,$this->object->isParentTypeOverall());
 		$this->setValues();
 		$this->tpl->setContent($this->form->getHTML());
 	}
@@ -136,8 +147,8 @@ class ilSelfEvaluationFeedbackGUI {
 		header('Cache-Control: no-cache, must-revalidate');
 		header('Content-type: application/json');
 		$ignore = ($_GET['feedback_id'] ? $_GET['feedback_id'] : 0);
-		$next_min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($_GET['block_id'], 0, $ignore);
-		$next_max = ilSelfEvaluationFeedback::_getNextMaxValueForParentId($_GET['block_id'], $next_min, $ignore);
+		$next_min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($_GET['block_id'], 0,0, $ignore,$this->object->isParentTypeOverall());
+		$next_max = ilSelfEvaluationFeedback::_getNextMaxValueForParentId($_GET['block_id'], $next_min,0, $ignore,$this->object->isParentTypeOverall());
 		$state = (($_GET['from'] < $next_min) OR ($_GET['to'] > $next_max)) ? false : true;
 		echo json_encode(array(
 			'check' => $state,
@@ -176,7 +187,7 @@ class ilSelfEvaluationFeedbackGUI {
             $sl = new ilSliderInputGUI($this->pl->txt('slider'), 'slider', 0, 100, $this->ctrl->getLinkTarget($this, 'checkNextValue'));
             $option_slider->addSubItem($sl);
 
-            if(ilSelfEvaluationFeedback::_isComplete($this->block->getId())){
+            if(ilSelfEvaluationFeedback::_isComplete($this->block->getId(),$this->object->isParentTypeOverall())){
                 $option_slider->setDisabled(true);
             }
 
@@ -205,11 +216,11 @@ class ilSelfEvaluationFeedbackGUI {
 	public function createObject() {
 		$this->initForm();
 		if ($this->form->checkInput()) {
-			$obj = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
+			$obj = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId(),$this->object->isParentTypeOverall());
 			$obj->setTitle($this->form->getInput('title'));
 			$obj->setDescription($this->form->getInput('description'));
             if($this->form->getInput('feedback_range_type') == 'option_auto'){
-                $range = ilSelfEvaluationFeedback::_rearangeFeedbackLinear($this->block->getId());
+                $range = ilSelfEvaluationFeedback::_rearangeFeedbackLinear($this->block->getId(),$this->object->isParentTypeOverall());
                 $obj->setStartValue(100-$range);
                 $obj->setEndValue(100);
             }
@@ -236,7 +247,7 @@ class ilSelfEvaluationFeedbackGUI {
 		$values['end_value'] = $this->object->getEndValue();
 		$values['feedback_text'] = $this->object->getFeedbackText();
 		$values['slider'] = array( $this->object->getStartValue(), $this->object->getEndValue() );
-        if(ilSelfEvaluationFeedback::_isComplete($this->block->getId())){
+        if(ilSelfEvaluationFeedback::_isComplete($this->block->getId(),$this->object->isParentTypeOverall())){
             $values['feedback_range_type'] = 'option_auto';
         }
         else{
@@ -294,8 +305,9 @@ class ilSelfEvaluationFeedbackGUI {
 	 */
 	public function getOverview() {
 		$this->getMeasurement();
-		$min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId());
-		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->block->getId());
+		$min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(),0,0,$this->object->isParentTypeOverall());
+		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->block->getId(),false,$this->object->isParentTypeOverall());
+
 		if (count($feedbacks) == 0) {
 			$this->parseOverviewBlock('blank', 100, 0);
 
@@ -307,11 +319,12 @@ class ilSelfEvaluationFeedbackGUI {
 				$this->parseOverviewBlock('blank', $fb->getStartValue() - $min, $min);
 			}
 			$this->parseOverviewBlock('fb', $fb->getEndValue() - $fb->getStartValue(), $fb->getId(), $fb->getTitle());
-			$min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $fb->getEndValue());
+			$min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $fb->getEndValue(),0,$this->object->isParentTypeOverall());
 		}
 		if ($min != 100 AND is_object($fb)) {
 			$this->parseOverviewBlock('blank', 100 - $min, $min);
 		}
+
 
 		return $this->ov;
 	}

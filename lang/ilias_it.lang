@@ -72,7 +72,7 @@ show_block_desc_sev#:#Beschreibung der Frageblöcke während der Selbstevaluatio
 feedback_section#:#Darstellung in der Auswertung
 show_block_titles_fb#:#Titel der Frageblöcke im Feedback anzeigen
 show_block_desc_fb#:#Beschreibung der Frageblöcke im Feedback anzeigen
-show_fbs_overview#:#Feedback-Übersichtsgrafik anzeigen
+show_fbs_overview#:#Feedback-Übersichtsbereich anzeigen
 show_bar#:#Balkendiagramm anzeigen
 overview_bar_show_label_as_percentage#:#Werte in %
 show_spider#:#Spinnengrafik anzeigen
@@ -102,6 +102,7 @@ add_new_question#:#Frage hinzufügen
 block_table_title#:#Frageblöcke
 add_new_question_block#:#Frageblock hinzufügen
 block_abbreviation_info#:#Die Abkürzung wird für die Benennung der Feedback Grafiken verwendet (max. 8 Zeichen).
+overall_feedback_block#:#Gesamtfeedback
 add_new_meta_block#:#Stammdatenblock hinzufügen
 edit_question#:#Frage bearbeiten
 delete_question#:#Frage löschen
@@ -141,6 +142,7 @@ edit_feedbacks#:#Feedbacks bearbeiten
 delete_feedback#:#Feedback löschen
 qst_delete_feedback#:#Sind Sie sicher, dass folgendes Feedback aus der Selbstevaluation entfernt werden soll?
 add_new_feedback#:#Feedback hinzufügen
+edit_overal_feedback#:#Gesamtfeedback bearbeiten
 update_feedback_form#:#Feedback bearbeiten
 update_feedback_button#:#Speichern
 count_feedbacks#:#Anzahl Feedbacks
@@ -168,7 +170,8 @@ start_new_button#:#Neuen Durchgang starten
 show_spider_chart#:#Spinnengrafik anzeigen
 show_bar_chart#:#Balkendiagramm anzeigen
 show_left_right_chart#:#Links-Rechts-Profil anzeigen
-
+show_fbs_overview_text#:#Gesamtfeedback anzeigen
+show_fbs_overview_text_info#:#Gesamtfeedback über den Mittelwert aller Fragenblöcke anzeigen. Dieses kann unter 'Fragen und Feedback bearbeiten' erstellt werden.
 msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
 show_results#:#Resultate

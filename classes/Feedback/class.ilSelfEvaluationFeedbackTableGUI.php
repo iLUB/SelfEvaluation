@@ -16,7 +16,7 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 	 * @param string                      $a_parent_cmd
 	 * @param ilSelfEvaluationBlock       $block
 	 */
-	function __construct(ilSelfEvaluationFeedbackGUI $a_parent_obj, $a_parent_cmd, ilSelfEvaluationBlock $block) {
+	function __construct(ilSelfEvaluationFeedbackGUI $a_parent_obj, $a_parent_cmd, $block, $is_ovarall = false) {
 		global $ilCtrl, $ilTabs;
 		/**
 		 * @var $ilCtrl ilCtrl
@@ -38,7 +38,7 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
         $this->ctrl->setParameter($this->parent_obj, 'feedback_id', NULL);
 
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Feedback/tpl.template_feedback_row.html');
-		$this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->block->getId(), true));
+		$this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->block->getId(), true, $is_ovarall));
 	}
 
 

@@ -458,10 +458,18 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$cb->addSubItem($sub_cb_2);
 		$cb->addSubItem($sub_cb_3);
 
+        // Show Feedbacks overview text
+        $sub_cb_4 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview_text'), 'show_fbs_overview_text');
+        $sub_cb_4->setInfo($this->getPluginObject()->txt('show_fbs_overview_text_info'));
+        $sub_cb_4->setValue(1);
+        $cb->addSubItem($sub_cb_4);
+
         $this->form->addItem($cb);
+
 		// Show question block titles during feedback
 		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_fb'), 'show_block_titles_fb');
 		$this->form->addItem($cb);
+
 		// Show question block descriptions during feedback
 		$cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_fb'), 'show_block_desc_fb');
 		$this->form->addItem($cb);
@@ -529,7 +537,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['show_fbs_overview'] = $this->object->getShowFeedbacksOverview();
-		$values['show_fbs'] = $this->object->getShowFeedbacks();
+        $values['show_fbs_overview_text'] = $this->object->isShowFbsOverviewText();
+
+        $values['show_fbs'] = $this->object->getShowFeedbacks();
 		$values['show_fbs_charts'] = $this->object->getShowFeedbacksCharts();
 		$values['show_block_titles_sev'] = $this->object->getShowBlockTitlesDuringEvaluation();
 		$values['show_block_desc_sev'] = $this->object->getShowBlockDescriptionsDuringEvaluation();
@@ -581,8 +591,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
             $this->object->setShowBlockDescriptionsDuringEvaluation($this->form->getInput('show_block_desc_sev'));
 
 			$this->object->setDisplayType($this->form->getInput('display_type'));
-			$this->object->setShowFeedbacksOverview($this->form->getInput('show_fbs_overview'));
-			$this->object->setShowFeedbacks($this->form->getInput('show_fbs'));
+
+            $this->object->setShowFeedbacksOverview($this->form->getInput('show_fbs_overview'));
+            $this->object->setShowFbsOverviewText($this->form->getInput('show_fbs_overview_text'));
+
+            $this->object->setShowFeedbacks($this->form->getInput('show_fbs'));
 			$this->object->setShowFeedbacksCharts($this->form->getInput('show_fbs_charts'));
 			$this->object->setShowBlockTitlesDuringFeedback($this->form->getInput('show_block_titles_fb'));
 			$this->object->setShowBlockDescriptionsDuringFeedback($this->form->getInput('show_block_desc_fb'));

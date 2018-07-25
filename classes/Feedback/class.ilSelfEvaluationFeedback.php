@@ -39,6 +39,11 @@ class ilSelfEvaluationFeedback {
 	 */
 	protected $feedback_text = '';
 
+    /**
+     * @var bool
+     */
+	protected $parent_type_overall = false;
+
 
 	/**
 	 * @param $id
@@ -48,7 +53,8 @@ class ilSelfEvaluationFeedback {
 		/**
 		 * @var $ilDB ilDB
 		 */
-		$this->id = $id;
+
+        $this->id = $id;
 		$this->db = $ilDB;
 //		$this->updateDB();
 		if ($id != 0) {
@@ -187,12 +193,20 @@ class ilSelfEvaluationFeedback {
 	 *
 	 * @return ilSelfEvaluationFeedback[]
 	 */
-	public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
+	public static function _getAllInstancesForParentId($parent_id, $as_array = false, $is_overall = false) {
 		global $ilDB;
 		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY start_value ASC');
-		while ($rec = $ilDB->fetchObject($set)) {
+		$q = 'SELECT * FROM ' . self::TABLE_NAME . ' ' .
+			' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer');
+
+        if ($is_overall) {
+            $q .= ' AND parent_type_overall = ' . $ilDB->quote($is_overall, 'integer');
+        }
+        $q .= ' ORDER BY start_value ASC';
+
+        $set = $ilDB->query($q);
+
+        while ($rec = $ilDB->fetchObject($set)) {
 			if ($as_array) {
 				$return[] = (array)new self($rec->id);
 			} else {
@@ -204,19 +218,23 @@ class ilSelfEvaluationFeedback {
 	}
 
 
-	/**
-	 * @param $parent_id
-	 * @param $percentage
-	 *
-	 * @return ilSelfEvaluationFeedback
-	 */
-	public static function _getFeedbackForPercentage($parent_id, $percentage) {
+    /**
+     * @param $parent_id
+     * @param $percentage
+     * @param bool $is_overall
+     * @return bool|ilSelfEvaluationFeedback
+     */
+	public static function _getFeedbackForPercentage($parent_id, $percentage, $is_overall = false) {
 		global $ilDB;
 		$q = 'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $ilDB->quote($parent_id, 'integer')
 			. ' AND start_value <= ' . $ilDB->quote($percentage, 'float')
 			. ' AND end_value >= ' . $ilDB->quote($percentage, 'float');
+        if ($is_overall) {
+            $q .= ' AND parent_type_overall = ' . $ilDB->quote($is_overall, 'integer');
+        }
 		$set = $ilDB->query($q);
-		while ($res = $ilDB->fetchObject($set)) {
+
+        while ($res = $ilDB->fetchObject($set)) {
 			return new self($res->id);
 		}
 
@@ -224,14 +242,14 @@ class ilSelfEvaluationFeedback {
 	}
 
 
-	/**
-	 * @param     $parent_id
-	 * @param int $value
-	 * @param int $ignore
-	 *
-	 * @return int
-	 */
-	public static function _getNextMinValueForParentId($parent_id, $value = 0, $ignore = 0) {
+    /**
+     * @param $parent_id
+     * @param int $value
+     * @param int $ignore
+     * @param bool $is_overall
+     * @return int
+     */
+	public static function _getNextMinValueForParentId($parent_id, $value = 0, $ignore = 0, $is_overall = false) {
 		global $ilDB;
 		for ($return = $value; $return < 100; $return ++) {
 			$q =
@@ -241,6 +259,9 @@ class ilSelfEvaluationFeedback {
 			if ($ignore) {
 				$q .= ' AND id != ' . $ilDB->quote($ignore, 'integer');
 			}
+            if ($is_overall) {
+                $q .= ' AND parent_type_overall = ' . $ilDB->quote($is_overall, 'integer');
+            }
 			$set = $ilDB->query($q);
 			$res = $ilDB->fetchObject($set);
 			if (! $res->id) {
@@ -252,14 +273,14 @@ class ilSelfEvaluationFeedback {
 	}
 
 
-	/**
-	 * @param     $parent_id
-	 * @param int $value
-	 * @param int $ignore
-	 *
-	 * @return int
-	 */
-	public static function _getNextMaxValueForParentId($parent_id, $value = 0, $ignore = 0) {
+    /**
+     * @param $parent_id
+     * @param int $value
+     * @param int $ignore
+     * @param bool $is_overall
+     * @return int
+     */
+	public static function _getNextMaxValueForParentId($parent_id, $value = 0, $ignore = 0, $is_overall = false) {
 		global $ilDB;
 		/**
 		 * @var $ilDB ilDB
@@ -272,12 +293,16 @@ class ilSelfEvaluationFeedback {
 			if ($ignore) {
 				$q .= ' AND id != ' . $ilDB->quote($ignore, 'integer');
 			}
+            if ($is_overall) {
+                $q .= ' AND parent_type_overall = ' . $ilDB->quote($is_overall, 'integer');
+            }
 			$set = $ilDB->query($q);
 			$res = $ilDB->fetchObject($set);
 			if ($res->id) {
 				return $return;
 			}
-		}
+
+        }
 
 		return 100;
 	}
@@ -288,9 +313,9 @@ class ilSelfEvaluationFeedback {
 	 *
 	 * @return bool
 	 */
-	public static function _isComplete($parent_id) {
-		$min = self::_getNextMinValueForParentId($parent_id);
-		$max = self::_getNextMaxValueForParentId($parent_id, $min);
+	public static function _isComplete($parent_id, $is_overall = false) {
+		$min = self::_getNextMinValueForParentId($parent_id,0,0,$is_overall);
+		$max = self::_getNextMaxValueForParentId($parent_id, $min,0,$is_overall);
 
 		return ($min == 100 AND $max == 100) ? true : false;
 	}
@@ -317,22 +342,24 @@ class ilSelfEvaluationFeedback {
 	 *
 	 * @return ilSelfEvaluationFeedback
 	 */
-	public static function _getNewInstanceByParentId($parent_id) {
+	public static function _getNewInstanceByParentId($parent_id, $is_overall = false) {
 		$obj = new self();
 		$obj->setParentId($parent_id);
+		$obj->setParentTypeOverall($is_overall);
 
 		return $obj;
 	}
 
     /**
      * @param $parent_id
-     * @return ilSelfEvaluationFeedback
+     * @param bool $is_overall
+     * @return int
      */
-    public static function _rearangeFeedbackLinear($parent_id) {
+    public static function _rearangeFeedbackLinear($parent_id, $is_overall = false) {
         $obj = new self();
         $obj->setParentId($parent_id);
 
-        $feedbacks = self::_getAllInstancesForParentId($parent_id);
+        $feedbacks = self::_getAllInstancesForParentId($parent_id,$is_overall);
         $nr_feedbacks = count($feedbacks)+1;
         $range_per_feedback = (int)floor(100/$nr_feedbacks);
         $remainder = 100-$range_per_feedback*$nr_feedbacks;
@@ -490,6 +517,22 @@ class ilSelfEvaluationFeedback {
 				return gettype($var);
 		}
 	}
+
+    /**
+     * @return bool
+     */
+    public function isParentTypeOverall(): bool
+    {
+        return $this->parent_type_overall;
+    }
+
+    /**
+     * @param bool $parent_type_overall
+     */
+    public function setParentTypeOverall(bool $parent_type_overall)
+    {
+        $this->parent_type_overall = $parent_type_overall;
+    }
 }
 
 ?>
