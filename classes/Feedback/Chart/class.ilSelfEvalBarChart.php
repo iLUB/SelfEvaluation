@@ -77,6 +77,7 @@ class ilSelfEvalBarChart extends ilChartGrid
 
         if($this->isShowVarianz()){
             $y_values = $this->getValuesForStandardabweichung();
+            $x = 1;
             foreach ($this->getStandardabweichungData() as $key => $sd_data){
                 $a_options->{"grid"}->{"markings"}[$key] = new stdClass();
                 $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"} = new stdClass();
@@ -84,11 +85,12 @@ class ilSelfEvalBarChart extends ilChartGrid
                 $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"}->to = $y_values[$key]+$sd_data/2;
 
                 $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"} = new stdClass();
-                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->from =$key+1;
-                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->to = $key+1;
+                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->from =$x+1;
+                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->to = $x+1;
 
                 $a_options->{"grid"}->{"markings"}[$key]->{"color"} = new stdClass();
                 $a_options->{"grid"}->{"markings"}[$key]->{"color"} = "#333333";
+                $x++;
             }
         }
 	}
