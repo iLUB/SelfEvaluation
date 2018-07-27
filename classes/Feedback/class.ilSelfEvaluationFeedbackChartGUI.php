@@ -162,8 +162,10 @@ class ilSelfEvaluationFeedbackChartGUI {
             $statistics_min = $this->pl->txt("overview_statistics_min")." ".$min['block']->getTitle().": ".$min['percentage']."%";
             $statistics_varianz = $this->pl->txt("overview_statistics_varianz").": ".$varianz;
             $statistics_sd_per_block = $this->pl->txt("overview_statistics_standardabweichung_per_plock").": ";
+            $x=1;
             foreach ($sd_per_block as $key => $sd){
-                $statistics_sd_per_block .= $key.": ".$sd."; ";
+                $statistics_sd_per_block .= $x.": ".$sd."; ";
+                $x++;
             }
             $statistics_standardabweichung = $this->pl->txt("overview_statistics_standardabweichung").": ".$standardabweichung;
 

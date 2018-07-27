@@ -85,8 +85,8 @@ class ilSelfEvalBarChart extends ilChartGrid
                 $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"}->to = $y_values[$key]+$sd_data/2;
 
                 $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"} = new stdClass();
-                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->from =$x+1;
-                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->to = $x+1;
+                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->from =$x;
+                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->to = $x;
 
                 $a_options->{"grid"}->{"markings"}[$key]->{"color"} = new stdClass();
                 $a_options->{"grid"}->{"markings"}[$key]->{"color"} = "#333333";
