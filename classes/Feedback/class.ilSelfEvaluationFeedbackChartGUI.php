@@ -153,18 +153,42 @@ class ilSelfEvaluationFeedbackChartGUI {
             $median = $data_set->getOverallPercentage();
             $min = $data_set->getMinPercentageBlock();
             $max = $data_set->getMaxPercentageBlock();
+            $varianz = $data_set->getOverallVarianz();
+            $standardabweichung = $data_set->getOverallStandardabweichung();
+            $sd_per_block = $data_set->getPercentagePerBlock();
+
             $statistics_median = $this->pl->txt("overview_statistics_median")." ".$median."%";
             $statistics_max = $this->pl->txt("overview_statistics_max")." ".$max['block']->getTitle().": ".$max['percentage']."%";
             $statistics_min = $this->pl->txt("overview_statistics_min")." ".$min['block']->getTitle().": ".$min['percentage']."%";
+            $statistics_varianz = $this->pl->txt("overview_statistics_varianz").": ".$varianz;
+            $statistics_sd_per_block = $this->pl->txt("overview_statistics_standardabweichung_per_plock").": ";
+            foreach ($sd_per_block as $key => $sd){
+                $statistics_sd_per_block .= $key.": ".$sd."; ";
+            }
+            $statistics_standardabweichung = $this->pl->txt("overview_statistics_standardabweichung").": ".$standardabweichung;
 
-            $tpl->setVariable('OVERVIEW_STATISTICS_MEDIAN', $statistics_median);
-            $tpl->setVariable('OVERVIEW_STATISTICS_MAX', $statistics_max);
-            $tpl->setVariable('OVERVIEW_STATISTICS_MIN', $statistics_min);
+            if($obj->isShowFbsOverviewStatistics())
+            {
+                $tpl->setVariable('OVERVIEW_STATISTICS_TITLE', $this->pl->txt("overview_statistics_title"));
+
+                $tpl->setVariable('OVERVIEW_STATISTICS_MEDIAN', $statistics_median);
+                $tpl->setVariable('OVERVIEW_STATISTICS_MAX', $statistics_max);
+                $tpl->setVariable('OVERVIEW_STATISTICS_MIN', $statistics_min);
+                $tpl->setVariable('OVERVIEW_VARIANZ', $statistics_varianz);
+                $tpl->setVariable('OVERVIEW_STANDARDABWEICHUNG', $statistics_standardabweichung);
+                $tpl->setVariable('OVERVIEW_STANDARDABWEICHUNG_PER_BLOCK', $statistics_sd_per_block);
+            }
 
 
             if($obj->isShowFbsOverviewBar()) {
 				$tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
-				$tpl->setVariable('OVERVIEW_BAR_CHART', $this->getOverviewBarChart($blocks,$data_set->getOverallPercentage())->getHTML());
+				$chart = $this->getOverviewBarChart($blocks,$data_set->getOverallPercentage());
+				if($obj->isShowFbsOverviewStatistics()){
+				    $chart->setShowVarianz(true);
+				    $chart->setStandardabweichungData($sd_per_block);
+                    $chart->setValuesForStandardabweichung($data_set->getPercentagePerBlock());
+                }
+				$tpl->setVariable('OVERVIEW_BAR_CHART', $chart->getHTML());
 			}
 			if($obj->isShowFbsOverviewSpider()) {
 				$tpl->setVariable('OVERVIEW_SPIDER_CHART', $this->getOverviewSpiderChart($blocks)->getHTML());

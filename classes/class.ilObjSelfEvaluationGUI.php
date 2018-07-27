@@ -464,6 +464,12 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         $sub_cb_4->setValue(1);
         $cb->addSubItem($sub_cb_4);
 
+        // Show Feedbacks overview statistics
+        $sub_cb_5 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview_statistics'), 'show_fbs_overview_statistics');
+        $sub_cb_5->setInfo($this->getPluginObject()->txt('show_fbs_overview_statistics_info'));
+        $sub_cb_5->setValue(1);
+        $cb->addSubItem($sub_cb_5);
+
         $this->form->addItem($cb);
 
 		// Show question block titles during feedback
@@ -538,6 +544,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['display_type'] = $this->object->getDisplayType();
 		$values['show_fbs_overview'] = $this->object->getShowFeedbacksOverview();
         $values['show_fbs_overview_text'] = $this->object->isShowFbsOverviewText();
+        $values['show_fbs_overview_statistics'] = $this->object->isShowFbsOverviewStatistics();
 
         $values['show_fbs'] = $this->object->getShowFeedbacks();
 		$values['show_fbs_charts'] = $this->object->getShowFeedbacksCharts();
@@ -594,6 +601,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
             $this->object->setShowFeedbacksOverview($this->form->getInput('show_fbs_overview'));
             $this->object->setShowFbsOverviewText($this->form->getInput('show_fbs_overview_text'));
+            $this->object->setShowFbsOverviewStatistics($this->form->getInput('show_fbs_overview_statistics'));
 
             $this->object->setShowFeedbacks($this->form->getInput('show_fbs'));
 			$this->object->setShowFeedbacksCharts($this->form->getInput('show_fbs_charts'));

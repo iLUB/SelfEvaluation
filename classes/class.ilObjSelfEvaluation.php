@@ -134,7 +134,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
      * @var bool
      */
     protected $show_fbs_overview_text = true;
-    
+    /**
+     * @var bool
+     */
+    protected $show_fbs_overview_statistics = true;
 	/**
 	 * @var bool
 	 */
@@ -246,6 +249,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
                 'integer',
                 $this->isShowFbsOverviewText()
             ),
+            'show_fbs_overview_statistics' => array(
+                'integer',
+                $this->isShowFbsOverviewStatistics()
+            ),
 			'show_block_titles_sev' => array(
 				'integer',
 				$this->getShowBlockTitlesDuringEvaluation()
@@ -328,6 +335,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$this->setShowFeedbacksCharts($rec->show_fbs_charts);
 			$this->setShowFeedbacksOverview($rec->show_fbs_overview);
             $this->setShowFbsOverviewText($rec->show_fbs_overview_text);
+            $this->setShowFbsOverviewStatistics($rec->show_fbs_overview_statistics);
             $this->setShowBlockTitlesDuringEvaluation($rec->show_block_titles_sev);
 			$this->setShowBlockDescriptionsDuringEvaluation($rec->show_block_desc_sev);
 			$this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
@@ -948,6 +956,20 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
         $this->show_fbs_overview_text = $show_fbs_overview_text;
     }
 
+    /**
+     * @return bool
+     */
+    public function isShowFbsOverviewStatistics()
+    {
+        return $this->show_fbs_overview_statistics;
+    }
 
+    /**
+     * @param bool $show_fbs_overview_statistics
+     */
+    public function setShowFbsOverviewStatistics( $show_fbs_overview_statistics)
+    {
+        $this->show_fbs_overview_statistics = $show_fbs_overview_statistics;
+    }
 }
 ?>

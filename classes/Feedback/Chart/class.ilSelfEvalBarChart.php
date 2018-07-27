@@ -20,6 +20,21 @@ class ilSelfEvalBarChart extends ilChartGrid
     protected $show_average_line = false;
 
     /**
+     * @var bool
+     */
+    protected $show_varianz = false;
+
+    /**
+     * @var array
+     */
+    protected $standardabweichung_data = [];
+
+    /**
+     * @var array
+     */
+    protected $values_for_standardabweichung = [];
+
+    /**
      * @var int
      */
     protected $average = 0;
@@ -48,16 +63,33 @@ class ilSelfEvalBarChart extends ilChartGrid
 	public function parseGlobalOptions(stdClass $a_options)
 	{
 		parent::parseGlobalOptions($a_options);
+        $a_options->{"grid"} = new stdClass();
+        $a_options->{"grid"}->{"markings"} = [];
 
-		if($this->isShowAverageLine()){
-            $a_options->{"grid"} = new stdClass();
-            $a_options->{"grid"}->{"markings"} = [];
+        if($this->isShowAverageLine()){
             $a_options->{"grid"}->{"markings"}[0] = new stdClass();
             $a_options->{"grid"}->{"markings"}[0]->{"yaxis"} = new stdClass();
             $a_options->{"grid"}->{"markings"}[0]->{"yaxis"}->from = $this->getAverage();
             $a_options->{"grid"}->{"markings"}[0]->{"yaxis"}->to = $this->getAverage();
             $a_options->{"grid"}->{"markings"}[0]->{"color"} = new stdClass();
             $a_options->{"grid"}->{"markings"}[0]->{"color"} = "#333333";
+        }
+
+        if($this->isShowVarianz()){
+            $y_values = $this->getValuesForStandardabweichung();
+            foreach ($this->getStandardabweichungData() as $key => $sd_data){
+                $a_options->{"grid"}->{"markings"}[$key] = new stdClass();
+                $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"} = new stdClass();
+                $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"}->from = $y_values[$key]-$sd_data/2;
+                $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"}->to = $y_values[$key]+$sd_data/2;
+
+                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"} = new stdClass();
+                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->from =$key+1;
+                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->to = $key+1;
+
+                $a_options->{"grid"}->{"markings"}[$key]->{"color"} = new stdClass();
+                $a_options->{"grid"}->{"markings"}[$key]->{"color"} = "#333333";
+            }
         }
 	}
 
@@ -93,5 +125,59 @@ class ilSelfEvalBarChart extends ilChartGrid
         $this->average = $average;
     }
 
+    /**
+     * @return bool
+     */
+    public function isShowVarianz()
+    {
+        return $this->show_varianz;
+    }
 
+    /**
+     * @param bool $show_varianz
+     */
+    public function setShowVarianz( $show_varianz)
+    {
+        $this->show_varianz = $show_varianz;
+    }
+
+    /**
+     * @return array
+     */
+    public function getVarianzData(): array
+    {
+        return $this->varianz_data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getStandardabweichungData()
+    {
+        return $this->standardabweichung_data;
+    }
+
+    /**
+     * @param array $standardabweichung_data
+     */
+    public function setStandardabweichungData( $standardabweichung_data)
+    {
+        $this->standardabweichung_data = $standardabweichung_data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValuesForStandardabweichung()
+    {
+        return $this->values_for_standardabweichung;
+    }
+
+    /**
+     * @param array $values_for_standardabweichung
+     */
+    public function setValuesForStandardabweichung( $values_for_standardabweichung)
+    {
+        $this->values_for_standardabweichung = $values_for_standardabweichung;
+    }
 }

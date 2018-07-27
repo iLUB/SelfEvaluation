@@ -343,12 +343,10 @@ class ilSelfEvaluationDataset {
 	 * @description return array(block_id => percentage)
 	 */
 	public function getPercentagePerBlock() {
-		$return = array();
-		$obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
-		$scale = ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray();
-		$sorted_scale = array_keys($scale);
-		sort($sorted_scale);
-		$highest = $sorted_scale[count($sorted_scale) - 1];
+        $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+
+        $return = array();
+		$highest = $this->getHighestValueFromScale();
 		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
 			$answer_data = $this->getDataPerBlock($block->getId());
 			if (count($answer_data) == 0) {
@@ -371,6 +369,17 @@ class ilSelfEvaluationDataset {
 	}
 
     /**
+     * @return mixed
+     */
+	protected function getHighestValueFromScale(){
+        $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+        $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray();
+        $sorted_scale = array_keys($scale);
+        sort($sorted_scale);
+        return $sorted_scale[count($sorted_scale) - 1];
+    }
+
+    /**
      * @param $block_id
      * @return ilSelfEvaluationBlock
      */
@@ -383,7 +392,6 @@ class ilSelfEvaluationDataset {
 			}
         }
     }
-
 
 	/**
 	 * @return float
@@ -402,8 +410,76 @@ class ilSelfEvaluationDataset {
 		return round($sum / $x, 2);
 	}
 
+    /**
+     * @return float
+     */
+    public function getOverallVarianz() {
+        return $this->getVarianz($this->getPercentagePerBlock(),$this->getOverallPercentage());
+    }
 
-	/**
+    /**
+     * @return float
+     */
+    public function getOverallStandardabweichung() {
+        return round(sqrt($this->getOverallVarianz()), 2);
+    }
+
+    /**
+     * @param $data
+     * @return float|int
+     */
+    protected function getVarianz($data,$average) {
+        $squared_sum = 0;
+        $x = 0;
+        foreach ($data as $percentage) {
+            $squared_sum += pow($average-$percentage,2);
+            $x ++;
+        }
+
+        if($x == 0){
+            return 0;
+        }
+        return round($squared_sum / $x, 2);
+    }
+
+    /**
+     * @param $data
+     * @param $average
+     * @return float
+     */
+    protected function getStandardabweichung($data,$average) {
+        return round(sqrt($this->getVarianz($data,$average)), 2);
+    }
+
+    /**
+     * @return array
+     * @description return array(block_id => percentage)
+     */
+    public function getStandardabweichungPerBlock() {
+        $return = array();
+        $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+        $highest = $this->getHighestValueFromScale();
+
+        foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
+            $answer_data_mean_percentage = $this->getPercentagePerBlock()[$block->getId()];
+            $data_as_percentage = [];
+
+            $answer_data = $this->getDataPerBlock($block->getId());
+            if (count($answer_data) == 0) {
+                continue;
+            }
+
+            foreach ($answer_data as $data){
+            	$data_as_percentage[] = $data/$highest*100;
+			}
+
+            $return[$block->getId()] = $this->getStandardabweichung($data_as_percentage,$answer_data_mean_percentage);
+        }
+
+        return $return;
+    }
+
+    /**
 	 * @param null $a_block_id
 	 *
 	 * @return ilSelfEvaluationFeedback[]

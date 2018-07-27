@@ -155,6 +155,9 @@ block_overview_title#:#Übersicht
 overview_statistics_median#:#Arithmetisches Mittel über alle Fragenblöcke hinweg:
 overview_statistics_max#:#Höchste Einschätzung Frageblock
 overview_statistics_min#:#Tiefste Einschätzung Frageblock
+overview_statistics_varianz#:#Varianz (n)
+overview_statistics_standardabweichung_per_plock#:#Standardabweichung (n) pro Block in % (siehe Säulendiagramm)
+overview_statistics_standardabweichung#:#Standardabweichung (n) in %
 fb_title#:#Titel
 fb_body#:#Feedback
 fb_start#:#Ab
@@ -172,6 +175,9 @@ show_bar_chart#:#Balkendiagramm anzeigen
 show_left_right_chart#:#Links-Rechts-Profil anzeigen
 show_fbs_overview_text#:#Gesamtfeedback anzeigen
 show_fbs_overview_text_info#:#Gesamtfeedback über den Mittelwert aller Fragenblöcke anzeigen. Dieses kann unter 'Fragen und Feedback bearbeiten' erstellt werden.
+show_fbs_overview_statistics#:#Statistik anzeigen
+show_fbs_overview_statistics_info#:#Für die Gesamtübersicht, werden Mittelwert in %, Standardabweichung, Varianz sowie höchster und tiefster Wert angezeigt.
+
 msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es kann kein weiterer Durchgang gestartet werden.
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
 show_results#:#Resultate

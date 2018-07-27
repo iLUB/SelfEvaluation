@@ -13,3 +13,8 @@ a.chart_toggle{
 .feedback{
     width: 100%;
 }
+
+.panel-statistics{
+    font-size: small;
+    font-style: italic;
+}

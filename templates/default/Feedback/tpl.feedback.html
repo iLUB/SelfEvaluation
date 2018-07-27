@@ -30,9 +30,20 @@
 	<script type="text/javascript">
 		new xsevChartToggle('fb_overview');
 	</script>
-	<div class="statistics">{OVERVIEW_STATISTICS_MEDIAN}</div>
-	<div class="statistics">{OVERVIEW_STATISTICS_MAX}</div>
-	<div class="statistics">{OVERVIEW_STATISTICS_MIN}</div>
+
+	<!-- BEGIN statistics -->
+	<div class="panel panel-default panel-statistics">
+		<div class="panel-body">
+			<div class="statistics">{OVERVIEW_STATISTICS_MEDIAN}</div>
+			<div class="statistics">{OVERVIEW_STATISTICS_MAX}</div>
+			<div class="statistics">{OVERVIEW_STATISTICS_MIN}</div>
+			<div class="statistics">{OVERVIEW_VARIANZ}</div>
+			<div class="statistics">{OVERVIEW_STANDARDABWEICHUNG}</div>
+			<div class="statistics">{OVERVIEW_STANDARDABWEICHUNG_PER_BLOCK}</div>
+		</div>
+	</div>
+	<!-- END statistics -->
+
 	<h3>{FEEDBACK_OVERVIEW_TITLE}</h3>
 	<p>{FEEDBACK_OVERVIEW_BODY}</p>
 </div>
