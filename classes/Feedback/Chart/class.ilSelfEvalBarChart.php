@@ -79,17 +79,17 @@ class ilSelfEvalBarChart extends ilChartGrid
             $y_values = $this->getValuesForStandardabweichung();
             $x = 1;
             foreach ($this->getStandardabweichungData() as $key => $sd_data){
-                $a_options->{"grid"}->{"markings"}[$key] = new stdClass();
-                $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"} = new stdClass();
-                $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"}->from = $y_values[$key]-$sd_data/2;
-                $a_options->{"grid"}->{"markings"}[$key]->{"yaxis"}->to = $y_values[$key]+$sd_data/2;
+                $a_options->{"grid"}->{"markings"}[$x] = new stdClass();
+                $a_options->{"grid"}->{"markings"}[$x]->{"yaxis"} = new stdClass();
+                $a_options->{"grid"}->{"markings"}[$x]->{"yaxis"}->from = $y_values[$key]-$sd_data/2;
+                $a_options->{"grid"}->{"markings"}[$x]->{"yaxis"}->to = $y_values[$key]+$sd_data/2;
 
-                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"} = new stdClass();
-                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->from =$x;
-                $a_options->{"grid"}->{"markings"}[$key]->{"xaxis"}->to = $x;
+                $a_options->{"grid"}->{"markings"}[$x]->{"xaxis"} = new stdClass();
+                $a_options->{"grid"}->{"markings"}[$x]->{"xaxis"}->from =$x;
+                $a_options->{"grid"}->{"markings"}[$x]->{"xaxis"}->to = $x;
 
-                $a_options->{"grid"}->{"markings"}[$key]->{"color"} = new stdClass();
-                $a_options->{"grid"}->{"markings"}[$key]->{"color"} = "#333333";
+                $a_options->{"grid"}->{"markings"}[$x]->{"color"} = new stdClass();
+                $a_options->{"grid"}->{"markings"}[$x]->{"color"} = "#333333";
                 $x++;
             }
         }
