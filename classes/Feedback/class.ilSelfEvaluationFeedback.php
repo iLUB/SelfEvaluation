@@ -521,7 +521,7 @@ class ilSelfEvaluationFeedback {
     /**
      * @return bool
      */
-    public function isParentTypeOverall(): bool
+    public function isParentTypeOverall()
     {
         return $this->parent_type_overall;
     }
@@ -529,7 +529,7 @@ class ilSelfEvaluationFeedback {
     /**
      * @param bool $parent_type_overall
      */
-    public function setParentTypeOverall(bool $parent_type_overall)
+    public function setParentTypeOverall( $parent_type_overall)
     {
         $this->parent_type_overall = $parent_type_overall;
     }
