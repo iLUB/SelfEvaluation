@@ -312,7 +312,7 @@ class ilSelfEvaluationDataset {
 
 		foreach ($blocks_percentage as $block_id => $percentage){
 			if($percentage <= $min){
-				$min = $percentage;
+				$min = round($percentage,2);
                 $min_block_id = $block_id;
 			}
 		}
@@ -330,7 +330,7 @@ class ilSelfEvaluationDataset {
 
         foreach ($blocks_percentage as $block_id => $percentage){
             if($percentage >= $max){
-                $max = $percentage;
+                $max = round($percentage,2);
                 $max_block_id = $block_id;
             }
         }
@@ -414,7 +414,7 @@ class ilSelfEvaluationDataset {
      * @return float
      */
     public function getOverallVarianz() {
-        return $this->getVarianz($this->getPercentagePerBlock(),$this->getOverallPercentage());
+        return round(sqrt($this->getVarianz($this->getPercentagePerBlock(),$this->getOverallPercentage())),2);
     }
 
     /**
@@ -439,7 +439,7 @@ class ilSelfEvaluationDataset {
         if($x == 0){
             return 0;
         }
-        return round($squared_sum / $x, 2);
+        return $squared_sum / $x;
     }
 
     /**
@@ -448,7 +448,7 @@ class ilSelfEvaluationDataset {
      * @return float
      */
     protected function getStandardabweichung($data,$average) {
-        return round(sqrt($this->getVarianz($data,$average)), 2);
+        return sqrt($this->getVarianz($data,$average));
     }
 
     /**
@@ -473,7 +473,7 @@ class ilSelfEvaluationDataset {
             	$data_as_percentage[] = $data/$highest*100;
 			}
 
-            $return[$block->getId()] = $this->getStandardabweichung($data_as_percentage,$answer_data_mean_percentage);
+            $return[$block->getId()] = round($this->getStandardabweichung($data_as_percentage,$answer_data_mean_percentage),2);
         }
 
         return $return;
