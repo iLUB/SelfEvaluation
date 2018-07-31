@@ -148,7 +148,9 @@ class ilSelfEvaluationFeedbackChartGUI {
 			);
 		}
 		if (count($data_set->getFeedbacksPerBlock()) > 0 AND $show_feedback_overview) {
-            $tpl->setVariable('BLOCK_OVERVIEW_TITLE', $this->pl->txt('block_overview_title'));
+			$tpl->setCurrentBlock('overview');
+
+			$tpl->setVariable('BLOCK_OVERVIEW_TITLE', $this->pl->txt('block_overview_title'));
 
             $median = $data_set->getOverallPercentage();
             $min = $data_set->getMinPercentageBlock();
@@ -207,10 +209,10 @@ class ilSelfEvaluationFeedbackChartGUI {
                     $tpl->setVariable('FEEDBACK_OVERVIEW_BODY', $feedback->getFeedbackText());
                 }
             }
-        }
-		if(!$obj->getShowFeedbacksOverview()) {
-			$tpl->setVariable('FEEDBACK_OVERVIEW_TITLE', "hidden");
+			$tpl->parseCurrentBlock();
+
 		}
+
 
 		return $tpl->get();
 	}
