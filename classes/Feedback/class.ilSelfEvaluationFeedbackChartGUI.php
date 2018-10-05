@@ -152,16 +152,17 @@ class ilSelfEvaluationFeedbackChartGUI {
 
 			$tpl->setVariable('BLOCK_OVERVIEW_TITLE', $this->pl->txt('block_overview_title'));
 
-            $median = $data_set->getOverallPercentage();
+            $mean = $data_set->getOverallPercentage();
             $min = $data_set->getMinPercentageBlock();
             $max = $data_set->getMaxPercentageBlock();
             $varianz = $data_set->getOverallVarianz();
             $standardabweichung = $data_set->getOverallStandardabweichung();
             $sd_per_block = $data_set->getStandardabweichungPerBlock();
+            $scale_max = $data_set->getHighestValueFromScale();
 
-            $statistics_median = $this->pl->txt("overview_statistics_median")." ".$median."%";
-            $statistics_max = $this->pl->txt("overview_statistics_max")." ".$max['block']->getTitle().": ".$max['percentage']."%";
-            $statistics_min = $this->pl->txt("overview_statistics_min")." ".$min['block']->getTitle().": ".$min['percentage']."%";
+            $statistics_median = $this->pl->txt("overview_statistics_median")." ".$scale_max*$mean/100 ." (".$mean."%)";
+            $statistics_max = $this->pl->txt("overview_statistics_max")." ".$max['block']->getTitle().": ".$scale_max*$max['percentage']/100 ." (".$max['percentage']."%)";
+            $statistics_min = $this->pl->txt("overview_statistics_min")." ".$min['block']->getTitle().": ".$scale_max*$min['percentage']/100 ." (".$min['percentage']."%)";
             $statistics_varianz = $this->pl->txt("overview_statistics_varianz").": ".$varianz;
             $statistics_sd_per_block = $this->pl->txt("overview_statistics_standardabweichung_per_plock").": ";
             foreach ($sd_per_block as $key => $sd){
@@ -176,9 +177,9 @@ class ilSelfEvaluationFeedbackChartGUI {
                 $tpl->setVariable('OVERVIEW_STATISTICS_MEDIAN', $statistics_median);
                 $tpl->setVariable('OVERVIEW_STATISTICS_MAX', $statistics_max);
                 $tpl->setVariable('OVERVIEW_STATISTICS_MIN', $statistics_min);
-                $tpl->setVariable('OVERVIEW_VARIANZ', $statistics_varianz);
-                $tpl->setVariable('OVERVIEW_STANDARDABWEICHUNG', $statistics_standardabweichung);
-                $tpl->setVariable('OVERVIEW_STANDARDABWEICHUNG_PER_BLOCK', $statistics_sd_per_block);
+                //$tpl->setVariable('OVERVIEW_VARIANZ', $statistics_varianz);
+                //$tpl->setVariable('OVERVIEW_STANDARDABWEICHUNG', $statistics_standardabweichung);
+                //$tpl->setVariable('OVERVIEW_STANDARDABWEICHUNG_PER_BLOCK', $statistics_sd_per_block);
             }
 
 
@@ -203,7 +204,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 
 
             if($obj->isShowFbsOverviewText()) {
-                $feedback = ilSelfEvaluationFeedback::_getFeedbackForPercentage($obj->ref_id, $median);;
+                $feedback = ilSelfEvaluationFeedback::_getFeedbackForPercentage($obj->ref_id, $mean);;
                 if($feedback){
                     $tpl->setVariable('FEEDBACK_OVERVIEW_TITLE', $feedback->getTitle());
                     $tpl->setVariable('FEEDBACK_OVERVIEW_BODY', $feedback->getFeedbackText());

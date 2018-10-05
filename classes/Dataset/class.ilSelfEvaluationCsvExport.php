@@ -94,10 +94,16 @@ class ilSelfEvaluationCsvExport extends csvExport{
 
     protected function setColumns(){
         $position = 0;
-        $this->getTable()->addColumn(new csvExportColumn("identity", $this->pl->txt("identity"),-5));
-        $this->getTable()->addColumn(new csvExportColumn("starting_date", $this->pl->txt("starting_date"),-4));
-        $this->getTable()->addColumn(new csvExportColumn("ending_date", $this->pl->txt("ending_date"),-3));
-        $this->getTable()->addColumn(new csvExportColumn("duration", $this->pl->txt("duration"),-2));
+        $this->getTable()->addColumn(new csvExportColumn("identity", $this->pl->txt("identity"),-100));
+        $this->getTable()->addColumn(new csvExportColumn("starting_date", $this->pl->txt("starting_date"),-90));
+        $this->getTable()->addColumn(new csvExportColumn("ending_date", $this->pl->txt("ending_date"),-80));
+        $this->getTable()->addColumn(new csvExportColumn("duration", $this->pl->txt("duration"),-70));
+        $this->getTable()->addColumn(new csvExportColumn("average", $this->pl->txt("overview_statistics_median"),-60));
+        $this->getTable()->addColumn(new csvExportColumn("max", $this->pl->txt("overview_statistics_max"),-50));
+        $this->getTable()->addColumn(new csvExportColumn("min", $this->pl->txt("overview_statistics_min"),-40));
+        $this->getTable()->addColumn(new csvExportColumn("variance", $this->pl->txt("overview_statistics_varianz"),-30));
+        $this->getTable()->addColumn(new csvExportColumn("sd", $this->pl->txt("overview_statistics_standardabweichung"),-20));
+        $this->getTable()->addColumn(new csvExportColumn("sd_per_block", $this->pl->txt("overview_statistics_standardabweichung_per_plock"),-10));
 
         $this->getTable()->setSortColumn("starting_date");
 
@@ -164,7 +170,14 @@ class ilSelfEvaluationCsvExport extends csvExport{
      * @return csvExportValue
      */
     protected function getIdentity($dataset){
-        return new csvExportValue("identity", substr(md5($dataset->getIdentifierId()), 0, 8));
+        $identifier = new ilSelfEvaluationIdentity($dataset->getIdentifierId());
+        $id = $identifier->getIdentifier();
+        if($identifier->getType() ==  ilSelfEvaluationIdentity::TYPE_LOGIN){
+            $username = ilObjUser::_lookupName($identifier->getIdentifier());
+            $id =  $username['login'];
+        }
+
+        return new csvExportValue("identity", $id);
     }
 
     protected function getDateValues($dataset){
@@ -192,6 +205,31 @@ class ilSelfEvaluationCsvExport extends csvExport{
         }catch(Exception $e){
             $meta_csv_values[] = new csvExportValue("Error", "Invalid Date");
         }
+        return $meta_csv_values;
+    }
+
+    /**
+     * @param ilSelfEvaluationDataset $dataset
+     * @return array
+     */
+    protected function getStatisticValues($dataset){
+        $meta_csv_values = [];
+        $min = $dataset->getMinPercentageBlock();
+        $max = $dataset->getMaxPercentageBlock();
+        $sd_per_block = $dataset->getStandardabweichungPerBlock();
+
+        $statistics_sd_per_block = "";
+        foreach ($sd_per_block as $key => $sd){
+            $statistics_sd_per_block .= $dataset->getBlockById($key)->getTitle().": ".$sd."; ";
+        }
+
+        $meta_csv_values[] = new csvExportValue("mean", $dataset->getOverallPercentage());
+        $meta_csv_values[] = new csvExportValue("max", $max['block']->getTitle().": ".$max['percentage']."%");
+        $meta_csv_values[] = new csvExportValue("min",$min['block']->getTitle().": ".$min['percentage']."%");
+        $meta_csv_values[] = new csvExportValue("variance", $dataset->getOverallVarianz());
+        $meta_csv_values[] = new csvExportValue("sd", $dataset->getOverallStandardabweichung());
+        $meta_csv_values[] = new csvExportValue("sd_per_block", $statistics_sd_per_block);
+
         return $meta_csv_values;
     }
 
@@ -296,7 +334,10 @@ class ilSelfEvaluationCsvExport extends csvExport{
             foreach($values as $value){
                 $row->addValue($value);
             }
-
+            $values = $this->getStatisticValues($dataset);
+            foreach($values as $value){
+                $row->addValue($value);
+            }
             $entries = ilSelfEvaluationData::_getAllInstancesByDatasetId($dataset->getId());
             foreach($entries as $entry){
                 if($this->getMetaQuestion($entry->getQuestionId()) || $this->getQuestion($entry->getQuestionId()))

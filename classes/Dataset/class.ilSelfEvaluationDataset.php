@@ -371,7 +371,7 @@ class ilSelfEvaluationDataset {
     /**
      * @return mixed
      */
-	protected function getHighestValueFromScale(){
+	public function getHighestValueFromScale(){
         $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
         $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray();
         $sorted_scale = array_keys($scale);
