@@ -76,7 +76,8 @@ class ilSelfEvaluationFeedbackChartGUI {
 							$obj->isShowFbsChartLeftRight());
 			$show_feedback_overview = $obj->getShowFeedbacksOverview() &&
 					($obj->isShowFbsOverviewBar() || $obj->isShowFbsOverviewSpider() ||
-							$obj->isShowFbsOverviewLeftRight());
+							$obj->isShowFbsOverviewLeftRight()|| $obj->isShowFbsOverviewStatistics()
+                    || $obj->getShowFeedbacksOverview());
 
             if($show_feedback_charts || $obj->getShowBlockTitlesDuringFeedback() ||
 		            $obj->getShowBlockDescriptionsDuringFeedback() || $obj->getShowFeedbacks()){
