@@ -35,6 +35,16 @@ class ilSelfEvaluationQuestion {
 	 */
 	protected $parent_id = 0;
 
+    /**
+     * @var array
+     */
+	static protected $instances_for_parent_id_array = [];
+
+    /**
+     * @var array
+     */
+    static protected $instances_for_parent_id = [];
+
 
 	/**
 	 * @param $id
@@ -216,20 +226,30 @@ class ilSelfEvaluationQuestion {
 	 * @return ilSelfEvaluationQuestion[]
 	 */
 	public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
-		
-		global $ilDB;
-		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-		. $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
-		while ($rec = $ilDB->fetchObject($set)) {
-			if ($as_array) {
-				$return[$rec->id] = (array)new self($rec->id);
-			} else {
-				$return[$rec->id] = new self($rec->id);
+        global $ilDB;
+
+        $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
+            . $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
+
+        if($as_array){
+			if(!self::$instances_for_parent_id_array[$parent_id]){
+                self::$instances_for_parent_id_array[$parent_id] = array();
+                while ($rec = $ilDB->fetchObject($set)) {
+                    self::$instances_for_parent_id_array[$parent_id][$rec->id] = (array)new self($rec->id);
+                }
 			}
+			return self::$instances_for_parent_id_array[$parent_id];
+		}else{
+            if(!self::$instances_for_parent_id[$parent_id]){
+                self::$instances_for_parent_id[$parent_id] = array();
+
+                while ($rec = $ilDB->fetchObject($set)) {
+                    self::$instances_for_parent_id[$parent_id][$rec->id] = new self($rec->id);
+                }
+            }
+            return self::$instances_for_parent_id[$parent_id];
 		}
 
-		return $return;
 	}
 
 

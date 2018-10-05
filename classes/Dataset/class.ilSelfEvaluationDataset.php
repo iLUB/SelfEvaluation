@@ -29,6 +29,15 @@ class ilSelfEvaluationDataset {
 	 */
 	protected $creation_date = 0;
 
+    /**
+     * @var int
+     */
+	static protected $highest_scale = 0;
+
+    /**
+     * @var bool
+     */
+	protected $percentage_per_block = false;
 
 	/**
 	 * @param $id
@@ -61,7 +70,7 @@ class ilSelfEvaluationDataset {
 	public function getArrayForDb() {
 		$e = array();
 		foreach (get_object_vars($this) as $k => $v) {
-			if (! in_array($k, array( 'db' ))) {
+			if (! in_array($k, array( 'db','percentage_per_block' ))) {
 				$e[$k] = array( self::_getType($v), $this->$k );
 			}
 		}
@@ -343,40 +352,47 @@ class ilSelfEvaluationDataset {
 	 * @description return array(block_id => percentage)
 	 */
 	public function getPercentagePerBlock() {
-        $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+		if(!$this->percentage_per_block){
+            $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
 
-        $return = array();
-		$highest = $this->getHighestValueFromScale();
-		foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
-			$answer_data = $this->getDataPerBlock($block->getId());
-			if (count($answer_data) == 0) {
-				continue;
-			}
-			$answer_total = array_sum($answer_data);
-			$anzahl_fragen = count($answer_data);
-			$possible_per_block = $anzahl_fragen * $highest;
-            if($possible_per_block != 0)
-            {
-                $percentage = $answer_total / $possible_per_block * 100;
-            } else{
-                $percentage = 0;
+            $this->percentage_per_block = array();
+            $highest = $this->getHighestValueFromScale();
+            foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
+                $answer_data = $this->getDataPerBlock($block->getId());
+                if (count($answer_data) == 0) {
+                    continue;
+                }
+                $answer_total = array_sum($answer_data);
+                $anzahl_fragen = count($answer_data);
+                $possible_per_block = $anzahl_fragen * $highest;
+                if($possible_per_block != 0)
+                {
+                    $percentage = $answer_total / $possible_per_block * 100;
+                } else{
+                    $percentage = 0;
+                }
+
+                $this->percentage_per_block[$block->getId()] = $percentage;
             }
-
-			$return[$block->getId()] = $percentage;
 		}
 
-		return $return;
+
+		return $this->percentage_per_block;
 	}
 
     /**
      * @return mixed
      */
 	public function getHighestValueFromScale(){
-        $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
-        $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray();
-        $sorted_scale = array_keys($scale);
-        sort($sorted_scale);
-        return $sorted_scale[count($sorted_scale) - 1];
+		if(!self::$highest_scale){
+            $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+            $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray();
+            $sorted_scale = array_keys($scale);
+            sort($sorted_scale);
+            self::$highest_scale = $sorted_scale[count($sorted_scale) - 1];
+		}
+		return self::$highest_scale;
+
     }
 
     /**
