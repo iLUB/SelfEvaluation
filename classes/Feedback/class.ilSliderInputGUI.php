@@ -50,8 +50,8 @@ class ilSliderInputGUI extends ilCustomInputGUI {
 
 	private function buildHTML() {
 		global $tpl;
-		$tpl->addCss("./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/jquery-ui-1.12.1.custom/jquery-ui.min.css");
-		$tpl->addJavaScript("./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/jquery-ui-1.12.1.custom/jquery-ui.min.js");
+		$tpl->addCss("./libs/bower/bower_components/jquery-ui/themes/base/jquery-ui.css");
+		$tpl->addJavaScript("./libs/bower/bower_components/jquery-ui/jquery-ui.min.js");
 
 		$pl = new ilSelfEvaluationPlugin();
 		$tpl = $pl->getTemplate('default/Feedback/tpl.slider_input.html');
