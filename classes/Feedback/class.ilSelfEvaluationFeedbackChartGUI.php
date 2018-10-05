@@ -188,7 +188,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 				$tpl->setVariable('SHOW_BAR_CHART', $this->pl->txt('show_bar_chart'));
 				$chart = $this->getOverviewBarChart($blocks,$data_set->getOverallPercentage());
 				if($obj->isShowFbsOverviewStatistics()){
-				    $chart->setShowVarianz(true);
+				    $chart->setShowVarianz(false);
 				    $chart->setStandardabweichungData($sd_per_block);
                     $chart->setValuesForStandardabweichung($data_set->getPercentagePerBlock());
                 }

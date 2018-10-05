@@ -77,7 +77,7 @@ class ilSelfEvalBarChart extends ilChartGrid
 
         if($this->isShowVarianz()){
             $y_values = $this->getValuesForStandardabweichung();
-            $x = 1;
+            $x = 0;
             foreach ($this->getStandardabweichungData() as $key => $sd_data){
                 $a_options->{"grid"}->{"markings"}[$x] = new stdClass();
                 $a_options->{"grid"}->{"markings"}[$x]->{"yaxis"} = new stdClass();
