@@ -161,9 +161,9 @@ class ilSelfEvaluationFeedbackChartGUI {
             $sd_per_block = $data_set->getStandardabweichungPerBlock();
             $scale_max = $data_set->getHighestValueFromScale();
 
-            $statistics_median = $this->pl->txt("overview_statistics_median")." ".$scale_max*$mean/100 ." (".$mean."%)";
-            $statistics_max = $this->pl->txt("overview_statistics_max")." ".$max['block']->getTitle().": ".$scale_max*$max['percentage']/100 ." (".$max['percentage']."%)";
-            $statistics_min = $this->pl->txt("overview_statistics_min")." ".$min['block']->getTitle().": ".$scale_max*$min['percentage']/100 ." (".$min['percentage']."%)";
+            $statistics_median = $this->pl->txt("overview_statistics_median")." ".$scale_max*$mean/100;//." (".$mean."%)";
+            $statistics_max = $this->pl->txt("overview_statistics_max")." ".$max['block']->getTitle().": ".$scale_max*$max['percentage']/100;// ." (".$max['percentage']."%)";
+            $statistics_min = $this->pl->txt("overview_statistics_min")." ".$min['block']->getTitle().": ".$scale_max*$min['percentage']/100;// ." (".$min['percentage']."%)";
             $statistics_varianz = $this->pl->txt("overview_statistics_varianz").": ".$varianz;
             $statistics_sd_per_block = $this->pl->txt("overview_statistics_standardabweichung_per_plock").": ";
             foreach ($sd_per_block as $key => $sd){
