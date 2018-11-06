@@ -10,8 +10,9 @@
 					{VAL_FROM},
 					{VAL_TO}
 				],
-				slide: function (event, ui) {
 
+
+				slide: function (event, ui) {
 					$('#amount').val('' + ui.values[ 0 ] + '{UNIT} - ' + ui.values[ 1 ] + '{UNIT}');
 					$('#{POSTVAR}_from').val(ui.values[ 0 ]);
 					$('#{POSTVAR}_to').val(ui.values[ 1 ]);
@@ -19,7 +20,7 @@
 				change: function (e, ui) {
 					var link = '{AJAX}';
 					var replacer = new RegExp('amp;', 'g');
-					link = link.replace(replacer, '') + '&from=' + ui.values[ 0 ] + '&to=' + ui.values[ 1 ];
+					link = link.replace(replacer, '') + '&from=' + ui.values[ 0 ] + '&to=' + ui.values[ 1 ] + '&start_value='+ui.values[0];
 
 					$.getJSON(link, function (data) {
 						if (!data.check) {

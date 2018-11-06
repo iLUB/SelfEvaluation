@@ -143,19 +143,21 @@ class ilSelfEvaluationFeedbackGUI {
 	}
 
 
-	public function checkNextValue() {
+    public function checkNextValue() {
 		header('Cache-Control: no-cache, must-revalidate');
 		header('Content-type: application/json');
 		$ignore = ($_GET['feedback_id'] ? $_GET['feedback_id'] : 0);
-		$next_min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($_GET['block_id'], 0,0, $ignore,$this->object->isParentTypeOverall());
-		$next_max = ilSelfEvaluationFeedback::_getNextMaxValueForParentId($_GET['block_id'], $next_min,0, $ignore,$this->object->isParentTypeOverall());
-		$state = (($_GET['from'] < $next_min) OR ($_GET['to'] > $next_max)) ? false : true;
+		$start= ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $_GET['start_value'] ? $_GET['start_value'] : 0,  $ignore, $this->object->isParentTypeOverall());
+		$end=ilSelfEvaluationFeedback::_getNextMaxValueForParentId($this->block->getID(), $start,  $ignore ,$this->object->isParentTypeOverall());
+
+		$state = (($_GET['from'] < $start) OR ($_GET['to'] > $end)) ? false : true;
 		echo json_encode(array(
-			'check' => $state,
-			'next_from' => $next_min,
-			'next_to' => $next_max
+		    'check'=>$state,
+		    'start_value' => $_GET['start_value'],
+			'next_from' => $start,
+			'next_to' => $end
 		));
-		$this->tpl->hide = true; // TODO this looks very nasty (writing to the global template object)
+		//$this->tpl->hide = true; // TODO this looks very nasty (writing to the global template object)
 		exit;
 	}
 
