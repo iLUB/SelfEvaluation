@@ -34,6 +34,14 @@ class ilSelfEvaluationPresentationGUI {
 	 */
 	protected $form;
 
+    /**
+     * @var int
+     */
+	protected $ref_id = 0;
+
+	const SESSION_KEY = "xsev_data";
+	const SESSION_KEY_CREATION_DATE = "creation_date";
+	const SESSION_KEY_SHUFFLE = "shuffled_blocks";
 
 	function __construct(ilObjSelfEvaluationGUI $parent) {
 		global $tpl, $ilCtrl, $ilUser;
@@ -54,6 +62,8 @@ class ilSelfEvaluationPresentationGUI {
 		} else {
 			$this->identity = new ilSelfEvaluationIdentity($_GET['uid']);
 		}
+
+		$this->ref_id = $_GET['ref_id'];
 	}
 
 
@@ -153,16 +163,17 @@ class ilSelfEvaluationPresentationGUI {
 
 
 	public function startNewEvaluation() {
-        unset($_SESSION['shuffled_blocks']);
-        $_SESSION['xsev_data']['creation_date_dataset'] = time();
+        $_SESSION[self::SESSION_KEY][$this->ref_id] = null;
+        $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE] = time();
 		$this->startEvaluation();
 	}
 
 
 	public function startEvaluation() {
 		$this->initPresentationForm();
-        if(!is_array($_SESSION['xsev_data']) || !array_key_exists('creation_date_dataset',$_SESSION['xsev_data'] )){
-            $_SESSION['xsev_data']['creation_date_dataset'] = time();
+        if(!is_array($_SESSION[self::SESSION_KEY][$this->ref_id])
+            || !array_key_exists(self::SESSION_KEY_CREATION_DATE,$_SESSION[self::SESSION_KEY][$this->ref_id] )){
+            $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE] = time();
         }
 		$this->tpl->setContent($this->form->getHTML());
 	}
@@ -184,11 +195,11 @@ class ilSelfEvaluationPresentationGUI {
 
 
         if($this->parent->object->getSortType()==ilObjSelfEvaluation::SHUFFLE_ACROSS_BLOCKS){
-            if(empty($_SESSION['shuffled_blocks'])){
-                $_SESSION['shuffled_blocks'] = serialize($this->orderMixedBlocks($blocks));
+            if(empty($_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_SHUFFLE])){
+                $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_SHUFFLE] = serialize($this->orderMixedBlocks($blocks));
             }
 
-            $blocks = unserialize($_SESSION['shuffled_blocks']);
+            $blocks = unserialize($_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_SHUFFLE]);
         }
 
         if($this->parent->object->getDisplayType() == ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE){
@@ -323,10 +334,10 @@ class ilSelfEvaluationPresentationGUI {
 
 		if ($this->form->checkinput()) {
 
-			if (is_array($_SESSION['xsev_data'])) {
-				$_SESSION['xsev_data'] = array_merge($_SESSION['xsev_data'], $_POST);
+			if (is_array($_SESSION[self::SESSION_KEY][$this->ref_id])) {
+				$_SESSION[self::SESSION_KEY][$this->ref_id] = array_merge($_SESSION[self::SESSION_KEY][$this->ref_id], $_POST);
 			} else {
-				$_SESSION['xsev_data'] = $_POST;
+				$_SESSION[self::SESSION_KEY][$this->ref_id] = $_POST;
 			}
 
 
@@ -345,9 +356,9 @@ class ilSelfEvaluationPresentationGUI {
 
 		if ($this->form->checkinput()) {
             $dataset = ilSelfEvaluationDataset::_getNewInstanceForIdentifierId($this->identity->getId());
-            $dataset->setCreationDate($_SESSION['xsev_data']['creation_date_dataset']);
-			$dataset->saveValuesByPost(array_merge($_SESSION['xsev_data'], $_POST));
-            $_SESSION['xsev_data'] = '';
+            $dataset->setCreationDate($_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE]);
+			$dataset->saveValuesByPost(array_merge($_SESSION[self::SESSION_KEY][$this->ref_id], $_POST));
+            $_SESSION[self::SESSION_KEY][$this->ref_id] = '';
 			//See #1017
 			//ilUtil::sendSuccess($this->pl->txt('data_saved'), true);
 			$this->redirectToResults($dataset);
