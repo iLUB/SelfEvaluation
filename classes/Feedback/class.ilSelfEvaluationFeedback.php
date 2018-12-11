@@ -359,7 +359,7 @@ class ilSelfEvaluationFeedback {
         $obj = new self();
         $obj->setParentId($parent_id);
 
-        $feedbacks = self::_getAllInstancesForParentId($parent_id,$is_overall);
+        $feedbacks = self::_getAllInstancesForParentId($parent_id, $as_array=false, $is_overall);
         $nr_feedbacks = count($feedbacks)+1;
         $range_per_feedback = (int)floor(100/$nr_feedbacks);
         $remainder = 100-$range_per_feedback*$nr_feedbacks;
