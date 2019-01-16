@@ -182,8 +182,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		/**
 		 * @var $ilDB ilDB
 		 */
-		parent::__construct($a_ref_id);
 		$this->db = $ilDB;
+		parent::__construct($a_ref_id);
 	}
 
 
