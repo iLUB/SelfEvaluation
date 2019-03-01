@@ -23,6 +23,7 @@
 
 require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
 require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlock.php');
+require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlockFactory.php');
 require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
 require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestion.php');
 require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScale.php');
@@ -355,6 +356,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 
 	function doUpdate() {
+
 		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
 			'id' => array(
 				'integer',
@@ -365,7 +367,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
 
 	public function doDelete() {
-		$scale = ilSelfEvaluationScale::_getInstanceByRefId($this->getId());
+		$scale = ilSelfEvaluationScale::_getInstanceByObjId($this->getId());
 		foreach (ilSelfEvaluationScaleUnit::_getAllInstancesByParentId($scale->getId()) as $u) {
 			$u->delete();
 		}
@@ -403,7 +405,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @param                     $a_copy_id
 	 * @param ilObjSelfEvaluation $new_obj
 	 */
-	function doClone($a_target_id, $a_copy_id, ilObjSelfEvaluation $new_obj) {
+    protected function doCloneObject($new_obj, $a_target_id, $a_copy_id = null){
 		$new_obj->setOnline($this->getOnline());
 		$new_obj->setEvaluationType($this->getEvaluationType());
 		$new_obj->setSortType($this->getSortType());
@@ -412,6 +414,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setOutro($this->getOutro());
 		$new_obj->setOutroTitle($this->getOutroTitle());
 		$new_obj->setIdentitySelectionInfoText($this->getIdentitySelectionInfoText());
+        $new_obj->setShowFeedbacks($this->getShowFeedbacks());
+        $new_obj->setShowFeedbacksCharts($this->getShowFeedbacksCharts());
+        $new_obj->setShowFeedbacksOverview($this->getShowFeedbacksOverview());
+        $new_obj->setShowFbsOverviewStatistics($this->isShowFbsOverviewStatistics());
 		$new_obj->setShowBlockTitlesDuringEvaluation($this->getShowBlockTitlesDuringEvaluation());
 		$new_obj->setShowBlockDescriptionsDuringEvaluation($this->getShowBlockDescriptionsDuringEvaluation());
 		$new_obj->setShowBlockTitlesDuringFeedback($this->getShowBlockTitlesDuringFeedback());
@@ -426,9 +432,25 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$new_obj->setShowFbsChartBar($this->isShowFbsChartBar());
 		$new_obj->setShowFbsChartSpider($this->isShowFbsChartSpider());
 		$new_obj->setShowFbsChartLeftRight($this->isShowFbsChartLeftRight());
-		// TODO clone meta blocks and questions?
 		$new_obj->update();
-	}
+
+		//Copy Scale
+		$old_scale = ilSelfEvaluationScale::_getInstanceByObjId($this->getId());
+		$old_scale->cloneTo($new_obj->getId());
+
+		//Copy Blocks
+		$block_factory = new ilSelfEvaluationBlockFactory($this->getId());
+        foreach ($block_factory->getAllBlocks() as $block){
+            $block->cloneTo($new_obj->getId());
+        }
+
+		//Copy Overall Feedback
+        $old_feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getRefId(),false,true);
+        foreach ($old_feedbacks as $feedback){
+            $feedback->cloneTo($new_obj->getRefId());
+        }
+
+    }
 
 
 	/**
@@ -441,7 +463,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
      * @return bool
      */
     public function hasScale() {
-        return count(ilSelfEvaluationScale::_getInstanceByRefId($this->getId())->getUnitsAsArray())==0 ? false: true;
+        return ilSelfEvaluationScale::_getInstanceByObjId($this->getId())->hasUnits();
     }
 
 	/**

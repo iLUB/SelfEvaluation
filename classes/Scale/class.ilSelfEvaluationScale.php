@@ -37,6 +37,25 @@ class ilSelfEvaluationScale {
 		$this->units = ilSelfEvaluationScaleUnit::_getAllInstancesByParentId($this->getId());
 	}
 
+    /**
+     * @param $parent_obj_id
+     * @return ilSelfEvaluationScale
+     */
+	public function cloneTo($parent_obj_id){
+		$clone = new self();
+		$clone->setParentId($parent_obj_id);
+		$clone->update();
+        $old_units = ilSelfEvaluationScaleUnit::_getAllInstancesByParentId($this->getId());
+		$new_units = [];
+
+        foreach ($old_units as $old_unit){
+            $new_units[] = $old_unit->cloneTo($clone->getId());
+		}
+        $clone->units = $new_units;
+
+        return $clone;
+	}
+
 
 	/**
 	 * @param bool $flipped
@@ -54,6 +73,10 @@ class ilSelfEvaluationScale {
 		}
 
 		return $return;
+	}
+
+	public function hasUnits(){
+		return count($this->units)>0;
 	}
 
     /**
@@ -192,16 +215,16 @@ class ilSelfEvaluationScale {
 	 *
 	 * @return ilSelfEvaluationScale
 	 */
-	public static function _getInstanceByRefId($parent_id) {
+	public static function _getInstanceByObjId($parent_obj_id) {
 		global $ilDB;
 		// Existing Object
 		$set = $ilDB->query("SELECT * FROM " . self::TABLE_NAME . " " . " WHERE parent_id = "
-		. $ilDB->quote($parent_id, "integer"));
+		. $ilDB->quote($parent_obj_id, "integer"));
 		while ($rec = $ilDB->fetchObject($set)) {
 			return new self($rec->id);
 		}
 		$obj = new self();
-		$obj->setParentId($parent_id);
+		$obj->setParentId($parent_obj_id);
 
 		return $obj;
 	}

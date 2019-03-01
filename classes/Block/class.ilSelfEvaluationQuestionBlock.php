@@ -16,12 +16,37 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
 	 */
 	protected $abbreviation = '';
 
+    /**
+     * @param $parent_ref_id
+     * @return ilSelfEvaluationQuestionBlock
+     */
+    public function cloneTo($parent_id){
+        $clone = new self();
+        $clone->setParentId($parent_id);
+        $clone->setTitle($this->getTitle());
+        $clone->setAbbreviation($this->getAbbreviation());
+        $clone->setDescription($this->getDescription());
+        $clone->setPosition($this->getPosition());
+        $clone->update();
+
+        $old_questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->getId());
+        foreach ($old_questions as $question){
+            $question->cloneTo($clone->getId());
+        }
+
+        $old_feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getId());
+        foreach ($old_feedbacks as $feedback){
+            $feedback->cloneTo($clone->getId());
+        }
+
+        return $clone;
+    }
+
 	/**
 	 * @param ilSelfEvaluationQuestionBlock $block
 	 * @param stdClass                      $rec
 	 */
-	protected static function setObjectValuesFromRecord(ilSelfEvaluationBlock
-&$block = NULL, $rec = NULL) {
+	protected static function setObjectValuesFromRecord(ilSelfEvaluationBlock &$block = NULL, $rec = NULL) {
 		parent::setObjectValuesFromRecord($block, $rec);
 	}
 

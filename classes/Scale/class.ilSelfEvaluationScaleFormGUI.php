@@ -29,7 +29,7 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI {
 	 * @param int  $parent_id
 	 * @param bool $locked
 	 */
-	public function __construct($parent_id, $locked = false) {
+	public function __construct($parent_obj_id, $locked = false) {
 		global $tpl, $ilCtrl;
 		/**
 		 * @var $tpl    ilTemplate
@@ -39,8 +39,8 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI {
 		$this->locked = $locked;
 		$this->ctrl = $ilCtrl;
 		$this->pl = new ilSelfEvaluationPlugin();
-		$this->parent_id = $parent_id;
-		$this->obj = ilSelfEvaluationScale::_getInstanceByRefId($this->parent_id);
+		$this->parent_id = $parent_obj_id;
+		$this->obj = ilSelfEvaluationScale::_getInstanceByObjId($this->parent_id);
 		$this->initForm();
 		$this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
 	}

@@ -42,6 +42,11 @@ abstract class ilSelfEvaluationBlock {
 		}
 	}
 
+    /**
+     * @param $parent_id
+     * @return ilSelfEvaluationBlock
+     */
+    abstract public function cloneTo($parent_id);
 
 	public function read() {
 		global $DIC;
@@ -249,7 +254,7 @@ abstract class ilSelfEvaluationBlock {
 	// Static
 	//
 	/**
-	 * @param int  $parent_id ilObjSelfEvaluation obj id
+	 * @param int  $parent_id
 	 *
 	 * @return ilSelfEvaluationBlock[]
 	 */

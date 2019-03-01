@@ -33,7 +33,7 @@ class ilSelfEvaluationQuestionBlockPresentationGUI extends ilSelfEvaluationBlock
     public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
         $form = parent::getBlockForm($parent_form, $first);
 
-        $scale = ilSelfEvaluationScale::_getInstanceByRefId($this->object->getParentId());
+        $scale = ilSelfEvaluationScale::_getInstanceByObjId($this->object->getParentId());
         $matrix_gui = new ilMatrixHeaderGUI();
         $matrix_gui->setScale($scale->getUnitsAsArray());
         $form->addItem($matrix_gui);

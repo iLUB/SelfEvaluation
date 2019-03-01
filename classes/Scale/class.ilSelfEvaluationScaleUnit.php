@@ -48,6 +48,19 @@ class ilSelfEvaluationScaleUnit {
 		}
 	}
 
+    /**
+     * @param $parent_id
+     * @return ilSelfEvaluationScaleUnit
+     */
+    public function cloneTo($parent_id){
+        $clone = new self();
+        $clone->setParentId($parent_id);
+        $clone->setTitle($this->getTitle());
+        $clone->setValue($this->getValue());
+        $clone->setPosition($this->getPosition());
+        $clone->update();
+        return $clone;
+    }
 
 	public function read() {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '

@@ -62,6 +62,22 @@ class ilSelfEvaluationFeedback {
 		}
 	}
 
+    /**
+     * @param $parent_id
+     * @return ilSelfEvaluationFeedback
+     */
+    public function cloneTo($parent_id){
+        $clone = new self();
+        $clone->setParentId($parent_id);
+        $clone->setTitle($this->getTitle());
+        $clone->setDescription($this->getDescription());
+        $clone->setStartValue($this->getStartValue());
+        $clone->setEndValue($this->getEndValue());
+        $clone->setFeedbackText($this->getFeedbackText());
+        $clone->setParentTypeOverall($this->isParentTypeOverall());
+        $clone->update();
+        return $clone;
+    }
 
 	public function read() {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '

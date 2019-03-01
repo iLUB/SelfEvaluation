@@ -32,11 +32,49 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
  */
 class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock {
 
+    /**
+     * @var string
+     */
+    protected $title = '';
+    /**
+     * @var string
+     */
+    protected $description = '';
+    /**
+     * @var int
+     */
+    protected $position = 99;
+    /**
+     * @var int
+     */
+    protected $parent_id = 0;
+
+
 	/**
 	 * @var iLubFieldDefinitionContainer
 	 */
 	protected $meta_container;
 
+    /**
+     * @param $parent_ref_id
+     * @return ilSelfEvaluationMetaBlock
+     */
+    public function cloneTo($parent_id){
+        $clone = new self();
+        $clone->setParentId($parent_id);
+        $clone->setTitle($this->getTitle());
+        $clone->setDescription($this->getDescription());
+        $clone->setPosition($this->getPosition());
+        $clone->update();
+
+        $old_questions = ilSelfEvaluationMetaQuestion::_getAllInstancesForParentId($this->getId());
+
+        foreach ($old_questions as $question){
+            $question->cloneTo($clone->getId());
+        }
+
+        return $clone;
+    }
 
 	/**
 	 * @param ilSelfEvaluationBlock $block

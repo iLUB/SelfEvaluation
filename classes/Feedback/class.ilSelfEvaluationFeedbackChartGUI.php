@@ -104,7 +104,7 @@ class ilSelfEvaluationFeedbackChartGUI {
                 }
 
                 if ($show_feedback_charts) {
-                    $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj->getId());
+                    $scale = ilSelfEvaluationScale::_getInstanceByObjId($obj->getId());
                     $units = $scale->getUnitsAsArray();
                     $max_cnt = max(array_keys($units));
 
@@ -347,7 +347,7 @@ class ilSelfEvaluationFeedbackChartGUI {
             }
             $chart->setTicks($x_axis, $y_axis, true);
         }else{
-            $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj->getId());
+            $scale = ilSelfEvaluationScale::_getInstanceByObjId($obj->getId());
             $units = $scale->getUnitsAsRelativeArray();
             $units = $this->setUnusedLegendLabels($units);
             $chart->setTicks($x_axis, $units, true);

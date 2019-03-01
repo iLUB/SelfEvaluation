@@ -57,6 +57,20 @@ class ilSelfEvaluationQuestion {
 		}
 	}
 
+    /**
+     * @param $parent_id
+     * @return ilSelfEvaluationMetaQuestion
+     */
+    public function cloneTo($parent_id){
+        $clone = new self();
+        $clone->setParentId($parent_id);
+        $clone->setTitle($this->getTitle());
+        $clone->setQuestionBody($this->getQuestionBody());
+        $clone->setPosition($this->getPosition());
+        $clone->setIsInverse($this->getIsInverse());
+        $clone->update();
+        return $clone;
+    }
 
 	public function read() {
 		global $DIC;

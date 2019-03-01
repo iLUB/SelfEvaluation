@@ -41,6 +41,16 @@ class ilSelfEvaluationPlugin extends ilRepositoryObjectPlugin {
 	protected function uninstallCustom() {
 		return;
 	}
+
+    /**
+     * decides if this repository plugin can be copied
+     *
+     * @return bool
+     */
+    public function allowCopy()
+    {
+        return true;
+    }
 }
 
 ?>

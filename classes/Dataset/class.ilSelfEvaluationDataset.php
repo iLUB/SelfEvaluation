@@ -386,7 +386,7 @@ class ilSelfEvaluationDataset {
 	public function getHighestValueFromScale(){
 		if(!self::$highest_scale){
             $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
-            $scale = ilSelfEvaluationScale::_getInstanceByRefId($obj_id)->getUnitsAsArray();
+            $scale = ilSelfEvaluationScale::_getInstanceByObjId($obj_id)->getUnitsAsArray();
             $sorted_scale = array_keys($scale);
             sort($sorted_scale);
             self::$highest_scale = $sorted_scale[count($sorted_scale) - 1];

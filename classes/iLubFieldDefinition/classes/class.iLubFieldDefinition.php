@@ -83,6 +83,21 @@ class iLubFieldDefinition {
 		}
 	}
 
+    /**
+     * @param iLubFieldDefinition $new_object
+     * @return iLubFieldDefinition
+     */
+	public function cloneToObject(iLubFieldDefinition $new_object){
+	    $new_object->setContainerId($this->getContainerId());
+        $new_object->setName($this->getName());
+        $new_object->setShortTitle($this->getShortTitle());
+        $new_object->setTypeId($this->getTypeId());
+        $new_object->setValues($this->getValues());
+        $new_object->enableRequired($this->isRequired());
+        $new_object->setPosition($this->getPosition());
+        return $new_object;
+    }
+
 
 	public function initDB() {
 		global $DIC;

@@ -41,6 +41,17 @@ class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition {
 		parent::__construct(self::TABLE_NAME, $container_id, $id);
 	}
 
+    /**
+     * @param $parent_id
+     * @return ilSelfEvaluationMetaQuestion
+     */
+    public function cloneTo($parent_id){
+        $clone = new self($parent_id);
+        $clone = $this->cloneToObject($clone);
+        $clone->setContainerId($parent_id);
+        $clone->save();
+        return $clone;
+    }
 
 	/**
 	 * @param int $field_id
