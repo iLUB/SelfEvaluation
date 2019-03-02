@@ -81,6 +81,7 @@ abstract class ilSelfEvaluationBlockGUI {
 			case 'updateObject':
 			case 'deleteBlock':
 			case 'deleteObject':
+            case 'duplicateBlock':
 				$this->parent->permissionCheck('write');
 				$this->$cmd();
 				break;
@@ -140,6 +141,14 @@ abstract class ilSelfEvaluationBlockGUI {
 		$this->tpl->setContent($this->form->getHTML());
 	}
 
+    /**
+     * Create a new block object
+     */
+    public function duplicateBlock() {
+        $this->object->cloneTo($this->object->getParentId());
+        ilUtil::sendSuccess($this->pl->txt('msg_block_duplicated'),true);
+        $this->cancel();
+    }
 
 	/**
 	 * Show the edit block GUI

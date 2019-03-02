@@ -107,9 +107,13 @@ class ilSelfEvaluationBlockTableRow {
 
 		// actions
 		$this->saveCtrlParameters();
+
 		$edit_action = $this->getEditAction();
 		$this->setBlockEditLink($edit_action->getLink());
 		$this->addAction($edit_action);
+
+        $duplicate_action = $this->getDuplicateAction();
+        $this->addAction($duplicate_action);
 
 		$delete_action = $this->getDeleteAction();
 		$this->addAction($delete_action);
@@ -367,4 +371,16 @@ class ilSelfEvaluationBlockTableRow {
 
 		return new ilSelfEvaluationTableAction($title, $cmd, $link,$position);
 	}
+
+    /**
+     * @return ilSelfEvaluationTableAction
+     */
+    protected function getDuplicateAction() {
+        $title = $this->pl->txt('duplicate_block');
+        $link = $this->ctrl->getLinkTargetByClass($this->block_gui_class, 'duplicateBlock');
+        $cmd = 'duplicateBlock';
+        $position = 3.5;
+
+        return new ilSelfEvaluationTableAction($title, $cmd, $link,$position);
+    }
 }
