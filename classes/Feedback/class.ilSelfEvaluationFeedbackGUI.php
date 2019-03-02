@@ -110,6 +110,7 @@ class ilSelfEvaluationFeedbackGUI {
 			case 'editFeedback':
 			case 'checkNextValue':
 			case 'deleteFeedback':
+            case 'deleteFeedbacks':
 			case 'deleteObject':
 				//				$this->checkPermission('read'); FSX
 				$this->$cmd();
@@ -285,19 +286,35 @@ class ilSelfEvaluationFeedbackGUI {
 
 
 	public function deleteFeedback() {
-		ilUtil::sendQuestion($this->pl->txt('qst_delete_feedback'));
-		$conf = new ilConfirmationGUI();
-		$conf->setFormAction($this->ctrl->getFormAction($this));
-		$conf->setCancel($this->pl->txt('cancel'), 'cancel');
-		$conf->setConfirm($this->pl->txt('delete_feedback'), 'deleteObject');
-		$conf->addItem('feedback_id', $this->object->getId(), $this->object->getTitle());
-		$this->tpl->setContent($conf->getHTML());
+		$this->deleteFeedbacksConfirmation([$this->object->getId()]);
 	}
 
+    public function deleteFeedbacks() {
+        $this->deleteFeedbacksConfirmation($_POST["id"]);
+    }
+
+    public function deleteFeedbacksConfirmation($ids = []) {
+        ilUtil::sendQuestion($this->pl->txt('qst_delete_feedback'));
+        $conf = new ilConfirmationGUI();
+        $conf->setFormAction($this->ctrl->getFormAction($this));
+        $conf->setCancel($this->pl->txt('cancel'), 'cancel');
+        $conf->setConfirm($this->pl->txt('delete_feedback'), 'deleteObject');
+        foreach ($ids as $id){
+            $obj = new ilSelfEvaluationFeedback($id);
+            $conf->addItem('id[]', $obj->getId(), $obj->getTitle());
+
+        }
+        $this->tpl->setContent($conf->getHTML());
+    }
 
 	public function deleteObject() {
-		ilUtil::sendSuccess($this->pl->txt('msg_feedback_deleted'), true);
-		$this->object->delete();
+        ilUtil::sendSuccess($this->pl->txt('msg_feedback_deleted'), true);
+
+        $ids = $_POST["id"];
+        foreach ($ids as $id){
+            $obj = new ilSelfEvaluationFeedback($id);
+            $obj->delete();
+        }
 		$this->cancel();
 	}
 

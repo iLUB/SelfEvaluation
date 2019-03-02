@@ -17,27 +17,27 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 	 * @param ilSelfEvaluationBlock       $block
 	 */
 	function __construct(ilSelfEvaluationFeedbackGUI $a_parent_obj, $a_parent_cmd, $block, $is_ovarall = false) {
-		global $ilCtrl, $ilTabs;
-		/**
-		 * @var $ilCtrl ilCtrl
-		 * @var $ilTabs ilTabsGUI
-		 */
+		global $DIC;
+
 		$this->pl = new ilSelfEvaluationPlugin();
-		$this->ctrl = $ilCtrl;
-		$this->tabs = $ilTabs;
+		$this->ctrl = $DIC->ctrl();
+		$this->tabs = $DIC->tabs();
 		$this->setId('');
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 		$this->setTitle($block->getTitle().': '. $this->pl->txt('edit_feedbacks'));
 		// Columns
-		$this->addColumn($this->pl->txt('fb_title'), 'title', 'auto');
+        $this->addColumn("", "", "1");
+        $this->addColumn($this->pl->txt('fb_title'), 'title', 'auto');
 		$this->addColumn($this->pl->txt('fb_body'), 'body', 'auto');
 		$this->addColumn($this->pl->txt('fb_start'), 'start', 'auto');
 		$this->addColumn($this->pl->txt('fb_end'), 'end', 'auto');
 		$this->addColumn($this->pl->txt('actions'), 'asction', 'auto');
 
         $this->ctrl->setParameter($this->parent_obj, 'feedback_id', NULL);
+        $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
+        $this->addMultiCommand("deleteFeedbacks", $this->pl->txt("delete_feedback"));
 
-		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Feedback/tpl.template_feedback_row.html');
+        $this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Feedback/tpl.template_feedback_row.html');
 		$this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->block->getId(), true, $is_ovarall));
 	}
 
@@ -47,7 +47,8 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 	 */
 	public function fillRow($a_set) {
 		$obj = new ilSelfEvaluationFeedback($a_set['id']);
-		$this->tpl->setVariable('TITLE', $obj->getTitle());
+        $this->tpl->setVariable("ID", $obj->getId());
+        $this->tpl->setVariable('TITLE', $obj->getTitle());
 		$this->tpl->setVariable('BODY', strip_tags($obj->getFeedbackText()));
 		$this->tpl->setVariable('START', ($obj->getStartValue() == 0 ? '>= ' : '> ') . $obj->getStartValue() . '%');
 		$this->tpl->setVariable('END', '<= ' . $obj->getEndValue() . '%');
