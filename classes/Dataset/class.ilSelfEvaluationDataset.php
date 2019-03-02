@@ -299,7 +299,7 @@ class ilSelfEvaluationDataset {
 	 *
 	 * @return mixed
 	 */
-	public function getDataPerBlock($block_id) { // TODO also fetch meta question data and display it in the feedback
+	public function getDataPerBlock($block_id) {
 		$sum = array();
 		foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block_id) as $qst) {
 			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $qst->getId());
@@ -545,16 +545,20 @@ class ilSelfEvaluationDataset {
 	 *
 	 * @return ilSelfEvaluationDataset[]
 	 */
-	public static function _getAllInstancesByObjectId($obj_id, $as_array = false) {
-		global $ilDB;
-		/**
-		 * @var $ilDB ilDB
-		 */
+	public static function _getAllInstancesByObjectId($obj_id, $as_array = false, $identifier = "") {
+		global $DIC;
+
 		$return = array();
-		foreach (ilSelfEvaluationIdentity::_getAllInstancesByForForObjId($obj_id) as $identity) {
-			$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-				. $ilDB->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
-			while ($rec = $ilDB->fetchObject($set)) {
+		if($identifier == ""){
+            $identities = ilSelfEvaluationIdentity::_getAllInstancesByObjId($obj_id);
+        }else{
+            $identities = ilSelfEvaluationIdentity::_getAllInstancesForObjIdAndIdentifier($obj_id,$identifier);
+		}
+
+		foreach ($identities as $identity) {
+			$set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+				. $DIC->database()->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
+			while ($rec = $DIC->database()->fetchObject($set)) {
 				if ($as_array) {
 					$return[] = (array)$rec;
 				} else {
@@ -568,6 +572,29 @@ class ilSelfEvaluationDataset {
 		return $return;
 	}
 
+    /**
+     * @param      $obj_id
+     * @param bool $as_array
+     *
+     * @return ilSelfEvaluationDataset[]
+     */
+    public static function _getAllInstancesByObjectIdOfCurrentUser($obj_id) {
+        global $DIC;
+
+        $return = array();
+        foreach (ilSelfEvaluationIdentity::_getAllInstancesByObjId($obj_id) as $identity) {
+            $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+                . $DIC->database()->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
+            while ($rec = $DIC->database()->fetchObject($set)) {
+
+                    $data_set = new ilSelfEvaluationDataset();
+                    $data_set->setObjectValuesFromRecord($data_set, $rec);
+                    $return[] = $data_set;
+            }
+        }
+
+        return $return;
+    }
 
 	/**
 	 * @param $obj_id

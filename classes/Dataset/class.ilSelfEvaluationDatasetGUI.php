@@ -23,16 +23,12 @@ class ilSelfEvaluationDatasetGUI {
 
 
 	function __construct(ilObjSelfEvaluationGUI $parent) {
-		global $tpl, $ilCtrl, $ilToolbar;
-		/**
-		 * @var $tpl       ilTemplate
-		 * @var $ilCtrl    ilCtrl
-		 * @var $ilToolbar ilToolbarGUI
-		 */
-		$this->tpl = $tpl;
-		$this->ctrl = $ilCtrl;
+		global $DIC;
+
+		$this->tpl = $DIC['tpl'];
+		$this->ctrl = $DIC->ctrl();
 		$this->parent = $parent;
-		$this->toolbar = $ilToolbar;
+		$this->toolbar = $DIC->toolbar();
 		$this->tabs_gui = $this->parent->tabs_gui;
 		$this->pl = $parent->getPluginObject();
 		$this->dataset = new ilSelfEvaluationDataset($_GET['dataset_id'] ? $_GET['dataset_id'] : 0);
@@ -68,7 +64,7 @@ class ilSelfEvaluationDatasetGUI {
 	function performCommand($cmd) {
 		$this->tabs_gui->setTabActive('all_results');
 		switch ($cmd) {
-			default:
+            default:
 				$this->$cmd();
 				break;
 		}
@@ -82,9 +78,18 @@ class ilSelfEvaluationDatasetGUI {
 
 
 	public function index() {
-		$table = new ilSelfEvaluationDatasetTableGUI($this, 'index', $this->pl, $this->parent->object->getId());
-		$this->tpl->setContent($table->getHTML());
+        global $DIC;
 
+	    if($this->parent->permissionCheckBool("write")){
+            $this->toolbar->addButton($this->pl->txt('delete_all_datasets'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDeleteAll'));
+            $this->toolbar->addButton($this->pl->txt('export_csv'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'exportCSV'));
+            $table = new ilSelfEvaluationDatasetTableGUI($this, 'index', $this->pl, $this->parent->object->getId());
+        }else{
+            $table = new ilSelfEvaluationDatasetTableGUI($this, 'index', $this->pl, $this->parent->object->getId(),$DIC->user()->getId());
+        }
+
+
+		$this->tpl->setContent($table->getHTML());
 		return;
 	}
 
@@ -100,7 +105,12 @@ class ilSelfEvaluationDatasetGUI {
 			$charts = new ilSelfEvaluationFeedbackChartGUI();
 			$feedback = $charts->getPresentationOfFeedback($this->dataset);
 		}
-		$this->tpl->setContent($content->get() . $feedback);
+        require_once('Services/PDFGeneration/classes/factory/class.ilHtmlToPdfTransformerFactory.php');
+        $pdf_factory = new ilHtmlToPdfTransformerFactory();
+		$html = $content->get() . $feedback;
+        //$pdf_factory->deliverPDFFromHTMLString($html, "feedback.pdf", ilHtmlToPdfTransformerFactory::PDF_OUTPUT_DOWNLOAD, "SelfEvaluation", "ContentExport");
+
+        $this->tpl->setContent($content->get() . $feedback);
 	}
 
 

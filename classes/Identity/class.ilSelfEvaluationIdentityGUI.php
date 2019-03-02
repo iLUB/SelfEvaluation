@@ -120,7 +120,7 @@ class ilSelfEvaluationIdentityGUI {
 		if ($this->ex->checkInput()) {
 			$identifier = $this->ex->getInput('uid');
 			if (ilSelfEvaluationIdentity::_identityExists($this->parent->object->getId(), $identifier)) {
-				$id = ilSelfEvaluationIdentity::_getInstanceForObjId($this->parent->object->getId(), $identifier);
+				$id = ilSelfEvaluationIdentity::_getInstanceForObjIdAndIdentifier($this->parent->object->getId(), $identifier);
 				$this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
 				$this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
 			} else {
@@ -134,7 +134,7 @@ class ilSelfEvaluationIdentityGUI {
 
 
 	public function startWithNewUid() {
-		$id = ilSelfEvaluationIdentity::_getInstanceForObjId($this->parent->object->getId(), NULL);
+		$id = ilSelfEvaluationIdentity::_getNewHashInstanceForObjId($this->parent->object->getId());
 		$this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
 		$this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
 	}

@@ -290,46 +290,26 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
 
 	function setTabs() {
-		/** @var ilAccessHandler $ilAccess */
-		global $ilAccess;
-		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
-			$this->object->setAllowShowResults(true);
-		}
-		if ($ilAccess->checkAccess('read', '', $this->object->getRefId())) {
+		global $DIC;
+
+		if ($DIC->access()->checkAccess('read', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab('content', $this->txt('content'), $this->ctrl->getLinkTarget($this, 'showContent'));
 		}
 		$this->addInfoTab();
-		if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
+		if ($DIC->access()->checkAccess('write', '', $this->object->getRefId())) {
 			$this->tabs_gui->addTab('properties', $this->txt('properties'), $this->ctrl->getLinkTarget($this, 'editProperties'));
 			$this->tabs_gui->addTab('administration', $this->txt('administration'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
 		}
-		if (($this->object->getAllowShowResults())
-			AND $this->object->hasDatasets()
-		) {
-			if ($ilAccess->checkAccess('write', '', $this->object->getRefId())) {
-				$this->tabs_gui->addTab('all_results', $this->txt('show_all_results'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'index'));
-			}
-		}
-		$this->addPermissionTab();
+		if ($this->object->getAllowShowResults() && !$DIC->user()->isAnonymous())
+        {
+            $this->tabs_gui->addTab('all_results', $this->txt('show_results'),
+                $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'index'));
+        }
+
+        $this->addExportTab();
+
+        $this->addPermissionTab();
 	}
-
-
-    /**
-     * Init creation froms
-     *
-     * this will create the default creation forms: new, import, clone
-     *
-     * @param	string	$a_new_type
-     * @return	array
-     */
-    protected function initCreationForms($a_new_type)
-    {
-        $forms = array(
-            self::CFORM_NEW => $this->initCreateForm($a_new_type),
-        );
-
-        return $forms;
-    }
 
 	function editProperties() {
 		if ($this->object->hasDatasets()) {
@@ -631,28 +611,17 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	// Show content
 	//
 	function showContent() {
-		global $ilUser;
-		if (self::_isAnonymous($ilUser->getId())) {
+		global $DIC;
+		if ($DIC->user()->isAnonymous()) {
 			$this->ctrl->redirectByClass('ilSelfEvaluationIdentityGUI', 'show');
 		} else {
-			$id = ilSelfEvaluationIdentity::_getInstanceForObjId($this->object->getId(), $ilUser->getId());
+			$id = ilSelfEvaluationIdentity::_getInstanceForObjIdAndIdentifier($this->object->getId(), $DIC->user()->getId());
+			if(!$id){
+                $id = ilSelfEvaluationIdentity::_getNewInstanceForObjIdAndUserId($this->object->getId(), $DIC->user()->getId());
+			}
 			$this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
 			$this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
 		}
-	}
-
-
-	//
-	// Helper
-	//
-	public static function _isAnonymous($user_id) {
-		foreach (ilObjUser::_getUsersForRole(ANONYMOUS_ROLE_ID) as $u) {
-			if ($u['usr_id'] == $user_id) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 
@@ -670,15 +639,25 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 	}
 
 
-	/**
-	 * @param string $permission
-	 * @param string $cmd
-	 *
-	 * @return bool
-	 */
+    /**
+     * @param $permission
+     * @param string $cmd
+     * @throws ilObjectException
+     */
 	public function permissionCheck($permission, $cmd = '') {
-		return $this->checkPermission($permission, $cmd);
+		$this->checkPermission($permission, $cmd);
 	}
+
+    /**
+     * @param $permission
+     * @param string $cmd
+     * @return bool
+     */
+    public function permissionCheckBool($permission, $cmd = '') {
+        return $this->checkPermissionBool($permission, $cmd);
+    }
+
+
 }
 
 ?>

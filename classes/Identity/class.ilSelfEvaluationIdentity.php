@@ -35,12 +35,10 @@ class ilSelfEvaluationIdentity {
 	 * @param $id
 	 */
 	function __construct($id = 0) {
-		global $ilDB;
-		/**
-		 * @var $ilDB ilDB
-		 */
+		global $DIC;
+
 		$this->id = $id;
-		$this->db = $ilDB;
+		$this->db = $DIC->database();
 		//		$this->updateDB();
 		if ($id != 0) {
 			$this->read();
@@ -172,18 +170,23 @@ class ilSelfEvaluationIdentity {
 	 *
 	 * @return ilSelfEvaluationIdentity[]
 	 */
-	public static function _getAllInstancesByForForObjId($obj_id) {
-		global $ilDB;
+	public static function _getAllInstancesByObjId($obj_id, $identifier = null) {
+		global $DIC;
 		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
-		. $ilDB->quote($obj_id, 'integer'));
-		while ($rec = $ilDB->fetchObject($set)) {
+		if($identifier){
+            $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
+                . $DIC->database()->quote($obj_id, 'integer') . ' AND identifier = ' .  $DIC->database()->quote($identifier, 'text'));
+		}else{
+            $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
+                . $DIC->database()->quote($obj_id, 'integer'));
+		}
+
+		while ($rec = $DIC->database()->fetchObject($set)) {
 			$return[] = new self($rec->id);
 		}
 
 		return $return;
 	}
-
 
 	/**
 	 * @param $obj_id
@@ -191,34 +194,49 @@ class ilSelfEvaluationIdentity {
 	 *
 	 * @return ilSelfEvaluationIdentity
 	 */
-	public static function _getInstanceForObjId($obj_id, $identifier) {
-		global $ilDB;
-		$external = false;
-		if ($identifier === NULL) {
-			$external = true;
-			$identifier = strtoupper(substr(md5(rand(1, 99999)), 0, self::LENGTH));
-			$set = $ilDB->query('SELECT identifier FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier = '
-			. $ilDB->quote($identifier, 'text'));
-			while (! $rec = $ilDB->fetchObject($set)) {
-				break;
-			}
-		}
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
-		. $ilDB->quote($obj_id, 'integer') . ' AND identifier = ' . $ilDB->quote($identifier, 'text'));
-		while ($rec = $ilDB->fetchObject($set)) {
+	public static function _getInstanceForObjIdAndIdentifier($obj_id, $identifier) {
+		global $DIC;
+
+		$set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
+		. $DIC->database()->quote($obj_id, 'integer') . ' AND identifier = ' .  $DIC->database()->quote($identifier, 'text'));
+
+		while ($rec = $DIC->database()->fetchObject($set)) {
 			return new self($rec->id);
 		}
-		$obj = new self();
-		$obj->setObjId($obj_id);
-		$obj->setIdentifier($identifier);
-		if ($external) {
-			$obj->setType(self::TYPE_EXTERNAL);
-		}
-		$obj->create();
-
-		return $obj;
 	}
 
+    /**
+     * @param $obj_id
+     * @param $identifier
+     *
+     * @return ilSelfEvaluationIdentity
+     */
+    public static function _getAllInstancesForObjIdAndIdentifier($obj_id, $identifier) {
+        return self::_getAllInstancesByObjId($obj_id,$identifier);
+    }
+
+	public static function _getNewHashInstanceForObjId($obj_id) {
+        do{
+            $identifier = strtoupper(substr(md5(rand(1, 99999)), 0, self::LENGTH));
+        }while(self::_identityExists($obj_id,$identifier));
+
+        $obj = new self();
+        $obj->setObjId($obj_id);
+        $obj->setIdentifier($identifier);
+        $obj->setType(self::TYPE_EXTERNAL);
+        $obj->create();
+
+        return $obj;
+    }
+
+    public static function _getNewInstanceForObjIdAndUserId($obj_id,$user_id) {
+        $obj = new self();
+        $obj->setObjId($obj_id);
+        $obj->setIdentifier($user_id);
+        $obj->create();
+
+        return $obj;
+    }
 
 	/**
 	 * @param $obj_id

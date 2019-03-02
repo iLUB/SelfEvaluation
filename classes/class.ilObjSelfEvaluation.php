@@ -372,7 +372,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			$u->delete();
 		}
 		$scale->delete();
-		foreach (ilSelfEvaluationIdentity::_getAllInstancesByForForObjId($this->getId()) as $id) {
+		foreach (ilSelfEvaluationIdentity::_getAllInstancesByObjId($this->getId()) as $id) {
 			foreach (ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId()) as $ds) {
 				foreach (ilSelfEvaluationData::_getAllInstancesByDatasetId($ds->getId()) as $d) {
 					$d->delete();
@@ -470,7 +470,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @return bool
 	 */
 	public function hasDatasets() {
-		foreach (ilSelfEvaluationIdentity::_getAllInstancesByForForObjId($this->getId()) as $id) {
+		foreach (ilSelfEvaluationIdentity::_getAllInstancesByObjId($this->getId()) as $id) {
 			if (count(ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId())) > 0) {
 				return true;
 			}

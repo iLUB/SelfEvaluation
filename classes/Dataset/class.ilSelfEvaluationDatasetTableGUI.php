@@ -17,16 +17,13 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 	 * @param ilSelfEvaluationPlugin     $plugin
 	 * @param int                        $obj_id
 	 */
-	function __construct(ilSelfEvaluationDatasetGUI $a_parent_obj, $a_parent_cmd, $plugin, $obj_id = 0) {
-		global $ilCtrl, $ilTabs, $ilToolbar;
-		/**
-		 * @var $ilCtrl ilCtrl
-		 * @var $ilTabs ilTabsGUI
-		 * @var $ilToolbar ilToolbarGUI
-		 */
+	function __construct(ilSelfEvaluationDatasetGUI $a_parent_obj, $a_parent_cmd, $plugin, $obj_id = 0, $identifier = null) {
+		global $DIC;
+
 		$this->pl = $plugin;
-		$this->ctrl = $ilCtrl;
-		$this->tabs = $ilTabs;
+		$this->ctrl = $DIC->ctrl();
+		$this->tabs = $DIC->tabs();
+
 		$this->setId('');
 		parent::__construct($a_parent_obj, $a_parent_cmd);
 		$this->setTitle($this->pl->txt('dataset_table_title'));
@@ -38,16 +35,14 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$this->addColumn($this->pl->txt('average_all'), false, 'auto');
 		$this->addColumn($this->pl->txt('actions'), false, 'auto');
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', NULL);
-		$this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationDatasetGUI'));
+		$this->setFormAction($this->ctrl->getFormActionByClass('ilSelfEvaluationDatasetGUI'));
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Dataset/tpl.template_dataset_row.html');
-		$ilToolbar->addButton($this->pl->txt('delete_all_datasets'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDeleteAll'));
-        $ilToolbar->addButton($this->pl->txt('export_csv'), $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'exportCSV'));
 
-		switch ($a_parent_cmd) {
-			case 'index':
-				$this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id, true));
-				break;
-		}
+		if($identifier){
+            $this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id,true,$identifier));
+        }else{
+            $this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id, true));
+        }
 	}
 
 

@@ -30,9 +30,10 @@ offline#:#Offline
 online#:#Online
 start_button#:#Start
 intro_header#:#Einleitung
-administration#:#Fragen und Feedback bearbeiten
+administration#:#Fragen und Feedback
 actions#:#Aktionen
 edit_block#:#Blockinformationen bearbeiten
+duplicate_block#:#Block dublizieren
 delete_block#:#Block löschen
 update_block#:#Block bearbeiten
 update_block_button#:#Speichern
@@ -40,6 +41,7 @@ qst_delete_block#:#Sind Sie sicher, dass folgender Fragenblock mit allen dazugeh
 msg_block_deleted#:#Block wurde gelöscht
 create_block#:#Block erstellen
 create_block_button#:#Block erstellen
+msg_block_duplicated#:#Der Block wurde dubliziert. Der neue Block wurde unten an der Liste mit gleichem Namen wie das Original hinzugefügt.
 edit_questions#:#Fragen bearbeiten
 edit_feedback#:#Feedback bearbeiten
 
@@ -210,6 +212,7 @@ identity#:#Benutzer-Kennung
 
 show_my_results#:#Meine Resultate
 show_all_results#:#Alle Resultate
+show_results#:#Resultate
 percentage#:#Prozent
 average_all#:#Arithmetisches Mittel in %
 date#:#Datum
