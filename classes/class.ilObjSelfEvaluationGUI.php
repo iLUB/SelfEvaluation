@@ -40,7 +40,7 @@ require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php')
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationDatasetGUI, ilSelfEvaluationFeedbackGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationMetaQuestionGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationMetaQuestionGUI, ilExportGUI
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 
@@ -192,6 +192,14 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 						$block->getTitle(), $this->getPluginObject(), $this->object->getRefId());
 					$this->ctrl->forwardCommand($container_gui);
 					break;
+                case 'ilexportgui':
+                    // only if plugin supports it?
+                    $this->tabs->setTabActive("export");
+                    include_once './Services/Export/classes/class.ilExportGUI.php';
+                    $exp = new ilExportGUI($this);
+                    $exp->addFormat('xml');
+                    $this->ctrl->forwardCommand($exp);
+                    break;
 				case '':
 					if (! in_array($cmd, get_class_methods($this))) {
 						$this->performCommand($this->getStandardCmd());
