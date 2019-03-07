@@ -56,6 +56,20 @@ class ilSelfEvaluationScale {
         return $clone;
 	}
 
+	/**
+	 * @param SimpleXMLElement $xml
+	 * @return SimpleXMLElement
+	 */
+	public function toXml(SimpleXMLElement $xml){
+		$child_xml = $xml->addChild("scale");
+		$units = ilSelfEvaluationScaleUnit::_getAllInstancesByParentId($this->getId());
+
+		foreach ($units as $unit){
+			$child_xml = $unit->toXml($this->getId(),$child_xml);
+		}
+
+		return $xml;
+	}
 
 	/**
 	 * @param bool $flipped

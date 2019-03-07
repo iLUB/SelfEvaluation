@@ -62,6 +62,21 @@ class ilSelfEvaluationScaleUnit {
         return $clone;
     }
 
+
+	/**
+	 * @param $parent_id
+	 * @param SimpleXMLElement $xml
+	 * @return SimpleXMLElement
+	 */
+	public function toXml($parent_id,SimpleXMLElement $xml){
+		$child_xml = $xml->addChild("scaleUnit");
+		$child_xml->addAttribute("parentId",$parent_id);
+		$child_xml->addAttribute("title",$this->getTitle());
+		$child_xml->addAttribute("value",$this->getValue());
+		$child_xml->addAttribute("position",$this->getPosition());
+		return $xml;
+	}
+
 	public function read() {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));

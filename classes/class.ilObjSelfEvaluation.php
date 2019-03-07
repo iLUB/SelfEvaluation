@@ -452,6 +452,71 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
     }
 
+	/**
+	 * @param $a_entity
+	 * @return SimpleXMLElement
+	 */
+	public function toXML($a_entity){
+		$xml = new SimpleXMLElement('<SelfEvaluation/>');
+		$xml->addAttribute("xmlns","http://www.w3.org");
+		$xml->addAttribute("online",$this->getOnline());
+		$xml->addAttribute("evaluationType",$this->getEvaluationType());
+		$xml->addAttribute("sortType",$this->getSortType());
+		$xml->addAttribute("setDisplayType",$this->getDisplayType());
+		$xml->addAttribute("intro",$this->getIntro());
+		$xml->addAttribute("outro",$this->getOutro());
+		$xml->addAttribute("identitySelectionInfoText",$this->getIdentitySelectionInfoText());
+		$xml->addAttribute("showFeedbacks",$this->getShowFeedbacks());
+		$xml->addAttribute("showFeedbacksCharts",$this->getShowFeedbacksCharts());
+		$xml->addAttribute("showFeedbacksOverview",$this->getShowFeedbacksOverview());
+		$xml->addAttribute("showFbsOverviewStatistics",$this->getShowFeedbacksOverview());
+		$xml->addAttribute("showBlockTitlesDuringEvaluation",$this->getShowBlockTitlesDuringEvaluation());
+		$xml->addAttribute("showBlockDescriptionsDuringEvaluation",$this->getShowBlockDescriptionsDuringEvaluation());
+		$xml->addAttribute("sortRandomNrItemBlock",$this->getSortRandomNrItemBlock());
+		$xml->addAttribute("blockOptionRandomDesc",$this->getBlockOptionRandomDesc());
+		$xml->addAttribute("showFbsOverviewBar",$this->isShowFbsOverviewBar());
+		$xml->addAttribute("showFbsOverviewText",$this->isShowFbsOverviewText());
+		$xml->addAttribute("overviewBarShowLabelAsPercentage",$this->isOverviewBarShowLabelAsPercentage());
+		$xml->addAttribute("showFbsOverviewSpider",$this->isShowFbsChartSpider());
+		$xml->addAttribute("showFbsOverviewLeftRight",$this->isShowFbsOverviewLeftRight());
+		$xml->addAttribute("showFbsChartBar",$this->isShowFbsChartBar());
+		$xml->addAttribute("showFbsChartSpider",$this->isShowFbsChartSpider());
+		$xml->addAttribute("showFbsChartLeftRight",$this->isShowFbsChartLeftRight());
+
+
+
+		//Copy Scale
+		$scale = ilSelfEvaluationScale::_getInstanceByObjId($this->getId());
+		$scale->toXML($xml);
+
+		var_dump($xml->children()->scale->asXML());
+		exit;
+
+		//Copy Blocks
+		$block_factory = new ilSelfEvaluationBlockFactory($this->getId());
+		foreach ($block_factory->getAllBlocks() as $block){
+			$block->cloneTo($new_obj->getId());
+		}
+
+		//Copy Overall Feedback
+		$old_feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getRefId(),false,true);
+		foreach ($old_feedbacks as $feedback){
+			$feedback->cloneTo($new_obj->getRefId());
+		}
+		return $xml;
+
+	}
+	/**
+	 * @param $a_entity
+	 */
+	public function fromXML($xml){
+		$xml = new SimpleXMLElement($xml);
+
+		var_dump($xml);
+		exit;
+
+
+	}
 
 	/**
 	 * @return bool
