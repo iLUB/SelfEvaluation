@@ -232,3 +232,5 @@ export_csv#:#Als csv exportieren
 starting_date#:#Startdatum
 ending_date#:#Enddatum
 duration#:#Bearbeitungsdauer (s)
+
+print_pdf#:#Drucken (PDF)
