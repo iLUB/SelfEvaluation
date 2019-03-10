@@ -71,6 +71,23 @@ class ilSelfEvaluationScale {
 		return $xml;
 	}
 
+    /**
+     * @param $parent_id
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    static function fromXml($parent_id, SimpleXMLElement $xml){
+        $scale = new self();
+        $scale->setParentId($parent_id);
+        $scale->create();
+
+        foreach ($xml->scaleUnit as $unit){
+            $child_xml = ilSelfEvaluationScaleUnit::fromXML($scale->getId(),$unit);
+        }
+
+        return $xml;
+    }
+
 	/**
 	 * @param bool $flipped
 	 *

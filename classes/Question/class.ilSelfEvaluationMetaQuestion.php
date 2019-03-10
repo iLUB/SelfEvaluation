@@ -53,7 +53,41 @@ class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition {
         return $clone;
     }
 
-	/**
+    /**
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public function toXml(SimpleXMLElement $xml){
+        $child_xml = $xml->addChild("metaQuestion");
+        $child_xml->addAttribute("containerId",$this->getContainerId());
+        $child_xml->addAttribute("name",$this->getName());
+        $child_xml->addAttribute("shortTitle",$this->getShortTitle());
+        $child_xml->addAttribute("typeId",$this->getTypeId());
+        $child_xml->addAttribute("values",serialize($this->getValues()));
+        $child_xml->addAttribute("enableRequired",$this->isRequired());
+        $child_xml->addAttribute("position",$this->getPosition());
+        return $xml;
+    }
+
+    /**
+     * @param $parent_id
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public static function fromXml($parent_id,SimpleXMLElement $xml){
+        $attributes =  $xml->attributes();
+        $question = new self($parent_id);
+        $question->setName($attributes["name"]);
+        $question->setShortTitle($attributes["shortTitle"]);
+        $question->setTypeId($attributes["typeId"]);
+        $question->setValues(unserialize($attributes["values"]));
+        $question->enableRequired($attributes["enableRequired"]=="1"?true:false);
+        $question->setPosition($attributes["position"]);
+        $question->save();
+        return $xml;
+    }
+
+    /**
 	 * @param int $field_id
 	 *
 	 * @return bool

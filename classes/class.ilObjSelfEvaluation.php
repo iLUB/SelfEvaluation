@@ -458,64 +458,121 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
 	public function toXML($a_entity){
 		$xml = new SimpleXMLElement('<SelfEvaluation/>');
-		$xml->addAttribute("xmlns","http://www.w3.org");
-		$xml->addAttribute("online",$this->getOnline());
+        $xml->addAttribute("xmlns","http://www.w3.org");
+        $xml->addAttribute("title",$this->getTitle());
+        $xml->addAttribute("description",$this->getDescription());
+        $xml->addAttribute("online",$this->getOnline());
 		$xml->addAttribute("evaluationType",$this->getEvaluationType());
 		$xml->addAttribute("sortType",$this->getSortType());
-		$xml->addAttribute("setDisplayType",$this->getDisplayType());
+		$xml->addAttribute("displayType",$this->getDisplayType());
 		$xml->addAttribute("intro",$this->getIntro());
 		$xml->addAttribute("outro",$this->getOutro());
-		$xml->addAttribute("identitySelectionInfoText",$this->getIdentitySelectionInfoText());
+        $xml->addAttribute("outroTitle",$this->getOutroTitle());
+        $xml->addAttribute("identitySelectionInfoText",$this->getIdentitySelectionInfoText());
 		$xml->addAttribute("showFeedbacks",$this->getShowFeedbacks());
 		$xml->addAttribute("showFeedbacksCharts",$this->getShowFeedbacksCharts());
 		$xml->addAttribute("showFeedbacksOverview",$this->getShowFeedbacksOverview());
 		$xml->addAttribute("showFbsOverviewStatistics",$this->getShowFeedbacksOverview());
 		$xml->addAttribute("showBlockTitlesDuringEvaluation",$this->getShowBlockTitlesDuringEvaluation());
-		$xml->addAttribute("showBlockDescriptionsDuringEvaluation",$this->getShowBlockDescriptionsDuringEvaluation());
+        $xml->addAttribute("showBlockDescriptionsDuringEvaluation",$this->getShowBlockDescriptionsDuringEvaluation());
+        $xml->addAttribute("showBlockTitlesDuringFeedback",$this->getShowBlockTitlesDuringFeedback());
+        $xml->addAttribute("showBlockDescriptionsDuringFeedback",$this->getShowBlockDescriptionsDuringFeedback());
 		$xml->addAttribute("sortRandomNrItemBlock",$this->getSortRandomNrItemBlock());
 		$xml->addAttribute("blockOptionRandomDesc",$this->getBlockOptionRandomDesc());
 		$xml->addAttribute("showFbsOverviewBar",$this->isShowFbsOverviewBar());
 		$xml->addAttribute("showFbsOverviewText",$this->isShowFbsOverviewText());
 		$xml->addAttribute("overviewBarShowLabelAsPercentage",$this->isOverviewBarShowLabelAsPercentage());
-		$xml->addAttribute("showFbsOverviewSpider",$this->isShowFbsChartSpider());
+		$xml->addAttribute("showFbsOverviewSpider",$this->isShowFbsOverviewSpider());
 		$xml->addAttribute("showFbsOverviewLeftRight",$this->isShowFbsOverviewLeftRight());
 		$xml->addAttribute("showFbsChartBar",$this->isShowFbsChartBar());
 		$xml->addAttribute("showFbsChartSpider",$this->isShowFbsChartSpider());
 		$xml->addAttribute("showFbsChartLeftRight",$this->isShowFbsChartLeftRight());
 
-
-
-		//Copy Scale
+		//Export Scale
 		$scale = ilSelfEvaluationScale::_getInstanceByObjId($this->getId());
-		$scale->toXML($xml);
+        $xml = $scale->toXML($xml);
 
-		var_dump($xml->children()->scale->asXML());
-		exit;
-
-		//Copy Blocks
+		//Export Blocks
 		$block_factory = new ilSelfEvaluationBlockFactory($this->getId());
 		foreach ($block_factory->getAllBlocks() as $block){
-			$block->cloneTo($new_obj->getId());
+            $xml = $block->toXML($xml);
 		}
 
-		//Copy Overall Feedback
-		$old_feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getRefId(),false,true);
-		foreach ($old_feedbacks as $feedback){
-			$feedback->cloneTo($new_obj->getRefId());
+		//Export Overall Feedback
+		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getRefId(),false,true);
+		foreach ($feedbacks as $feedback){
+            $xml = $feedback->toXML($xml);
 		}
 		return $xml;
 
 	}
-	/**
-	 * @param $a_entity
-	 */
-	public function fromXML($xml){
+
+    /**
+     * @param string $entity
+     * @param string $id
+     * @param string $xml
+     * @param ilImportMapping $mapping
+     * @return $this
+     */
+    public function fromXML(string $entity,string $id,string $xml,ilImportMapping $mapping){
+
+    	if(!$this->getId()){
+            $this->create();
+            $this->createReference();
+		}
+
 		$xml = new SimpleXMLElement($xml);
+		$xml_attributes =  $xml->attributes();
 
-		var_dump($xml);
-		exit;
+		$this->setTitle($xml_attributes["title"]." Import");
+        $this->setDescription($xml_attributes["description"]);
+        $this->setOnline($xml_attributes["online"]);
+        $this->setEvaluationType($xml_attributes["evaluationType"]);
+        $this->setSortType($xml_attributes["sortType"]);
+        $this->setDisplayType($xml_attributes["displayType"]);
+        $this->setIntro($xml_attributes["intro"]);
+        $this->setOutro($xml_attributes["outro"]);
+        $this->setOutroTitle($xml_attributes["outroTitle"]);
+        $this->setIdentitySelectionInfoText($xml_attributes["identitySelectionInfoText"]);
+        $this->setShowFeedbacks($xml_attributes["showFeedbacks"]);
+        $this->setShowFeedbacksCharts($xml_attributes["showFeedbacksCharts"]);
+        $this->setShowFeedbacksOverview($xml_attributes["showFeedbacksOverview"]);
+        $this->setShowFbsOverviewStatistics($xml_attributes["showFbsOverviewStatistics"]);
+        $this->setShowBlockTitlesDuringEvaluation($xml_attributes["showBlockTitlesDuringEvaluation"]);
+        $this->setShowBlockDescriptionsDuringEvaluation($xml_attributes["showBlockDescriptionsDuringEvaluation"]);
+        $this->setShowBlockTitlesDuringFeedback($xml_attributes["showBlockTitlesDuringEvaluation"]);
+        $this->setShowBlockDescriptionsDuringFeedback($xml_attributes["online"]);
+        $this->setSortRandomNrItemBlock($xml_attributes["sortRandomNrItemBlock"]);
+        $this->setBlockOptionRandomDesc($xml_attributes["blockOptionRandomDesc"]);
+        $this->setShowFbsOverviewBar($xml_attributes["showFbsOverviewBar"]);
+        $this->setShowFbsOverviewText($xml_attributes["showFbsOverviewText"]);
+        $this->setOverviewBarShowLabelAsPercentage($xml_attributes["overviewBarShowLabelAsPercentage"]);
+        $this->setShowFbsOverviewSpider($xml_attributes["showFbsOverviewSpider"]);
+        $this->setShowFbsOverviewLeftRight($xml_attributes["showFbsOverviewLeftRight"]);
+        $this->setShowFbsChartBar($xml_attributes["showFbsChartBar"]);
+        $this->setShowFbsChartSpider($xml_attributes["showFbsChartSpider"]);
+        $this->setShowFbsChartLeftRight($xml_attributes["showFbsChartLeftRight"]);
+        $this->update();
 
+        //Import Scale
+        if($xml->scale){
+            ilSelfEvaluationScale::fromXml($this->getId(),$xml->scale);
+		}
 
+        //Import Blocks
+        foreach($xml->metaBlock as $block){
+            ilSelfEvaluationMetaBlock::fromXml($this->getId(),$block);
+        }
+        foreach($xml->questionBlock as $block){
+            ilSelfEvaluationQuestionBlock::fromXml($this->getId(),$block);
+        }
+
+        //Import Overall Feedback
+        foreach($xml->feedback as $feedback){
+            ilSelfEvaluationFeedback::fromXml($this->getRefId(),$feedback);
+        }
+
+        return $this;
 	}
 
 	/**

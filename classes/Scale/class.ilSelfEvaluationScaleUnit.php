@@ -77,6 +77,22 @@ class ilSelfEvaluationScaleUnit {
 		return $xml;
 	}
 
+    /**
+     * @param $parent_id
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public static function fromXml($parent_id,SimpleXMLElement $xml){
+        $attributes =  $xml->attributes();
+        $unit = new self();
+        $unit->setParentId($parent_id);
+        $unit->setTitle($attributes["title"]);
+        $unit->setValue($attributes["value"]);
+        $unit->setPosition($attributes["position"]);
+        $unit->create();
+        return $xml;
+    }
+
 	public function read() {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));

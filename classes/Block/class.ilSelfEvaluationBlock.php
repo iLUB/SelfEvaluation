@@ -48,6 +48,19 @@ abstract class ilSelfEvaluationBlock {
      */
     abstract public function cloneTo($parent_id);
 
+    /**
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    abstract function toXml(SimpleXMLElement $xml);
+
+    /**
+     * @param $parent_id
+     * @param SimpleXMLElement $xml
+     * @return mixed
+     */
+    static abstract function fromXml($parent_id, SimpleXMLElement $xml);
+
 	public function read() {
 		global $DIC;
 		/**
@@ -60,7 +73,6 @@ abstract class ilSelfEvaluationBlock {
 			static::setObjectValuesFromRecord($this, $rec);
 		}
 	}
-
 
 	/**
 	 * @return array

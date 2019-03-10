@@ -79,6 +79,42 @@ class ilSelfEvaluationFeedback {
         return $clone;
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public function toXml(SimpleXMLElement $xml){
+        $child_xml = $xml->addChild("feedback");
+        $child_xml->addAttribute("parentId",$this->getParentId());
+        $child_xml->addAttribute("title",$this->getTitle());
+        $child_xml->addAttribute("description",$this->getDescription());
+        $child_xml->addAttribute("startValue",$this->getStartValue());
+        $child_xml->addAttribute("endValue",$this->getEndValue());
+        $child_xml->addAttribute("feedbackText",$this->getFeedbackText());
+        $child_xml->addAttribute("parentTypeOverall",$this->isParentTypeOverall());
+
+        return $xml;
+    }
+
+    /**
+     * @param $parent_id
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public static function fromXml($parent_id,SimpleXMLElement $xml){
+        $attributes =  $xml->attributes();
+        $question = new self();
+        $question->setParentId($parent_id);
+        $question->setTitle($attributes["title"]);
+        $question->setDescription($attributes["description"]);
+        $question->setStartValue($attributes["startValue"]);
+        $question->setEndValue($attributes["endValue"]);
+        $question->setFeedbackText($attributes["feedbackText"]);
+        $question->setParentTypeOverall($attributes["parentTypeOverall"]);
+        $question->create();
+        return $xml;
+    }
+
 	public function read() {
 		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
 		. $this->db->quote($this->getId(), 'integer'));

@@ -42,7 +42,60 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
         return $clone;
     }
 
-	/**
+    /**
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public function toXml(SimpleXMLElement $xml){
+        $child_xml = $xml->addChild("questionBlock");
+        $child_xml->addAttribute("parentId",$this->getParentId());
+        $child_xml->addAttribute("title",$this->getTitle());
+        $child_xml->addAttribute("abbreviation",$this->getAbbreviation());
+        $child_xml->addAttribute("description",$this->getDescription());
+        $child_xml->addAttribute("position",$this->getPosition());
+
+        $questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($this->getId());
+
+        foreach ($questions as $question){
+            $child_xml = $question->toXml($child_xml);
+        }
+
+        $feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getId());
+        foreach ($feedbacks as $feedback){
+            $child_xml = $feedback->toXml($child_xml);
+        }
+
+        return $xml;
+    }
+
+    /**
+     * @param $parent_id
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    static function fromXml($parent_id, SimpleXMLElement $xml){
+        $attributes =  $xml->attributes();
+        $block = new self();
+        $block->setParentId($parent_id);
+        $block->setTitle($attributes["title"]);
+        $block->setAbbreviation($attributes["abbreviation"]);
+        $block->setDescription($attributes["description"]);
+        $block->setPosition($attributes["position"]);
+        $block->create();
+
+        foreach ($xml->question as $question){
+            ilSelfEvaluationQuestion::fromXML($block->getId(),$question);
+        }
+
+        foreach ($xml->feedback as $feedback){
+            ilSelfEvaluationFeedback::fromXML($block->getId(),$feedback);
+        }
+
+        return $xml;
+    }
+
+
+    /**
 	 * @param ilSelfEvaluationQuestionBlock $block
 	 * @param stdClass                      $rec
 	 */

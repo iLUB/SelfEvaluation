@@ -72,7 +72,39 @@ class ilSelfEvaluationQuestion {
         return $clone;
     }
 
-	public function read() {
+    /**
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public function toXml(SimpleXMLElement $xml){
+        $child_xml = $xml->addChild("question");
+        $child_xml->addAttribute("parentId",$this->getParentId());
+        $child_xml->addAttribute("title",$this->getTitle());
+        $child_xml->addAttribute("questionBody",$this->getQuestionBody());
+        $child_xml->addAttribute("position",$this->getPosition());
+        $child_xml->addAttribute("inverse",$this->getIsInverse());
+        return $xml;
+    }
+
+    /**
+     * @param $parent_id
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public static function fromXml($parent_id,SimpleXMLElement $xml){
+        $attributes =  $xml->attributes();
+        $question = new self();
+        $question->setParentId($parent_id);
+        $question->setTitle($attributes["title"]);
+        $question->setQuestionBody($attributes["questionBody"]);
+        $question->setIsInverse($attributes["inverse"]);
+        $question->create();
+        $question->setPosition($attributes["position"]);
+        $question->update();
+        return $xml;
+    }
+
+    public function read() {
 		global $DIC;
 		/**
 		 * @var $DIC ILIAS\DI\Container

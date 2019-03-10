@@ -76,6 +76,47 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock {
         return $clone;
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    public function toXml(SimpleXMLElement $xml){
+        $child_xml = $xml->addChild("metaBlock");
+        $child_xml->addAttribute("parentId",$this->getParentId());
+        $child_xml->addAttribute("title",$this->getTitle());
+        $child_xml->addAttribute("description",$this->getDescription());
+        $child_xml->addAttribute("position",$this->getPosition());
+
+        $questions = ilSelfEvaluationMetaQuestion::_getAllInstancesForParentId($this->getId());
+
+        foreach ($questions as $question){
+            $child_xml = $question->toXml($child_xml);
+        }
+
+        return $xml;
+    }
+
+    /**
+     * @param $parent_id
+     * @param SimpleXMLElement $xml
+     * @return SimpleXMLElement
+     */
+    static function fromXml($parent_id, SimpleXMLElement $xml){
+        $attributes =  $xml->attributes();
+        $block = new self();
+        $block->setParentId($parent_id);
+        $block->setTitle($attributes["title"]);
+        $block->setDescription($attributes["description"]);
+        $block->setPosition($attributes["position"]);
+        $block->create();
+
+        foreach ($xml->metaQuestion as $question){
+            ilSelfEvaluationMetaQuestion::fromXML($block->getId(),$question);
+        }
+
+        return $xml;
+    }
+
 	/**
 	 * @param ilSelfEvaluationBlock $block
 	 * @param stdClass                  $rec
