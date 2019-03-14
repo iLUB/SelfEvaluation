@@ -314,7 +314,18 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
                 $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'index'));
         }
 
-        $this->addExportTab();
+        // Not yet supported for 5.3
+        //$this->addExportTab();
+		// write
+		if($this->access->checkAccess('write', "", $this->object->getRefId()))
+		{
+			$this->tabs->addTarget(
+				'export',
+				$this->ctrl->getLinkTargetByClass("ilexportgui",''),
+				'export',
+				'ilexportgui'
+			);
+		}
 
         $this->addPermissionTab();
 	}
