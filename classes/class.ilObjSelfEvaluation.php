@@ -406,7 +406,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 * @param ilObjSelfEvaluation $new_obj
 	 */
     protected function doCloneObject($new_obj, $a_target_id, $a_copy_id = null){
-		$new_obj->setOnline($this->getOnline());
+		$new_obj->setOnline(false);
 		$new_obj->setEvaluationType($this->getEvaluationType());
 		$new_obj->setSortType($this->getSortType());
 		$new_obj->setDisplayType($this->getDisplayType());
@@ -524,9 +524,9 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$xml = new SimpleXMLElement($xml);
 		$xml_attributes =  $xml->attributes();
 
-		$this->setTitle($xml_attributes["title"]." Import");
+		$this->setTitle($xml_attributes["title"]);
         $this->setDescription($xml_attributes["description"]);
-        $this->setOnline($xml_attributes["online"]);
+        $this->setOnline(false);
         $this->setEvaluationType($xml_attributes["evaluationType"]);
         $this->setSortType($xml_attributes["sortType"]);
         $this->setDisplayType($xml_attributes["displayType"]);
