@@ -98,7 +98,6 @@ class iLubFieldDefinition {
         return $new_object;
     }
 
-
 	public function initDB() {
 		global $DIC;
 		/**

@@ -77,33 +77,5 @@ xsevChartToggle = function(parent_id) {
 		self.left_right_chart.show();
 		return false;
 	});
-
-	this.printFeedback = function(){
-        if(this.bar_chart_button.length){
-            self.bar_chart.show();
-        }
-        if(this.spider_chart_button.length){
-            self.spider_chart.show();
-        }
-        if(this.spider_chart_button.length){
-            self.left_right_chart.show();
-        }
-
-        $.when( $("body").width(800),$("feedback").height(400)).then(
-            function() {setTimeout(
-                function () {
-                    window.print();
-                    self.first_button.addClass("active");
-                    self.hideIfLoaded(0);
-                },500)
-            }
-		);
-
-
-
-
-
-
-	}
 };
 

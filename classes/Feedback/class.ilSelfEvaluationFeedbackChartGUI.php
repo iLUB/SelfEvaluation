@@ -56,7 +56,15 @@ class ilSelfEvaluationFeedbackChartGUI {
 	 * @return string
 	 */
 	public function getPresentationOfFeedback(ilSelfEvaluationDataset $data_set) {
-		/**
+	    global $DIC;
+
+	    $btn = ilButton::getInstance();
+	    $btn->setCaption($this->pl->txt("print_pdf"),false);
+	    $btn->addCSSClass("printPDF");
+	    $btn->setOnClick("printFeedback()");
+        $DIC->toolbar()->addButtonInstance($btn);
+
+        /**
 		 * @var $obj ilObjSelfEvaluation
 		 */
 		$factory = new ilObjectFactory();
@@ -65,6 +73,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 		$tpl = $this->pl->getTemplate('default/Feedback/tpl.feedback.html');
         $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/feedback.css");
 		$this->tpl->addJavaScript("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/bar_spider_chart_toggle.js");
+        $this->tpl->addJavaScript("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/print.js");
 
 		$percentages = $data_set->getPercentagePerBlock();
 		$blocks = array();
