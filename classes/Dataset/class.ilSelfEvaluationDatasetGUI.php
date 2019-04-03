@@ -114,21 +114,43 @@ class ilSelfEvaluationDatasetGUI {
 	}
 
 
-	public function confirmDelete() {
+	public function deleteDataset(){
+		$this->confirmDelete([$this->dataset->getId()]);
+	}
+
+	public function deleteDatasets(){
+		$this->confirmDelete($_POST["id"]);
+	}
+
+	/**
+	 * @param array $ids
+	 */
+	public function confirmDelete($ids = []) {
 		$conf = new ilConfirmationGUI();
         ilUtil::sendQuestion($this->pl->txt('qst_delete_dataset'));
         $conf->setFormAction($this->ctrl->getFormAction($this));
 		$conf->setCancel($this->pl->txt('cancel'), 'index');
 		$conf->setConfirm($this->pl->txt('delete_dataset'), 'delete');
-		$conf->addItem('dataset_id', $this->dataset->getId(), date('d.m.Y - H:i:s', $this->dataset->getCreationDate()));
+		foreach ($ids as $id){
+			$dataset = new ilSelfEvaluationDataset($id);
+			$identifier = new ilSelfEvaluationIdentity($dataset->getIdentifierId());
+			$user = $identifier->getIdentifier();
+			if($identifier->getType() == $identifier::TYPE_LOGIN){
+				$user = (new ilObjUser($identifier->getIdentifier()))->getPublicName();
+			}
+			$conf->addItem('dataset_ids[]',$id , $user." ".date('d.m.Y - H:i:s', $dataset->getCreationDate()));
+		}
 		$this->tpl->setContent($conf->getHTML());
 	}
 
 
 	public function delete() {
 		ilUtil::sendSuccess($this->pl->txt('msg_dataset_deleted'), true);
-		$this->dataset = new ilSelfEvaluationDataset($_POST['dataset_id']);
-		$this->dataset->delete();
+		foreach ($_POST['dataset_ids'] as $id){
+			$this->dataset = new ilSelfEvaluationDataset($id);
+			$this->dataset->delete();
+		}
+
 		$this->ctrl->redirect($this, 'index');
 	}
 

@@ -29,6 +29,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$this->setTitle($this->pl->txt('dataset_table_title'));
 		//
 		// Columns
+		$this->addColumn("", "", "1");
 		$this->addColumn($this->pl->txt('identity_type'), false, '100px');
 		$this->addColumn($this->pl->txt('date'), false, 'auto');
 		$this->addColumn($this->pl->txt('identity'), false, 'auto');
@@ -37,6 +38,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', NULL);
 		$this->setFormAction($this->ctrl->getFormActionByClass('ilSelfEvaluationDatasetGUI'));
 		$this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Dataset/tpl.template_dataset_row.html');
+		$this->addMultiCommand("deleteDatasets", $this->pl->txt("delete_dataset"));
 
 		if($identifier){
             $this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id,true,$identifier));
@@ -54,6 +56,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$identifier = new ilSelfEvaluationIdentity($obj->getIdentifierId());
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', $obj->getId());
 		// Row
+		$this->tpl->setVariable("ID", $obj->getId());
 		$this->tpl->setVariable('DATE', date('d.m.Y - H:i:s', $obj->getCreationDate()));
         $this->tpl->setVariable('EDIT_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'));
 		switch ($identifier->getType()) {
@@ -75,7 +78,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI {
 		$ac = new ilAdvancedSelectionListGUI();
 		$ac->setId('dataset_' . $obj->getId());
 		$ac->addItem($this->pl->txt('show_feedback'), 'show_dataset', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'), true);
-		$ac->addItem($this->pl->txt('delete_dataset'), 'delete_dataset', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDelete'));
+		$ac->addItem($this->pl->txt('delete_dataset'), 'delete_dataset', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'deleteDataset'));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//
 		$this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', 0);

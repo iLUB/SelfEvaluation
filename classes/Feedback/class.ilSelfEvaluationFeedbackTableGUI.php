@@ -57,7 +57,7 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI {
 		$this->ctrl->setParameter($this->parent_obj, 'feedback_id', $obj->getId());
 		$ac->setId('fb_' . $obj->getId());
 		$ac->addItem($this->pl->txt('edit_feedback'), 'edit_feedback', $this->ctrl->getLinkTarget($this->parent_obj, 'editFeedback'));
-		$ac->addItem($this->pl->txt('delete_feedback'), 'delete_question', $this->ctrl->getLinkTarget($this->parent_obj, 'deleteFeedback'));
+		$ac->addItem($this->pl->txt('delete_feedback'), 'delete_feedback', $this->ctrl->getLinkTarget($this->parent_obj, 'deleteFeedback'));
 		$ac->setListTitle($this->pl->txt('actions'));
 		//
 		$this->tpl->setVariable('ACTIONS', $ac->getHTML());
