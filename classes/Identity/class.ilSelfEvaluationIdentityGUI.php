@@ -67,6 +67,10 @@ class ilSelfEvaluationIdentityGUI {
 	 * @param $cmd
 	 */
 	function performCommand($cmd) {
+		if(!$this->parent->object->isIdentitySelection()){
+			$this->startWithNewUid();
+		}
+
 		switch ($cmd) {
 			case 'show':
 			case 'addNew':

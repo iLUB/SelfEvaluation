@@ -93,7 +93,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		 */
 		if ($_GET['uid']) {
 			$id = new ilSelfEvaluationIdentity($_GET['uid']);
-			if ($id->getType() == ilSelfEvaluationIdentity::TYPE_EXTERNAL) {
+			if ($id->getType() == ilSelfEvaluationIdentity::TYPE_EXTERNAL && $this->object->isIdentitySelection()) {
 				global $ilToolbar;
 				$ilToolbar->addText('<b>' . $this->getPluginObject()->txt('your_uid') . ' ' . $id->getIdentifier() . '</b>');
 			}
@@ -353,6 +353,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		// online
 		$cb = new ilCheckboxInputGUI($this->txt('online'), 'online');
 		$this->form->addItem($cb);
+		// online
+		$cb = new ilCheckboxInputGUI($this->txt('identity_selection'), 'identity_selection');
+		$cb->setInfo($this->txt('identity_selection_info'));
+		$this->form->addItem($cb);
 
         $section = new ilFormSectionHeaderGUI();
         $section->setTitle($this->txt('help_text_section'));
@@ -375,9 +379,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         $te->setInfo($this->txt('outro_info'));
 		$this->form->addItem($te);
 		// identity selection info text for anonymous users
-		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('identity_selection'), 'identity_selection_info');
+		$te = new ilTinyMceTextAreaInputGUI($this->object, $this->txt('identity_selection_text'), 'identity_selection_info');
 		// $te->setRTESupport($this->object->getId(), $this->object->getType(), '', NULL, FALSE, '3.4.7');
-		$te->setInfo($this->txt('identity_selection_info'));
+		$te->setInfo($this->txt('identity_selection_text_info'));
 		$this->form->addItem($te);
 
         //////////////////////////////
@@ -522,6 +526,8 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 		$values['title'] = $this->object->getTitle();
 		$values['desc'] = $this->object->getDescription();
 		$values['online'] = $this->object->getOnline();
+		$values['identity_selection'] = $this->object->isIdentitySelection();
+
 		$values['intro'] = $this->object->getIntro();
 
         if($this->object->getSortType() == self::ORDER_QUESTIONS_FULLY_RANDOM){
@@ -576,6 +582,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
 			$this->object->setTitle($this->form->getInput('title'));
 			$this->object->setDescription($this->form->getInput('desc'));
 			$this->object->setOnline($this->form->getInput('online'));
+			$this->object->setIdentitySelection($this->form->getInput('identity_selection'));
 			$this->object->setIntro($this->form->getInput('intro'));
             $this->object->setOutroTitle($this->form->getInput('outro_title'));
             $this->object->setOutro($this->form->getInput('outro'));
@@ -692,6 +699,17 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         ilUtil::sendSuccess($this->lng->txt("object_added"), true);
         $this->ctrl->returnToParent($this);
     }
+
+	/**
+	 * Redirect after creation, see https://docu.ilias.de/goto_docu_wiki_wpage_5035_1357.html
+	 *
+	 * Should be overwritten and redirect to settings screen.
+	 */
+	public function redirectAfterCreation()
+	{
+		$link = ilLink::_getLink($this->object->getRefId());
+		$this->ctrl->redirectToURL($link);
+	}
 }
 
 ?>

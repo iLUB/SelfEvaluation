@@ -52,8 +52,10 @@ outro_title#:#Abschliessender Titel
 outro_title_info#:#Titel, der nach Beendigung der Selbstevaluation angezeigt wird.
 outro#:#Abschliessende Beschreibung
 outro_info#:#Beschreibung, die nach Beendigung der Selbstevaluation angezeigt wird.
-identity_selection#:#Standardtext zur Identitätsauswahl bei anonymen Selbstevaluationen
-identity_selection_info#:#Dieser Text wird den anonymen Nutzern des Selbstevaluations Plugins angezeigt.
+identity_selection#:#Identitätsauswahl
+identity_selection_info#:#Für anonyme Selbstevaluationen kann eine Identitätsauswahl angeboten werden, um eine Evaluation zu unterbrechen und später fortsetzen zu können.
+identity_selection_text#:#Standardtext zur Identitätsauswahl bei anonymen Selbstevaluationen
+identity_selection_text_info#:#Dieser Text wird den anonymen Nutzern des Selbstevaluations Plugins angezeigt.
 
 block_section#:#Darstellung im Fragebogen
 block_presentation_type#:#Blockaufteilung der Fragen

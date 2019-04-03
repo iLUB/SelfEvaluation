@@ -405,3 +405,19 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
     }
 }
 ?>
+<#22>
+<?php
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+/**
+ * @var $ilDB ilDB
+ */
+if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
+	$field = array(
+		'type' => 'integer',
+		'length' => 4
+	);
+	if(!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'identity_selection')){
+		$ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'identity_selection', $field);
+	}
+}
+?>

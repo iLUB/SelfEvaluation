@@ -79,6 +79,11 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
      */
     protected $outro = '';
 	/**
+	 * @var bool
+	 */
+	protected $identity_selection = true;
+
+	/**
 	 * @var string
 	 */
 	protected $identity_selection_info_text = '';
@@ -206,6 +211,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 				'integer',
 				$this->getOnline()
 			),
+			'identity_selection' => array(
+				'integer',
+				$this->isIdentitySelection()
+			),
 			'evaluation_type' => array(
 				'integer',
 				$this->getEvaluationType()
@@ -325,6 +334,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 			. $this->db->quote($this->getId(), 'integer'));
 		while ($rec = $this->db->fetchObject($set)) {
 			$this->setOnline($rec->is_online);
+			$this->setIdentitySelection($rec->identity_selection);
 			$this->setEvaluationType($rec->evaluation_type);
 			$this->setSortType($rec->sort_type);
 			$this->setDisplayType($rec->display_type);
@@ -407,6 +417,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 	 */
     protected function doCloneObject($new_obj, $a_target_id, $a_copy_id = null){
 		$new_obj->setOnline(false);
+		$new_obj->setIdentitySelection($this->isIdentitySelection());
 		$new_obj->setEvaluationType($this->getEvaluationType());
 		$new_obj->setSortType($this->getSortType());
 		$new_obj->setDisplayType($this->getDisplayType());
@@ -462,6 +473,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
         $xml->addAttribute("title",$this->getTitle());
         $xml->addAttribute("description",$this->getDescription());
         $xml->addAttribute("online",$this->getOnline());
+		$xml->addAttribute("identitySelection",$this->getIdentitySelection());
 		$xml->addAttribute("evaluationType",$this->getEvaluationType());
 		$xml->addAttribute("sortType",$this->getSortType());
 		$xml->addAttribute("displayType",$this->getDisplayType());
@@ -527,6 +539,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		$this->setTitle($xml_attributes["title"]);
         $this->setDescription($xml_attributes["description"]);
         $this->setOnline(false);
+        $this->setIdentitySelection($xml_attributes["identitySelection"]);
         $this->setEvaluationType($xml_attributes["evaluationType"]);
         $this->setSortType($xml_attributes["sortType"]);
         $this->setDisplayType($xml_attributes["displayType"]);
@@ -1115,5 +1128,23 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
     {
         $this->show_fbs_overview_statistics = $show_fbs_overview_statistics;
     }
+
+	/**
+	 * @return bool
+	 */
+	public function isIdentitySelection()
+	{
+		return $this->identity_selection;
+	}
+
+	/**
+	 * @param bool $identity_selection
+	 */
+	public function setIdentitySelection( $identity_selection)
+	{
+		$this->identity_selection = $identity_selection;
+	}
+
+
 }
 ?>
