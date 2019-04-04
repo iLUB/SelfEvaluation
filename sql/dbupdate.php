@@ -421,3 +421,24 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 	}
 }
 ?>
+<#23>
+<?php
+/**
+ * Overall Feedback used ref-id to reference the parent, this is an issue for copying and exporting.
+ * This is hereby fixed by setting the obj_id as parent.
+ */
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
+require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Feedback/class.ilSelfEvaluationFeedback.php');
+$overall_feedbacks = ilSelfEvaluationFeedback::_getAllInstances(true);
+foreach ($overall_feedbacks as $overall_feedback){
+    if(ilObject::_lookupType($overall_feedback->getParentId(),true) == "xsev"){
+	    $self_eval = new ilObjSelfEvaluation($overall_feedback->getParentId());
+	    $obj_id = $self_eval->getId();
+	    $overall_feedback->setParentId($obj_id);
+	    $overall_feedback->update();
+    }else{
+	    $overall_feedback->delete();
+        throw new Exception("Step 23: Given ID is not ref-id of type xsev: ".$overall_feedback->getParentId()." the Feedback has been deleted due to invalid data");
+    }
+}
+?>

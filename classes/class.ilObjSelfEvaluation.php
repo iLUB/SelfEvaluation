@@ -456,9 +456,9 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
         }
 
 		//Copy Overall Feedback
-        $old_feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getRefId(),false,true);
+        $old_feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getId(),false,true);
         foreach ($old_feedbacks as $feedback){
-            $feedback->cloneTo($new_obj->getRefId());
+            $feedback->cloneTo($new_obj->getId());
         }
 
     }
@@ -473,7 +473,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
         $xml->addAttribute("title",$this->getTitle());
         $xml->addAttribute("description",$this->getDescription());
         $xml->addAttribute("online",$this->getOnline());
-		$xml->addAttribute("identitySelection",$this->getIdentitySelection());
+		$xml->addAttribute("identitySelection",$this->isIdentitySelection());
 		$xml->addAttribute("evaluationType",$this->getEvaluationType());
 		$xml->addAttribute("sortType",$this->getSortType());
 		$xml->addAttribute("displayType",$this->getDisplayType());
@@ -511,7 +511,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 		}
 
 		//Export Overall Feedback
-		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getRefId(),false,true);
+		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getId(),false,true);
 		foreach ($feedbacks as $feedback){
             $xml = $feedback->toXML($xml);
 		}
@@ -582,7 +582,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin {
 
         //Import Overall Feedback
         foreach($xml->feedback as $feedback){
-            ilSelfEvaluationFeedback::fromXml($this->getRefId(),$feedback);
+            ilSelfEvaluationFeedback::fromXml($this->getId(),$feedback);
         }
 
         return $this;

@@ -18,7 +18,7 @@ class ilSelfEvaluationVirtualOverallBlock extends ilSelfEvaluationVirtualQuestio
      */
     function __construct(ilObjSelfEvaluationGUI $parent) {
         $this->parent_gui = $parent;
-        $this->setId($this->parent_gui->ref_id);
+        $this->setId($this->parent_gui->object->getId());
         $this->setParentId($this->parent_gui->ref_id);
         $this->setTitle($this->parent_gui->getPluginObject()->txt("overall_feedback_block"));
         $this->setDescription($this->parent_gui->getPluginObject()->txt("overall_feedback_block_description"));

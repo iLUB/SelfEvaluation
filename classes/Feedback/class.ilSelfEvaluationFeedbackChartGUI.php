@@ -214,7 +214,7 @@ class ilSelfEvaluationFeedbackChartGUI {
 
 
             if($obj->isShowFbsOverviewText()) {
-                $feedback = ilSelfEvaluationFeedback::_getFeedbackForPercentage($obj->ref_id, $mean);;
+                $feedback = ilSelfEvaluationFeedback::_getFeedbackForPercentage($obj->getId(), $mean);;
                 if($feedback){
                     $tpl->setVariable('FEEDBACK_OVERVIEW_TITLE', $feedback->getTitle());
                     $tpl->setVariable('FEEDBACK_OVERVIEW_BODY', $feedback->getFeedbackText());

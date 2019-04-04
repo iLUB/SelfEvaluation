@@ -56,7 +56,7 @@ class ilSelfEvaluationFeedbackGUI {
 
 		if($_GET['parent_overall']){
             $this->block = new ilSelfEvaluationVirtualOverallBlock($this->parent);
-            $_GET['block_id'] = $this->parent->ref_id;
+            $_GET['block_id'] = $this->parent->object->getId();
         }else{
             $this->block = new ilSelfEvaluationQuestionBlock($_GET['block_id']);
         }

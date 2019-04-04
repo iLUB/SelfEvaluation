@@ -269,6 +269,30 @@ class ilSelfEvaluationFeedback {
 		return $return;
 	}
 
+	/**
+	 * @param      $parent_id
+	 * @param bool $as_array
+	 *
+	 * @return ilSelfEvaluationFeedback[]
+	 */
+	public static function _getAllInstances($is_overall = false) {
+		global $ilDB;
+		$return = [];
+		$q = 'SELECT * FROM ' . self::TABLE_NAME . ' ';
+
+		if ($is_overall) {
+			$q .= ' WHERE parent_type_overall = ' . $ilDB->quote($is_overall, 'integer');
+		}
+		$set = $ilDB->query($q);
+
+		while ($rec = $ilDB->fetchObject($set)) {
+			$return[] = new self($rec->id);
+
+		}
+
+		return $return;
+	}
+
 
     /**
      * @param $parent_id

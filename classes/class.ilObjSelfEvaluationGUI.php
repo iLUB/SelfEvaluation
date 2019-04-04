@@ -683,23 +683,6 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI {
         return $this->checkPermissionBool($permission, $cmd);
     }
 
-    /**
-     * Post (successful) object import hook, used here to correct ref_id which is created twice during import.
-     *
-     * @param ilObject $a_new_object
-     */
-    protected function afterImport(ilObject $a_new_object)
-    {
-        list($invalid_id, $valid_id) = array_values(ilObject::_getAllReferences($a_new_object->getId()));
-
-        foreach (ilSelfEvaluationFeedback::_getAllInstancesForParentId($invalid_id,false,true) as $feedback){
-        	$feedback->setParentId($valid_id);
-            $feedback->update();
-		}
-        ilUtil::sendSuccess($this->lng->txt("object_added"), true);
-        $this->ctrl->returnToParent($this);
-    }
-
 	/**
 	 * Redirect after creation, see https://docu.ilias.de/goto_docu_wiki_wpage_5035_1357.html
 	 *
