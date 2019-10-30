@@ -442,3 +442,10 @@ foreach ($overall_feedbacks as $overall_feedback){
     }
 }
 ?>
+
+<#24>
+<?php
+if (!$ilDB->indexExistsByFields('rep_robj_xsev_d', ['i2'])) {
+    $ilDB->addIndex('rep_robj_xsev_d',array('dataset_id','question_id','question_type'), 'i2');
+}
+?>
