@@ -1,22 +1,21 @@
-
 <div class="knob">
-	<input type='text' value='{VALUE}' id='{ID}' data-height="{HEIGHT}%">
-	<script>
-		$(function () {
-			$('#{ID}').knob({
-				'min': {MIN},
-				'max': {MAX},
-				readOnly: {READONLY},
-				fgColor: 'rgb({FGCOLOR})',
-				bgColor:'rgb({BGCOLOR})',
-				angleOffset: {ANGLEOFFSET},
-				angleArc: {ANGLEARC},
-				stopper: {STOPPER},
-				thickness: {THICKNESS},
-				lineCap: {LINECAP},
-				displayInput: {DISPLAYINPUT},
-				displayPrevious: {DISPLAYPREVIOUS}
-			});
-		});
-	</script>
+    <input type='text' value='{VALUE}' id='{ID}' data-height="{HEIGHT}%">
+    <script>
+        $(function () {
+            $('#{ID}').knob({
+                'min': {MIN},
+                'max': {MAX},
+                readOnly: {READONLY},
+                fgColor: 'rgb({FGCOLOR})',
+                bgColor: 'rgb({BGCOLOR})',
+                angleOffset: {ANGLEOFFSET},
+                angleArc: {ANGLEARC},
+                stopper: {STOPPER},
+                thickness: {THICKNESS},
+                lineCap: {LINECAP},
+                displayInput: {DISPLAYINPUT},
+                displayPrevious: {DISPLAYPREVIOUS}
+            });
+        });
+    </script>
 </div>

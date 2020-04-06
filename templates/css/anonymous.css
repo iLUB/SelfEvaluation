@@ -2,14 +2,16 @@
     margin-top: -50px;
     height: 155px;
 }
-.fsxLngSelect,.ilMainMenuSearch,#LanguageSwitch{
+
+.fsxLngSelect, .ilMainMenuSearch, #LanguageSwitch {
     display: none;
 }
-.fsxMainMenu{
-     display: none;
- }
 
-#TAXtabs{
+.fsxMainMenu {
+    display: none;
+}
+
+#TAXtabs {
     display: none;
 }
 

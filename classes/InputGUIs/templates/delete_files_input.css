@@ -1,13 +1,13 @@
 td.ilFileUploadEntryFileName.ilFileDeleteList {
-	padding-left: 6px;
-	background-image: none;
+    padding-left: 6px;
+    background-image: none;
 }
 
 .ilDownloadIcon img {
-	border: 0;
-	width: 22px;
+    border: 0;
+    width: 22px;
 }
 
 .ilFileDelete {
-	text-decoration: line-through;
+    text-decoration: line-through;
 }

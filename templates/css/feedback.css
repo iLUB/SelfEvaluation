@@ -1,20 +1,20 @@
 * {
-    box-sizing:  	content-box;
+    box-sizing: content-box;
 }
 
-a.chart_toggle{
+a.chart_toggle {
     padding-top: 5px;
 }
 
-.bar_chart{
+.bar_chart {
     padding-top: 15px;
 }
 
-.feedback{
+.feedback {
     width: 100%;
 }
 
-.panel-statistics{
+.panel-statistics {
     font-size: small;
     font-style: italic;
 }

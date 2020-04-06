@@ -1,93 +1,93 @@
 <!-- BEGIN overview -->
 <div id="fb_overview" class="feedback" {VISIBILITY_OVERVIEW}>
-	<h1 class="feedback_block_title">{BLOCK_OVERVIEW_TITLE}</h1>
+    <h1 class="feedback_block_title">{BLOCK_OVERVIEW_TITLE}</h1>
 
-	<div class="btn-group" role="group" aria-label="Visualization Swith">
-		<!-- BEGIN overview_bar_button -->
-		<button type="button" class="btn btn-default bar_chart_button active">
-			{SHOW_BAR_CHART}
-		</button>
-		<!-- END overview_bar_button -->
+    <div class="btn-group" role="group" aria-label="Visualization Swith">
+        <!-- BEGIN overview_bar_button -->
+        <button type="button" class="btn btn-default bar_chart_button active">
+            {SHOW_BAR_CHART}
+        </button>
+        <!-- END overview_bar_button -->
 
-		<!-- BEGIN overview_spider_button -->
-		<button type="button" class="btn btn-default spider_chart_button">
-			{SHOW_SPIDER_CHART}
-		</button>
-		<!-- END overview_spider_button -->
+        <!-- BEGIN overview_spider_button -->
+        <button type="button" class="btn btn-default spider_chart_button">
+            {SHOW_SPIDER_CHART}
+        </button>
+        <!-- END overview_spider_button -->
 
-		<!-- BEGIN overview_left_right_button -->
-		<button type="button" class="btn btn-default left_right_chart_button">
-			{SHOW_LEFT_RIGHT_CHART}
-		</button>
-		<!-- END overview_left_right_button -->
+        <!-- BEGIN overview_left_right_button -->
+        <button type="button" class="btn btn-default left_right_chart_button">
+            {SHOW_LEFT_RIGHT_CHART}
+        </button>
+        <!-- END overview_left_right_button -->
 
-	</div>
+    </div>
 
-	<div class="bar_chart">{OVERVIEW_BAR_CHART}</div>
-	<div class="spider_chart">{OVERVIEW_SPIDER_CHART}</div>
-	<div class="left_right_chart">{OVERVIEW_LEFT_RIGHT_CHART}</div>
+    <div class="bar_chart">{OVERVIEW_BAR_CHART}</div>
+    <div class="spider_chart">{OVERVIEW_SPIDER_CHART}</div>
+    <div class="left_right_chart">{OVERVIEW_LEFT_RIGHT_CHART}</div>
 
-	<script type="text/javascript">
-		new xsevChartToggle('fb_overview');
-	</script>
+    <script type="text/javascript">
+        new xsevChartToggle('fb_overview');
+    </script>
 
-	<!-- BEGIN statistics -->
-	<div class="panel panel-default panel-statistics">
-		<div class="panel-body">
-			<div class="statistics">{OVERVIEW_STATISTICS_MEDIAN}</div>
-			<div class="statistics">{OVERVIEW_STATISTICS_MAX}</div>
-			<div class="statistics">{OVERVIEW_STATISTICS_MIN}</div>
-			<div class="statistics">{OVERVIEW_VARIANZ}</div>
-			<div class="statistics">{OVERVIEW_STANDARDABWEICHUNG}</div>
-			<div class="statistics">{OVERVIEW_STANDARDABWEICHUNG_PER_BLOCK}</div>
-		</div>
-	</div>
-	<!-- END statistics -->
+    <!-- BEGIN statistics -->
+    <div class="panel panel-default panel-statistics">
+        <div class="panel-body">
+            <div class="statistics">{OVERVIEW_STATISTICS_MEDIAN}</div>
+            <div class="statistics">{OVERVIEW_STATISTICS_MAX}</div>
+            <div class="statistics">{OVERVIEW_STATISTICS_MIN}</div>
+            <div class="statistics">{OVERVIEW_VARIANZ}</div>
+            <div class="statistics">{OVERVIEW_STANDARDABWEICHUNG}</div>
+            <div class="statistics">{OVERVIEW_STANDARDABWEICHUNG_PER_BLOCK}</div>
+        </div>
+    </div>
+    <!-- END statistics -->
 
-	<h3>{FEEDBACK_OVERVIEW_TITLE}</h3>
-	<p>{FEEDBACK_OVERVIEW_BODY}</p>
+    <h3>{FEEDBACK_OVERVIEW_TITLE}</h3>
+    <p>{FEEDBACK_OVERVIEW_BODY}</p>
 </div>
 <!-- END overview -->
 
 
 <!-- BEGIN feedback -->
-<div class="feedback" id="{FEEDBACK_ID}" >
-	<h1 class="feedback_block_title">{BLOCK_TITLE}
-		<!-- BEGIN block_abbreviation -->
+<div class="feedback" id="{FEEDBACK_ID}">
+    <h1 class="feedback_block_title">{BLOCK_TITLE}
+        <!-- BEGIN block_abbreviation -->
         <span class="feedback_block_abbreviation">{BLOCK_ABBREVIATION}</span>
-		<!-- END block_abbreviation -->
+        <!-- END block_abbreviation -->
     </h1>
-	<p>{BLOCK_DESCRIPTION}</p>
-	<div class="btn-group" role="group" aria-label="Visualization Swith">
+    <p>{BLOCK_DESCRIPTION}</p>
+    <div class="btn-group" role="group" aria-label="Visualization Swith">
 
-		<!-- BEGIN chart_bar_button -->
-		<button type="button" class="btn btn-default bar_chart_button active">
-			{SHOW_BAR_CHART}
-		</button>
-		<!-- END chart_bar_button -->
+        <!-- BEGIN chart_bar_button -->
+        <button type="button" class="btn btn-default bar_chart_button active">
+            {SHOW_BAR_CHART}
+        </button>
+        <!-- END chart_bar_button -->
 
-		<!-- BEGIN chart_spider_button -->
-		<button type="button" class="btn btn-default spider_chart_button">
-			{SHOW_SPIDER_CHART}
-		</button>
-		<!-- END chart_spider_button -->
+        <!-- BEGIN chart_spider_button -->
+        <button type="button" class="btn btn-default spider_chart_button">
+            {SHOW_SPIDER_CHART}
+        </button>
+        <!-- END chart_spider_button -->
 
-		<!-- BEGIN chart_left_right_button -->
-		<button type="button" class="btn btn-default left_right_chart_button">
-			{SHOW_LEFT_RIGHT_CHART}
-		</button>
-		<!-- END chart_left_right_button -->
-	</div>
+        <!-- BEGIN chart_left_right_button -->
+        <button type="button" class="btn btn-default left_right_chart_button">
+            {SHOW_LEFT_RIGHT_CHART}
+        </button>
+        <!-- END chart_left_right_button -->
+    </div>
 
-	<div class="bar_chart">{BAR_CHART}</div>
-	<div class="left_right_chart">{LEFT_RIGHT_CHART}</div>
-	<div class="spider_chart">{SPIDER_CHART}</div>
-	<script type="text/javascript">
-		new xsevChartToggle('{FEEDBACK_ID}');
-	</script>
-	<br>
+    <div class="bar_chart">{BAR_CHART}</div>
+    <div class="left_right_chart">{LEFT_RIGHT_CHART}</div>
+    <div class="spider_chart">{SPIDER_CHART}</div>
+    <script type="text/javascript">
+        new xsevChartToggle('{FEEDBACK_ID}');
+    </script>
+    <br>
 
-	<h3>{FEEDBACK_TITLE}</h3>
-	<p>{FEEDBACK_BODY}</p>
+    <h3>{FEEDBACK_TITLE}</h3>
+    <p>{FEEDBACK_BODY}</p>
 </div>
 <!-- END feedback -->

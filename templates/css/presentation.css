@@ -1,15 +1,16 @@
 * {
-    box-sizing:  	content-box;
+    box-sizing: content-box;
 }
 
 h4 {
-  margin-top: 25px;
+    margin-top: 25px;
 }
 
-.block-header{
-    border-bottom: 2px solid  #a1a1a1;
+.block-header {
+    border-bottom: 2px solid #a1a1a1;
 }
-.table > tbody > tr td.ilUnitEven,.table > tbody > tr td.ilUnitOdd{
+
+.table > tbody > tr td.ilUnitEven, .table > tbody > tr td.ilUnitOdd {
     text-align: center;
     padding-left: 2px;
     padding-right: 2px;
@@ -23,29 +24,33 @@ h4 {
     background-color: #eff2ff;
 }
 
-
-.block-question{
-    border-bottom:  1px solid  #a1a1a1;
+.block-question {
+    border-bottom: 1px solid #a1a1a1;
 }
-.block-question div.question-text{
+
+.block-question div.question-text {
     padding-top: 4px;
 }
 
-.block-title{
+.block-title {
     padding-left: 0;
 }
-.block-question .rating td{
+
+.block-question .rating td {
     padding-top: 6px;
     padding-bottom: 4px;
 }
-.block-question .rating .inputs{
+
+.block-question .rating .inputs {
     padding-top: 4px;
     padding-bottom: 4px;
 }
-.self-evaluation-presentation .rating{
+
+.self-evaluation-presentation .rating {
     padding-right: 0px;
     padding-left: 0px;
 }
+
 .table {
     margin-bottom: 0px;
     table-layout: fixed;
@@ -53,28 +58,30 @@ h4 {
     max-width: 10000px
 }
 
-.row div.ilFormFooter{
+.row div.ilFormFooter {
     padding-left: 0;
     background-color: transparent;
 }
 
-.knob-col{
+.knob-col {
     padding-right: 0;
 }
 
 .self-evaluation-presentation * {
-    box-sizing:  	border-box;
+    box-sizing: border-box;
 }
-.table > tbody > tr > td{
+
+.table > tbody > tr > td {
     padding: 0px;
     border-top: 0px;
     word-wrap: normal;
 }
 
-.knob{
+.knob {
     float: right;
 }
-.sev-panel-body{
+
+.sev-panel-body {
     padding-top: 0;
     padding-bottom: 0;
 }
@@ -82,16 +89,20 @@ h4 {
 .block-header {
     padding-top: 20px;
 }
-.block-header + .block-question{
+
+.block-header + .block-question {
     display: none;
 }
-.sev-commands{
+
+.sev-commands {
     margin-top: 20px;
 }
-.self-matrix_header, .self-matrix_field{
+
+.self-matrix_header, .self-matrix_field {
     border-bottom: 1px solid #eee;
 }
-.block-question + :not(.self-matrix_field ){
+
+.block-question + :not(.self-matrix_field ) {
     margin-top: -1px;
     border-top: 1px solid #a1a1a1;
 }

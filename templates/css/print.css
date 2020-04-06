@@ -1,41 +1,46 @@
 @media print {
-	body {
-		background-color: white;
-		background-image: none;
-	}
+    body {
+        background-color: white;
+        background-image: none;
+    }
 
-	.feedback_block_title{
-		/** page-break-before: always;**/
-	}
+    .feedback_block_title {
+        /** page-break-before: always;**/
+    }
 
-	.feedback_block_abbreviation:before { content:"[" }
-	.feedback_block_abbreviation:after { content:"]" }
+    .feedback_block_abbreviation:before {
+        content: "["
+    }
 
-	div.ilMainHeader, div.il_HeaderOuter, div.ilPermaLink, div.il_Footer, div.ilTopBar, .breadcrumb, ul#ilTab {
-		display: none;
-	}
+    .feedback_block_abbreviation:after {
+        content: "]"
+    }
 
-	#mainspacekeeper, div.ilTabContentOuter {
-		box-shadow: none;
-		padding:    0;
-		margin:     0;
-	}
+    div.ilMainHeader, div.il_HeaderOuter, div.ilPermaLink, div.il_Footer, div.ilTopBar, .breadcrumb, ul#ilTab {
+        display: none;
+    }
 
-	#mainspacekeeper {
-		background-color: white;
-	}
+    #mainspacekeeper, div.ilTabContentOuter {
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+    }
 
-	.feedback{
-		page-break-after: always;
-		page-break-inside: avoid;
-	}
+    #mainspacekeeper {
+        background-color: white;
+    }
 
-	.ilChartWrapper{
-		page-break-inside: avoid;
-	}
+    .feedback {
+        page-break-after: always;
+        page-break-inside: avoid;
+    }
 
-	@page {
-		size: auto;
-		margin-bottom: 0mm;
-	}
+    .ilChartWrapper {
+        page-break-inside: avoid;
+    }
+
+    @page {
+        size: auto;
+        margin-bottom: 0mm;
+    }
 }

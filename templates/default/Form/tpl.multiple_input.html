@@ -1,77 +1,77 @@
 <script>
-	$(document).ready(function () {
-		var handler = function(e) {
-			var last_value = parseInt($(".multipleinput_new").last().find('input').first().val());
-			if (last_value >= 0) {
-				var next_value = 1 + last_value;
-			} else {
-				next_value = '';
-			}
-			$('.multipleinput_new').last().clone().appendTo('#input_colletion').fadeIn(500);
-			$('.multipleinput_new').last().find('input').first().val(next_value);
-			$('.multipleinput_new').last().find('input').last().val('');
-			$('.multipleinput_new').last().find('input').last().focus();
+    $(document).ready(function () {
+        var handler = function (e) {
+            var last_value = parseInt($(".multipleinput_new").last().find('input').first().val());
+            if (last_value >= 0) {
+                var next_value = 1 + last_value;
+            } else {
+                next_value = '';
+            }
+            $('.multipleinput_new').last().clone().appendTo('#input_colletion').fadeIn(500);
+            $('.multipleinput_new').last().find('input').first().val(next_value);
+            $('.multipleinput_new').last().find('input').last().val('');
+            $('.multipleinput_new').last().find('input').last().focus();
 
-			return false;
-		}
+            return false;
+        }
 
-		$(document).on("click", 'span.add_button', handler);
-		$('span.delete_button').click(function () {
-			var mydiff = $(this).parent().parent().parent();
-			mydiff.find('input').each(function () {
-				$(this).val('');
-			});
-			mydiff.fadeOut(500);
+        $(document).on("click", 'span.add_button', handler);
+        $('span.delete_button').click(function () {
+            var mydiff = $(this).parent().parent().parent();
+            mydiff.find('input').each(function () {
+                $(this).val('');
+            });
+            mydiff.fadeOut(500);
 
-		});
-	});
+        });
+    });
 
 
-	$(document).ready(function () {
-		var fixHelper = function (e, ui) {
-			ui.children().each(function () {
-				$(this).width($(this).width());
-			});
-			return ui;
-		};
+    $(document).ready(function () {
+        var fixHelper = function (e, ui) {
+            ui.children().each(function () {
+                $(this).width($(this).width());
+            });
+            return ui;
+        };
 
-		$("table#input_colletion tbody").sortable({
-			helper: fixHelper,
-			items: '.fsxSortable'
-		});
-	});
+        $("table#input_colletion tbody").sortable({
+            helper: fixHelper,
+            items: '.fsxSortable'
+        });
+    });
 </script>
 <style>
-	.locked {
-		display: none;
-	}
+    .locked {
+        display: none;
+    }
 </style>
 <table id='input_colletion'>
-	<!-- BEGIN input -->
-	<tr class='multipleinput_old fsxSortable'>
-		<td style="width: 30px" class="{LOCK_CSS}">
-			<img src="./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/move.png">
-		</td>
-		<td><input type="hidden" name="{POSTVAR}_position[]" value="{ID}"><input {DISABLED} style='float: left;'
-			type='text'
-			name='{VALUE_N}' value='{VALUE_V}'>
-		</td>
-		<td><input {DISABLED} style='float: left;' type='text' name='{TITLE_N}' value='{TITLE_V}'></td>
-		<td class="{LOCK_CSS}"><a><span class="glyphicon glyphicon-minus delete_button" aria-hidden="true"></span></a>
-		</td>
-	</tr>
-	<!-- END input -->
-	<!-- BEGIN new_input -->
-	<tr class='multipleinput_new'>
-		<td class="{LOCK_CSS}"></td>
-		<td><input {DISABLED_N} style='float: left' type='text' name='{VALUE_N_NEW}' value='{DEFAULT_VALUE}'
-			placeholder="{PLACEHOLDER_VALUE}">
-		</td>
-		<td><input {DISABLED_N} style='float: left' type='text' name='{TITLE_N_NEW}' value=''
-			placeholder="{PLACEHOLDER_TITLE}">
-		</td>
-		<td class="{LOCK_CSS}"><a><span class="glyphicon glyphicon-plus add_button" aria-hidden="true"></span></a></td>
-	</tr>
-	<!-- END new_input -->
+    <!-- BEGIN input -->
+    <tr class='multipleinput_old fsxSortable'>
+        <td style="width: 30px" class="{LOCK_CSS}">
+            <img src="./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/move.png">
+        </td>
+        <td><input type="hidden" name="{POSTVAR}_position[]" value="{ID}"><input {DISABLED} style='float: left;'
+                                                                                 type='text'
+                                                                                 name='{VALUE_N}' value='{VALUE_V}'>
+        </td>
+        <td><input {DISABLED} style='float: left;' type='text' name='{TITLE_N}' value='{TITLE_V}'></td>
+        <td class="{LOCK_CSS}"><a><span class="glyphicon glyphicon-minus delete_button" aria-hidden="true"></span></a>
+        </td>
+    </tr>
+    <!-- END input -->
+    <!-- BEGIN new_input -->
+    <tr class='multipleinput_new'>
+        <td class="{LOCK_CSS}"></td>
+        <td><input {DISABLED_N} style='float: left' type='text' name='{VALUE_N_NEW}' value='{DEFAULT_VALUE}'
+                   placeholder="{PLACEHOLDER_VALUE}">
+        </td>
+        <td><input {DISABLED_N} style='float: left' type='text' name='{TITLE_N_NEW}' value=''
+                   placeholder="{PLACEHOLDER_TITLE}">
+        </td>
+        <td class="{LOCK_CSS}"><a><span class="glyphicon glyphicon-plus add_button" aria-hidden="true"></span></a></td>
+    </tr>
+    <!-- END new_input -->
 </table>
 <div class="ilFormInfo">{DESCRIPTION}</div>
