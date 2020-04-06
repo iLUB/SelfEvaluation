@@ -22,71 +22,73 @@
 */
 
 require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
+
 /**
  * Class ilSelfEvaluationBlockTableRow
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationQuestionBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class ilSelfEvaluationQuestionBlockTableRow extends ilSelfEvaluationBlockTableRow
+{
 
-	/**
-	 * @param ilSelfEvaluationQuestionBlock $block
-	 */
-	public function __construct(ilSelfEvaluationQuestionBlock $block) {
-		parent::__construct($block);
+    /**
+     * @param ilSelfEvaluationQuestionBlock $block
+     */
+    public function __construct(ilSelfEvaluationQuestionBlock $block)
+    {
+        parent::__construct($block);
 
-		$questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId());
-		$this->setQuestionCount(count($questions));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
+        $questions = ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId());
+        $this->setQuestionCount(count($questions));
+        $question_action = $this->getQuestionAction();
+        $this->setQuestionsLink($question_action->getLink());
+        $this->addAction($question_action);
 
-		$feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($block->getId());
-		$this->setFeedbackCount(count($feedbacks));
-		$feedback_action = $this->getFeedbackAction();
-		$this->setFeedbackLink($feedback_action->getLink());
-		$this->addAction($feedback_action);
+        $feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($block->getId());
+        $this->setFeedbackCount(count($feedbacks));
+        $feedback_action = $this->getFeedbackAction();
+        $this->setFeedbackLink($feedback_action->getLink());
+        $this->addAction($feedback_action);
 
-		if (ilSelfEvaluationFeedback::_isComplete($block->getId())) {
-			$img_path = ilUtil::getImagePath('icon_ok.svg');
-		} else {
-			$img_path = ilUtil::getImagePath('icon_not_ok.svg');
-		}
-		$this->setStatusImg($img_path);
+        if (ilSelfEvaluationFeedback::_isComplete($block->getId())) {
+            $img_path = ilUtil::getImagePath('icon_ok.svg');
+        } else {
+            $img_path = ilUtil::getImagePath('icon_not_ok.svg');
+        }
+        $this->setStatusImg($img_path);
 
-		$this->setAbbreviation($block->getAbbreviation());
-	}
+        $this->setAbbreviation($block->getAbbreviation());
+    }
 
+    protected function saveCtrlParameters()
+    {
+        $this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('ilSelfEvaluationFeedbackGUI', 'block_id', $this->getBlockId());
+    }
 
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI',    'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI',         'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationFeedbackGUI',         'block_id', $this->getBlockId());
-	}
+    /**
+     * @return ilSelfEvaluationTableAction
+     */
+    protected function getQuestionAction()
+    {
+        $title = $this->pl->txt('edit_questions');
+        $link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent');
+        $cmd = 'edit_questions';
 
+        return new ilSelfEvaluationTableAction($title, $cmd, $link);
+    }
 
-	/**
-	 * @return ilSelfEvaluationTableAction
-	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent');
-		$cmd = 'edit_questions';
-
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
-	}
-
-
-	/**
-	 * @return ilSelfEvaluationTableAction
-	 */
-	protected function getFeedbackAction() {
-		$title = $this->pl->txt('edit_feedback');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects');
-		$cmd = 'listObjects';
+    /**
+     * @return ilSelfEvaluationTableAction
+     */
+    protected function getFeedbackAction()
+    {
+        $title = $this->pl->txt('edit_feedback');
+        $link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects');
+        $cmd = 'listObjects';
         $position = 2;
-        return new ilSelfEvaluationTableAction($title, $cmd, $link,$position);
-	}
+        return new ilSelfEvaluationTableAction($title, $cmd, $link, $position);
+    }
 }

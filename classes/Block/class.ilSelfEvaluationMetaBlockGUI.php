@@ -24,17 +24,16 @@ require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockGUI.php');
 
 /**
  * Class ilSelfEvaluationMetaBlockGUI
- *
  * @ilCtrl_isCalledBy ilSelfEvaluationMetaBlockGUI: ilObjSelfEvaluationGUI
- *
- * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- * @version $Id$
+ * @author            Fabio Heer <fabio.heer@ilub.unibe.ch>
+ * @author            Timon Amstutz <timon.amstutz@ilub.unibe.ch>
+ * @version           $Id$
  */
-class ilSelfEvaluationMetaBlockGUI extends ilSelfEvaluationBlockGUI {
+class ilSelfEvaluationMetaBlockGUI extends ilSelfEvaluationBlockGUI
+{
 
-	/**
-	 * @var ilSelfEvaluationMetaBlock
-	 */
-	protected $object;
+    /**
+     * @var ilSelfEvaluationMetaBlock
+     */
+    protected $object;
 }

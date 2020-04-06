@@ -23,23 +23,21 @@
 
 /**
  * Fixed version of ilFormSectionHeaderGUI (info shown in output)
- *
- * @author Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- * @version $Id$
+ * @author     Timon Amstutz <timon.amstutz@ilub.unibe.ch>
+ * @version    $Id$
  * @ingroup    ServicesForm
  */
 class ilFormSectionHeaderGUIFixed extends ilFormSectionHeaderGUI
 {
     /**
      * Insert property html
-     *
      */
     function insert($a_tpl = null)
     {
         $a_tpl->setCurrentBlock("header");
         $a_tpl->setVariable("TXT_TITLE", $this->getTitle());
-        $a_tpl->setVariable("TXT_DESCRIPTION",$this->getInfo());
-        if (isset($this->section_anchor)){
+        $a_tpl->setVariable("TXT_DESCRIPTION", $this->getInfo());
+        if (isset($this->section_anchor)) {
             $a_tpl->setVariable('LABEL', $this->section_anchor);
         }
 

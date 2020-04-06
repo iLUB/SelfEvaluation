@@ -1,13 +1,13 @@
 <?php
 require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
+
 /**
  * GUI-Class ilSelfEvaluationPresentationGUI
- *
  * @author            Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version           $Id:
- *
  */
-class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
+class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI
+{
 
     /**
      * @var array
@@ -26,9 +26,8 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
 
     /**
      * Add Command button
-     *
-     * @param	string	Command
-     * @param	string	Text
+     * @param    string    Command
+     * @param    string    Text
      */
     public function addCommandButton($a_cmd, $a_text, $a_id = '')
     {
@@ -46,8 +45,8 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
         parent::clearCommandButtons();
     }
 
-
-    public function addKnob($page,$last_page){
+    public function addKnob($page, $last_page)
+    {
         $this->knob = new ilKnobGUI();
         $this->knob->setValue($page);
         $this->knob->setMax($last_page);
@@ -74,43 +73,39 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
         $tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/bootstrap.css");
         $tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/presentation.css");
 
-        $this->tpl = new ilTemplate("tpl.presentation_form.html", true, true, "Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/");
+        $this->tpl = new ilTemplate("tpl.presentation_form.html", true, true,
+            "Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/");
 
         // properties
         $this->required_text = false;
-        foreach($this->getItems() as $item)
-        {
+        foreach ($this->getItems() as $item) {
 
-            if($item->getType() == "section_header" && $this->knob){
-                $this->tpl->setVariable("PROGRESS_KNOB",$this->knob->getHtml());
+            if ($item->getType() == "section_header" && $this->knob) {
+                $this->tpl->setVariable("PROGRESS_KNOB", $this->knob->getHtml());
                 //$this->tpl->setVariable("PROP_CLASS","block-header");
-            }
-            else{
+            } else {
                 //$this->tpl->setVariable("PROP_CLASS","block-question");
             }
-            if ($item->getType() != "hidden")
-            {
-                $this->tpl->setVariable("RATING_SIZE",12-$this->getQuestionFieldSize());
-                $this->tpl->setVariable("QUESTION_SIZE",$this->getQuestionFieldSize());
-                $this->tpl->setVariable("RATING_SIZE_COMMAND",12-$this->getQuestionFieldSize());
-                $this->tpl->setVariable("QUESTION_SIZE_COMMAND",$this->getQuestionFieldSize());
-                $this->tpl->setVariable("TYPE",$item->getType());
+            if ($item->getType() != "hidden") {
+                $this->tpl->setVariable("RATING_SIZE", 12 - $this->getQuestionFieldSize());
+                $this->tpl->setVariable("QUESTION_SIZE", $this->getQuestionFieldSize());
+                $this->tpl->setVariable("RATING_SIZE_COMMAND", 12 - $this->getQuestionFieldSize());
+                $this->tpl->setVariable("QUESTION_SIZE_COMMAND", $this->getQuestionFieldSize());
+                $this->tpl->setVariable("TYPE", $item->getType());
 
                 $this->insertItem($item);
             }
         }
 
         // required
-        if ($this->required_text && $this->getMode() == "std")
-        {
+        if ($this->required_text && $this->getMode() == "std") {
             $this->tpl->setCurrentBlock("required_text");
             $this->tpl->setVariable("TXT_REQUIRED", $lng->txt("required_field"));
             $this->tpl->parseCurrentBlock();
         }
 
         /** command buttons**/
-        foreach($this->copy_of_buttons as $button)
-        {
+        foreach ($this->copy_of_buttons as $button) {
             $this->tpl->setCurrentBlock("cmd");
             $this->tpl->setVariable("CMD", $button["cmd"]);
             $this->tpl->setVariable("CMD_TXT", $button["text"]);
@@ -119,17 +114,14 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
 
         // hidden properties
         $hidden_fields = false;
-        foreach($this->getItems() as $item)
-        {
-            if ($item->getType() == "hidden")
-            {
+        foreach ($this->getItems() as $item) {
+            if ($item->getType() == "hidden") {
                 $item->insert($this->tpl);
                 $hidden_fields = true;
             }
         }
 
-        if ($this->required_text ||  $hidden_fields)
-        {
+        if ($this->required_text || $hidden_fields) {
             $this->tpl->setCurrentBlock("commands");
             $this->tpl->parseCurrentBlock();
         }
@@ -153,6 +145,6 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI{
         return $this->question_field_size;
     }
 
-
 }
+
 ?>

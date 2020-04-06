@@ -24,53 +24,50 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
 
 /**
  * Class iLubFieldDefinitionTypeSelect
- *
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
 class iLubFieldDefinitionTypeSingleChoice extends
-		iLubFieldDefinitionTypeSelect {
+    iLubFieldDefinitionTypeSelect
+{
 
+    const TYPE_ID = 3;
 
-	const TYPE_ID = 3;
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return self::TYPE_ID;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return self::TYPE_ID;
-	}
+    /**
+     * Return a title in the users translation
+     * @return string
+     */
+    public function getTypeName()
+    {
+        global $lng;
+        $lng->loadLanguageModule('assessment');
+        return $lng->txt('assSingleChoice');
+    }
 
+    /**
+     * @param string $title
+     * @param string $postvar
+     * @param array  $values
+     * @return ilFormPropertyGUI
+     */
+    public function getPresentationInputGUI($title, $postvar, $values)
+    {
+        require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilRadioGroupInputGUIwrapper.php');
+        $select = new ilRadioGroupInputGUIwrapper($title, $postvar);
 
-	/**
-	 * Return a title in the users translation
-	 *
-	 * @return string
-	 */
-	public function getTypeName() {
-		global $lng;
-		$lng->loadLanguageModule('assessment');
-		return $lng->txt('assSingleChoice');
-	}
+        foreach ($values as $key => $value) {
 
+            $select->addOption(new ilRadioOption($value, $key));
+        }
 
-	/**
-	 * @param string $title
-	 * @param string $postvar
-	 * @param array  $values
-	 *
-	 * @return ilFormPropertyGUI
-	 */
-	public function getPresentationInputGUI($title, $postvar, $values) {
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilRadioGroupInputGUIwrapper.php');
-		$select = new ilRadioGroupInputGUIwrapper($title, $postvar);
-
-		foreach($values as $key => $value)
-		{
-
-			$select->addOption(new ilRadioOption($value,$key));
-		}
-
-		return $select;
-	}
+        return $select;
+    }
 }

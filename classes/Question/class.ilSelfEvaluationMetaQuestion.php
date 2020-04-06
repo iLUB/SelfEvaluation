@@ -24,28 +24,29 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
 
 /**
  * Class ilSelfEvaluationMetaQuestion
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition {
+class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition
+{
 
-	const TABLE_NAME = 'rep_robj_xsev_mqst';
+    const TABLE_NAME = 'rep_robj_xsev_mqst';
 
-
-	/**
-	 * @param string $container_id
-	 * @param int    $id
-	 */
-	public function __construct($container_id, $id = 0) {
-		parent::__construct(self::TABLE_NAME, $container_id, $id);
-	}
+    /**
+     * @param string $container_id
+     * @param int    $id
+     */
+    public function __construct($container_id, $id = 0)
+    {
+        parent::__construct(self::TABLE_NAME, $container_id, $id);
+    }
 
     /**
      * @param $parent_id
      * @return ilSelfEvaluationMetaQuestion
      */
-    public function cloneTo($parent_id){
+    public function cloneTo($parent_id)
+    {
         $clone = new self($parent_id);
         $clone = $this->cloneToObject($clone);
         $clone->setContainerId($parent_id);
@@ -57,53 +58,55 @@ class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition {
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement
      */
-    public function toXml(SimpleXMLElement $xml){
+    public function toXml(SimpleXMLElement $xml)
+    {
         $child_xml = $xml->addChild("metaQuestion");
-        $child_xml->addAttribute("containerId",$this->getContainerId());
-        $child_xml->addAttribute("name",$this->getName());
-        $child_xml->addAttribute("shortTitle",$this->getShortTitle());
-        $child_xml->addAttribute("typeId",$this->getTypeId());
-        $child_xml->addAttribute("values",serialize($this->getValues()));
-        $child_xml->addAttribute("enableRequired",$this->isRequired());
-        $child_xml->addAttribute("position",$this->getPosition());
+        $child_xml->addAttribute("containerId", $this->getContainerId());
+        $child_xml->addAttribute("name", $this->getName());
+        $child_xml->addAttribute("shortTitle", $this->getShortTitle());
+        $child_xml->addAttribute("typeId", $this->getTypeId());
+        $child_xml->addAttribute("values", serialize($this->getValues()));
+        $child_xml->addAttribute("enableRequired", $this->isRequired());
+        $child_xml->addAttribute("position", $this->getPosition());
         return $xml;
     }
 
     /**
-     * @param $parent_id
+     * @param                  $parent_id
      * @param SimpleXMLElement $xml
      * @return SimpleXMLElement
      */
-    public static function fromXml($parent_id,SimpleXMLElement $xml){
-        $attributes =  $xml->attributes();
+    public static function fromXml($parent_id, SimpleXMLElement $xml)
+    {
+        $attributes = $xml->attributes();
         $question = new self($parent_id);
         $question->setName($attributes["name"]);
         $question->setShortTitle($attributes["shortTitle"]);
         $question->setTypeId($attributes["typeId"]);
         $question->setValues(unserialize($attributes["values"]));
-        $question->enableRequired($attributes["enableRequired"]=="1"?true:false);
+        $question->enableRequired($attributes["enableRequired"] == "1" ? true : false);
         $question->setPosition($attributes["position"]);
         $question->save();
         return $xml;
     }
 
     /**
-	 * @param int $field_id
-	 *
-	 * @return bool
-	 */
-	public static function isObject($field_id) {
-		global $ilDB;
+     * @param int $field_id
+     * @return bool
+     */
+    public static function isObject($field_id)
+    {
+        global $ilDB;
 
-		$set = $ilDB->query('SELECT field_id FROM ' . self::TABLE_NAME . ' WHERE field_id = '
-			. $ilDB->quote($field_id, 'integer'));
+        $set = $ilDB->query('SELECT field_id FROM ' . self::TABLE_NAME . ' WHERE field_id = '
+            . $ilDB->quote($field_id, 'integer'));
 
-		while ($rec = $ilDB->fetchObject($set)) {
-			return true;
-		}
+        while ($rec = $ilDB->fetchObject($set)) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
     //
     // Static
@@ -111,10 +114,10 @@ class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition {
     /**
      * @param int  $parent_id is a meta_block id
      * @param bool $as_array
-     *
      * @return ilSelfEvaluationMetaQuestion[]
      */
-    public static function _getAllInstancesForParentId($parent_id, $as_array = false) {
+    public static function _getAllInstancesForParentId($parent_id, $as_array = false)
+    {
         global $ilDB;
         $return = array();
         $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE container_id = '
@@ -122,7 +125,7 @@ class ilSelfEvaluationMetaQuestion extends iLubFieldDefinition {
 
         while ($rec = $ilDB->fetchObject($set)) {
             if ($as_array) {
-                $return[$rec->field_id] = (array)new self($parent_id, $rec->field_id);
+                $return[$rec->field_id] = (array) new self($parent_id, $rec->field_id);
             } else {
                 $return[$rec->field_id] = new self($parent_id, $rec->field_id);
             }

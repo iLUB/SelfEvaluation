@@ -24,43 +24,41 @@
 /**
  * Class ilSelectInputGUIwrapper
  * Improve input validation check: allowed POST values should match one of the set options.
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
- * @see https://www.ilias.de/mantis/view.php?id=13499
+ * @see     https://www.ilias.de/mantis/view.php?id=13499
  */
-class ilSelectInputGUIwrapper extends ilSelectInputGUI {
+class ilSelectInputGUIwrapper extends ilSelectInputGUI
+{
 
-	/**
-	 * Check input, strip slashes etc. set alert, if input is not ok.
-	 *
-	 * @return	boolean		Input ok, true/false
-	 */
-	function checkInput() {
-		global $lng;
+    /**
+     * Check input, strip slashes etc. set alert, if input is not ok.
+     * @return    boolean        Input ok, true/false
+     */
+    function checkInput()
+    {
+        global $lng;
 
-		$ok = parent::checkInput();
+        $ok = parent::checkInput();
 
-		if ($ok) {
-			if(!$this->getMulti()) {
-				// make sure the received value matches one of the provided options
-				if(!array_key_exists($_POST[$this->getPostVar()], $this->getOptions()))
-				{
-					$ok = FALSE;
-					$this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
-				}
-			} else {
-				foreach($_POST[$this->getPostVar()] as $idx => $value) {
-					// make sure the received value matches one of the provided options
-					if(!array_key_exists($_POST[$this->getPostVar()][$idx], $this->getOptions()))
-					{
-						$ok = FALSE;
-						$this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
-					}
-				}
-			}
-		}
+        if ($ok) {
+            if (!$this->getMulti()) {
+                // make sure the received value matches one of the provided options
+                if (!array_key_exists($_POST[$this->getPostVar()], $this->getOptions())) {
+                    $ok = false;
+                    $this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
+                }
+            } else {
+                foreach ($_POST[$this->getPostVar()] as $idx => $value) {
+                    // make sure the received value matches one of the provided options
+                    if (!array_key_exists($_POST[$this->getPostVar()][$idx], $this->getOptions())) {
+                        $ok = false;
+                        $this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
+                    }
+                }
+            }
+        }
 
-		return $ok;
-	}
+        return $ok;
+    }
 }

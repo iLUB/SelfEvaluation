@@ -23,11 +23,11 @@
 
 /**
  * Class csvExportValue
- *
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class csvExportValue {
+class csvExportValue
+{
     /**
      * @var csvExportColumn
      */
@@ -41,7 +41,8 @@ class csvExportValue {
      * @param string $column_name
      * @param string $value
      */
-    function __construct($column_name, $value){
+    function __construct($column_name, $value)
+    {
         $this->column = new csvExportColumn($column_name);
         $this->value = $value;
     }
@@ -61,7 +62,6 @@ class csvExportValue {
     {
         return $this->column;
     }
-
 
     /**
      * @param string $value

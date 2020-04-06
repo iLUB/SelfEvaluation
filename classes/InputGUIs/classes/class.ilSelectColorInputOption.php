@@ -1,4 +1,5 @@
 <?php
+
 /*
 	+-----------------------------------------------------------------------------+
 	| ILIAS open source                                                           |
@@ -20,111 +21,114 @@
 	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
 	+-----------------------------------------------------------------------------+
 */
-class ilSelectColorInputOption {
 
-	/**
-	 * @var int
-	 */
-	protected $id;
-	/**
-	 * @var string
-	 */
-	protected $color;
-	/**
-	 * @var string
-	 */
-	protected $title;
-	/**
-	 * @var array
-	 */
-	protected $style_properties = array();
+class ilSelectColorInputOption
+{
 
+    /**
+     * @var int
+     */
+    protected $id;
+    /**
+     * @var string
+     */
+    protected $color;
+    /**
+     * @var string
+     */
+    protected $title;
+    /**
+     * @var array
+     */
+    protected $style_properties = array();
 
-	/**
-	 * @param int    $id        color id
-	 * @param string $color     color code
-	 * @param string $title     name of the color
-	 */
-	public function __construct($id, $color, $title = '') {
-		$this->setId($id);
-		$this->setColor($color);
-		$this->setTitle($title);
-	}
+    /**
+     * @param int    $id    color id
+     * @param string $color color code
+     * @param string $title name of the color
+     */
+    public function __construct($id, $color, $title = '')
+    {
+        $this->setId($id);
+        $this->setColor($color);
+        $this->setTitle($title);
+    }
 
+    /**
+     * @param string $color
+     */
+    public function setColor($color)
+    {
+        if ($color == 'transparent') {
+            $this->color = $color;
+        } else {
+            require_once('Services/Form/classes/class.ilColorPickerInputGUI.php');
+            $hex_code = '#' . ilColorPickerInputGUI::determineHexcode($color);
+            $this->color = $hex_code;
+        }
+    }
 
-	/**
-	 * @param string $color
-	 */
-	public function setColor($color) {
-		if ($color == 'transparent') {
-			$this->color = $color;
-		} else {
-			require_once('Services/Form/classes/class.ilColorPickerInputGUI.php');
-			$hex_code = '#' . ilColorPickerInputGUI::determineHexcode($color);
-			$this->color = $hex_code;
-		}
-	}
+    /**
+     * @return string
+     */
+    public function getColor()
+    {
+        return $this->color;
+    }
 
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getColor() {
-		return $this->color;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
 
-	/**
-	 * @param int $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
 
+    /**
+     * @param array $property
+     */
+    public function setStyleProperties($property)
+    {
+        $this->style_properties = $property;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @param string $property
+     */
+    public function addStyleProperty($property)
+    {
+        $this->style_properties[] = $property;
+    }
 
-
-	/**
-	 * @param string $title
-	 */
-	public function setTitle($title) {
-		$this->title = $title;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
-
-
-	/**
-	 * @param array $property
-	 */
-	public function setStyleProperties($property) {
-		$this->style_properties = $property;
-	}
-
-
-	/**
-	 * @param string $property
-	 */
-	public function addStyleProperty($property) {
-		$this->style_properties[] = $property;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getStyleProperties() {
-		return $this->style_properties;
-	}
+    /**
+     * @return array
+     */
+    public function getStyleProperties()
+    {
+        return $this->style_properties;
+    }
 }

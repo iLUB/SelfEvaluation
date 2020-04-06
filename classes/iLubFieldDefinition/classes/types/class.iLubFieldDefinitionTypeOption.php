@@ -23,50 +23,48 @@
 
 /**
  * Class iLubFieldDefinitionTypeOption
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class iLubFieldDefinitionTypeOption extends ilRadioOption {
+class iLubFieldDefinitionTypeOption extends ilRadioOption
+{
 
-	/**
-	 * @param string $info
-	 */
-	public function __construct($info = '') {
-		parent::__construct('', '', $info);
-	}
+    /**
+     * @param string $info
+     */
+    public function __construct($info = '')
+    {
+        parent::__construct('', '', $info);
+    }
 
+    /**
+     * @param bool $disabled
+     */
+    public function setDisabled($disabled)
+    {
+        $this->disabled = $disabled;
 
-	/**
-	 * @param bool $disabled
-	 */
-	public function setDisabled($disabled) {
-		$this->disabled = $disabled;
+        foreach ($this->getSubItems() as $sub_item) {
+            $this->disable($sub_item, $disabled);
+        }
+    }
 
-		foreach($this->getSubItems() as $sub_item) {
-			$this->disable($sub_item, $disabled);
-		}
-	}
+    /**
+     * Disable items recursively
+     * @param object $item
+     * @param bool   $disabled
+     */
+    protected function disable($item, $disabled)
+    {
+        if (method_exists($item, 'getSubItems')) {
+            foreach ($item->getSubItems() as $sub_item) {
+                $this->disable($sub_item, $disabled);
+            }
+        }
 
-
-	/**
-	 * Disable items recursively
-	 *
-	 * @param object $item
-	 * @param bool   $disabled
-	 */
-	protected function disable($item, $disabled) {
-		if (method_exists($item , 'getSubItems')) {
-			foreach ($item->getSubItems() as $sub_item) {
-				$this->disable($sub_item, $disabled);
-			}
-		}
-
-		if (method_exists($item, 'setDisabled')) {
-			$item->setDisabled($disabled);
-		}
-	}
-
-
+        if (method_exists($item, 'setDisabled')) {
+            $item->setDisabled($disabled);
+        }
+    }
 
 }

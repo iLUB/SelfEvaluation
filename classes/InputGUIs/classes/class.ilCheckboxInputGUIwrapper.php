@@ -24,21 +24,21 @@
 /**
  * Class ilCheckboxInputGUIwrapper
  * Improve input validation check: make sure the value is boolean
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
- * @see https://www.ilias.de/mantis/view.php?id=13499
+ * @see     https://www.ilias.de/mantis/view.php?id=13499
  */
-class ilCheckboxInputGUIwrapper extends ilCheckboxInputGUI {
-	/**
-	 * Check input, strip slashes etc. set alert, if input is not ok.
-	 *
-	 * @return	boolean		Input ok, true/false
-	 */
-	function checkInput() {
-		$ok = parent::checkInput();
-		$_POST[$this->getPostVar()] = (bool)$_POST[$this->getPostVar()];
+class ilCheckboxInputGUIwrapper extends ilCheckboxInputGUI
+{
+    /**
+     * Check input, strip slashes etc. set alert, if input is not ok.
+     * @return    boolean        Input ok, true/false
+     */
+    function checkInput()
+    {
+        $ok = parent::checkInput();
+        $_POST[$this->getPostVar()] = (bool) $_POST[$this->getPostVar()];
 
-		return $ok;
-	}
+        return $ok;
+    }
 }

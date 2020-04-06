@@ -3,11 +3,11 @@ require_once('class.ilSelfEvaluationVirtualQuestionBlock.php');
 
 /**
  * Class ilSelfEvaluationVirtualOverallBlock
- *
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationVirtualOverallBlock extends ilSelfEvaluationVirtualQuestionBlock {
+class ilSelfEvaluationVirtualOverallBlock extends ilSelfEvaluationVirtualQuestionBlock
+{
     /**
      * @var ilObjSelfEvaluationGUI
      */
@@ -16,7 +16,8 @@ class ilSelfEvaluationVirtualOverallBlock extends ilSelfEvaluationVirtualQuestio
     /**
      * @param $parent_id
      */
-    function __construct(ilObjSelfEvaluationGUI $parent) {
+    function __construct(ilObjSelfEvaluationGUI $parent)
+    {
         $this->parent_gui = $parent;
         $this->setId($this->parent_gui->object->getId());
         $this->setParentId($this->parent_gui->ref_id);
@@ -25,4 +26,5 @@ class ilSelfEvaluationVirtualOverallBlock extends ilSelfEvaluationVirtualQuestio
 
     }
 }
+
 ?>

@@ -25,126 +25,125 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
 
 /**
  * Class iLubFieldDefinitionContainer
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class iLubFieldDefinitionContainer {
+class iLubFieldDefinitionContainer
+{
 
-	/**
-	 * @var int
-	 */
-	protected $id;
-	/**
-	 * @var iLubFieldDefinition[]
-	 */
-	protected $field_definitions = array();
-	/**
-	 * @var iLubFieldDefinitionFactory
-	 */
-	protected $factory;
+    /**
+     * @var int
+     */
+    protected $id;
+    /**
+     * @var iLubFieldDefinition[]
+     */
+    protected $field_definitions = array();
+    /**
+     * @var iLubFieldDefinitionFactory
+     */
+    protected $factory;
 
+    /**
+     * Constructor
+     * @param iLubFieldDefinitionFactory $factory
+     * @param int                        $id
+     */
+    public function __construct(iLubFieldDefinitionFactory $factory, $id = 0)
+    {
+        $this->factory = $factory;
+        $this->setId($id);
 
-	/**
-	 * Constructor
-	 *
-	 * @param iLubFieldDefinitionFactory $factory
-	 * @param int                        $id
-	 */
-	public function __construct(iLubFieldDefinitionFactory $factory, $id = 0) {
-		$this->factory = $factory;
-		$this->setId($id);
+        if ($this->getId() > 0) {
+            $this->read();
+        }
+    }
 
-		if ($this->getId() > 0) {
-			$this->read();
-		}
-	}
+    /**
+     * Creates the table setup for the field definitions. Should be called in dbupdate.sql
+     */
+    public function initDB()
+    {
+        $field = $this->factory->createILubFieldDefinition();
+        $field->initDB();
+    }
 
+    /**
+     * Read DB entries
+     */
+    protected function read()
+    {
+        global $DIC;
+        /**
+         * @var $DIC ILIAS\DI\Container
+         */
 
-	/**
-	 * Creates the table setup for the field definitions. Should be called in dbupdate.sql
-	 */
-	public function initDB() {
-		$field = $this->factory->createILubFieldDefinition();
-		$field->initDB();
-	}
-
-
-	/**
-	 * Read DB entries
-	 */
-	protected function read() {
-		global $DIC;
-		/**
-		 * @var $DIC ILIAS\DI\Container
-		 */
-
-		$field = $this->factory->createILubFieldDefinition();
-		$stmt = $DIC->database()->prepare('SELECT * FROM ' . $field->getTableName() . ' WHERE
+        $field = $this->factory->createILubFieldDefinition();
+        $stmt = $DIC->database()->prepare('SELECT * FROM ' . $field->getTableName() . ' WHERE
 		container_id = ? ORDER BY position ASC;',
-			array('integer'));
-		$DIC->database()->execute($stmt, array($this->getId()));
+            array('integer'));
+        $DIC->database()->execute($stmt, array($this->getId()));
 
-		while ($row = $DIC->database()->fetchObject($stmt)) {
-			$field = $this->factory->createILubFieldDefinition();
-			$field->setId($row->field_id);
-			$field->setContainerId($this->getId());
-			$field->setName($row->field_name);
-			$field->setShortTitle($row->short_title);
-			$field->setTypeId($row->field_type);
-			$field->setValues(unserialize($row->field_values));
-			$field->enableRequired($row->field_required);
-			$field->setPosition($row->position);
+        while ($row = $DIC->database()->fetchObject($stmt)) {
+            $field = $this->factory->createILubFieldDefinition();
+            $field->setId($row->field_id);
+            $field->setContainerId($this->getId());
+            $field->setName($row->field_name);
+            $field->setShortTitle($row->short_title);
+            $field->setTypeId($row->field_type);
+            $field->setValues(unserialize($row->field_values));
+            $field->enableRequired($row->field_required);
+            $field->setPosition($row->position);
 
-			$this->field_definitions[] = $field;
-		}
-	}
+            $this->field_definitions[] = $field;
+        }
+    }
 
+    /**
+     * @param \iLubFieldDefinition[] $field_definitions
+     */
+    public function setFieldDefinitions($field_definitions)
+    {
+        $this->field_definitions = $field_definitions;
+    }
 
-	/**
-	 * @param \iLubFieldDefinition[] $field_definitions
-	 */
-	public function setFieldDefinitions($field_definitions) {
-		$this->field_definitions = $field_definitions;
-	}
+    /**
+     * @return \iLubFieldDefinition[]
+     */
+    public function getFieldDefinitions()
+    {
+        return $this->field_definitions;
+    }
 
+    /**
+     * @param iLubFieldDefinition $field_definition
+     */
+    public function addFieldDefinition(iLubFieldDefinition $field_definition)
+    {
+        $this->field_definitions[] = $field_definition;
+    }
 
-	/**
-	 * @return \iLubFieldDefinition[]
-	 */
-	public function getFieldDefinitions() {
-		return $this->field_definitions;
-	}
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param iLubFieldDefinition $field_definition
-	 */
-	public function addFieldDefinition(iLubFieldDefinition $field_definition) {
-		$this->field_definitions[] = $field_definition;
-	}
-
-
-	/**
-	 * @param int $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-
-	/**
-	 * @return \iLubFieldDefinitionFactory
-	 */
-	public function getFactory() {
-		return $this->factory;
-	}
+    /**
+     * @return \iLubFieldDefinitionFactory
+     */
+    public function getFactory()
+    {
+        return $this->factory;
+    }
 }

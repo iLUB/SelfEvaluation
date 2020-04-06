@@ -23,68 +23,68 @@
 
 /**
  * Class ilSelfEvaluationTableAction
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationTableAction {
+class ilSelfEvaluationTableAction
+{
 
-	/**
-	 * @var string
-	 */
-	protected $title;
-	/**
-	 * @var string
-	 */
-	protected $cmd;
-	/**
-	 * @var string
-	 */
-	protected $link;
+    /**
+     * @var string
+     */
+    protected $title;
+    /**
+     * @var string
+     */
+    protected $cmd;
+    /**
+     * @var string
+     */
+    protected $link;
 
     /**
      * @var int
      */
     protected $position = 0;
 
-
     /**
-     * @param $title
-     * @param $cmd
-     * @param $link
+     * @param     $title
+     * @param     $cmd
+     * @param     $link
      * @param int $position
      */
-    public function __construct($title, $cmd, $link, $position = 0) {
-		$this->title = $title;
-		$this->cmd = $cmd;
-		$this->link = $link;
+    public function __construct($title, $cmd, $link, $position = 0)
+    {
+        $this->title = $title;
+        $this->cmd = $cmd;
+        $this->link = $link;
         $this->setPosition($position);
-	}
+    }
 
+    /**
+     * @return string
+     */
+    public function getCmd()
+    {
+        return $this->cmd;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getCmd() {
-		return $this->cmd;
-	}
+    /**
+     * @return string
+     */
+    public function getLink()
+    {
+        return $this->link;
+    }
 
-
-	/**
-	 * @return string
-	 */
-	public function getLink() {
-		return $this->link;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
 
     /**
      * @param int $position
@@ -101,6 +101,5 @@ class ilSelfEvaluationTableAction {
     {
         return $this->position;
     }
-
 
 }

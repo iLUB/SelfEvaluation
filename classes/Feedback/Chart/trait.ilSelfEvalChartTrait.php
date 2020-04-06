@@ -9,23 +9,26 @@ trait ilSelfEvalChartTrait
     protected $canvas_width = "99%";
     protected $canvas_height = "450px";
 
-
-    protected function getLegend(){
+    protected function getLegend()
+    {
         $legend = new ilChartLegend();
         $legend->setBackground($this->getChartColors()[0]);
         return $legend;
     }
+
     /**
      * @return mixed
      */
-    protected function getBackgroundColor(){
+    protected function getBackgroundColor()
+    {
         return $this->getChartColors()[0];
     }
 
     /**
      * @return array containing color codes
      */
-    protected function getChartColors() {
+    protected function getChartColors()
+    {
         return array(
             '#00CCFF',
             '#00CC99',
@@ -45,7 +48,7 @@ trait ilSelfEvalChartTrait
     /**
      * @return string
      */
-    public function getCanvasWidth(): string
+    public function getCanvasWidth() : string
     {
         return $this->canvas_width;
     }
@@ -61,7 +64,7 @@ trait ilSelfEvalChartTrait
     /**
      * @return string
      */
-    public function getCanvasHeight(): string
+    public function getCanvasHeight() : string
     {
         return $this->canvas_height;
     }

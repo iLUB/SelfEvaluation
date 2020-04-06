@@ -25,42 +25,40 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
 /**
  * Class ilSelectInputGUIwrapper
  * Improve input validation check: allowed POST values should match one of the set options.
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelectInputGUIwithDefaultText extends ilSelectInputGUIwrapper {
+class ilSelectInputGUIwithDefaultText extends ilSelectInputGUIwrapper
+{
 
-	const IGNORE_KEY = 'ilsel_dummy';
+    const IGNORE_KEY = 'ilsel_dummy';
 
+    /**
+     * Prepends the options with an information text "select an item"
+     * @param array $a_options
+     */
+    function setOptions($a_options)
+    {
+        global $lng;
 
-	/**
-	 * Prepends the options with an information text "select an item"
-	 *
-	 * @param array $a_options
-	 */
-	function setOptions($a_options) {
-		global $lng;
+        parent::setOptions(array(self::IGNORE_KEY => $lng->txt('select_one')) + $a_options);
+    }
 
-		parent::setOptions(array(self::IGNORE_KEY => $lng->txt('select_one')) + $a_options);
-	}
+    /**
+     * Check input, strip slashes etc. set alert, if input is not ok.
+     * @return    boolean        Input ok, true/false
+     */
+    function checkInput()
+    {
+        global $lng;
 
+        $ok = parent::checkInput();
+        if ($ok AND $this->getRequired() AND $_POST[$this->getPostVar()] == self::IGNORE_KEY) {
+            $this->setAlert($lng->txt('msg_input_is_required'));
 
-	/**
-	 * Check input, strip slashes etc. set alert, if input is not ok.
-	 *
-	 * @return	boolean		Input ok, true/false
-	 */
-	function checkInput() {
-		global $lng;
+            return false;
+        }
 
-		$ok = parent::checkInput();
-		if ($ok AND $this->getRequired() AND $_POST[$this->getPostVar()] == self::IGNORE_KEY) {
-			$this->setAlert($lng->txt('msg_input_is_required'));
-
-			return FALSE;
-		}
-
-		return $ok;
-	}
+        return $ok;
+    }
 }

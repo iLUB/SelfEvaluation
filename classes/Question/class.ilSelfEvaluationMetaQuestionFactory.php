@@ -25,20 +25,19 @@ require_once(dirname(__FILE__) . '/class.ilSelfEvaluationMetaQuestion.php');
 
 /**
  * Class ilSelfEvaluaitonMetaQuestionFactory
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaQuestionFactory extends iLubFieldDefinitionFactory {
+class ilSelfEvaluationMetaQuestionFactory extends iLubFieldDefinitionFactory
+{
 
-	/**
-	 * @param int $container_id
-	 *
-	 * @param int $field_id
-	 *
-	 * @return iLubFieldDefinition
-	 */
-	public function createILubFieldDefinition($container_id = 0, $field_id = 0) {
-		return new ilSelfEvaluationMetaQuestion($container_id, $field_id);
-	}
+    /**
+     * @param int $container_id
+     * @param int $field_id
+     * @return iLubFieldDefinition
+     */
+    public function createILubFieldDefinition($container_id = 0, $field_id = 0)
+    {
+        return new ilSelfEvaluationMetaQuestion($container_id, $field_id);
+    }
 }

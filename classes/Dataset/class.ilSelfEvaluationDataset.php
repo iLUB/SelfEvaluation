@@ -6,353 +6,356 @@ require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestio
 require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedback.php');
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
 require_once(dirname(__FILE__) . '/../Identity/class.ilSelfEvaluationIdentity.php');
+
 /**
  * ilSelfEvaluationDataset
- *
  * @author  Fabian Schmid <fs@studer-raimann.ch>
- *
  * @version
  */
-class ilSelfEvaluationDataset {
+class ilSelfEvaluationDataset
+{
 
-	const TABLE_NAME = 'rep_robj_xsev_ds';
-	/**
-	 * @var int
-	 */
-	public $id = 0;
-	/**
-	 * @var int
-	 */
-	protected $identifier_id = 0;
-	/**
-	 * @var int
-	 */
-	protected $creation_date = 0;
+    const TABLE_NAME = 'rep_robj_xsev_ds';
+    /**
+     * @var int
+     */
+    public $id = 0;
+    /**
+     * @var int
+     */
+    protected $identifier_id = 0;
+    /**
+     * @var int
+     */
+    protected $creation_date = 0;
 
     /**
      * @var int
      */
-	static protected $highest_scale = 0;
+    static protected $highest_scale = 0;
 
     /**
      * @var bool
      */
-	protected $percentage_per_block = false;
-
-	/**
-	 * @param $id
-	 */
-	function __construct($id = 0) {
-		global $ilDB;
-		/**
-		 * @var $ilDB ilDB
-		 */
-		$this->id = $id;
-		$this->db = $ilDB;
-		if ($id != 0) {
-			$this->read();
-		}
-	}
-
-
-	public function read() {
-		$set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
-			. $this->db->quote($this->getId(), 'integer'));
-		while ($rec = $this->db->fetchObject($set)) {
-			$this->setObjectValuesFromRecord($this, $rec);
-		}
-	}
-
-
-	/**
-	 * @return array
-	 */
-	public function getArrayForDb() {
-		$e = array();
-		foreach (get_object_vars($this) as $k => $v) {
-			if (! in_array($k, array( 'db','percentage_per_block' ))) {
-				$e[$k] = array( self::_getType($v), $this->$k );
-			}
-		}
-
-		return $e;
-	}
-
-
-	/**
-	 * @param ilSelfEvaluationDataset $data_set
-	 * @param stdClass                $rec
-	 */
-	protected function setObjectValuesFromRecord(ilSelfEvaluationDataset &$data_set, $rec) {
-		foreach ($this->getArrayForDb() as $k => $v) {
-			$data_set->{$k} = $rec->{$k};
-		}
-	}
-
-
-	/**
-	 * @param string $postvar_key
-	 *
-	 * @return string|false
-	 */
-	protected function determineQuestionType($postvar_key) {
-		$type = FALSE;
-
-		if (strpos($postvar_key, ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX) === 0) {
-			$type = ilSelfEvaluationData::QUESTION_TYPE;
-		} else if (strpos($postvar_key, ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX) === 0) {
-			$type = ilSelfEvaluationData::META_QUESTION_TYPE;
-		}
-
-		return $type;
-	}
-
-
-	/**
-	 * @param string $question_type
-	 * @param string $postvar_key
-	 *
-	 * @return int|false
-	 */
-	protected function getQuestionId($question_type, $postvar_key) {
-		$qid = FALSE;
-
-		if ($question_type == ilSelfEvaluationData::QUESTION_TYPE) {
-			$qid = (int)str_replace(ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
-		} else if ($question_type == ilSelfEvaluationData::META_QUESTION_TYPE) {
-			$qid = (int)str_replace(ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
-		}
-
-		return $qid;
-	}
-
-
-	/**
-	 * @param int $qid
-	 * @param string $question_type
-	 *
-	 * @return bool
-	 */
-	protected function questionExists($qid, $question_type) {
-		if ($question_type == ilSelfEvaluationData::QUESTION_TYPE) {
-			return ilSelfEvaluationQuestion::_isObject($qid);
-		} else if ($question_type == ilSelfEvaluationData::META_QUESTION_TYPE) {
-			return ilSelfEvaluationMetaQuestion::isObject($qid);
-		}
-
-		return FALSE;
-	}
-
-
-	/**
-	 * @param $post
-	 *
-	 * @return array
-	 */
-	protected function getDataFromPost($post) {
-		$data = array();
-		foreach ($post as $k => $v) {
-			$type = $this->determineQuestionType($k);
-			if ($type === false) {
-				continue;
-			}
-			$qid = $this->getQuestionId($type, $k);
-			if ($qid === false) {
-				continue;
-			}
-
-			if ($this->questionExists($qid, $type)) {
-				$data[] = array( 'qid' => $qid, 'value' => $v, 'type' => $type );
-			}
-		}
-
-		return $data;
-	}
-
-
-	final function initDB() {
-		$fields = array();
-		foreach ($this->getArrayForDb() as $k => $v) {
-			$fields[$k] = array(
-				'type' => $v[0],
-			);
-			switch ($v[0]) {
-				case 'integer':
-					$fields[$k]['length'] = 4;
-					break;
-				case 'text':
-					$fields[$k]['length'] = 1024;
-					break;
-			}
-			if ($k == 'id') {
-				$fields[$k]['notnull'] = true;
-			}
-		}
-		if (! $this->db->tableExists(self::TABLE_NAME)) {
-			$this->db->createTable(self::TABLE_NAME, $fields);
-			$this->db->addPrimaryKey(self::TABLE_NAME, array( 'id' ));
-			$this->db->createSequence(self::TABLE_NAME);
-		}
-	}
-
-
-	final private function resetDB() {
-		$this->db->dropTable(self::TABLE_NAME);
-		$this->initDB();
-	}
-
-
-	public function create() {
-		if ($this->getId() != 0) {
-			$this->update();
-
-			return;
-		}
-		$this->setId($this->db->nextID(self::TABLE_NAME));
-		$this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function delete() {
-		$this->db->manipulate('DELETE FROM ' . ilSelfEvaluationData::TABLE_NAME . ' WHERE dataset_id = '
-			. $this->db->quote($this->getId(), 'integer'));
-
-		return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
-			. $this->db->quote($this->getId(), 'integer'));
-	}
-
-
-	public function update() {
-		if ($this->getId() == 0) {
-			$this->create();
-
-			return;
-		}
-		$this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
-			'id' => array(
-				'integer',
-				$this->getId()
-			),
-		));
-	}
-
-
-	/**
-	 * @param $array array (qid => int, value => string, type => string)
-	 */
-	public function saveValuesByArray($array) {
-		if ($this->getId() == 0) {
-			$this->create();
-		}
-
-		$qids = [];
-
-		foreach ($array as $item) {
-			if(!array_key_exists($item['type'].$item['qid'],$qids))
-			{
-				$da = new ilSelfEvaluationData();
-				$da->setDatasetId($this->getId());
-				$da->setQuestionId($item['qid']);
-				$da->setValue($item['value']);
-				$da->setQuestionType($item['type']);
-				$da->setCreationDate(time());
-				$da->create();
-				$qids[$item['type'].$item['qid']] = true;
-			}
-		}
-	}
-
+    protected $percentage_per_block = false;
 
     /**
-     * @param $post
+     * @param $id
      */
-    public function saveValuesByPost($post) {
-		$this->saveValuesByArray($this->getDataFromPost($post));
-	}
+    function __construct($id = 0)
+    {
+        global $ilDB;
+        /**
+         * @var $ilDB ilDB
+         */
+        $this->id = $id;
+        $this->db = $ilDB;
+        if ($id != 0) {
+            $this->read();
+        }
+    }
 
-
-	/**
-	 * @param $array array (qid => int, value => string, type => string)
-	 */
-	public function updateValuesByArray($array) {
-		foreach ($array as $item) {
-			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $item['qid'], $item['type']);
-			$da->setValue($item['value']);
-			$da->update();
-		}
-	}
-
-
-	/**
-	 * @param $post
-	 */
-	public function updateValuesByPost($post) {
-		$this->updateValuesByArray($this->getDataFromPost($post));
-	}
-
-
-	/**
-	 * @param $block_id
-	 *
-	 * @return mixed
-	 */
-	public function getDataPerBlock($block_id) {
-		$sum = array();
-		foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block_id) as $qst) {
-			$da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $qst->getId());
-			$sum[$qst->getId()] = (int)$da->getValue();
-		}
-
-		return $sum;
-	}
-
+    public function read()
+    {
+        $set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
+            . $this->db->quote($this->getId(), 'integer'));
+        while ($rec = $this->db->fetchObject($set)) {
+            $this->setObjectValuesFromRecord($this, $rec);
+        }
+    }
 
     /**
      * @return array
      */
-	public function getMinPercentageBlock(){
-		$min = 100;
+    public function getArrayForDb()
+    {
+        $e = array();
+        foreach (get_object_vars($this) as $k => $v) {
+            if (!in_array($k, array('db', 'percentage_per_block'))) {
+                $e[$k] = array(self::_getType($v), $this->$k);
+            }
+        }
+
+        return $e;
+    }
+
+    /**
+     * @param ilSelfEvaluationDataset $data_set
+     * @param stdClass                $rec
+     */
+    protected function setObjectValuesFromRecord(ilSelfEvaluationDataset &$data_set, $rec)
+    {
+        foreach ($this->getArrayForDb() as $k => $v) {
+            $data_set->{$k} = $rec->{$k};
+        }
+    }
+
+    /**
+     * @param string $postvar_key
+     * @return string|false
+     */
+    protected function determineQuestionType($postvar_key)
+    {
+        $type = false;
+
+        if (strpos($postvar_key, ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX) === 0) {
+            $type = ilSelfEvaluationData::QUESTION_TYPE;
+        } else {
+            if (strpos($postvar_key, ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX) === 0) {
+                $type = ilSelfEvaluationData::META_QUESTION_TYPE;
+            }
+        }
+
+        return $type;
+    }
+
+    /**
+     * @param string $question_type
+     * @param string $postvar_key
+     * @return int|false
+     */
+    protected function getQuestionId($question_type, $postvar_key)
+    {
+        $qid = false;
+
+        if ($question_type == ilSelfEvaluationData::QUESTION_TYPE) {
+            $qid = (int) str_replace(ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
+        } else {
+            if ($question_type == ilSelfEvaluationData::META_QUESTION_TYPE) {
+                $qid = (int) str_replace(ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
+            }
+        }
+
+        return $qid;
+    }
+
+    /**
+     * @param int    $qid
+     * @param string $question_type
+     * @return bool
+     */
+    protected function questionExists($qid, $question_type)
+    {
+        if ($question_type == ilSelfEvaluationData::QUESTION_TYPE) {
+            return ilSelfEvaluationQuestion::_isObject($qid);
+        } else {
+            if ($question_type == ilSelfEvaluationData::META_QUESTION_TYPE) {
+                return ilSelfEvaluationMetaQuestion::isObject($qid);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $post
+     * @return array
+     */
+    protected function getDataFromPost($post)
+    {
+        $data = array();
+        foreach ($post as $k => $v) {
+            $type = $this->determineQuestionType($k);
+            if ($type === false) {
+                continue;
+            }
+            $qid = $this->getQuestionId($type, $k);
+            if ($qid === false) {
+                continue;
+            }
+
+            if ($this->questionExists($qid, $type)) {
+                $data[] = array('qid' => $qid, 'value' => $v, 'type' => $type);
+            }
+        }
+
+        return $data;
+    }
+
+    final function initDB()
+    {
+        $fields = array();
+        foreach ($this->getArrayForDb() as $k => $v) {
+            $fields[$k] = array(
+                'type' => $v[0],
+            );
+            switch ($v[0]) {
+                case 'integer':
+                    $fields[$k]['length'] = 4;
+                    break;
+                case 'text':
+                    $fields[$k]['length'] = 1024;
+                    break;
+            }
+            if ($k == 'id') {
+                $fields[$k]['notnull'] = true;
+            }
+        }
+        if (!$this->db->tableExists(self::TABLE_NAME)) {
+            $this->db->createTable(self::TABLE_NAME, $fields);
+            $this->db->addPrimaryKey(self::TABLE_NAME, array('id'));
+            $this->db->createSequence(self::TABLE_NAME);
+        }
+    }
+
+    final private function resetDB()
+    {
+        $this->db->dropTable(self::TABLE_NAME);
+        $this->initDB();
+    }
+
+    public function create()
+    {
+        if ($this->getId() != 0) {
+            $this->update();
+
+            return;
+        }
+        $this->setId($this->db->nextID(self::TABLE_NAME));
+        $this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
+    }
+
+    /**
+     * @return int
+     */
+    public function delete()
+    {
+        $this->db->manipulate('DELETE FROM ' . ilSelfEvaluationData::TABLE_NAME . ' WHERE dataset_id = '
+            . $this->db->quote($this->getId(), 'integer'));
+
+        return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
+            . $this->db->quote($this->getId(), 'integer'));
+    }
+
+    public function update()
+    {
+        if ($this->getId() == 0) {
+            $this->create();
+
+            return;
+        }
+        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
+            'id' => array(
+                'integer',
+                $this->getId()
+            ),
+        ));
+    }
+
+    /**
+     * @param $array array (qid => int, value => string, type => string)
+     */
+    public function saveValuesByArray($array)
+    {
+        if ($this->getId() == 0) {
+            $this->create();
+        }
+
+        $qids = [];
+
+        foreach ($array as $item) {
+            if (!array_key_exists($item['type'] . $item['qid'], $qids)) {
+                $da = new ilSelfEvaluationData();
+                $da->setDatasetId($this->getId());
+                $da->setQuestionId($item['qid']);
+                $da->setValue($item['value']);
+                $da->setQuestionType($item['type']);
+                $da->setCreationDate(time());
+                $da->create();
+                $qids[$item['type'] . $item['qid']] = true;
+            }
+        }
+    }
+
+    /**
+     * @param $post
+     */
+    public function saveValuesByPost($post)
+    {
+        $this->saveValuesByArray($this->getDataFromPost($post));
+    }
+
+    /**
+     * @param $array array (qid => int, value => string, type => string)
+     */
+    public function updateValuesByArray($array)
+    {
+        foreach ($array as $item) {
+            $da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $item['qid'], $item['type']);
+            $da->setValue($item['value']);
+            $da->update();
+        }
+    }
+
+    /**
+     * @param $post
+     */
+    public function updateValuesByPost($post)
+    {
+        $this->updateValuesByArray($this->getDataFromPost($post));
+    }
+
+    /**
+     * @param $block_id
+     * @return mixed
+     */
+    public function getDataPerBlock($block_id)
+    {
+        $sum = array();
+        foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block_id) as $qst) {
+            $da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $qst->getId());
+            $sum[$qst->getId()] = (int) $da->getValue();
+        }
+
+        return $sum;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMinPercentageBlock()
+    {
+        $min = 100;
         $min_block_id = null;
 
-		$blocks_percentage = $this->getPercentagePerBlock();
+        $blocks_percentage = $this->getPercentagePerBlock();
 
-		foreach ($blocks_percentage as $block_id => $percentage){
-			if($percentage <= $min){
-				$min = round($percentage,2);
+        foreach ($blocks_percentage as $block_id => $percentage) {
+            if ($percentage <= $min) {
+                $min = round($percentage, 2);
                 $min_block_id = $block_id;
-			}
-		}
-        return ['block'=>$this->getBlockById($min_block_id),'percentage'=>$min];
-	}
+            }
+        }
+        return ['block' => $this->getBlockById($min_block_id), 'percentage' => $min];
+    }
 
     /**
      * @return ilSelfEvaluationBlock[]
      */
-    public function getMaxPercentageBlock(){
+    public function getMaxPercentageBlock()
+    {
         $max = 0;
         $max_block_id = null;
 
         $blocks_percentage = $this->getPercentagePerBlock();
 
-        foreach ($blocks_percentage as $block_id => $percentage){
-            if($percentage >= $max){
-                $max = round($percentage,2);
+        foreach ($blocks_percentage as $block_id => $percentage) {
+            if ($percentage >= $max) {
+                $max = round($percentage, 2);
                 $max_block_id = $block_id;
             }
         }
 
-        return ['block'=>$this->getBlockById($max_block_id),'percentage'=>$max];
+        return ['block' => $this->getBlockById($max_block_id), 'percentage' => $max];
     }
 
-	/**
-	 * @return array
-	 * @description return array(block_id => percentage)
-	 */
-	public function getPercentagePerBlock() {
-		if(!$this->percentage_per_block){
+    /**
+     * @return array
+     * @description return array(block_id => percentage)
+     */
+    public function getPercentagePerBlock()
+    {
+        if (!$this->percentage_per_block) {
             $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
 
             $this->percentage_per_block = array();
@@ -365,33 +368,32 @@ class ilSelfEvaluationDataset {
                 $answer_total = array_sum($answer_data);
                 $anzahl_fragen = count($answer_data);
                 $possible_per_block = $anzahl_fragen * $highest;
-                if($possible_per_block != 0)
-                {
+                if ($possible_per_block != 0) {
                     $percentage = $answer_total / $possible_per_block * 100;
-                } else{
+                } else {
                     $percentage = 0;
                 }
 
                 $this->percentage_per_block[$block->getId()] = $percentage;
             }
-		}
+        }
 
-
-		return $this->percentage_per_block;
-	}
+        return $this->percentage_per_block;
+    }
 
     /**
      * @return mixed
      */
-	public function getHighestValueFromScale(){
-		if(!self::$highest_scale){
+    public function getHighestValueFromScale()
+    {
+        if (!self::$highest_scale) {
             $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
             $scale = ilSelfEvaluationScale::_getInstanceByObjId($obj_id)->getUnitsAsArray();
             $sorted_scale = array_keys($scale);
             sort($sorted_scale);
             self::$highest_scale = $sorted_scale[count($sorted_scale) - 1];
-		}
-		return self::$highest_scale;
+        }
+        return self::$highest_scale;
 
     }
 
@@ -399,44 +401,48 @@ class ilSelfEvaluationDataset {
      * @param $block_id
      * @return ilSelfEvaluationBlock
      */
-    public function getBlockById($block_id){
+    public function getBlockById($block_id)
+    {
         $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
 
         foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
-            if($block->getId() == $block_id){
-            	return $block;
-			}
+            if ($block->getId() == $block_id) {
+                return $block;
+            }
         }
     }
 
-	/**
-	 * @return float
-	 */
-	public function getOverallPercentage() {
-		$sum = 0;
-		$x = 0;
-		foreach ($this->getPercentagePerBlock() as $percentage) {
-			$sum += $percentage;
-			$x ++;
-		}
-
-		if($x == 0){
-			return 100;
-		}
-		return round($sum / $x, 2);
-	}
-
     /**
      * @return float
      */
-    public function getOverallVarianz() {
-        return round(sqrt($this->getVarianz($this->getPercentagePerBlock(),$this->getOverallPercentage())),2);
+    public function getOverallPercentage()
+    {
+        $sum = 0;
+        $x = 0;
+        foreach ($this->getPercentagePerBlock() as $percentage) {
+            $sum += $percentage;
+            $x++;
+        }
+
+        if ($x == 0) {
+            return 100;
+        }
+        return round($sum / $x, 2);
     }
 
     /**
      * @return float
      */
-    public function getOverallStandardabweichung() {
+    public function getOverallVarianz()
+    {
+        return round(sqrt($this->getVarianz($this->getPercentagePerBlock(), $this->getOverallPercentage())), 2);
+    }
+
+    /**
+     * @return float
+     */
+    public function getOverallStandardabweichung()
+    {
         return round(sqrt($this->getOverallVarianz()), 2);
     }
 
@@ -444,15 +450,16 @@ class ilSelfEvaluationDataset {
      * @param $data
      * @return float|int
      */
-    protected function getVarianz($data,$average) {
+    protected function getVarianz($data, $average)
+    {
         $squared_sum = 0;
         $x = 0;
         foreach ($data as $percentage) {
-            $squared_sum += pow($average-$percentage,2);
-            $x ++;
+            $squared_sum += pow($average - $percentage, 2);
+            $x++;
         }
 
-        if($x == 0){
+        if ($x == 0) {
             return 0;
         }
         return $squared_sum / $x;
@@ -463,15 +470,17 @@ class ilSelfEvaluationDataset {
      * @param $average
      * @return float
      */
-    protected function getStandardabweichung($data,$average) {
-        return sqrt($this->getVarianz($data,$average));
+    protected function getStandardabweichung($data, $average)
+    {
+        return sqrt($this->getVarianz($data, $average));
     }
 
     /**
      * @return array
      * @description return array(block_id => percentage)
      */
-    public function getStandardabweichungPerBlock() {
+    public function getStandardabweichungPerBlock()
+    {
         $return = array();
         $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
         $highest = $this->getHighestValueFromScale();
@@ -485,100 +494,100 @@ class ilSelfEvaluationDataset {
                 continue;
             }
 
-            foreach ($answer_data as $data){
-            	$data_as_percentage[] = $data/$highest*100;
-			}
+            foreach ($answer_data as $data) {
+                $data_as_percentage[] = $data / $highest * 100;
+            }
 
-            $return[$block->getId()] = round($this->getStandardabweichung($data_as_percentage,$answer_data_mean_percentage),2);
+            $return[$block->getId()] = round($this->getStandardabweichung($data_as_percentage,
+                $answer_data_mean_percentage), 2);
         }
 
         return $return;
     }
 
     /**
-	 * @param null $a_block_id
-	 *
-	 * @return ilSelfEvaluationFeedback[]
-	 */
-	public function getFeedbacksPerBlock($a_block_id = NULL) {
-		$return = array();
-		foreach ($this->getPercentagePerBlock() as $block_id => $percentage) {
-			$return[$block_id] = ilSelfEvaluationFeedback::_getFeedbackForPercentage($block_id, $percentage);;
-		}
-		if ($a_block_id) {
-			return $return[$a_block_id];
-		} else {
-			return $return;
-		}
-	}
+     * @param null $a_block_id
+     * @return ilSelfEvaluationFeedback[]
+     */
+    public function getFeedbacksPerBlock($a_block_id = null)
+    {
+        $return = array();
+        foreach ($this->getPercentagePerBlock() as $block_id => $percentage) {
+            $return[$block_id] = ilSelfEvaluationFeedback::_getFeedbackForPercentage($block_id, $percentage);;
+        }
+        if ($a_block_id) {
+            return $return[$a_block_id];
+        } else {
+            return $return;
+        }
+    }
 
 
-	//
-	// Static
-	//
-	/**
-	 * @param $identifier_id
-	 *
-	 * @return ilSelfEvaluationDataset[]
-	 */
-	public static function _getAllInstancesByIdentifierId($identifier_id) {
-		global $ilDB;
-		/**
-		 * @var $ilDB ilDB
-		 */
-		$return = array();
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-			. $ilDB->quote($identifier_id, 'integer') . ' ORDER BY creation_date ASC');
-		while ($rec = $ilDB->fetchObject($set)) {
-			$data_set = new ilSelfEvaluationDataset();
-			$data_set->setObjectValuesFromRecord($data_set, $rec);
-			$return[] = $data_set;
-		}
+    //
+    // Static
+    //
+    /**
+     * @param $identifier_id
+     * @return ilSelfEvaluationDataset[]
+     */
+    public static function _getAllInstancesByIdentifierId($identifier_id)
+    {
+        global $ilDB;
+        /**
+         * @var $ilDB ilDB
+         */
+        $return = array();
+        $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+            . $ilDB->quote($identifier_id, 'integer') . ' ORDER BY creation_date ASC');
+        while ($rec = $ilDB->fetchObject($set)) {
+            $data_set = new ilSelfEvaluationDataset();
+            $data_set->setObjectValuesFromRecord($data_set, $rec);
+            $return[] = $data_set;
+        }
 
-		return $return;
-	}
-
-
-	/**
-	 * @param      $obj_id
-	 * @param bool $as_array
-	 *
-	 * @return ilSelfEvaluationDataset[]
-	 */
-	public static function _getAllInstancesByObjectId($obj_id, $as_array = false, $identifier = "") {
-		global $DIC;
-
-		$return = array();
-		if($identifier == ""){
-            $identities = ilSelfEvaluationIdentity::_getAllInstancesByObjId($obj_id);
-        }else{
-            $identities = ilSelfEvaluationIdentity::_getAllInstancesForObjIdAndIdentifier($obj_id,$identifier);
-		}
-
-		foreach ($identities as $identity) {
-			$set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-				. $DIC->database()->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
-			while ($rec = $DIC->database()->fetchObject($set)) {
-				if ($as_array) {
-					$return[] = (array)$rec;
-				} else {
-					$data_set = new ilSelfEvaluationDataset();
-					$data_set->setObjectValuesFromRecord($data_set, $rec);
-					$return[] = $data_set;
-				}
-			}
-		}
-
-		return $return;
-	}
+        return $return;
+    }
 
     /**
      * @param      $obj_id
      * @param bool $as_array
-     *
      * @return ilSelfEvaluationDataset[]
      */
-    public static function _getAllInstancesByObjectIdOfCurrentUser($obj_id) {
+    public static function _getAllInstancesByObjectId($obj_id, $as_array = false, $identifier = "")
+    {
+        global $DIC;
+
+        $return = array();
+        if ($identifier == "") {
+            $identities = ilSelfEvaluationIdentity::_getAllInstancesByObjId($obj_id);
+        } else {
+            $identities = ilSelfEvaluationIdentity::_getAllInstancesForObjIdAndIdentifier($obj_id, $identifier);
+        }
+
+        foreach ($identities as $identity) {
+            $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+                . $DIC->database()->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
+            while ($rec = $DIC->database()->fetchObject($set)) {
+                if ($as_array) {
+                    $return[] = (array) $rec;
+                } else {
+                    $data_set = new ilSelfEvaluationDataset();
+                    $data_set->setObjectValuesFromRecord($data_set, $rec);
+                    $return[] = $data_set;
+                }
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * @param      $obj_id
+     * @param bool $as_array
+     * @return ilSelfEvaluationDataset[]
+     */
+    public static function _getAllInstancesByObjectIdOfCurrentUser($obj_id)
+    {
         global $DIC;
 
         $return = array();
@@ -587,135 +596,133 @@ class ilSelfEvaluationDataset {
                 . $DIC->database()->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
             while ($rec = $DIC->database()->fetchObject($set)) {
 
-                    $data_set = new ilSelfEvaluationDataset();
-                    $data_set->setObjectValuesFromRecord($data_set, $rec);
-                    $return[] = $data_set;
+                $data_set = new ilSelfEvaluationDataset();
+                $data_set->setObjectValuesFromRecord($data_set, $rec);
+                $return[] = $data_set;
             }
         }
 
         return $return;
     }
 
-	/**
-	 * @param $obj_id
-	 *
-	 * @return bool
-	 */
-	public static function _deleteAllInstancesByObjectId($obj_id) {
-		foreach (self::_getAllInstancesByObjectId($obj_id) as $obj) {
-			$obj->delete();
-		}
+    /**
+     * @param $obj_id
+     * @return bool
+     */
+    public static function _deleteAllInstancesByObjectId($obj_id)
+    {
+        foreach (self::_getAllInstancesByObjectId($obj_id) as $obj) {
+            $obj->delete();
+        }
 
-		return true;
-	}
+        return true;
+    }
 
+    /**
+     * @param $identifier_id
+     * @return bool|ilSelfEvaluationDataset
+     */
+    public static function _getInstanceByIdentifierId($identifier_id)
+    {
+        global $ilDB;
+        /**
+         * @var $ilDB ilDB
+         */
+        $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+            . $ilDB->quote($identifier_id, 'integer'));
+        while ($rec = $ilDB->fetchObject($set)) {
+            $data_set = new ilSelfEvaluationDataset();
+            $data_set->setObjectValuesFromRecord($data_set, $rec);
+            return $data_set;
+        }
 
-	/**
-	 * @param $identifier_id
-	 *
-	 * @return bool|ilSelfEvaluationDataset
-	 */
-	public static function _getInstanceByIdentifierId($identifier_id) {
-		global $ilDB;
-		/**
-		 * @var $ilDB ilDB
-		 */
-		$set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-			. $ilDB->quote($identifier_id, 'integer'));
-		while ($rec = $ilDB->fetchObject($set)) {
-			$data_set = new ilSelfEvaluationDataset();
-			$data_set->setObjectValuesFromRecord($data_set, $rec);
-			return $data_set;
-		}
+        return false;
+    }
 
-		return false;
-	}
+    /**
+     * @param $identifier_id
+     * @return ilSelfEvaluationDataset
+     */
+    public static function _getNewInstanceForIdentifierId($identifier_id)
+    {
+        $obj = new self();
+        $obj->setIdentifierId($identifier_id);
 
+        return $obj;
+    }
 
-	/**
-	 * @param $identifier_id
-	 *
-	 * @return ilSelfEvaluationDataset
-	 */
-	public static function _getNewInstanceForIdentifierId($identifier_id) {
-		$obj = new self();
-		$obj->setIdentifierId($identifier_id);
+    /**
+     * @param $identifier_id
+     * @return bool
+     */
+    public static function _datasetExists($identifier_id)
+    {
+        global $ilDB;
+        $set = $ilDB->query('SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+            . $ilDB->quote($identifier_id, 'integer'));
+        while ($rec = $ilDB->fetchObject($set)) {
+            return true;
+        }
 
-		return $obj;
-	}
+        return false;
+    }
 
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * @param $identifier_id
-	 *
-	 * @return bool
-	 */
-	public static function _datasetExists($identifier_id) {
-		global $ilDB;
-		$set = $ilDB->query('SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-			. $ilDB->quote($identifier_id, 'integer'));
-		while ($rec = $ilDB->fetchObject($set)) {
-			return true;
-		}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-		return false;
-	}
+    /**
+     * @param int $identifier_id
+     */
+    public function setIdentifierId($identifier_id)
+    {
+        $this->identifier_id = $identifier_id;
+    }
 
+    /**
+     * @return int
+     */
+    public function getIdentifierId()
+    {
+        return $this->identifier_id;
+    }
 
-	/**
-	 * @param int $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * @param int $creation_date
+     */
+    public function setCreationDate($creation_date)
+    {
+        $this->creation_date = $creation_date;
+    }
 
-
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-
-	/**
-	 * @param int $identifier_id
-	 */
-	public function setIdentifierId($identifier_id) {
-		$this->identifier_id = $identifier_id;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getIdentifierId() {
-		return $this->identifier_id;
-	}
-
-
-	/**
-	 * @param int $creation_date
-	 */
-	public function setCreationDate($creation_date) {
-		$this->creation_date = $creation_date;
-	}
-
-
-	/**
-	 * @return int
-	 */
-	public function getCreationDate() {
-		return $this->creation_date;
-	}
+    /**
+     * @return int
+     */
+    public function getCreationDate()
+    {
+        return $this->creation_date;
+    }
 
     /**
      * @return int
      * @throws Exception
      */
-    public function getSubmitDate(){
+    public function getSubmitDate()
+    {
         $latest_entry = ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId());
-        if($latest_entry){
+        if ($latest_entry) {
             return $latest_entry->getCreationDate();
         } else {
             throw new Exception("Invalid Entry");
@@ -726,36 +733,37 @@ class ilSelfEvaluationDataset {
      * @return int
      * @throws Exception
      */
-    public function getDuration(){
+    public function getDuration()
+    {
         $latest_entry = ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId());
-        if($latest_entry){
-            return $latest_entry->getCreationDate()-$this->getCreationDate();
+        if ($latest_entry) {
+            return $latest_entry->getCreationDate() - $this->getCreationDate();
         } else {
             throw new Exception("Invalid Entry");
         }
     }
 
-	//
-	// Helper
-	//
-	/**
-	 * @param $var
-	 *
-	 * @return string
-	 */
-	public static function _getType($var) {
-		switch (gettype($var)) {
-			case 'string':
-			case 'array':
-			case 'object':
-				return 'text';
-			case 'NULL':
-			case 'boolean':
-				return 'integer';
-			default:
-				return gettype($var);
-		}
-	}
+    //
+    // Helper
+    //
+    /**
+     * @param $var
+     * @return string
+     */
+    public static function _getType($var)
+    {
+        switch (gettype($var)) {
+            case 'string':
+            case 'array':
+            case 'object':
+                return 'text';
+            case 'NULL':
+            case 'boolean':
+                return 'integer';
+            default:
+                return gettype($var);
+        }
+    }
 }
 
 ?>

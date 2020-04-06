@@ -21,50 +21,61 @@
 	+-----------------------------------------------------------------------------+
 */
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Export/class.csvExport.php');
+
 /**
  * Class csvExample
- *
  * @author       Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- * @version $Id$
+ * @version      $Id$
  */
-class csvExample {
+class csvExample
+{
     /**
      * @var array
      */
-    protected $columns = array("column1","column2","column3");
+    protected $columns = array("column1", "column2", "column3");
     /**
      * @var array
      */
-    protected $rows_values = array(array("e1r1c1","e1r1c2","e1r1c3"),array("e1r2c1","e1r2c2","e1r2c3"),array("e1r3c1","e1r3c2","e1r3c3"));
+    protected $rows_values = array(array("e1r1c1", "e1r1c2", "e1r1c3"),
+                                   array("e1r2c1", "e1r2c2", "e1r2c3"),
+                                   array("e1r3c1", "e1r3c2", "e1r3c3")
+    );
     /**
      * @var array
      */
-    protected $rows_paired = array(array("column1"=>"e2r1c1","column2"=>"e2r1c2","column3"=>"e2r1c3"),array("column1"=>"e2c1","column3"=>"e2r2c3"),array("column3"=>"e2r3c3"),array("columnX"=>"e2r4cX","column1"=>"e2r4c1"));
-
+    protected $rows_paired = array(array("column1" => "e2r1c1", "column2" => "e2r1c2", "column3" => "e2r1c3"),
+                                   array("column1" => "e2c1", "column3" => "e2r2c3"),
+                                   array("column3" => "e2r3c3"),
+                                   array("columnX" => "e2r4cX", "column1" => "e2r4c1")
+    );
 
     /**
      * If csvExport is part of a bigger class. Maybe its better to outfactor specific csv export in a module and
      * make an own csvExport clas extending from csvExport
      * @var csvExportTable
      */
-    protected $csvExport= null;
+    protected $csvExport = null;
 
-    function __construct(){
+    function __construct()
+    {
         $this->csvExport = new csvExport();
     }
+
     /**
      * First example with $rows_values and $columns, rows must contain all values
      */
-    public function example1(){
-        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns,$this->rows_values);
+    public function example1()
+    {
+        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns, $this->rows_values);
         $this->csvExport->getCsvExport();
     }
 
     /**
      * second example with $rows_paired, missing values allowed
      */
-    public function example2(){
-        foreach($this->rows_paired as $row_paired){
+    public function example2()
+    {
+        foreach ($this->rows_paired as $row_paired) {
             $row = new csvExportRow();
             $row->addValuesFromPairedArray($row_paired);
             $this->csvExport->getTable()->addRow($row);
@@ -76,42 +87,44 @@ class csvExample {
     /**
      * Join the two previous example into one csv table and add one row with two values
      */
-    public function example3(){
-        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns,$this->rows_values);
+    public function example3()
+    {
+        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns, $this->rows_values);
 
-        foreach($this->rows_paired as $row_paired){
+        foreach ($this->rows_paired as $row_paired) {
             $row = new csvExportRow();
             $row->addValuesFromPairedArray($row_paired);
             $this->csvExport->getTable()->addRow($row);
         }
 
-        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns,$this->rows_values);
+        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns, $this->rows_values);
         $this->csvExport->getTable()->addRow(new csvExportRow(
-            array(new csvExportValue("column1","e3r1c1"),new csvExportValue("columnY","e3r1cY") )));
+            array(new csvExportValue("column1", "e3r1c1"), new csvExportValue("columnY", "e3r1cY"))));
         $this->csvExport->getCsvExport();
 
     }
 
-     /**
+    /**
      * Reorder positions of Columns
      */
-    public function example4(){
-        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns,$this->rows_values);
+    public function example4()
+    {
+        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns, $this->rows_values);
 
-        foreach($this->rows_paired as $row_paired){
+        foreach ($this->rows_paired as $row_paired) {
             $row = new csvExportRow();
             $row->addValuesFromPairedArray($row_paired);
             $this->csvExport->getTable()->addRow($row);
         }
 
-        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns,$this->rows_values);
+        $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns, $this->rows_values);
         $this->csvExport->getTable()->addRow(new csvExportRow(
-            array(new csvExportValue("column1","e3r1c1"),new csvExportValue("columnY","e3r1cY") )));
+            array(new csvExportValue("column1", "e3r1c1"), new csvExportValue("columnY", "e3r1cY"))));
 
-        $this->csvExport->getTable()->setPositionOfColumn("columnY",-1);
-        $this->csvExport->getTable()->setPositionOfColumn("column2",1);
-        $this->csvExport->getTable()->setPositionOfColumn("column1",3);
-        $this->csvExport->getTable()->setPositionOfColumn("column3",2);
+        $this->csvExport->getTable()->setPositionOfColumn("columnY", -1);
+        $this->csvExport->getTable()->setPositionOfColumn("column2", 1);
+        $this->csvExport->getTable()->setPositionOfColumn("column1", 3);
+        $this->csvExport->getTable()->setPositionOfColumn("column3", 2);
         $this->csvExport->getCsvExport();
 
     }
@@ -119,9 +132,10 @@ class csvExample {
     /**
      * Export Tablefrom DB
      */
-    public function example5(){
+    public function example5()
+    {
         $this->csvExport->getTable()->addDBTable("il_plugin");
-        $this->csvExport->getTable()->setPositionOfColumn("plugin_id",-1);
+        $this->csvExport->getTable()->setPositionOfColumn("plugin_id", -1);
         $this->csvExport->getCsvExport();
     }
 }

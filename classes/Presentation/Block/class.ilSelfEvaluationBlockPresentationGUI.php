@@ -1,11 +1,12 @@
 <?php
+
 /**
  * GUI-Class SelfEvaluation
- *
  * @author            Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version           $Id:
  */
-abstract class ilSelfEvaluationBlockPresentationGUI {
+abstract class ilSelfEvaluationBlockPresentationGUI
+{
     /**
      * @var ilSelfEvaluationBlock
      */
@@ -20,7 +21,8 @@ abstract class ilSelfEvaluationBlockPresentationGUI {
      * @param ilSelfEvaluationPresentationFormGUI $parent_form
      * @return ilPropertyFormGUI|ilSelfEvaluationPresentationFormGUI
      */
-    public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
+    public function getBlockForm(ilPropertyFormGUI $parent_form = null, $first = true)
+    {
         if ($parent_form) {
             $form = $parent_form;
         } else {
@@ -40,4 +42,5 @@ abstract class ilSelfEvaluationBlockPresentationGUI {
         return $form;
     }
 }
+
 ?>

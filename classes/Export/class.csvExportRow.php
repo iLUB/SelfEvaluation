@@ -26,11 +26,11 @@ require_once(dirname(__FILE__) . '/Exceptions/class.csvExportException.php');
 
 /**
  * Class csvExportRow
- *
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class csvExportRow {
+class csvExportRow
+{
     /**
      * @var csvExportValue[]
      */
@@ -48,7 +48,7 @@ class csvExportRow {
     {
         $this->columns = new csvExportColumns();
         $this->values = $values;
-        foreach($values as $value){
+        foreach ($values as $value) {
             $this->addValue($value);
         }
     }
@@ -60,7 +60,7 @@ class csvExportRow {
     {
         unset($this->values);
         $this->getColumns()->reset();
-        foreach($values as $value){
+        foreach ($values as $value) {
             $this->addValue($value);
         }
     }
@@ -79,9 +79,9 @@ class csvExportRow {
      */
     public function getValue(csvExportColumn $column)
     {
-        if(array_key_exists($column->getColumnId(),$this->values)){
+        if (array_key_exists($column->getColumnId(), $this->values)) {
             return $this->values[$column->getColumnId()];
-        }else{
+        } else {
             return null;
         }
     }
@@ -90,38 +90,44 @@ class csvExportRow {
      * @param csvExportValue $value
      * @throws csvExportException
      */
-    public function addValue(csvExportValue $value){
-        if($this->getColumns()->columnExists($value->getColumn())){
+    public function addValue(csvExportValue $value)
+    {
+        if ($this->getColumns()->columnExists($value->getColumn())) {
             throw new csvExportException(csvExportException::COLUMN_DOES_ALREADY_EXISTS_IN_ROW);
         }
         $this->columns->addColumn($value->getColumn());
         $this->values[$value->getColumn()->getColumnId()] = $value;
     }
 
-    public function getColumns(){
+    public function getColumns()
+    {
         return $this->columns;
     }
 
     /**
      * @param $values
      */
-    public function addValuesFromArray($column_names, $values){
-        foreach($values as $value){
-            $this->addValue(new csvExportValue(array_shift($column_names),$value));
-        }
-    }
-    /**
-     * @param $values
-     */
-    public function addValuesFromPairedArray($values){
-        foreach($values as $column_name => $value){
-            $this->addValue(new csvExportValue($column_name,$value));
+    public function addValuesFromArray($column_names, $values)
+    {
+        foreach ($values as $value) {
+            $this->addValue(new csvExportValue(array_shift($column_names), $value));
         }
     }
 
-    public function getValuesAsArray(){
+    /**
+     * @param $values
+     */
+    public function addValuesFromPairedArray($values)
+    {
+        foreach ($values as $column_name => $value) {
+            $this->addValue(new csvExportValue($column_name, $value));
+        }
+    }
+
+    public function getValuesAsArray()
+    {
         $values = array();
-        foreach($this->getValues() as $value){
+        foreach ($this->getValues() as $value) {
             $values[$value->getColumn()->getColumnId()] = $value->getValue();
         }
         return $values;

@@ -23,18 +23,16 @@
 
 /**
  * Class iLubFieldDefinitionFactory
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-abstract class iLubFieldDefinitionFactory {
+abstract class iLubFieldDefinitionFactory
+{
 
-	/**
-	 * @param int $container_id
-	 *
-	 * @param int $field_id
-	 *
-	 * @return iLubFieldDefinition
-	 */
-	abstract public function createILubFieldDefinition($container_id = 0, $field_id = 0);
+    /**
+     * @param int $container_id
+     * @param int $field_id
+     * @return iLubFieldDefinition
+     */
+    abstract public function createILubFieldDefinition($container_id = 0, $field_id = 0);
 }

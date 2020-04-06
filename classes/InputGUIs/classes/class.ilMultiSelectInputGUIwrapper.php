@@ -25,36 +25,35 @@
  * Class ilMultiSelectInputGUIwrapper
  * Improve input validation check: allowed POST values should match one of the set options.
  * Make width and height setting configurable.
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
- * @see https://www.ilias.de/mantis/view.php?id=13499
+ * @see     https://www.ilias.de/mantis/view.php?id=13499
  */
-class ilMultiSelectInputGUIwrapper extends ilMultiSelectInputGUI {
-	/**
-	 * Check input, strip slashes etc. set alert, if input is not ok.
-	 *
-	 * @return	boolean		Input ok, true/false
-	 */
-	function checkInput() {
-		global $lng;
+class ilMultiSelectInputGUIwrapper extends ilMultiSelectInputGUI
+{
+    /**
+     * Check input, strip slashes etc. set alert, if input is not ok.
+     * @return    boolean        Input ok, true/false
+     */
+    function checkInput()
+    {
+        global $lng;
 
-		$ok = parent::checkInput();
-		if ($ok) {
-			foreach ($_POST[$this->getPostVar()] as $k => $v) {
-				// Ignore 'select all'
-				if ($this->select_all AND $k == 0 AND $_POST[$this->getPostVar()][$k] == '') {
-					continue;
-				}
-				// Alert on invalid option
-				if (!array_key_exists($_POST[$this->getPostVar()][$k], $this->getOptions()))
-				{
-					$this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
-					return FALSE;
-				}
-			}
-		}
+        $ok = parent::checkInput();
+        if ($ok) {
+            foreach ($_POST[$this->getPostVar()] as $k => $v) {
+                // Ignore 'select all'
+                if ($this->select_all AND $k == 0 AND $_POST[$this->getPostVar()][$k] == '') {
+                    continue;
+                }
+                // Alert on invalid option
+                if (!array_key_exists($_POST[$this->getPostVar()][$k], $this->getOptions())) {
+                    $this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
+                    return false;
+                }
+            }
+        }
 
-		return $ok;
-	}
+        return $ok;
+    }
 }

@@ -23,11 +23,11 @@
 
 /**
  * Class csvExportColumn
- *
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class csvExportColumn {
+class csvExportColumn
+{
     /**
      * @var string
      */
@@ -44,11 +44,12 @@ class csvExportColumn {
     protected $position = 0;
 
     /**
-     * @param $column_id
+     * @param        $column_id
      * @param string $column_txt
-     * @param int $position
+     * @param int    $position
      */
-    function __construct($column_id, $column_txt = "", $position = 0){
+    function __construct($column_id, $column_txt = "", $position = 0)
+    {
         $this->setColumnId($column_id);
         $this->setColumnTxt($column_txt);
         $this->setPosition($position);
@@ -83,15 +84,12 @@ class csvExportColumn {
      */
     public function getColumnTxt()
     {
-        if($this->column_txt == ""){
+        if ($this->column_txt == "") {
             return $this->getColumnId();
-        }
-        else{
+        } else {
             return $this->column_txt;
         }
     }
-
-
 
     /**
      * @param int $position
@@ -108,6 +106,5 @@ class csvExportColumn {
     {
         return $this->position;
     }
-
 
 }

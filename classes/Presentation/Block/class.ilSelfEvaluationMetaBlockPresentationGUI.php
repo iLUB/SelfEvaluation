@@ -4,31 +4,33 @@ require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestio
 
 /**
  * GUI-Class SelfEvaluation
- *
  * @author            Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version           $Id:
  */
-class ilSelfEvaluationMetaBlockPresentationGUI  extends ilSelfEvaluationBlockPresentationGUI{
+class ilSelfEvaluationMetaBlockPresentationGUI extends ilSelfEvaluationBlockPresentationGUI
+{
     /**
      * @var ilSelfEvaluationMetaBlock
      */
     protected $object;
 
     /**
-     * @param ilObjSelfEvaluationGUI $parent
-     * @param ilSelfEvaluationMetaBlock  $block
+     * @param ilObjSelfEvaluationGUI    $parent
+     * @param ilSelfEvaluationMetaBlock $block
      */
-    function __construct(ilObjSelfEvaluationGUI $parent,ilSelfEvaluationMetaBlock $block) {
+    function __construct(ilObjSelfEvaluationGUI $parent, ilSelfEvaluationMetaBlock $block)
+    {
         $this->object = $block;
         $this->parent = $parent;
     }
+
     /**
      * @param ilPropertyFormGUI $parent_form
      * @param bool              $first
-     *
      * @return ilPropertyFormGUI
      */
-    public function getBlockForm(ilPropertyFormGUI $parent_form = NULL, $first = true) {
+    public function getBlockForm(ilPropertyFormGUI $parent_form = null, $first = true)
+    {
         $form = parent::getBlockForm($parent_form, $first);
 
         require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestionPresentationGUI.php');
@@ -37,4 +39,5 @@ class ilSelfEvaluationMetaBlockPresentationGUI  extends ilSelfEvaluationBlockPre
         return $question_gui->getQuestionForm($form);
     }
 }
+
 ?>

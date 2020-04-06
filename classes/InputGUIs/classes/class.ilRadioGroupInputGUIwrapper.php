@@ -24,39 +24,38 @@
 /**
  * Class ilRadioGroupInputGUIwrapper
  * Improve input validation check: allowed POST values should match one of the set options.
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
- * @see https://www.ilias.de/mantis/view.php?id=13499
+ * @see     https://www.ilias.de/mantis/view.php?id=13499
  */
-class ilRadioGroupInputGUIwrapper extends ilRadioGroupInputGUI {
-	/**
-	 * Check input, strip slashes etc. set alert, if input is not ok.
-	 *
-	 * @return	boolean		Input ok, true/false
-	 */
-	function checkInput() {
-		global $lng;
+class ilRadioGroupInputGUIwrapper extends ilRadioGroupInputGUI
+{
+    /**
+     * Check input, strip slashes etc. set alert, if input is not ok.
+     * @return    boolean        Input ok, true/false
+     */
+    function checkInput()
+    {
+        global $lng;
 
-		$ok = parent::checkInput();
-		// allow unset radio options
-		if (!$this->getRequired() && trim($_POST[$this->getPostVar()]) == "")
-		{
-			return true;
-		}
+        $ok = parent::checkInput();
+        // allow unset radio options
+        if (!$this->getRequired() && trim($_POST[$this->getPostVar()]) == "") {
+            return true;
+        }
 
-		$valid_option = FALSE;
-		/** @var ilRadioOption $option */
-		foreach ($this->getOptions() as $option) {
-			// check that one of the set options is selected
-			if ($_POST[$this->getPostVar()] == $option->getValue()) {
-				$valid_option = TRUE;
-			}
-		}
-		if (!$valid_option) {
-			$this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
-		}
+        $valid_option = false;
+        /** @var ilRadioOption $option */
+        foreach ($this->getOptions() as $option) {
+            // check that one of the set options is selected
+            if ($_POST[$this->getPostVar()] == $option->getValue()) {
+                $valid_option = true;
+            }
+        }
+        if (!$valid_option) {
+            $this->setAlert($lng->txt("msg_input_does_not_match_regexp"));
+        }
 
-		return $ok AND $valid_option;
-	}
+        return $ok AND $valid_option;
+    }
 }

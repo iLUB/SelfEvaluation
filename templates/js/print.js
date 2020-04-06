@@ -1,7 +1,7 @@
-printFeedback = function() {
+printFeedback = function () {
     this.originalBodyWidht = $("body").width();
 
-    window.onafterprint = function(e){
+    window.onafterprint = function (e) {
         $(window).off('mousemove', window.onafterprint);
         $("body").width(this.originalBodyWidht);
         console.log("On After Print");
@@ -12,7 +12,7 @@ printFeedback = function() {
             setTimeout(
                 function () {
                     window.print();
-                    setTimeout(function(){
+                    setTimeout(function () {
                         $(window).one('mousemove', window.onafterprint);
                         console.log("On After One");
 

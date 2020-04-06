@@ -24,75 +24,72 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
 
 /**
  * Class iLubFieldDefinitionTypeText
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class iLubFieldDefinitionTypeText extends iLubFieldDefinitionType {
+class iLubFieldDefinitionTypeText extends iLubFieldDefinitionType
+{
 
+    const TYPE_ID = 1;
 
-	const TYPE_ID = 1;
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return self::TYPE_ID;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return self::TYPE_ID;
-	}
+    /**
+     * Return a title in the users translation
+     * @return string
+     */
+    public function getTypeName()
+    {
+        global $lng;
+        $lng->loadLanguageModule('ps');
 
+        return $lng->txt('ps_type_txt_long');
+    }
 
-	/**
-	 * Return a title in the users translation
-	 *
-	 * @return string
-	 */
-	public function getTypeName() {
-		global $lng;
-		$lng->loadLanguageModule('ps');
+    /**
+     * @param iLubFieldDefinitionTypeOption $option
+     * @return iLubFieldDefinitionTypeOption
+     */
+    public function getValueDefinitionInputGUI(iLubFieldDefinitionTypeOption &$option)
+    {
+        return $option;
+    }
 
-		return $lng->txt('ps_type_txt_long');
-	}
+    /**
+     * @param iLubFieldDefinitionTypeOption $item
+     * @param array                         $values
+     */
+    public function setValues(iLubFieldDefinitionTypeOption $item, $values = array())
+    {
+    }
 
+    /**
+     * @param ilPropertyFormGUI $form
+     * @return array
+     */
+    public function getValues(ilPropertyFormGUI $form)
+    {
+        return array();
+    }
 
-	/**
-	 * @param iLubFieldDefinitionTypeOption $option
-	 *
-	 * @return iLubFieldDefinitionTypeOption
-	 */
-	public function getValueDefinitionInputGUI(iLubFieldDefinitionTypeOption &$option) {
-		return $option;
-	}
+    /**
+     * @param string $title
+     * @param string $postvar
+     * @param array  $values
+     * @return ilFormPropertyGUI
+     */
+    public function getPresentationInputGUI($title, $postvar, $values)
+    {
+        $text = new ilTextInputGUI($title, $postvar);
+        $text->setSize(32);
+        $text->setMaxLength(255);
 
-
-	/**
-	 * @param iLubFieldDefinitionTypeOption $item
-	 * @param array                         $values
-	 */
-	public function setValues(iLubFieldDefinitionTypeOption $item, $values = array()) {}
-
-
-	/**
-	 * @param ilPropertyFormGUI $form
-	 *
-	 * @return array
-	 */
-	public function getValues(ilPropertyFormGUI $form) {
-		return array();
-	}
-
-
-	/**
-	 * @param string $title
-	 * @param string $postvar
-	 * @param array  $values
-	 *
-	 * @return ilFormPropertyGUI
-	 */
-	public function getPresentationInputGUI($title, $postvar, $values) {
-		$text = new ilTextInputGUI($title, $postvar);
-		$text->setSize(32);
-		$text->setMaxLength(255);
-
-		return $text;
-	}
+        return $text;
+    }
 }

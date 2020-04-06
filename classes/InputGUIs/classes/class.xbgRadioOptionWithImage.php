@@ -24,33 +24,35 @@ require_once('Services/Form/classes/class.ilRadioOption.php');
 
 /**
  * Class xbgRadioOptionWithImage
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class xbgRadioOptionWithImage extends ilRadioOption {
+class xbgRadioOptionWithImage extends ilRadioOption
+{
 
-	/**
-	 * @param string $radio_group_field_id  use ilRadioGroupInputGUI->getFieldId()
-	 * @param string $title                 text of the radio option
-	 * @param string $value                 value of the radio option
-	 * @param string $image_path            path to the image
-	 * @param string $image_alt_text        alternative text
-	 * @param string $class                 this class is set to the image element
-	 */
-	function __construct($radio_group_field_id, $title, $value, $image_path, $image_alt_text = '', $class = 'radio_img') {
-		$this->setTitle($title);
-		$this->setValue($value);
-		if ($image_alt_text = '') {
-			$image_alt_text = $value;
-		}
+    /**
+     * @param string $radio_group_field_id use ilRadioGroupInputGUI->getFieldId()
+     * @param string $title                text of the radio option
+     * @param string $value                value of the radio option
+     * @param string $image_path           path to the image
+     * @param string $image_alt_text       alternative text
+     * @param string $class                this class is set to the image element
+     */
+    function __construct($radio_group_field_id, $title, $value, $image_path, $image_alt_text = '', $class = 'radio_img')
+    {
+        $this->setTitle($title);
+        $this->setValue($value);
+        if ($image_alt_text = '') {
+            $image_alt_text = $value;
+        }
 
-		$template = new ilTemplate('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/templates/tpl.radio_option_with_images.html', TRUE, TRUE);
-		$template->setVariable('OP_ID', $radio_group_field_id . '_' . $value);
-		$template->setVariable('IMG_PATH', $image_path);
-		$template->setVariable('IMG_CLASS', $class);
-		$template->setVariable('ALT_TXT', $image_alt_text);
+        $template = new ilTemplate('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/templates/tpl.radio_option_with_images.html',
+            true, true);
+        $template->setVariable('OP_ID', $radio_group_field_id . '_' . $value);
+        $template->setVariable('IMG_PATH', $image_path);
+        $template->setVariable('IMG_CLASS', $class);
+        $template->setVariable('ALT_TXT', $image_alt_text);
 
-		$this->setInfo($template->get());
-	}
+        $this->setInfo($template->get());
+    }
 }

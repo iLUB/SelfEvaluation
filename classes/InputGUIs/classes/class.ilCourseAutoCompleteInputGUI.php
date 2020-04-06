@@ -25,89 +25,90 @@ require_once('Services/Form/classes/class.ilTextInputGUI.php');
 /**
  * Class ilCourseAutoCompleteInputGUI
  * A form input element to select course names through an asynchronous lookup.
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilCourseAutoCompleteInputGUI extends ilTextInputGUI {
+class ilCourseAutoCompleteInputGUI extends ilTextInputGUI
+{
 
-	/**
-	 * @param string $title
-	 * @param string $postvar
-	 * @param string $class
-	 * @param string $autocomplete_cmd
-	 */
-	public function __construct($title, $postvar, $class, $autocomplete_cmd) {
-		/** @var ilCtrl $ilCtrl */
-		global $ilCtrl;
+    /**
+     * @param string $title
+     * @param string $postvar
+     * @param string $class
+     * @param string $autocomplete_cmd
+     */
+    public function __construct($title, $postvar, $class, $autocomplete_cmd)
+    {
+        /** @var ilCtrl $ilCtrl */
+        global $ilCtrl;
 
-		if (is_object($class)) {
-			$class = get_class($class);
-		}
-		$class = strtolower($class);
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+        $class = strtolower($class);
 
-		parent::__construct($title, $postvar);
-		$this->setMaxLength(70);
-		$this->setSize(30);
-		$this->setDataSource($ilCtrl->getLinkTargetByClass($class, $autocomplete_cmd, '', TRUE));
-	}
+        parent::__construct($title, $postvar);
+        $this->setMaxLength(70);
+        $this->setSize(30);
+        $this->setDataSource($ilCtrl->getLinkTargetByClass($class, $autocomplete_cmd, '', true));
+    }
 
+    /**
+     * Static asynchronous default auto complete function.
+     */
+    static function echoAutoCompleteList()
+    {
+        $q = $_REQUEST['term'];
+        require_once('Customizing/global/plugins/Libraries/AutoComplete/class.ilCourseAutoComplete.php');
+        $search = new ilCourseAutoComplete();
+        $list = $search->getList($q);
+        echo $list;
+    }
 
-	/**
-	 * Static asynchronous default auto complete function.
-	 */
-	static function echoAutoCompleteList() {
-		$q = $_REQUEST['term'];
-		require_once('Customizing/global/plugins/Libraries/AutoComplete/class.ilCourseAutoComplete.php');
-		$search = new ilCourseAutoComplete();
-		$list = $search->getList($q);
-		echo $list;
-	}
+    /**
+     * @return    boolean        Input ok, true/false
+     */
+    function checkInput()
+    {
+        global $lng;
+        $valid = parent::checkInput();
 
+        // Check for ilCourseAutoComplete Format
+        if ($_POST[$this->getPostVar()] != '') {
+            if (!preg_match('/^\[([0-9]+)\] (.+$)/', $_POST[$this->getPostVar()], $matches)) {
+                $valid = false;
+                $this->setAlert($lng->txt('msg_input_does_not_match_regexp'));
+            } else {
+                $id = $matches[1];
+                if (ilObject::_lookupType($id) != 'crs') {
+                    $valid = false;
+                    $this->setAlert($lng->txt('msg_input_does_not_match_regexp'));
+                }
 
-	/**
-	 * @return	boolean		Input ok, true/false
-	 */
-	function checkInput() {
-		global $lng;
-		$valid = parent::checkInput();
+                $_POST[$this->getPostVar()] = array();
+                $_POST[$this->getPostVar()]['id'] = $id;
+                $_POST[$this->getPostVar()]['title'] = $matches[2];
+            }
+        }
 
-		// Check for ilCourseAutoComplete Format
-		if ($_POST[$this->getPostVar()] != '') {
-			if (!preg_match('/^\[([0-9]+)\] (.+$)/', $_POST[$this->getPostVar()], $matches)) {
-				$valid = FALSE;
-				$this->setAlert($lng->txt('msg_input_does_not_match_regexp'));
-			} else {
-				$id = $matches[1];
-				if (ilObject::_lookupType($id) != 'crs') {
-					$valid = FALSE;
-					$this->setAlert($lng->txt('msg_input_does_not_match_regexp'));
-				}
+        return $valid;
+    }
 
-				$_POST[$this->getPostVar()] = array();
-				$_POST[$this->getPostVar()]['id'] = $id;
-				$_POST[$this->getPostVar()]['title'] = $matches[2];
-			}
-		}
-
-		return $valid;
-	}
-
-
-	/**
-	 * Override parent to handle array parameters.
-	 * @param string $value
-	 */
-	function setValue($value) {
-		if (is_array($value)) {
-			// Check for proper format
-			if (array_key_exists('id', $value) AND array_key_exists('title', $value)) {
-				$this->value = '[' . $value['id'] . ']' . ' ' . $value['title'];
-			} else {
-				$this->value = implode(', ', $value);
-			}
-		} else {
-			$this->value = $value;
-		}
-	}
+    /**
+     * Override parent to handle array parameters.
+     * @param string $value
+     */
+    function setValue($value)
+    {
+        if (is_array($value)) {
+            // Check for proper format
+            if (array_key_exists('id', $value) AND array_key_exists('title', $value)) {
+                $this->value = '[' . $value['id'] . ']' . ' ' . $value['title'];
+            } else {
+                $this->value = implode(', ', $value);
+            }
+        } else {
+            $this->value = $value;
+        }
+    }
 }

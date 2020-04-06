@@ -26,72 +26,71 @@ require_once('class.ilObjSelfEvaluation.php');
 
 /**
  * Access/Condition checking for SelfEvaluation object
- *
  * Please do not create instances of large application classes (like ilObjSelfEvaluation)
  * Write small methods within this class to determin the status.
- *
  * @author        Alex Killing <alex.killing@gmx.de>
  * @author        fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * @author       Timon Amstutz <timon.amstutz@ilub.unibe.ch>
+ * @author        Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version       $Id$
  */
-class ilObjSelfEvaluationAccess extends ilObjectPluginAccess {
+class ilObjSelfEvaluationAccess extends ilObjectPluginAccess
+{
 
-	/**
-	 * @param string $a_cmd
-	 * @param string $a_permission
-	 * @param int    $a_ref_id
-	 * @param int    $a_obj_id
-	 * @param string $a_user_id
-	 *
-	 * @return bool
-	 */
-	function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = '') {
+    /**
+     * @param string $a_cmd
+     * @param string $a_permission
+     * @param int    $a_ref_id
+     * @param int    $a_obj_id
+     * @param string $a_user_id
+     * @return bool
+     */
+    function _checkAccess($a_cmd, $a_permission, $a_ref_id, $a_obj_id, $a_user_id = '')
+    {
         global $ilUser, $ilAccess;
         /**
          * @var ilAccessHandler $ilAccess
          * */
 
-		if ($a_user_id == '') {
-			$a_user_id = $ilUser->getId();
-		}
-		switch ($a_permission) {
-			case 'read':
+        if ($a_user_id == '') {
+            $a_user_id = $ilUser->getId();
+        }
+        switch ($a_permission) {
+            case 'read':
             case 'visible':
-				if (! ilObjSelfEvaluationAccess::checkOnline($a_obj_id)
-					AND ! $ilAccess->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id)
-				) {
-					return false;
-				}
-				break;
-		}
+                if (!ilObjSelfEvaluationAccess::checkOnline($a_obj_id)
+                    AND !$ilAccess->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id)
+                ) {
+                    return false;
+                }
+                break;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
+    /**
+     * @param $a_id
+     * @return bool
+     */
+    static function checkOnline($a_id)
+    {
+        global $ilDB;
+        $set = $ilDB->query('SELECT is_online FROM rep_robj_xsev_data ' . ' WHERE id = '
+            . $ilDB->quote($a_id, 'integer'));
+        $rec = $ilDB->fetchAssoc($set);
 
-	/**
-	 * @param $a_id
-	 *
-	 * @return bool
-	 */
-	static function checkOnline($a_id) {
-		global $ilDB;
-		$set = $ilDB->query('SELECT is_online FROM rep_robj_xsev_data ' . ' WHERE id = '
-		. $ilDB->quote($a_id, 'integer'));
-		$rec = $ilDB->fetchAssoc($set);
+        return (boolean) $rec['is_online'];
+    }
 
-		return (boolean)$rec['is_online'];
-	}
-
-    static function checkWebAccess($a_ref_id){
+    static function checkWebAccess($a_ref_id)
+    {
         global $ilUser, $ilAccess;
 
         $a_user_id = $ilUser->getId();
         $a_obj_id = ilObject::_lookupObjectId($a_ref_id);
 
-        if (! ilObjSelfEvaluationAccess::checkOnline($a_obj_id)
-            AND ! $ilAccess->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id)
+        if (!ilObjSelfEvaluationAccess::checkOnline($a_obj_id)
+            AND !$ilAccess->checkAccessOfUser($a_user_id, 'write', '', $a_ref_id)
         ) {
             return false;
         }

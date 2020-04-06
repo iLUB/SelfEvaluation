@@ -21,14 +21,16 @@
 	+-----------------------------------------------------------------------------+
 */
 
-class ilTinyMceTextAreaInputGUI extends ilTextAreaInputGUI {
+class ilTinyMceTextAreaInputGUI extends ilTextAreaInputGUI
+{
 
-	public function __construct(ilObjSelfEvaluation $object, $a_title = "", $a_postvar = "") {
-		parent::__construct($a_title, $a_postvar);
-		$this->setUseRte(true);
-		$this->setRTESupport($object->getRefId(), $object->getType(), '', NULL, FALSE, '3.4.7');
-		$this->setRteTagSet('full');
-		$this->disableButtons(array(
+    public function __construct(ilObjSelfEvaluation $object, $a_title = "", $a_postvar = "")
+    {
+        parent::__construct($a_title, $a_postvar);
+        $this->setUseRte(true);
+        $this->setRTESupport($object->getRefId(), $object->getType(), '', null, false, '3.4.7');
+        $this->setRteTagSet('full');
+        $this->disableButtons(array(
             'charmap',
             'undo',
             'redo',
@@ -46,5 +48,5 @@ class ilTinyMceTextAreaInputGUI extends ilTextAreaInputGUI {
             'imgupload',
             'ilimgupload'
         ));
-	}
+    }
 }

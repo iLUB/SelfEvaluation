@@ -23,117 +23,121 @@
 
 /**
  * Class iLubFieldDefinitionLng
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class iLubFieldDefinitionLng {
+class iLubFieldDefinitionLng
+{
 
-	/**
-	 * @return string
-	 */
-	public function getTxtFieldAdded() {
-		global $ilUser;
+    /**
+     * @return string
+     */
+    public function getTxtFieldAdded()
+    {
+        global $ilUser;
 
-		if ($ilUser->getCurrentLanguage() == 'de') {
-			return 'Eine neues Datenfeld wurde angelegt.';
-		} else {
-			return 'Added a new data field.';
-		}
-	}
+        if ($ilUser->getCurrentLanguage() == 'de') {
+            return 'Eine neues Datenfeld wurde angelegt.';
+        } else {
+            return 'Added a new data field.';
+        }
+    }
 
+    /**
+     * @return string
+     */
+    public function getTxtConfirmDelete()
+    {
+        global $ilUser;
 
-	/**
-	 * @return string
-	 */
-	public function getTxtConfirmDelete() {
-		global $ilUser;
+        if ($ilUser->getCurrentLanguage() == 'de') {
+            return 'Sind Sie sicher, dass Sie dieses Datenfeld löschen möchten?';
+        } else {
+            return 'Do you really want to delete these user fields?';
+        }
+    }
 
-		if ($ilUser->getCurrentLanguage() == 'de') {
-			return 'Sind Sie sicher, dass Sie dieses Datenfeld löschen möchten?';
-		} else {
-			return 'Do you really want to delete these user fields?';
-		}
-	}
+    /**
+     * @return string
+     */
+    public function getTxtAddField()
+    {
+        global $ilUser;
 
+        if ($ilUser->getCurrentLanguage() == 'de') {
+            return 'Neues Datenfeld anlegen';
+        } else {
+            return 'Add a data field';
+        }
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getTxtAddField() {
-		global $ilUser;
+    /**
+     * @return string
+     */
+    public function getSortingSaved()
+    {
+        global $ilUser;
 
-		if ($ilUser->getCurrentLanguage() == 'de') {
-			return 'Neues Datenfeld anlegen';
-		} else {
-			return 'Add a data field';
-		}
-	}
+        if ($ilUser->getCurrentLanguage() == 'de') {
+            return 'Reihenfolge gespeichert';
+        } else {
+            return 'Saved order';
+        }
+    }
 
+    /**
+     * @return string
+     */
+    public function getMatrixScale()
+    {
+        global $ilUser;
 
-	/**
-	 * @return string
-	 */
-	public function getSortingSaved() {
-		global $ilUser;
+        if ($ilUser->getCurrentLanguage() == 'de') {
+            return 'Skala';
+        } else {
+            return 'Scale';
+        }
+    }
 
-		if ($ilUser->getCurrentLanguage() == 'de') {
-			return 'Reihenfolge gespeichert';
-		} else {
-			return 'Saved order';
-		}
-	}
+    /**
+     * @return string
+     */
+    public function getMatrixScaleDescription()
+    {
+        global $ilUser;
 
-	/**
-	 * @return string
-	 */
-	public function getMatrixScale() {
-		global $ilUser;
+        if ($ilUser->getCurrentLanguage() == 'de') {
+            return 'Skala der Matrixfrage (horizontal)';
+        } else {
+            return 'Scale of the Matrix question (horizontal)';
+        }
+    }
 
-		if ($ilUser->getCurrentLanguage() == 'de') {
-			return 'Skala';
-		} else {
-			return 'Scale';
-		}
-	}
+    /**
+     * @return string
+     */
+    public function getMatrixQuestion()
+    {
+        global $ilUser;
 
+        if ($ilUser->getCurrentLanguage() == 'de') {
+            return 'Fragen';
+        } else {
+            return 'Fragen';
+        }
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getMatrixScaleDescription() {
-		global $ilUser;
+    /**
+     * @return string
+     */
+    public function getMatrixQuestionDescription()
+    {
+        global $ilUser;
 
-		if ($ilUser->getCurrentLanguage() == 'de') {
-			return 'Skala der Matrixfrage (horizontal)';
-		} else {
-			return 'Scale of the Matrix question (horizontal)';
-		}
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMatrixQuestion() {
-		global $ilUser;
-
-		if ($ilUser->getCurrentLanguage() == 'de') {
-			return 'Fragen';
-		} else {
-			return 'Fragen';
-		}
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMatrixQuestionDescription() {
-		global $ilUser;
-
-		if ($ilUser->getCurrentLanguage() == 'de') {
-			return 'Liste mit Fragen (vertikal)';
-		} else {
-			return 'List with questions (vertical)';
-		}
-	}
+        if ($ilUser->getCurrentLanguage() == 'de') {
+            return 'Liste mit Fragen (vertikal)';
+        } else {
+            return 'List with questions (vertical)';
+        }
+    }
 }

@@ -2,16 +2,16 @@
 
 /**
  * interface ilSelfEvaluationQuestionBlockInterface
- *
  * @author       Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- *
- * @version 2.0.6
+ * @version      2.0.6
  */
-interface ilSelfEvaluationQuestionBlockInterface {
+interface ilSelfEvaluationQuestionBlockInterface
+{
     /**
      * @return int
      */
     public function getId();
+
     /**
      * @return string
      */
@@ -36,6 +36,7 @@ interface ilSelfEvaluationQuestionBlockInterface {
      * @return string
      */
     public function getAbbreviation();
+
     /**
      * @return ilSelfEvaluationQuestion[]
      */

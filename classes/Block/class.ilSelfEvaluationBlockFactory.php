@@ -22,88 +22,85 @@
 */
 require_once(dirname(__FILE__) . '/class.ilSelfEvaluationMetaBlock.php');
 require_once(dirname(__FILE__) . '/class.ilSelfEvaluationQuestionBlock.php');
+
 /**
  * Class ilSelfEvaluationBlockFactory
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationBlockFactory {
+class ilSelfEvaluationBlockFactory
+{
 
-	/**
-	 * @var int
-	 */
-	protected $id;
+    /**
+     * @var int
+     */
+    protected $id;
 
+    /**
+     * @param int $self_eval_id
+     */
+    public function __construct($self_eval_id)
+    {
+        $this->id = $self_eval_id;
+    }
 
-	/**
-	 * @param int $self_eval_id
-	 */
-	public function __construct($self_eval_id) {
-		$this->id = $self_eval_id;
-	}
+    /**
+     * @return ilSelfEvaluationBlock[]
+     */
+    public function getAllBlocks()
+    {
+        $blocks = ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->id);
 
+        $blocks = array_merge($blocks, ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->id));
 
-	/**
-	 * @return ilSelfEvaluationBlock[]
-	 */
-	public function getAllBlocks() {
-		$blocks = ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->id);
+        $this->sortByPosition($blocks);
 
-		$blocks = array_merge($blocks, ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->id));
+        return $blocks;
+    }
 
-		$this->sortByPosition($blocks);
+    /**
+     * @param $self_eval_id
+     * @return int
+     */
+    public static function getNextPositionAcrossBlocks($self_eval_id)
+    {
+        $block = new ilSelfEvaluationQuestionBlock();
+        $pos = $block->getNextPosition($self_eval_id);
+        $block = new ilSelfEvaluationMetaBlock();
+        $pos = max($block->getNextPosition($self_eval_id), $pos);
 
-		return $blocks;
-	}
+        return $pos;
+    }
 
+    /**
+     * usort callback function
+     * @param ilSelfEvaluationBlock $a
+     * @param ilSelfEvaluationBlock $b
+     * @return int
+     */
+    protected function positionSort(ilSelfEvaluationBlock $a, ilSelfEvaluationBlock $b)
+    {
+        if ($a->getPosition() == $b->getPosition()) {
 
-	/**
-	 * @param $self_eval_id
-	 *
-	 * @return int
-	 */
-	public static function getNextPositionAcrossBlocks($self_eval_id) {
-		$block = new ilSelfEvaluationQuestionBlock();
-		$pos = $block->getNextPosition($self_eval_id);
-		$block = new ilSelfEvaluationMetaBlock();
-		$pos = max($block->getNextPosition($self_eval_id), $pos);
+            return 0; // a and b are equal
 
-		return $pos;
-	}
+        } else {
+            if ($a->getPosition() > $b->getPosition()) {
 
+                return 1; // a is after b
+            } else {
 
-	/**
-	 * usort callback function
-	 *
-	 * @param ilSelfEvaluationBlock $a
-	 * @param ilSelfEvaluationBlock $b
-	 *
-	 * @return int
-	 */
-	protected function positionSort(ilSelfEvaluationBlock $a, ilSelfEvaluationBlock $b) {
-		if ($a->getPosition() == $b->getPosition()) {
+                return -1; // a is before b
+            }
+        }
+    }
 
-			return 0; // a and b are equal
-
-		} else {
-			if ($a->getPosition() > $b->getPosition()) {
-
-				return 1; // a is after b
-			} else {
-
-				return -1; // a is before b
-			}
-		}
-	}
-
-
-	/**
-	 * @param ilSelfEvaluationBlock[] $blocks
-	 *
-	 * @return bool
-	 */
-	public function sortByPosition(&$blocks) {
-		return usort($blocks, array(get_class(), "positionSort"));
-	}
+    /**
+     * @param ilSelfEvaluationBlock[] $blocks
+     * @return bool
+     */
+    public function sortByPosition(&$blocks)
+    {
+        return usort($blocks, array(get_class(), "positionSort"));
+    }
 }

@@ -22,47 +22,49 @@
 */
 
 require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockTableRow.php');
+
 /**
  * Class ilSelfEvaluationBlockTableRow
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow {
+class ilSelfEvaluationMetaBlockTableRow extends ilSelfEvaluationBlockTableRow
+{
 
-	/**
-	 * @param ilSelfEvaluationMetaBlock $block
-	 */
-	public function __construct(ilSelfEvaluationMetaBlock $block) {
-		parent::__construct($block);
+    /**
+     * @param ilSelfEvaluationMetaBlock $block
+     */
+    public function __construct(ilSelfEvaluationMetaBlock $block)
+    {
+        parent::__construct($block);
 
-		$this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
-		$question_action = $this->getQuestionAction();
-		$this->setQuestionsLink($question_action->getLink());
-		$this->addAction($question_action);
+        $this->setQuestionCount(count($block->getMetaContainer()->getFieldDefinitions()));
+        $question_action = $this->getQuestionAction();
+        $this->setQuestionsLink($question_action->getLink());
+        $this->addAction($question_action);
 
-		$this->setFeedbackCount('-');
-		$img_path = ilUtil::getImagePath('icon_ok.svg');
-		$this->setStatusImg($img_path);
-	}
+        $this->setFeedbackCount('-');
+        $img_path = ilUtil::getImagePath('icon_ok.svg');
+        $this->setStatusImg($img_path);
+    }
 
+    protected function saveCtrlParameters()
+    {
+        $this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
+    }
 
-	protected function saveCtrlParameters() {
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-		$this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
-	}
+    /**
+     * @return ilSelfEvaluationTableAction
+     */
+    protected function getQuestionAction()
+    {
+        $title = $this->pl->txt('edit_questions');
+        require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
+        $link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
+        $cmd = 'edit_questions';
 
-
-	/**
-	 * @return ilSelfEvaluationTableAction
-	 */
-	protected function getQuestionAction() {
-		$title = $this->pl->txt('edit_questions');
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainerGUI.php');
-		$link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
-		$cmd = 'edit_questions';
-
-		return new ilSelfEvaluationTableAction($title, $cmd, $link);
-	}
+        return new ilSelfEvaluationTableAction($title, $cmd, $link);
+    }
 }

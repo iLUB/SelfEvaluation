@@ -24,98 +24,93 @@ require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/Se
 
 /**
  * Class iLubFieldDefinitionTypeSelect
- *
  * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
  * @version $Id$
  */
-class iLubFieldDefinitionTypeSelect extends iLubFieldDefinitionType {
+class iLubFieldDefinitionTypeSelect extends iLubFieldDefinitionType
+{
 
+    const TYPE_ID = 2;
 
-	const TYPE_ID = 2;
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return self::TYPE_ID;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return self::TYPE_ID;
-	}
+    /**
+     * Return a title in the users translation
+     * @return string
+     */
+    public function getTypeName()
+    {
+        global $lng;
+        $lng->loadLanguageModule('ps');
 
+        return $lng->txt('ps_type_select_long');
+    }
 
-	/**
-	 * Return a title in the users translation
-	 *
-	 * @return string
-	 */
-	public function getTypeName() {
-		global $lng;
-		$lng->loadLanguageModule('ps');
+    /**
+     * @param iLubFieldDefinitionTypeOption $option
+     * @return iLubFieldDefinitionTypeOption
+     */
+    public function getValueDefinitionInputGUI(iLubFieldDefinitionTypeOption &$option)
+    {
+        global $lng;
 
-		return $lng->txt('ps_type_select_long');
-	}
+        // Select Type Values
+        require_once('Services/Form/classes/class.ilTextWizardInputGUI.php');
+        $ty_se_mu = new ilTextWizardInputGUI($lng->txt('value'), 'value_' . $this->getId());
+        $ty_se_mu->setRequired(true);
+        $ty_se_mu->setSize(32);
+        $ty_se_mu->setMaxLength(128);
+        $ty_se_mu->setValues(array(''));
+        $option->addSubItem($ty_se_mu);
 
+        return $option;
+    }
 
-	/**
-	 * @param iLubFieldDefinitionTypeOption $option
-	 *
-	 * @return iLubFieldDefinitionTypeOption
-	 */
-	public function getValueDefinitionInputGUI(iLubFieldDefinitionTypeOption &$option) {
-		global $lng;
+    /**
+     * @param iLubFieldDefinitionTypeOption $item
+     * @param array                         $values
+     */
+    public function setValues(iLubFieldDefinitionTypeOption $item, $values = array())
+    {
+        foreach ($item->getSubItems() as $sub_item) {
+            if ($sub_item instanceof ilTextWizardInputGUI AND $sub_item->getPostVar() == 'value_' . $this->getId()) {
+                $sub_item->setValue($values);
+            }
+        }
+    }
 
-		// Select Type Values
-		require_once('Services/Form/classes/class.ilTextWizardInputGUI.php');
-		$ty_se_mu = new ilTextWizardInputGUI($lng->txt('value'), 'value_' . $this->getId());
-		$ty_se_mu->setRequired(true);
-		$ty_se_mu->setSize(32);
-		$ty_se_mu->setMaxLength(128);
-		$ty_se_mu->setValues(array(''));
-		$option->addSubItem($ty_se_mu);
+    /**
+     * @param ilPropertyFormGUI $form
+     * @return array
+     */
+    public function getValues(ilPropertyFormGUI $form)
+    {
+        return $form->getInput('value_' . $this->getId());
+    }
 
-		return $option;
-	}
+    /**
+     * @param string $title
+     * @param string $postvar
+     * @param array  $values
+     * @return ilFormPropertyGUI
+     */
+    public function getPresentationInputGUI($title, $postvar, $values)
+    {
+        require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilSelectInputGUIwithDefaultText.php');
+        $select = new ilSelectInputGUIwithDefaultText($title, $postvar);
 
+        $options = array();
+        foreach ($values as $key => $value) {
+            $options[$key] = $value;
+        }
+        $select->setOptions($options);
 
-	/**
-	 * @param iLubFieldDefinitionTypeOption $item
-	 * @param array                         $values
-	 */
-	public function setValues(iLubFieldDefinitionTypeOption $item, $values = array()) {
-		foreach ($item->getSubItems() as $sub_item) {
-			if ($sub_item instanceof ilTextWizardInputGUI AND $sub_item->getPostVar() == 'value_' . $this->getId()) {
-				$sub_item->setValue($values);
-			}
-		}
-	}
-
-
-	/**
-	 * @param ilPropertyFormGUI $form
-	 *
-	 * @return array
-	 */
-	public function getValues(ilPropertyFormGUI $form) {
-		return $form->getInput('value_' . $this->getId());
-	}
-
-
-	/**
-	 * @param string $title
-	 * @param string $postvar
-	 * @param array  $values
-	 *
-	 * @return ilFormPropertyGUI
-	 */
-	public function getPresentationInputGUI($title, $postvar, $values) {
-		require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilSelectInputGUIwithDefaultText.php');
-		$select = new ilSelectInputGUIwithDefaultText($title, $postvar);
-
-		$options = array();
-		foreach($values as $key => $value)
-		{
-			$options[$key] = $value;
-		}
-		$select->setOptions($options);
-
-		return $select;
-	}
+        return $select;
+    }
 }

@@ -21,13 +21,14 @@
 	+-----------------------------------------------------------------------------+
 */
 require_once('class.csvExportColumn.php');
+
 /**
  * Class csvExportRows
- *
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class csvExportColumns {
+class csvExportColumns
+{
     /**
      * @var csvExportColumn[]
      */
@@ -62,7 +63,7 @@ class csvExportColumns {
      */
     public function addColumns(csvExportColumns $columns)
     {
-        foreach($columns->getColumns() as $column){
+        foreach ($columns->getColumns() as $column) {
             $this->addColumn($column);
         }
     }
@@ -72,7 +73,7 @@ class csvExportColumns {
      */
     public function addColumn(csvExportColumn $column)
     {
-        if(!$this->columnExists($column)){
+        if (!$this->columnExists($column)) {
             $this->columns[$column->getColumnId()] = $column;
         }
     }
@@ -81,7 +82,8 @@ class csvExportColumns {
      * @param csvExportColumn $column
      * @return bool
      */
-    public function columnExists(csvExportColumn $column){
+    public function columnExists(csvExportColumn $column)
+    {
         return $this->columnIdExists($column->getColumnId());
     }
 
@@ -89,11 +91,13 @@ class csvExportColumns {
      * @param string $column_id
      * @return bool
      */
-    public function columnIdExists($column_id = ""){
-        return array_key_exists($column_id,$this->getColumns());
+    public function columnIdExists($column_id = "")
+    {
+        return array_key_exists($column_id, $this->getColumns());
     }
 
-    public function reset(){
+    public function reset()
+    {
         $this->setColumns(null);
     }
 
@@ -101,18 +105,16 @@ class csvExportColumns {
      * @param $columns
      * @throws csvExportException
      */
-    public function addColumnsFromArray($columns){
-        foreach($columns as $column){
-            if(is_array($column) && array_key_exists("position",$column) && array_key_exists("name",$column)){
-                $this->addColumn(new csvExportColumn($column["name"],$column["position"]));
-            }
-            elseif(is_array($column)&& array_key_exists("name",$column) ){
+    public function addColumnsFromArray($columns)
+    {
+        foreach ($columns as $column) {
+            if (is_array($column) && array_key_exists("position", $column) && array_key_exists("name", $column)) {
+                $this->addColumn(new csvExportColumn($column["name"], $column["position"]));
+            } elseif (is_array($column) && array_key_exists("name", $column)) {
                 $this->addColumn(new csvExportColumn($column["name"]));
-            }
-            elseif(is_array($column) ){
+            } elseif (is_array($column)) {
                 throw new csvExportException(csvExportException::INVALID_ARRAY);
-            }
-            else{
+            } else {
                 $this->addColumn(new csvExportColumn($column));
             }
 
@@ -122,9 +124,10 @@ class csvExportColumns {
     /**
      * @return array
      */
-    public function getColumnNamesAsArray(){
+    public function getColumnNamesAsArray()
+    {
         $column_names = array();
-        foreach($this->getColumns() as $column){
+        foreach ($this->getColumns() as $column) {
             $column_names[$column->getColumnId()] = $column->getColumnTxt();
         }
         return $column_names;
@@ -133,14 +136,15 @@ class csvExportColumns {
     /**
      * @return bool
      */
-    public function isEmpty(){
+    public function isEmpty()
+    {
         return empty($this->columns);
     }
 
-    public function sortColumns(){
-        uasort($this->columns, function (csvExportColumn $column_a, csvExportColumn $column_b)
-        {
-            if($column_a->getPosition() == $column_b->getPosition()){
+    public function sortColumns()
+    {
+        uasort($this->columns, function (csvExportColumn $column_a, csvExportColumn $column_b) {
+            if ($column_a->getPosition() == $column_b->getPosition()) {
                 return strcmp($column_a->getColumnId(), $column_b->getColumnId());
             }
             return $column_a->getPosition() > $column_b->getPosition();
@@ -152,11 +156,11 @@ class csvExportColumns {
      * @return csvExportColumn
      * @throws csvExportException
      */
-    public function getColumnById($id = ""){
-        if(array_key_exists($id,$this->getColumns())){
+    public function getColumnById($id = "")
+    {
+        if (array_key_exists($id, $this->getColumns())) {
             return $this->columns[$id];
-        }
-        else{
+        } else {
             throw new csvExportException(csvExportException::COLUMN_DOES_NOT_EXIST);
         }
 
@@ -165,7 +169,8 @@ class csvExportColumns {
     /**
      * @return int
      */
-    public function count(){
+    public function count()
+    {
         return count($this->getColumns());
     }
 }

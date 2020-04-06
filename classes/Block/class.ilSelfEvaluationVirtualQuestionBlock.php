@@ -1,11 +1,12 @@
 <?php
+
 /**
  * Class ilSelfEvaluationBlock
- *
  * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
  * @version $Id$
  */
-class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQuestionBlockInterface {
+class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQuestionBlockInterface
+{
 
     /**
      * @var int
@@ -39,7 +40,8 @@ class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQuestionBl
     /**
      * @param $parent_id
      */
-    function __construct($parent_id = 0) {
+    function __construct($parent_id = 0)
+    {
         $this->setParentId($parent_id);
     }
 
@@ -142,16 +144,19 @@ class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQuestionBl
     /**
      * @param ilSelfEvaluationQuestion $question
      */
-    public function addQuestion(ilSelfEvaluationQuestion $question){
+    public function addQuestion(ilSelfEvaluationQuestion $question)
+    {
         $this->questions[$question->getId()] = $question;
     }
 
     /**
      * @return ilSelfEvaluationQuestion[]
      */
-    public function getQuestions(){
+    public function getQuestions()
+    {
         return $this->questions;
     }
 
 }
+
 ?>
