@@ -1,33 +1,11 @@
 <?php
-/*
-	+-----------------------------------------------------------------------------+
-	| ILIAS open source                                                           |
-	+-----------------------------------------------------------------------------+
-	| Copyright (c) 1998-2014 ILIAS open source, University of Cologne            |
-	|                                                                             |
-	| This program is free software; you can redistribute it and/or               |
-	| modify it under the terms of the GNU General Public License                 |
-	| as published by the Free Software Foundation; either version 2              |
-	| of the License, or (at your option) any later version.                      |
-	|                                                                             |
-	| This program is distributed in the hope that it will be useful,             |
-	| but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-	| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-	| GNU General Public License for more details.                                |
-	|                                                                             |
-	| You should have received a copy of the GNU General Public License           |
-	| along with this program; if not, write to the Free Software                 |
-	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-	+-----------------------------------------------------------------------------+
-*/
+/* Copyright (c) 2020 iLUB Universität Bern Extended GPL, see docs/LICENSE */
+
 require_once(dirname(__FILE__) . '/Table/class.ilSelfEvaluationBlockTableGUI.php');
 require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockFactory.php');
 
 /**
  * Class ilSelfEvaluationListBlocksGUI
- * @ilCtrl_isCalledBy ilSelfEvaluationListBlocksGUI: ilObjSelfEvaluationGUI
- * @author            Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @version           $Id$
  */
 class ilSelfEvaluationListBlocksGUI
 {
@@ -46,45 +24,43 @@ class ilSelfEvaluationListBlocksGUI
      */
     protected $toolbar;
 
-    /**
-     * @param ilObjSelfEvaluationGUI $parent
-     */
-    public function __construct(ilObjSelfEvaluationGUI $parent)
-    {
-        global $ilCtrl, $ilToolbar;
-        /**
-         * @var $ilCtrl    ilCtrl
-         * @var $ilToolbar ilToolbarGUI
-         */
+    public function __construct(
+        ilObjSelfEvaluationGUI $parent,
+        ilGlobalTemplateInterface $tpl,
+        ilCtrl $ilCtrl,
+        ilToolbarGUI $ilToolbar,
+        ilAccess $access,
+        ilSelfEvaluationPlugin $plugin
+    ) {
         $this->ctrl = $ilCtrl;
+        $this->tpl = $tpl;
         $this->parent = $parent;
         $this->toolbar = $ilToolbar;
+        $this->access = $access;
+        $this->plugin = $plugin;
     }
 
     public function executeCommand()
     {
-        $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
         $this->ctrl->saveParameter($this, 'block_id');
-        $this->parent->tabs_gui->setTabActive('administration');
-        switch ($cmd) {
-            default:
-                $this->performCommand($cmd);
-                break;
-        }
-
-        return true;
+        $this->performCommand();
     }
 
     /**
-     * @param $cmd
+     * @throws ilObjectException
      */
-    function performCommand($cmd)
+    function performCommand()
     {
+        $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
+
         switch ($cmd) {
             case 'showContent':
             case 'saveSorting':
             case 'editOverall':
-                $this->parent->permissionCheck('write');
+                if (!$this->access->checkAccess("write", $cmd, $this->parent->object->getRefId(), $this->plugin->getId(),
+                    $this->parent->object->getId())) {
+                    throw new \ilObjectException($this->pl->txt("permission_denied"));
+                }
                 $this->$cmd();
                 break;
         }
@@ -100,9 +76,7 @@ class ilSelfEvaluationListBlocksGUI
 
     public function showContent()
     {
-        global $tpl;
-
-        $tpl->addJavaScript($this->parent->getPluginObject()->getDirectory() . '/templates/js/sortable.js');
+        $this->tpl->addJavaScript($this->plugin->getDirectory() . '/templates/js/sortable.js');
         $table = new ilSelfEvaluationBlockTableGUI($this->parent, 'showContent');
 
         $this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI', 'block_id', null);
@@ -127,7 +101,7 @@ class ilSelfEvaluationListBlocksGUI
         }
 
         $table->setData($table_data);
-        $tpl->setContent($table->getHTML());
+        $this->tpl->setContent($table->getHTML());
     }
 
     public function saveSorting()
@@ -149,10 +123,7 @@ class ilSelfEvaluationListBlocksGUI
 
     public function editOverall()
     {
-        global $DIC;
-
-        $DIC['tpl']->setContent("hello World");
-
+        $this->tpl->setContent("hello World");
     }
 
     /**
@@ -169,6 +140,6 @@ class ilSelfEvaluationListBlocksGUI
      */
     protected function txt($lng_var)
     {
-        return $this->parent->getPluginObject()->txt($lng_var);
+        return $this->plugin->txt($lng_var);
     }
 }

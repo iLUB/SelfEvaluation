@@ -1,37 +1,13 @@
 <?php
-/*
-	+-----------------------------------------------------------------------------+
-	| ILIAS open source                                                           |
-	+-----------------------------------------------------------------------------+
-	| Copyright (c) 1998-2009 ILIAS open source, University of Cologne            |
-	|                                                                             |
-	| This program is free software; you can redistribute it and/or               |
-	| modify it under the terms of the GNU General Public License                 |
-	| as published by the Free Software Foundation; either version 2              |
-	| of the License, or (at your option) any later version.                      |
-	|                                                                             |
-	| This program is distributed in the hope that it will be useful,             |
-	| but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-	| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-	| GNU General Public License for more details.                                |
-	|                                                                             |
-	| You should have received a copy of the GNU General Public License           |
-	| along with this program; if not, write to the Free Software                 |
-	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-	+-----------------------------------------------------------------------------+
-*/
+require_once __DIR__ . '/../vendor/autoload.php';
 
-require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
-require_once('./Services/Repository/classes/class.ilObjectPluginGUI.php');
 require_once('class.ilSelfEvaluationPlugin.php');
 require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScaleFormGUI.php');
 require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php');
 
 /**
  * Class ilObjSelfEvaluationGUI
- * @author            Alex Killing <alex.killing@gmx.de>
- * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * $Id$
+ *
  * @ilCtrl_isCalledBy ilObjSelfEvaluationGUI: ilRepositoryGUI, ilObjPluginDispatchGUI, ilAdministrationGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, , ilCommonActionDispatcherGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilSelfEvaluationPresentationGUI, ilSelfEvaluationQuestionGUI
@@ -58,30 +34,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
      * @var ilObjSelfEvaluation
      */
     public $object;
-    /**
-     * @var ilSelfEvaluationPlugin
-     */
-    protected $pl;
-    /**
-     * @var ilCtrl
-     */
-    protected $ctrl;
+
     /**
      * @var ilPropertyFormGUI
      */
     protected $form;
-    /**
-     * @var ilNavigationHistory
-     */
-    protected $history;
-    /**
-     * @var ilAccessHandler
-     */
-    protected $access;
-    /**
-     * @var ilTabsGUI
-     */
-    public $tabs_gui; // Dirty type hinting fix for nasty implicit declaration by upstream code
 
     public function displayIdentifier()
     {
@@ -92,52 +49,41 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
             $id = new ilSelfEvaluationIdentity($_GET['uid']);
             if ($id->getType() == ilSelfEvaluationIdentity::TYPE_EXTERNAL && $this->object->isIdentitySelection()) {
                 global $ilToolbar;
-                $ilToolbar->addText('<b>' . $this->getPluginObject()->txt('your_uid') . ' ' . $id->getIdentifier() . '</b>');
+                $ilToolbar->addText('<b>' . $this->txt('your_uid') . ' ' . $id->getIdentifier() . '</b>');
             }
         }
     }
 
     public function initHeader()
     {
-        global $ilUser;
-        /**
-         * @var $ilUser ilObjUser
-         */
-
-        $this->tpl->getStandardTemplate();
         $this->setTitleAndDescription();
         $this->displayIdentifier();
-        $this->tpl->addCss($this->getPluginObject()->getStyleSheetLocation('css/content.css'));
-        $this->tpl->addCss($this->getPluginObject()->getStyleSheetLocation('css/print.css'), 'print');
+        $this->tpl->addCss($this->getPlugin()->getStyleSheetLocation('css/content.css'));
+        $this->tpl->addCss($this->getPlugin()->getStyleSheetLocation('css/print.css'), 'print');
 
         $is_in_survey = $this->ctrl->getCmd() == "showContent" || $this->ctrl->getCmd() == "show" || $this->ctrl->getNextClass($this) == "ilselfevaluationpresentationgui";
-        $is_not_logged_in = $ilUser->login == "anonymous";
+        $is_not_logged_in = $this->user->getLogin() == "anonymous";
 
         if ($is_in_survey && $is_not_logged_in) {
             $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/anonymous.css");
         } else {
             $this->setLocator();
         }
-        $this->tpl->addJavaScript($this->getPluginObject()->getDirectory() . '/templates/scripts.js');
+        $this->tpl->addJavaScript($this->getPlugin()->getDirectory() . '/templates/scripts.js');
         $this->setTabs();
     }
 
-    /**
-     * @return bool|void
-     */
-    public function executeCommand()
+    public function executeCommand():bool
     {
         if (!$this->getCreationMode()) {
             if ($this->access->checkAccess('read', '', $_GET['ref_id'])) {
-                $this->history->addItem($_GET['ref_id'], $this->ctrl->getLinkTarget($this, $this->getStandardCmd()),
+                $this->nav_history->addItem($_GET['ref_id'], $this->ctrl->getLinkTarget($this, $this->getStandardCmd()),
                     $this->getType(), '');
             }
 
             $cmd = $this->ctrl->getCmd();
             $next_class = $this->ctrl->getNextClass($this);
-            if (self::RELOAD OR $_GET['rl'] == 'true') {
-                $this->getPluginObject()->updateLanguages();
-            }
+
             $this->ctrl->saveParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $_GET['uid']);
             $this->ctrl->saveParameterByClass('ilSelfEvaluationDatasetGUI', 'uid', $_GET['uid']);
             $this->ctrl->saveParameterByClass('ilSelfEvaluationFeedbackGUI', 'uid', $_GET['uid']);
@@ -151,43 +97,54 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
                 case 'ilpermissiongui':
                     include_once('Services/AccessControl/classes/class.ilPermissionGUI.php');
                     $perm_gui = new ilPermissionGUI($this);
-                    $this->tabs_gui->setTabActive('perm_settings');
+                    $this->tabs->setTabActive('perm_settings');
                     $this->ctrl->forwardCommand($perm_gui);
                     break;
                 case 'ilinfoscreengui':
                     include_once('Services/InfoScreen/classes/class.ilInfoScreenGUI.php');
                     $gui = new ilInfoScreenGUI($this);
-                    $this->tabs_gui->setTabActive('info_short');
+                    $this->tabs->setTabActive('info_short');
                     $this->ctrl->forwardCommand($gui);
                     break;
                 case 'ilselfevaluationlistblocksgui':
                     require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationListBlocksGUI.php');
-                    $gui = new ilSelfEvaluationListBlocksGUI($this);
-                    $this->tabs_gui->setTabActive('administration');
+                    $gui = new ilSelfEvaluationListBlocksGUI($this,$this->tpl,$this->ctrl,$this->toolbar,$this->access,$this->getPlugin());
+                    $this->tabs->setTabActive('administration');
                     $this->ctrl->forwardCommand($gui);
                     break;
                 case 'ilselfevaluationquestionblockgui':
                     require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationQuestionBlockGUI.php');
-                    $block = new ilSelfEvaluationQuestionBlock((int) $_GET['block_id']);
-                    $block->setParentId($this->object->getId());
-                    $block_gui = new ilSelfEvaluationQuestionBlockGUI($this, $block);
+                    $block_gui = new ilSelfEvaluationQuestionBlockGUI($this->object->getId(),$this->object->getRefId(),$this->tpl,$this->ctrl,$this->access,$this->getPlugin());
+                    $this->tabs->setTabActive('administration');
                     $this->ctrl->forwardCommand($block_gui);
                     break;
                 case 'ilselfevaluationmetablockgui':
                     require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlockGUI.php');
-                    require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
-                    $block = new ilSelfEvaluationMetaBlock((int) $_GET['block_id']);
-                    $block->setParentId($this->object->getId());
-                    $block_gui = new ilSelfEvaluationMetaBlockGUI($this, $block);
+                    $block_gui = new ilSelfEvaluationMetaBlockGUI($this->object->getId(),$this->object->getRefId(),$this->tpl,$this->ctrl,$this->access,$this->getPlugin());
+                    $this->tabs->setTabActive('administration');
                     $this->ctrl->forwardCommand($block_gui);
+                    break;
+                case 'ilselfevaluationquestiongui':
+                    require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
+                    require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationMetaQuestionGUI.php');
+                    $block = new ilSelfEvaluationMetaBlock((int) $_GET['block_id']);
+                    $container_gui = new ilSelfEvaluationQuestionGUI($block->getMetaContainer(),
+                        $block->getTitle(), $this->getPlugin(), $this->object->getRefId());
+                    $this->ctrl->forwardCommand($container_gui);
                     break;
                 case 'ilselfevaluationmetaquestiongui':
                     require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
                     require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationMetaQuestionGUI.php');
                     $block = new ilSelfEvaluationMetaBlock((int) $_GET['block_id']);
                     $container_gui = new ilSelfEvaluationMetaQuestionGUI($block->getMetaContainer(),
-                        $block->getTitle(), $this->getPluginObject(), $this->object->getRefId());
+                        $block->getTitle(), $this->getPlugin(), $this->object->getRefId());
                     $this->ctrl->forwardCommand($container_gui);
+                    break;
+                case 'ilselfevaluationfeedbackgui':
+                    require_once(dirname(__FILE__) . '/Feedback/class.ilSelfEvaluationFeedbackGUI.php');
+                    $gui = new ilSelfEvaluationFeedbackGUI($this,$this->tpl,$this->ctrl,$this->toolbar,$this->access,$this->getPlugin());
+                    $this->tabs->setTabActive('administration');
+                    $this->ctrl->forwardCommand($gui);
                     break;
                 case 'ilexportgui':
                     // only if plugin supports it?
@@ -197,51 +154,33 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
                     $exp->addFormat('xml');
                     $this->ctrl->forwardCommand($exp);
                     break;
+                case 'ilselfevaluationpresentationgui':
+                    require_once(dirname(__FILE__) . '/Presentation/class.ilSelfEvaluationPresentationGUI.php');
+                    $this->tabs_gui->setTabActive('content');
+                    $gui = new ilSelfEvaluationPresentationGUI($this,$this->tpl,$this->ctrl,$this->toolbar);
+                    $this->ctrl->forwardCommand($gui);
+                    break;
+                case 'ilselfevaluationdatasetgui':
+                    require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDatasetGUI.php');
+                    $this->tabs_gui->setTabActive('all_results');
+                    $gui = new ilSelfEvaluationDatasetGUI($this,$this->tpl,$this->ctrl,$this->toolbar,$this->access,$this->getPlugin(),$this->user->getId());
+                    $this->ctrl->forwardCommand($gui);
                 case '':
-                    if (!in_array($cmd, get_class_methods($this))) {
-                        $this->performCommand($this->getStandardCmd());
-                        if (self::DEBUG) {
-                            ilUtil::sendInfo('COMMAND NOT FOUND! Redirecting to standard class in ilObjSelfEvaluationGUI executeCommand()');
-                        }
-                        break;
-                    }
+                default:
                     switch ($cmd) {
                         default:
                             $this->performCommand($cmd);
                             break;
                     }
                     break;
-                default:
-                    require_once($this->ctrl->lookupClassPath($next_class));
-                    $gui = new $next_class($this);
-                    $this->ctrl->forwardCommand($gui);
-                    break;
             }
             if ($this->tpl->hide === false OR $this->tpl->hide === null) {
-                $this->tpl->show();
+                $this->tpl->printToStdout();
             }
 
             return true;
         } else {
             return parent::executeCommand();
-        }
-    }
-
-    protected function afterConstructor()
-    {
-        global $tpl, $ilCtrl, $ilAccess, $ilNavigationHistory;
-        /**
-         * @var $tpl                 ilTemplate
-         * @var $ilCtrl              ilCtrl
-         * @var $ilAccess            ilAccessHandler
-         * @var $ilNavigationHistory ilNavigationHistory
-         */
-        $this->tpl = $tpl;
-        $this->history = $ilNavigationHistory;
-        $this->access = $ilAccess;
-        $this->ctrl = $ilCtrl;
-        if (self::DEBUG OR $_GET['rl'] == 'true') {
-            $this->getPluginObject()->updateLanguages();
         }
     }
 
@@ -298,17 +237,17 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
         global $DIC;
 
         if ($DIC->access()->checkAccess('read', '', $this->object->getRefId())) {
-            $this->tabs_gui->addTab('content', $this->txt('content'), $this->ctrl->getLinkTarget($this, 'showContent'));
+            $this->tabs->addTab('content', $this->txt('content'), $this->ctrl->getLinkTarget($this, 'showContent'));
         }
         $this->addInfoTab();
         if ($DIC->access()->checkAccess('write', '', $this->object->getRefId())) {
-            $this->tabs_gui->addTab('properties', $this->txt('properties'),
+            $this->tabs->addTab('properties', $this->txt('properties'),
                 $this->ctrl->getLinkTarget($this, 'editProperties'));
-            $this->tabs_gui->addTab('administration', $this->txt('administration'),
+            $this->tabs->addTab('administration', $this->txt('administration'),
                 $this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
         }
         if ($this->object->getAllowShowResults() && !$DIC->user()->isAnonymous()) {
-            $this->tabs_gui->addTab('all_results', $this->txt('show_results'),
+            $this->tabs->addTab('all_results', $this->txt('show_results'),
                 $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'index'));
         }
 
@@ -330,9 +269,9 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
     function editProperties()
     {
         if ($this->object->hasDatasets()) {
-            ilUtil::sendInfo($this->getPluginObject()->txt('scale_cannot_be_edited'));
+            ilUtil::sendInfo($this->txt('scale_cannot_be_edited'));
         }
-        $this->tabs_gui->activateTab('properties');
+        $this->tabs->activateTab('properties');
         $this->initPropertiesForm();
         $this->getPropertiesValues();
         $this->tpl->setContent($this->form->getHTML());
@@ -391,14 +330,14 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
         $this->form->addItem($section);
 
         //Ordering of Questions in Blocks
-        $radio_options = new ilRadioGroupInputGUI($this->getPluginObject()->txt(self::FIELD_ORDER_TYPE),
+        $radio_options = new ilRadioGroupInputGUI($this->txt(self::FIELD_ORDER_TYPE),
             self::FIELD_ORDER_TYPE);
 
-        $option_random = new ilRadioOption($this->getPluginObject()->txt(self::FIELD_ORDER_FULLY_RANDOM),
+        $option_random = new ilRadioOption($this->txt(self::FIELD_ORDER_FULLY_RANDOM),
             self::FIELD_ORDER_FULLY_RANDOM);
-        $option_random->setInfo($this->getPluginObject()->txt("block_option_random_info"));
+        $option_random->setInfo($this->txt("block_option_random_info"));
 
-        $nr_input = new ilNumberInputGUI($this->getPluginObject()->txt("sort_random_nr_items_block"),
+        $nr_input = new ilNumberInputGUI($this->txt("sort_random_nr_items_block"),
             'sort_random_nr_items_block');
         $option_random->addSubItem($nr_input);
 
@@ -407,11 +346,11 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
         $te->setInfo($this->txt('block_option_random_desc_info'));
         $option_random->addSubItem($te);
 
-        $option_block = new ilRadioOption($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK),
+        $option_block = new ilRadioOption($this->txt(self::FIELD_ORDER_BLOCK),
             self::FIELD_ORDER_BLOCK);
-        $option_block->setInfo($this->getPluginObject()->txt("block_option_block_info"));
+        $option_block->setInfo($this->txt("block_option_block_info"));
 
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt(self::FIELD_ORDER_BLOCK_RANDOM),
+        $cb = new ilCheckboxInputGUI($this->txt(self::FIELD_ORDER_BLOCK_RANDOM),
             self::FIELD_ORDER_BLOCK_RANDOM);
         $option_block->addSubItem($cb);
 
@@ -421,21 +360,21 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
         $this->form->addItem($radio_options);
 
         // DisplayType
-        $se = new ilSelectInputGUI($this->getPluginObject()->txt('display_type'), 'display_type');
-        $se->setInfo($this->getPluginObject()->txt("display_type_info"));
+        $se = new ilSelectInputGUI($this->txt('display_type'), 'display_type');
+        $se->setInfo($this->txt("display_type_info"));
         $opt = array(
-            ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->getPluginObject()->txt('single_page'),
-            ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->getPluginObject()->txt('multiple_pages'),
+            ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->txt('single_page'),
+            ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->txt('multiple_pages'),
         );
         $se->setOptions($opt);
         $this->form->addItem($se);
 
         // Show question block titles during evaluation
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_sev'), 'show_block_titles_sev');
+        $cb = new ilCheckboxInputGUI($this->txt('show_block_titles_sev'), 'show_block_titles_sev');
         $this->form->addItem($cb);
 
         // Show question block descriptions during evaluation
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_sev'), 'show_block_desc_sev');
+        $cb = new ilCheckboxInputGUI($this->txt('show_block_desc_sev'), 'show_block_desc_sev');
         $this->form->addItem($cb);
 
         //////////////////////////////
@@ -446,21 +385,21 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
         $this->form->addItem($section);
 
         // Show Feedbacks overview graphics
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview'), 'show_fbs_overview');
+        $cb = new ilCheckboxInputGUI($this->txt('show_fbs_overview'), 'show_fbs_overview');
         $cb->setValue(1);
 
-        $sub_cb_1 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_bar'), 'show_fbs_overview_bar');
+        $sub_cb_1 = new ilCheckboxInputGUI($this->txt('show_bar'), 'show_fbs_overview_bar');
         $sub_cb_1->setValue(1);
 
-        $sub_sub_cb_1 = new ilCheckboxInputGUI($this->getPluginObject()->txt('overview_bar_show_label_as_percentage'),
+        $sub_sub_cb_1 = new ilCheckboxInputGUI($this->txt('overview_bar_show_label_as_percentage'),
             'overview_bar_show_label_as_percentage');
         $sub_sub_cb_1->setValue(1);
         $sub_cb_1->addSubItem($sub_sub_cb_1);
 
-        $sub_cb_2 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_spider'), 'show_fbs_overview_spider');
+        $sub_cb_2 = new ilCheckboxInputGUI($this->txt('show_spider'), 'show_fbs_overview_spider');
         $sub_cb_2->setValue(1);
 
-        $sub_cb_3 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_left_right'),
+        $sub_cb_3 = new ilCheckboxInputGUI($this->txt('show_left_right'),
             'show_fbs_overview_left_right');
         $sub_cb_3->setValue(1);
 
@@ -469,43 +408,43 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
         $cb->addSubItem($sub_cb_3);
 
         // Show Feedbacks overview text
-        $sub_cb_4 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview_text'),
+        $sub_cb_4 = new ilCheckboxInputGUI($this->txt('show_fbs_overview_text'),
             'show_fbs_overview_text');
-        $sub_cb_4->setInfo($this->getPluginObject()->txt('show_fbs_overview_text_info'));
+        $sub_cb_4->setInfo($this->txt('show_fbs_overview_text_info'));
         $sub_cb_4->setValue(1);
         $cb->addSubItem($sub_cb_4);
 
         // Show Feedbacks overview statistics
-        $sub_cb_5 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_overview_statistics'),
+        $sub_cb_5 = new ilCheckboxInputGUI($this->txt('show_fbs_overview_statistics'),
             'show_fbs_overview_statistics');
-        $sub_cb_5->setInfo($this->getPluginObject()->txt('show_fbs_overview_statistics_info'));
+        $sub_cb_5->setInfo($this->txt('show_fbs_overview_statistics_info'));
         $sub_cb_5->setValue(1);
         $cb->addSubItem($sub_cb_5);
 
         $this->form->addItem($cb);
 
         // Show question block titles during feedback
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_titles_fb'), 'show_block_titles_fb');
+        $cb = new ilCheckboxInputGUI($this->txt('show_block_titles_fb'), 'show_block_titles_fb');
         $this->form->addItem($cb);
 
         // Show question block descriptions during feedback
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_block_desc_fb'), 'show_block_desc_fb');
+        $cb = new ilCheckboxInputGUI($this->txt('show_block_desc_fb'), 'show_block_desc_fb');
         $this->form->addItem($cb);
         //
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs'), 'show_fbs');
+        $cb = new ilCheckboxInputGUI($this->txt('show_fbs'), 'show_fbs');
         $cb->setValue(1);
         $this->form->addItem($cb);
         //
-        $cb = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_fbs_charts'), 'show_fbs_charts');
+        $cb = new ilCheckboxInputGUI($this->txt('show_fbs_charts'), 'show_fbs_charts');
         $cb->setValue(1);
 
-        $sub_cb_1 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_bar'), 'show_fbs_chart_bar');
+        $sub_cb_1 = new ilCheckboxInputGUI($this->txt('show_bar'), 'show_fbs_chart_bar');
         $sub_cb_1->setValue(1);
 
-        $sub_cb_2 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_spider'), 'show_fbs_chart_spider');
+        $sub_cb_2 = new ilCheckboxInputGUI($this->txt('show_spider'), 'show_fbs_chart_spider');
         $sub_cb_2->setValue(1);
 
-        $sub_cb_3 = new ilCheckboxInputGUI($this->getPluginObject()->txt('show_left_right'),
+        $sub_cb_3 = new ilCheckboxInputGUI($this->txt('show_left_right'),
             'show_fbs_chart_left_right');
         $sub_cb_3->setValue(1);
 
@@ -633,7 +572,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
             ilUtil::sendSuccess($this->txt('msg_obj_modified'), true);
             $this->ctrl->redirect($this, 'editProperties');
         }
-        $this->tabs_gui->activateTab('properties');
+        $this->tabs->activateTab('properties');
         $this->form->setValuesByPost();
         $this->tpl->setContent($this->form->getHtml());
     }
@@ -658,50 +597,4 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
             $this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
         }
     }
-
-
-    //
-    // Make important but unfortunately as 'final' declared methods available
-    //
-
-    /**
-     * Get plugin object
-     * @return ilSelfEvaluationPlugin plugin object
-     */
-    public function getPluginObject()
-    {
-        return $this->plugin;
-    }
-
-    /**
-     * @param        $permission
-     * @param string $cmd
-     * @throws ilObjectException
-     */
-    public function permissionCheck($permission, $cmd = '')
-    {
-        $this->checkPermission($permission, $cmd);
-    }
-
-    /**
-     * @param        $permission
-     * @param string $cmd
-     * @return bool
-     */
-    public function permissionCheckBool($permission, $cmd = '')
-    {
-        return $this->checkPermissionBool($permission, $cmd);
-    }
-
-    /**
-     * Redirect after creation, see https://docu.ilias.de/goto_docu_wiki_wpage_5035_1357.html
-     * Should be overwritten and redirect to settings screen.
-     */
-    public function redirectAfterCreation()
-    {
-        $link = ilLink::_getLink($this->object->getRefId());
-        $this->ctrl->redirectToURL($link);
-    }
 }
-
-?>

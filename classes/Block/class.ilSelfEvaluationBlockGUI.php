@@ -4,59 +4,41 @@ require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
 require_once(dirname(__FILE__) . '/../Presentation/class.ilFormSectionHeaderGUIFixed.php');
 
 /**
- * GUI-Class ilSelfEvaluationBlockGUI
- * @ilCtrl_isCalledBy ilSelfEvaluationBlockGUI: ilObjSelfEvaluationGUI
- * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * @author            Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @version           $Id:
+ * Class ilSelfEvaluationBlockGUI
  */
 abstract class ilSelfEvaluationBlockGUI
 {
-
-    /**
-     * @var ilTabsGUI
-     */
-    protected $tabs_gui;
-    /**
-     * @var ilSelfEvaluationBlock
-     */
-    protected $object;
     /**
      * @var ilPropertyFormGUI
      */
     protected $form;
 
-    /**
-     * @param ilObjSelfEvaluationGUI $parent
-     * @param ilSelfEvaluationBlock  $block
-     */
-    function __construct(ilObjSelfEvaluationGUI $parent, ilSelfEvaluationBlock $block)
-    {
-        global $tpl, $ilCtrl;
-        /**
-         * @var $tpl    ilTemplate
-         * @var $ilCtrl ilCtrl
-         */
+    function __construct(
+        int $parent_obj_id,
+        int $parent_ref_id,
+        ilGlobalTemplateInterface $tpl,
+        ilCtrl $ilCtrl,
+        ilAccess $access,
+        ilSelfEvaluationPlugin $plugin
+    ) {
         $this->tpl = $tpl;
         $this->ctrl = $ilCtrl;
-        $this->parent = $parent;
-        $this->tabs_gui = $this->parent->tabs_gui;
-        $this->object = $block;
-        $this->pl = $parent->getPluginObject();
+        $this->access = $access;
+        $this->plugin = $plugin;
+
+        $this->object = new ilSelfEvaluationQuestionBlock((int) $_GET['block_id']);
+        $this->object->setParentId($parent_obj_id);
+
+        $this->parent_ref_id = $parent_ref_id;
     }
 
+    /**
+     * @throws ilObjectException
+     */
     public function executeCommand()
     {
-        $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
         $this->ctrl->saveParameter($this, 'block_id');
-        $this->tabs_gui->setTabActive('administration');
-        switch ($cmd) {
-            default:
-                $this->performCommand($cmd);
-                break;
-        }
-
-        return true;
+        $this->performCommand();
     }
 
     /**
@@ -68,10 +50,12 @@ abstract class ilSelfEvaluationBlockGUI
     }
 
     /**
-     * @param $cmd
+     * @throws ilObjectException
      */
-    function performCommand($cmd)
+    protected function performCommand()
     {
+        $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
+
         switch ($cmd) {
             case 'addBlock':
             case 'createObject':
@@ -80,26 +64,35 @@ abstract class ilSelfEvaluationBlockGUI
             case 'deleteBlock':
             case 'deleteObject':
             case 'duplicateBlock':
-                $this->parent->permissionCheck('write');
+                if (!$this->checkAccess("write", $cmd)) {
+                    throw new \ilObjectException($this->plugin->txt("permission_denied"));
+                }
                 $this->$cmd();
                 break;
             case 'cancel':
-                $this->parent->permissionCheck('read');
+                if (!$this->checkAccess("read", $cmd)) {
+                    throw new \ilObjectException($this->plugin->txt("permission_denied"));
+                }
                 $this->$cmd();
                 break;
         }
     }
 
+    protected function checkAccess($permission, $cmd)
+    {
+        return $this->access->checkAccess($permission, $cmd, $this->parent_ref_id, $this->plugin->getId(),$this->object->getParentId());
+    }
+
     /**
      * Show the add block input GUI
      */
-    public function addBlock()
+    protected function addBlock()
     {
         $this->initForm();
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    public function cancel()
+    protected function cancel()
     {
         $this->ctrl->redirectByClass('ilSelfEvaluationListBlocksGUI', 'showContent');
     }
@@ -108,31 +101,31 @@ abstract class ilSelfEvaluationBlockGUI
      * Initialise the block form
      * @param string $mode create or update mode
      */
-    public function initForm($mode = 'create')
+    protected function initForm($mode = 'create')
     {
         $this->form = new  ilPropertyFormGUI();
-        $this->form->setTitle($this->pl->txt($mode . '_block'));
+        $this->form->setTitle($this->plugin->txt($mode . '_block'));
         $this->form->setFormAction($this->ctrl->getFormAction($this));
-        $this->form->addCommandButton($mode . 'Object', $this->pl->txt($mode . '_block_button'));
-        $this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
+        $this->form->addCommandButton($mode . 'Object', $this->plugin->txt($mode . '_block_button'));
+        $this->form->addCommandButton('cancel', $this->plugin->txt('cancel'));
 
-        $te = new ilTextInputGUI($this->pl->txt('title'), 'title');
+        $te = new ilTextInputGUI($this->plugin->txt('title'), 'title');
         $te->setRequired(true);
         $this->form->addItem($te);
-        $te = new ilTextAreaInputGUI($this->pl->txt('description'), 'description');
+        $te = new ilTextAreaInputGUI($this->plugin->txt('description'), 'description');
         $this->form->addItem($te);
     }
 
     /**
      * Create a new block object
      */
-    public function createObject()
+    protected function createObject()
     {
         $this->initForm();
         if ($this->form->checkInput()) {
             $this->setObjectValuesByPost();
             $this->object->create();
-            ilUtil::sendSuccess($this->pl->txt('msg_block_created'));
+            ilUtil::sendSuccess($this->plugin->txt('msg_block_created'));
             $this->cancel();
         }
         $this->tpl->setContent($this->form->getHTML());
@@ -141,17 +134,17 @@ abstract class ilSelfEvaluationBlockGUI
     /**
      * Create a new block object
      */
-    public function duplicateBlock()
+    protected function duplicateBlock()
     {
         $this->object->cloneTo($this->object->getParentId());
-        ilUtil::sendSuccess($this->pl->txt('msg_block_duplicated'), true);
+        ilUtil::sendSuccess($this->plugin->txt('msg_block_duplicated'), true);
         $this->cancel();
     }
 
     /**
      * Show the edit block GUI
      */
-    public function editBlock()
+    protected function editBlock()
     {
         $this->initForm('update');
         $values = $this->getObjectValuesAsArray();
@@ -170,49 +163,41 @@ abstract class ilSelfEvaluationBlockGUI
     /**
      * Update a block object
      */
-    public function updateObject()
+    protected function updateObject()
     {
         $this->initForm();
         $this->form->setValuesByPost();
         if ($this->form->checkInput()) {
             $this->setObjectValuesByPost();
             $this->object->update();
-            ilUtil::sendSuccess($this->pl->txt('msg_block_updated'));
+            ilUtil::sendSuccess($this->plugin->txt('msg_block_updated'));
             $this->cancel();
         }
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    /**
-     * Show the delete block GUI
-     */
-    public function deleteBlock()
+    protected function deleteBlock()
     {
-        ilUtil::sendQuestion($this->pl->txt('qst_delete_block'));
+        ilUtil::sendQuestion($this->plugin->txt('qst_delete_block'));
         $conf = new ilConfirmationGUI();
         $conf->setFormAction($this->ctrl->getFormAction($this));
-        $conf->setCancel($this->pl->txt('cancel'), 'cancel');
-        $conf->setConfirm($this->pl->txt('delete_block'), 'deleteObject');
+        $conf->setCancel($this->plugin->txt('cancel'), 'cancel');
+        $conf->setConfirm($this->plugin->txt('delete_block'), 'deleteObject');
         $conf->addItem('block_id', $this->object->getId(), $this->object->getTitle());
         $this->tpl->setContent($conf->getHTML());
     }
 
-    /**
-     * Delete a block object
-     */
-    public function deleteObject()
+    protected function deleteObject()
     {
-        ilUtil::sendSuccess($this->pl->txt('msg_block_deleted'), true);
+        ilUtil::sendSuccess($this->plugin->txt('msg_block_deleted'), true);
         $this->object->delete();
         $this->cancel();
     }
 
     protected function setObjectValuesByPost()
     {
-        $this->object->setParentId($this->parent->object->getId());
+        $this->object->setParentId($this->object->getParentId());
         $this->object->setTitle($this->form->getInput('title'));
         $this->object->setDescription($this->form->getInput('description'));
     }
 }
-
-?>

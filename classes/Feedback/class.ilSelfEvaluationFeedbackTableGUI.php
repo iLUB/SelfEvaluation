@@ -39,7 +39,7 @@ class ilSelfEvaluationFeedbackTableGUI extends ilTable2GUI
         $this->addMultiCommand("deleteFeedbacks", $this->pl->txt("delete_feedback"));
 
         $this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Feedback/tpl.template_feedback_row.html');
-        $this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->block->getId(), true,
+        $this->setData(ilSelfEvaluationFeedback::_getAllInstancesForParentId($a_parent_obj->getBlock()->getId(), true,
             $is_ovarall));
     }
 

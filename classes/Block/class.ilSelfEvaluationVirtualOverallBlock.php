@@ -8,21 +8,14 @@ require_once('class.ilSelfEvaluationVirtualQuestionBlock.php');
  */
 class ilSelfEvaluationVirtualOverallBlock extends ilSelfEvaluationVirtualQuestionBlock
 {
-    /**
-     * @var ilObjSelfEvaluationGUI
-     */
-    protected $parent_gui = null;
 
-    /**
-     * @param $parent_id
-     */
-    function __construct(ilObjSelfEvaluationGUI $parent)
+
+    function __construct(int $parent_obj_id, ilSelfEvaluationPlugin $plugin)
     {
-        $this->parent_gui = $parent;
-        $this->setId($this->parent_gui->object->getId());
-        $this->setParentId($this->parent_gui->ref_id);
-        $this->setTitle($this->parent_gui->getPluginObject()->txt("overall_feedback_block"));
-        $this->setDescription($this->parent_gui->getPluginObject()->txt("overall_feedback_block_description"));
+        $this->setId($parent_obj_id);
+        $this->setParentId($parent_obj_id);
+        $this->setTitle($plugin->txt("overall_feedback_block"));
+        $this->setDescription($plugin->txt("overall_feedback_block_description"));
 
     }
 }

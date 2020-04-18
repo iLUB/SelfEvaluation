@@ -38,12 +38,8 @@ class ilSelfEvaluationFeedbackChartGUI
      */
     protected $pl;
 
-    public function __construct()
+    public function __construct(ilGlobalPageTemplate $tpl)
     {
-        global $tpl;
-        /**
-         * @var $tpl    ilTemplate
-         */
         $this->tpl = $tpl;
 
         $this->pl = new ilSelfEvaluationPlugin();

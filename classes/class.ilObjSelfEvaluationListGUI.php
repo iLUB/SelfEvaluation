@@ -39,10 +39,6 @@ class ilObjSelfEvaluationListGUI extends ilObjectPluginListGUI
      * @var ilSelfEvaluationPlugin
      */
     protected $plugin;
-    /**
-     * @var int
-     */
-    protected $obj_id;
 
     /**
      *
@@ -82,7 +78,8 @@ class ilObjSelfEvaluationListGUI extends ilObjectPluginListGUI
     {
         $props = array();
         $this->plugin->includeClass('class.ilObjSelfEvaluationAccess.php');
-        if (!ilObjSelfEvaluationAccess::checkOnline($this->obj_id)) {
+        $object = new ilObjSelfEvaluation($this->ref_id);
+        if (!$object->getOnline()) {
             $props[] = array(
                 'alert' => true,
                 'property' => $this->txt('status'),

@@ -18,17 +18,12 @@ require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
  */
 class ilSelfEvaluationFeedbackGUI
 {
-
-    /**
-     * @var ilTabsGUI
-     */
-    protected $tabs_gui;
     /**
      * @var ilPropertyFormGUI
      */
     protected $form;
     /**
-     * @var ilTemplate
+     * @var ilGlobalPageTemplate
      */
     protected $ov;
     /**
@@ -37,55 +32,52 @@ class ilSelfEvaluationFeedbackGUI
     protected $total;
 
     /**
+     * @var ilSelfEvaluationQuestionBlockInterface
+     */
+    protected $block;
+
+    /**
+     * @var ilSelfEvaluationFeedback
+     */
+    protected $object;
+
+    /**
      * @var array
      */
-    function __construct(ilObjSelfEvaluationGUI $parent)
-    {
-        global $tpl, $ilCtrl, $ilToolbar;
-        /**
-         * @var $tpl       ilTemplate
-         * @var $ilCtrl    ilCtrl
-         * @var $ilToolbar ilToolbarGUI
-         */
+    function __construct(
+        ilObjSelfEvaluationGUI $parent,
+        ilGlobalPageTemplate $tpl,
+        ilCtrl $ilCtrl,
+        ilToolbarGUI $ilToolbar,
+        ilAccess $access,
+        ilSelfEvaluationPlugin $plugin
+    ) {
         $this->tpl = $tpl;
         $this->ctrl = $ilCtrl;
         $this->parent = $parent;
-        $this->tabs_gui = $this->parent->tabs_gui;
-        $this->pl = $parent->getPluginObject();
         $this->toolbar = $ilToolbar;
+        $this->access = $access;
+        $this->plugin = $plugin;
+    }
 
+    public function executeCommand()
+    {
         if ($_GET['parent_overall']) {
-            $this->block = new ilSelfEvaluationVirtualOverallBlock($this->parent);
-            $_GET['block_id'] = $this->parent->object->getId();
+            $this->block = new ilSelfEvaluationVirtualOverallBlock($this->parent->object->getId(),$this->plugin);
         } else {
             $this->block = new ilSelfEvaluationQuestionBlock($_GET['block_id']);
         }
+
         if ($_GET['feedback_id']) {
             $this->object = new ilSelfEvaluationFeedback($_GET['feedback_id']);
         } else {
-            $this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId());
+            $this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->getBlock()->getId());
         }
         if ($_GET['parent_overall']) {
             $this->object->setParentTypeOverall(true);
         }
 
-    }
-
-    public function executeCommand()
-    {
-        $this->tabs_gui->setTabActive('administration');
-        $this->ctrl->saveParameter($this, 'block_id');
-        $this->ctrl->saveParameter($this, 'parent_overall');
-        $this->ctrl->saveParameter($this, 'feedback_id');
-        $this->ctrl->saveParameterByClass('ilSelfEvaluationBlockGUI', 'block_id');
-        $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
-        switch ($cmd) {
-            default:
-                $this->performCommand($cmd);
-                break;
-        }
-
-        return true;
+        $this->performCommand();
     }
 
     /**
@@ -96,11 +88,15 @@ class ilSelfEvaluationFeedbackGUI
         return 'listObjects';
     }
 
-    /**
-     * @param $cmd
-     */
-    function performCommand($cmd)
+    protected function performCommand()
     {
+        $this->ctrl->saveParameter($this, 'block_id');
+        $this->ctrl->saveParameter($this, 'parent_overall');
+        $this->ctrl->saveParameter($this, 'feedback_id');
+        $this->ctrl->saveParameterByClass('ilSelfEvaluationBlockGUI', 'block_id');
+
+        $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
+
         switch ($cmd) {
             case 'listObjects':
             case 'addNew':
@@ -112,30 +108,33 @@ class ilSelfEvaluationFeedbackGUI
             case 'deleteFeedback':
             case 'deleteFeedbacks':
             case 'deleteObject':
-                //				$this->checkPermission('read'); FSX
+                if (!$this->access->checkAccess("read", $cmd, $this->parent->object->getRefId(), $this->plugin->getId(),
+                    $this->parent->object->getId())) {
+                    throw new \ilObjectException($this->plugin->txt("permission_denied"));
+                }
                 $this->$cmd();
                 break;
         }
     }
 
-    public function cancel()
+    protected function cancel()
     {
         $this->ctrl->setParameter($this, 'feedback_id', '');
         $this->ctrl->redirect($this);
     }
 
-    public function listObjects()
+    protected function listObjects()
     {
-        $this->toolbar->addButton('&lt;&lt; ' . $this->pl->txt('back_to_blocks'),
+        $this->toolbar->addButton('&lt;&lt; ' . $this->plugin->txt('back_to_blocks'),
             $this->ctrl->getLinkTargetByClass('ilSelfEvaluationListBlocksGUI', 'showContent'));
-        $this->toolbar->addButton($this->pl->txt('add_new_feedback'), $this->ctrl->getLinkTarget($this, 'addNew'));
+        $this->toolbar->addButton($this->plugin->txt('add_new_feedback'), $this->ctrl->getLinkTarget($this, 'addNew'));
 
         $ov = $this->getOverview();
         $table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects', $this->block);
         $this->tpl->setContent($ov->get() . '<br><br>' . $table->getHTML());
     }
 
-    public function addNew()
+    protected function addNew()
     {
         $this->initForm();
         $this->object->setStartValue(ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(),
@@ -146,7 +145,7 @@ class ilSelfEvaluationFeedbackGUI
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    public function checkNextValue()
+    protected function checkNextValue()
     {
         header('Cache-Control: no-cache, must-revalidate');
         header('Content-type: application/json');
@@ -167,32 +166,32 @@ class ilSelfEvaluationFeedbackGUI
         exit;
     }
 
-    public function initForm($mode = 'create')
+    protected function initForm($mode = 'create')
     {
         $this->form = new  ilPropertyFormGUI();
-        $this->form->setTitle($this->pl->txt($mode . '_feedback_form'));
+        $this->form->setTitle($this->plugin->txt($mode . '_feedback_form'));
         $this->form->setFormAction($this->ctrl->getFormAction($this));
-        $this->form->addCommandButton($mode . 'Object', $this->pl->txt($mode . '_feedback_button'));
-        $this->form->addCommandButton('cancel', $this->pl->txt('cancel'));
+        $this->form->addCommandButton($mode . 'Object', $this->plugin->txt($mode . '_feedback_button'));
+        $this->form->addCommandButton('cancel', $this->plugin->txt('cancel'));
         // Block
-        $te = new ilNonEditableValueGUI($this->pl->txt('block'), 'block');
+        $te = new ilNonEditableValueGUI($this->plugin->txt('block'), 'block');
         $te->setValue($this->block->getTitle());
         $this->form->addItem($te);
         // Title
-        $te = new ilTextInputGUI($this->pl->txt('title'), 'title');
+        $te = new ilTextInputGUI($this->plugin->txt('title'), 'title');
         $te->setRequired(true);
         $this->form->addItem($te);
         // Description
-        $te = new ilTextInputGUI($this->pl->txt('description'), 'description');
+        $te = new ilTextInputGUI($this->plugin->txt('description'), 'description');
         $this->form->addItem($te);
 
         if ($mode == 'create') {
-            $radio_options = new ilRadioGroupInputGUI($this->pl->txt('feedback_range_type'), 'feedback_range_type');
-            $option_auto = new ilRadioOption($this->pl->txt("option_auto"), 'option_auto');
-            $option_auto->setInfo($this->pl->txt("option_auto_info"));
+            $radio_options = new ilRadioGroupInputGUI($this->plugin->txt('feedback_range_type'), 'feedback_range_type');
+            $option_auto = new ilRadioOption($this->plugin->txt("option_auto"), 'option_auto');
+            $option_auto->setInfo($this->plugin->txt("option_auto_info"));
 
-            $option_slider = new ilRadioOption($this->pl->txt("option_slider"), 'option_slider');
-            $sl = new ilSliderInputGUI($this->pl->txt('slider'), 'slider', 0, 100,
+            $option_slider = new ilRadioOption($this->plugin->txt("option_slider"), 'option_slider');
+            $sl = new ilSliderInputGUI($this->tpl, $this->plugin->txt('slider'), 'slider', 0, 100,
                 $this->ctrl->getLinkTarget($this, 'checkNextValue'));
             $option_slider->addSubItem($sl);
 
@@ -207,19 +206,19 @@ class ilSelfEvaluationFeedbackGUI
 
             $this->form->addItem($radio_options);
         } else {
-            $sl = new ilSliderInputGUI($this->pl->txt('slider'), 'slider', 0, 100,
+            $sl = new ilSliderInputGUI($this->tpl, $this->plugin->txt('slider'), 'slider', 0, 100,
                 $this->ctrl->getLinkTarget($this, 'checkNextValue'));
             $this->form->addItem($sl);
         }
 
         // Feedbacktext
         require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
-        $te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->pl->txt('feedback_text'), 'feedback_text');
+        $te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->plugin->txt('feedback_text'), 'feedback_text');
         $te->setRequired(true);
         $this->form->addItem($te);
     }
 
-    public function createObject()
+    protected function createObject()
     {
         $this->initForm();
         if ($this->form->checkInput()) {
@@ -240,14 +239,14 @@ class ilSelfEvaluationFeedbackGUI
 
             $obj->setFeedbackText($this->form->getInput('feedback_text'));
             $obj->create();
-            ilUtil::sendSuccess($this->pl->txt('msg_feedback_created'));
+            ilUtil::sendSuccess($this->plugin->txt('msg_feedback_created'));
             $this->cancel();
         }
         $this->form->setValuesByPost();
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    public function setValues()
+    protected function setValues()
     {
         $values['title'] = $this->object->getTitle();
         $values['description'] = $this->object->getDescription();
@@ -263,14 +262,14 @@ class ilSelfEvaluationFeedbackGUI
         $this->form->setValuesByArray($values);
     }
 
-    public function editFeedback()
+    protected function editFeedback()
     {
         $this->initForm('update');
         $this->setValues();
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    public function updateObject()
+    protected function updateObject()
     {
         $this->initForm('update');
         if ($this->form->checkInput()) {
@@ -281,30 +280,30 @@ class ilSelfEvaluationFeedbackGUI
             $this->object->setEndValue($slider[1]);
             $this->object->setFeedbackText($this->form->getInput('feedback_text'));
             $this->object->update();
-            ilUtil::sendSuccess($this->pl->txt('msg_feedback_created'));
+            ilUtil::sendSuccess($this->plugin->txt('msg_feedback_created'));
             $this->cancel();
         }
         $this->form->setValuesByPost();
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    public function deleteFeedback()
+    protected function deleteFeedback()
     {
         $this->deleteFeedbacksConfirmation([$this->object->getId()]);
     }
 
-    public function deleteFeedbacks()
+    protected function deleteFeedbacks()
     {
         $this->deleteFeedbacksConfirmation($_POST["id"]);
     }
 
-    public function deleteFeedbacksConfirmation($ids = [])
+    protected function deleteFeedbacksConfirmation($ids = [])
     {
-        ilUtil::sendQuestion($this->pl->txt('qst_delete_feedback'));
+        ilUtil::sendQuestion($this->plugin->txt('qst_delete_feedback'));
         $conf = new ilConfirmationGUI();
         $conf->setFormAction($this->ctrl->getFormAction($this));
-        $conf->setCancel($this->pl->txt('cancel'), 'cancel');
-        $conf->setConfirm($this->pl->txt('delete_feedback'), 'deleteObject');
+        $conf->setCancel($this->plugin->txt('cancel'), 'cancel');
+        $conf->setConfirm($this->plugin->txt('delete_feedback'), 'deleteObject');
         foreach ($ids as $id) {
             $obj = new ilSelfEvaluationFeedback($id);
             $conf->addItem('id[]', $obj->getId(), $obj->getTitle());
@@ -313,9 +312,9 @@ class ilSelfEvaluationFeedbackGUI
         $this->tpl->setContent($conf->getHTML());
     }
 
-    public function deleteObject()
+    protected function deleteObject()
     {
-        ilUtil::sendSuccess($this->pl->txt('msg_feedback_deleted'), true);
+        ilUtil::sendSuccess($this->plugin->txt('msg_feedback_deleted'), true);
 
         $ids = $_POST["id"];
         foreach ($ids as $id) {
@@ -325,10 +324,7 @@ class ilSelfEvaluationFeedbackGUI
         $this->cancel();
     }
 
-    /**
-     * @return ilTemplate
-     */
-    public function getOverview()
+    protected function getOverview() : ilTemplate
     {
         $this->getMeasurement();
         $min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), 0, 0,
@@ -338,7 +334,6 @@ class ilSelfEvaluationFeedbackGUI
 
         if (count($feedbacks) == 0) {
             $this->parseOverviewBlock('blank', 100, 0);
-
             return $this->ov;
         }
         $fb = null;
@@ -359,7 +354,7 @@ class ilSelfEvaluationFeedbackGUI
 
     public function getMeasurement()
     {
-        $this->ov = $this->pl->getTemplate('default/Feedback/tpl.feedback_overview.html');
+        $this->ov = $this->plugin->getTemplate('default/Feedback/tpl.feedback_overview.html');
         for ($x = 1; $x <= 100; $x += 1) {
             $this->ov->setCurrentBlock('line');
             if ($x % 5 == 0) {
@@ -373,13 +368,7 @@ class ilSelfEvaluationFeedbackGUI
         }
     }
 
-    /**
-     * @param string $type should be 'blank' or 'fb'
-     * @param int    $width
-     * @param int    $value
-     * @param string $title
-     */
-    public function parseOverviewBlock($type, $width, $value, $title = '')
+    public function parseOverviewBlock(string $type, int $width, int $value, string $title = '')
     {
         $href = '';
         $css = '';
@@ -389,7 +378,7 @@ class ilSelfEvaluationFeedbackGUI
                 $this->ctrl->setParameter($this, 'start_value', $value);
                 $href = ($this->ctrl->getLinkTarget($this, 'addNew'));
                 $css = '_blank';
-                $title = $this->pl->txt('insert_feedback');
+                $title = $this->plugin->txt('insert_feedback');
                 break;
             case 'fb':
                 $this->ctrl->setParameter($this, 'feedback_id', $value);
@@ -404,6 +393,12 @@ class ilSelfEvaluationFeedbackGUI
         $this->ov->setVariable('CSS', $css);
         $this->ov->parseCurrentBlock();
     }
-}
 
-?>
+    /**
+     * @return ilSelfEvaluationQuestionBlockInterface
+     */
+    public function getBlock() : ilSelfEvaluationQuestionBlockInterface
+    {
+        return $this->block;
+    }
+}

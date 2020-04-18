@@ -1,5 +1,8 @@
 <?php
 
+use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
+use ilDBInterface;
+
 /**
  * Class ilSelfEvaluationBlock
  * @author  Fabian Schmid <fs@studer-raimann.ch>
@@ -8,6 +11,7 @@
  */
 abstract class ilSelfEvaluationBlock
 {
+    use ArrayForDB;
 
     /**
      * @var int
@@ -31,10 +35,24 @@ abstract class ilSelfEvaluationBlock
     protected $parent_id = 0;
 
     /**
+     * @var bool
+     */
+    protected $sortable;
+
+    /**
+     * @var ilDBInterface
+     */
+    protected $db;
+
+    /**
      * @param $id
      */
     function __construct($id = 0)
     {
+        global $DIC;
+
+        $this->db = $DIC->database();
+
         $this->id = $id;
 
         //		 $this->updateDB();
@@ -60,43 +78,15 @@ abstract class ilSelfEvaluationBlock
      * @param SimpleXMLElement $xml
      * @return mixed
      */
-    static abstract function fromXml($parent_id, SimpleXMLElement $xml);
+    static abstract function fromXml(ilDBInterface $db, $parent_id, SimpleXMLElement $xml);
 
     public function read()
     {
-        global $DIC;
-        /**
-         * @var $DIC ILIAS\DI\Container
-         */
-
-        $set = $DIC->database()->query('SELECT * FROM ' . $this->getTableName() . ' ' . ' WHERE id = '
-            . $DIC->database()->quote($this->getId(), 'integer'));
-        while ($rec = $DIC->database()->fetchObject($set)) {
+        $set = $this->db->query('SELECT * FROM ' . $this->getTableName() . ' ' . ' WHERE id = '
+            . $this->db->quote($this->getId(), 'integer'));
+        while ($rec = $this->db->fetchObject($set)) {
             static::setObjectValuesFromRecord($this, $rec);
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getArrayForDb()
-    {
-        $e = array();
-        foreach (get_object_vars($this) as $k => $v) {
-            if (!in_array($k, $this->getNonDbFields())) {
-                $e[$k] = array(self::_getType($v), $this->$k);
-            }
-        }
-
-        return $e;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getNonDbFields()
-    {
-        return array('db');
     }
 
     /**
@@ -108,11 +98,6 @@ abstract class ilSelfEvaluationBlock
 
     public function initDB()
     {
-        global $DIC;
-        /**
-         * @var $DIC ILIAS\DI\Container
-         */
-
         $fields = array();
         foreach ($this->getArrayForDb() as $k => $v) {
             $fields[$k] = array(
@@ -130,42 +115,23 @@ abstract class ilSelfEvaluationBlock
                 $fields[$k]['notnull'] = true;
             }
         }
-        if (!$DIC->database()->tableExists($this->getTableName())) {
-            $DIC->database()->createTable($this->getTableName(), $fields);
-            $DIC->database()->addPrimaryKey($this->getTableName(), array('id'));
-            $DIC->database()->createSequence($this->getTableName());
+        if (!$this->db->tableExists($this->getTableName())) {
+            $this->db->createTable($this->getTableName(), $fields);
+            $this->db->addPrimaryKey($this->getTableName(), array('id'));
+            $this->db->createSequence($this->getTableName());
         }
     }
 
     final function updateDB()
     {
-        global $DIC;
-        /**
-         * @var $DIC ILIAS\DI\Container
-         */
-
-        if (!$DIC->database()->tableExists($this->getTableName())) {
+        if (!$this->db->tableExists($this->getTableName())) {
             $this->initDB();
 
             return;
         }
-        foreach ($this->getArrayForDb() as $k => $v) {
-            if (!$DIC->database()->tableColumnExists($this->getTableName(), $k)) {
-                $field = array(
-                    'type' => $v[0],
-                );
-                switch ($v[0]) {
-                    case 'integer':
-                        $field['length'] = 4;
-                        break;
-                    case 'text':
-                        $field['length'] = 1024;
-                        break;
-                }
-                if ($k == 'id') {
-                    $field['notnull'] = true;
-                }
-                $DIC->database()->addTableColumn($this->getTableName(), $k, $field);
+        foreach ($this->getArrayForDbWithAttributes() as $property => $attributes) {
+            if (!$this->db->tableColumnExists(self::TABLE_NAME, $property)) {
+                $this->db->addTableColumn(self::TABLE_NAME, $property, $attributes);
             }
         }
     }
@@ -183,33 +149,17 @@ abstract class ilSelfEvaluationBlock
         }
     }
 
-    final private function resetDB()
-    {
-        global $DIC;
-        /**
-         * @var $DIC ILIAS\DI\Container
-         */
-
-        $DIC->database()->dropTable($this->getTableName());
-        $this->initDB();
-    }
-
     public function create()
     {
-        global $DIC;
-        /**
-         * @var $DIC ILIAS\DI\Container
-         */
-
         if ($this->getId() != 0) {
             $this->update();
 
             return;
         }
-        $this->setId($DIC->database()->nextID($this->getTableName()));
+        $this->setId($this->db->nextID($this->getTableName()));
         require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlockFactory.php');
         $this->setPosition(ilSelfEvaluationBlockFactory::getNextPositionAcrossBlocks($this->getParentId()));
-        $DIC->database()->insert($this->getTableName(), $this->getArrayForDb());
+        $this->db->insert($this->getTableName(), $this->getArrayForDb());
     }
 
     /**
@@ -217,39 +167,30 @@ abstract class ilSelfEvaluationBlock
      */
     public function delete()
     {
-        global $DIC;
-        /**
-         * @var $DIC ILIAS\DI\Container
-         */
 
-        return $DIC->database()->manipulate('DELETE FROM ' . $this->getTableName() . ' WHERE id = '
-            . $DIC->database()->quote($this->getId(), 'integer'));
+        return $this->db->manipulate('DELETE FROM ' . $this->getTableName() . ' WHERE id = '
+            . $this->db->quote($this->getId(), 'integer'));
     }
 
     public function update()
     {
-        global $DIC;
-        /**
-         * @var $DIC ILIAS\DI\Container
-         */
-
         if ($this->getId() == 0) {
             $this->create();
 
             return;
         }
-        $DIC->database()->update($this->getTableName(), $this->getArrayForDb(), array(
-            'id' => array(
-                'integer',
-                $this->getId()
-            ),
-        ));
+        $this->db->update($this->getTableName(), $this->getArrayForDb(), $this->getIdForDb());
     }
 
-    /**
-     * @return bool
-     */
-    public function isBlockSortable()
+    public function isBlockSortable(): bool
+    {
+        if($this->sortable === null){
+            $this->sortable = $this->initSortable();
+        }
+        return $this->sortable;
+    }
+
+    protected function initSortable()
     {
         /**
          * @var $parentObject ilObjSelfEvaluation
@@ -276,10 +217,14 @@ abstract class ilSelfEvaluationBlock
      */
     public static function getAllInstancesByParentId($parent_id)
     {
-        global $ilDB;
+        global $DIC;
+        /**
+         * @var $DIC ILIAS\DI\Container
+         */
+
         $return = array();
-        $set = $ilDB->query('SELECT * FROM ' . static::getTableName() . ' ' . ' WHERE parent_id = '
-            . $ilDB->quote($parent_id, 'integer') . ' ORDER BY position ASC');
+        $set = $DIC->database()->query('SELECT * FROM ' . static::getTableName() . ' ' . ' WHERE parent_id = '
+            . $DIC->database()->quote($parent_id, 'integer') . ' ORDER BY position ASC');
         while ($rec = $ilDB->fetchObject($set)) {
             /** @var ilSelfEvaluationBlock $block */
             $block = new static();
@@ -296,10 +241,9 @@ abstract class ilSelfEvaluationBlock
      */
     public function getNextPosition($parent_id)
     {
-        global $ilDB;
-        $set = $ilDB->query('SELECT MAX(position) next_pos FROM ' . $this->getTableName() . ' ' . ' WHERE parent_id = '
-            . $ilDB->quote($parent_id, 'integer'));
-        while ($rec = $ilDB->fetchObject($set)) {
+        $set = $this->db->database()->query('SELECT MAX(position) next_pos FROM ' . $this->getTableName() . ' ' . ' WHERE parent_id = '
+            . $this->db->database()->quote($parent_id, 'integer'));
+        while ($rec = $this->db->database()->fetchObject($set)) {
             return $rec->next_pos + 1;
         }
 
@@ -395,29 +339,4 @@ abstract class ilSelfEvaluationBlock
     {
         return get_class($this) . '_' . $this->getId();
     }
-
-
-    //
-    // Helper
-    //
-    /**
-     * @param $var
-     * @return string
-     */
-    public static function _getType($var)
-    {
-        switch (gettype($var)) {
-            case 'string':
-            case 'array':
-            case 'object':
-                return 'text';
-            case 'NULL':
-            case 'boolean':
-                return 'integer';
-            default:
-                return gettype($var);
-        }
-    }
 }
-
-?>

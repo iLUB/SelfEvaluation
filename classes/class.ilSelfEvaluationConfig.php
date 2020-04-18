@@ -1,11 +1,5 @@
 <?php
 
-/**
- * ilSelfEvaluationConfig
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- * @author  Fabian Schmid <fs@studer-raimann.ch>
- * @version $Id$
- */
 class ilSelfEvaluationConfig
 {
 
@@ -189,5 +183,3 @@ class ilSelfEvaluationConfig
             $str);
     }
 }
-
-?>

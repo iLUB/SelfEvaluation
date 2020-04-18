@@ -1,25 +1,7 @@
 <?php
-/*
-	+-----------------------------------------------------------------------------+
-	| ILIAS open source                                                           |
-	+-----------------------------------------------------------------------------+
-	| Copyright (c) 1998-2014 ILIAS open source, University of Cologne            |
-	|                                                                             |
-	| This program is free software; you can redistribute it and/or               |
-	| modify it under the terms of the GNU General Public License                 |
-	| as published by the Free Software Foundation; either version 2              |
-	| of the License, or (at your option) any later version.                      |
-	|                                                                             |
-	| This program is distributed in the hope that it will be useful,             |
-	| but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-	| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-	| GNU General Public License for more details.                                |
-	|                                                                             |
-	| You should have received a copy of the GNU General Public License           |
-	| along with this program; if not, write to the Free Software                 |
-	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-	+-----------------------------------------------------------------------------+
-*/
+use ilDBInterface;
+use ilub\plugin\SelfEvaluation\Question\MetaQuestion;
+
 require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestionFactory.php');
 require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/class.iLubFieldDefinitionContainer.php');
@@ -67,7 +49,7 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock
         $clone->setPosition($this->getPosition());
         $clone->update();
 
-        $old_questions = ilSelfEvaluationMetaQuestion::_getAllInstancesForParentId($this->getId());
+        $old_questions = ilSelfEvaluationMetaQuestion::_getAllInstancesForParentId($this->db, $this->getId());
 
         foreach ($old_questions as $question) {
             $question->cloneTo($clone->getId());
@@ -88,7 +70,7 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock
         $child_xml->addAttribute("description", $this->getDescription());
         $child_xml->addAttribute("position", $this->getPosition());
 
-        $questions = ilSelfEvaluationMetaQuestion::_getAllInstancesForParentId($this->getId());
+        $questions = MetaQuestion::_getAllInstancesForParentId($this->db, $this->getId());
 
         foreach ($questions as $question) {
             $child_xml = $question->toXml($child_xml);
@@ -97,12 +79,7 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock
         return $xml;
     }
 
-    /**
-     * @param                  $parent_id
-     * @param SimpleXMLElement $xml
-     * @return SimpleXMLElement
-     */
-    static function fromXml($parent_id, SimpleXMLElement $xml)
+    static function fromXml(ilDBInterface $db, $parent_id, SimpleXMLElement $xml)
     {
         $attributes = $xml->attributes();
         $block = new self();
@@ -113,30 +90,10 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock
         $block->create();
 
         foreach ($xml->metaQuestion as $question) {
-            ilSelfEvaluationMetaQuestion::fromXML($block->getId(), $question);
+            MetaQuestion::fromXML($db,$block->getId(), $question);
         }
 
         return $xml;
-    }
-
-    /**
-     * @param ilSelfEvaluationBlock $block
-     * @param stdClass              $rec
-     */
-    protected static function setObjectValuesFromRecord(
-        ilSelfEvaluationBlock &$block = null,
-        $rec = null
-    ) {
-        parent::setObjectValuesFromRecord($block, $rec);
-        $block->initMetaContainer();
-    }
-
-    /**
-     * @return array
-     */
-    protected function getNonDbFields()
-    {
-        return array_merge(parent::getNonDbFields(), array('meta_container'));
     }
 
     /**
@@ -146,14 +103,6 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock
     {
         return 'rep_robj_xsev_mblock';
     }
-
-    public function initDB()
-    {
-        parent::initDB();
-        $this->initMetaContainer();
-        $this->meta_container->initDB();
-    }
-
     /**
      * @return ilSelfEvaluationBlockTableRow
      */
@@ -165,27 +114,13 @@ class ilSelfEvaluationMetaBlock extends ilSelfEvaluationBlock
         return $row;
     }
 
-    /**
-     * @return \iLubFieldDefinitionContainer
-     */
-    public function getMetaContainer()
-    {
-        return $this->meta_container;
-    }
-
-    public function initMetaContainer()
-    {
-        $factory = new ilSelfEvaluationMetaQuestionFactory();
-        $this->meta_container = new iLubFieldDefinitionContainer($factory, $this->getId());
-    }
-
     public function delete()
     {
-        // delete meta questions
-        foreach ($this->getMetaContainer()->getFieldDefinitions() as $field) {
-            $field->delete();
+        $questions = MetaQuestion::_getAllInstancesForParentId($this->db, $this->getId());
+
+        foreach ($questions as $question) {
+            $question->delete();
         }
-        // delete meta question block
         return parent::delete();
     }
 }

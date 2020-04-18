@@ -89,6 +89,15 @@ multinput_title#:#Bezeichnung
 multinput_description#:#Es empfiehlt sich, als ersten numerischen Wert die 0 zu wählen, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
 sort_type#:#Sortierung
 
+field_added#:#Eine neues Datenfeld wurde angelegt.
+confirm_delete#:#'Sind Sie sicher, dass Sie dieses Datenfeld löschen möchten?'
+add_field#:#Neues Datenfeld anlegen
+sorting_saved#:#Reihenfolge gespeichert
+matrix_scale#:#Skala
+matrix_scale_description#:#Skala der Matrixfrage (horizontal)
+matrix_scale_question#:#Fragen
+matrix_scale_question_description#:#Liste mit Fragen (vertikal)
+
 shuffle_in_blocks#:#Fragen pro Block mischen
 no_questions_per_page#:#Anzahl Fragen pro Seite
 

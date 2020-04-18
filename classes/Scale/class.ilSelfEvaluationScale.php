@@ -201,12 +201,6 @@ class ilSelfEvaluationScale
         }
     }
 
-    final private function resetDB()
-    {
-        $this->db->dropTable(self::TABLE_NAME);
-        $this->initDB();
-    }
-
     /**
      * @return bool
      */

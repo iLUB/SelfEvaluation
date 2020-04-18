@@ -1,36 +1,16 @@
 <?php
-/*
-	+-----------------------------------------------------------------------------+
-	| ILIAS open source                                                           |
-	+-----------------------------------------------------------------------------+
-	| Copyright (c) 1998-2009 ILIAS open source, University of Cologne            |
-	|                                                                             |
-	| This program is free software; you can redistribute it and/or               |
-	| modify it under the terms of the GNU General Public License                 |
-	| as published by the Free Software Foundation; either version 2              |
-	| of the License, or (at your option) any later version.                      |
-	|                                                                             |
-	| This program is distributed in the hope that it will be useful,             |
-	| but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-	| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-	| GNU General Public License for more details.                                |
-	|                                                                             |
-	| You should have received a copy of the GNU General Public License           |
-	| along with this program; if not, write to the Free Software                 |
-	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-	+-----------------------------------------------------------------------------+
-*/
+require_once __DIR__ . '/../vendor/autoload.php';
 
-require_once('./Services/Repository/classes/class.ilObjectPlugin.php');
+use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
+use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
+
 require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlockFactory.php');
 require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
-require_once(dirname(__FILE__) . '/Question/class.ilSelfEvaluationQuestion.php');
 require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScale.php');
 require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScaleUnit.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
 require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
-require_once(dirname(__FILE__) . '/Identity/class.ilSelfEvaluationIdentity.php');
 require_once(dirname(__FILE__) . '/Feedback/class.ilSelfEvaluationFeedback.php');
 
 /**
@@ -38,8 +18,9 @@ require_once(dirname(__FILE__) . '/Feedback/class.ilSelfEvaluationFeedback.php')
  * @author Fabian Schmid <fabian.schmid@ilub.unibe.ch>
  * $Id$
  */
-class ilObjSelfEvaluation extends ilObjectPlugin
+class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
 {
+    use ArrayForDB;
 
     const TABLE_NAME = 'rep_robj_xsev_data';
     const TYPE_GROUP = 1;
@@ -179,143 +160,10 @@ class ilObjSelfEvaluation extends ilObjectPlugin
      */
     protected $block_option_random_desc = "";
 
-    /**
-     * @param int $a_ref_id
-     */
-    function __construct($a_ref_id = 0)
-    {
-        global $ilDB;
-        /**
-         * @var $ilDB ilDB
-         */
-        $this->db = $ilDB;
-        parent::__construct($a_ref_id);
-    }
 
     final function initType()
     {
         $this->setType('xsev');
-    }
-
-    /**
-     * @return array
-     */
-    public function getArrayForDb()
-    {
-        return array(
-            'id' => array(
-                'integer',
-                $this->getId()
-            ),
-            'is_online' => array(
-                'integer',
-                $this->getOnline()
-            ),
-            'identity_selection' => array(
-                'integer',
-                $this->isIdentitySelection()
-            ),
-            'evaluation_type' => array(
-                'integer',
-                $this->getEvaluationType()
-            ),
-            'sort_type' => array(
-                'integer',
-                $this->getSortType()
-            ),
-            'display_type' => array(
-                'integer',
-                $this->getDisplayType()
-            ),
-            'intro' => array(
-                'text',
-                $this->getIntro()
-            ),
-            'outro_title' => array(
-                'text',
-                $this->getOutroTitle()
-            ),
-            'outro' => array(
-                'text',
-                $this->getOutro()
-            ),
-            'identity_selection_info' => array(
-                'text',
-                $this->getIdentitySelectionInfoText()
-            ),
-            'show_fbs' => array(
-                'integer',
-                $this->getShowFeedbacks()
-            ),
-            'show_fbs_charts' => array(
-                'integer',
-                $this->getShowFeedbacksCharts()
-            ),
-            'show_fbs_overview' => array(
-                'integer',
-                $this->getShowFeedbacksOverview()
-            ),
-            'show_fbs_overview_text' => array(
-                'integer',
-                $this->isShowFbsOverviewText()
-            ),
-            'show_fbs_overview_statistics' => array(
-                'integer',
-                $this->isShowFbsOverviewStatistics()
-            ),
-            'show_block_titles_sev' => array(
-                'integer',
-                $this->getShowBlockTitlesDuringEvaluation()
-            ),
-            'show_block_desc_sev' => array(
-                'integer',
-                $this->getShowBlockDescriptionsDuringEvaluation()
-            ),
-            'show_block_titles_fb' => array(
-                'integer',
-                $this->getShowBlockTitlesDuringFeedback()
-            ),
-            'show_block_desc_fb' => array(
-                'integer',
-                $this->getShowBlockDescriptionsDuringFeedback()
-            ),
-            'sort_random_nr_items_block' => array(
-                'integer',
-                $this->getSortRandomNrItemBlock()
-            ),
-            'block_option_random_desc' => array(
-                'text',
-                $this->getBlockOptionRandomDesc()
-            ),
-            'show_fbs_overview_bar' => array(
-                'integer',
-                $this->isShowFbsOverviewBar()
-            ),
-            'bar_show_label_as_percentage' => array(
-                'integer',
-                $this->isOverviewBarShowLabelAsPercentage()
-            ),
-            'show_fbs_overview_spider' => array(
-                'integer',
-                $this->isShowFbsOverviewSpider()
-            ),
-            'show_fbs_overview_left_right' => array(
-                'integer',
-                $this->isShowFbsOverviewLeftRight()
-            ),
-            'show_fbs_chart_bar' => array(
-                'integer',
-                $this->isShowFbsChartBar()
-            ),
-            'show_fbs_chart_spider' => array(
-                'integer',
-                $this->isShowFbsChartSpider()
-            ),
-            'show_fbs_chart_left_right' => array(
-                'integer',
-                $this->isShowFbsChartLeftRight()
-            ),
-        );
     }
 
     function doCreate()
@@ -367,12 +215,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin
     function doUpdate()
     {
 
-        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
-            'id' => array(
-                'integer',
-                $this->getId()
-            ),
-        ));
+        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(),$this->getId());
     }
 
     public function doDelete()
@@ -571,20 +414,20 @@ class ilObjSelfEvaluation extends ilObjectPlugin
 
         //Import Scale
         if ($xml->scale) {
-            ilSelfEvaluationScale::fromXml($this->getId(), $xml->scale);
+            ilSelfEvaluationScale::fromXml($this->db,$this->getId(), $xml->scale);
         }
 
         //Import Blocks
         foreach ($xml->metaBlock as $block) {
-            ilSelfEvaluationMetaBlock::fromXml($this->getId(), $block);
+            ilSelfEvaluationMetaBlock::fromXml($this->db,$this->getId(), $block);
         }
         foreach ($xml->questionBlock as $block) {
-            ilSelfEvaluationQuestionBlock::fromXml($this->getId(), $block);
+            ilSelfEvaluationQuestionBlock::fromXml($this->db,$this->getId(), $block);
         }
 
         //Import Overall Feedback
         foreach ($xml->feedback as $feedback) {
-            ilSelfEvaluationFeedback::fromXml($this->getId(), $feedback);
+            ilSelfEvaluationFeedback::fromXml($this->db,$this->getId(), $feedback);
         }
 
         return $this;
@@ -1149,7 +992,4 @@ class ilObjSelfEvaluation extends ilObjectPlugin
     {
         $this->identity_selection = $identity_selection;
     }
-
 }
-
-?>

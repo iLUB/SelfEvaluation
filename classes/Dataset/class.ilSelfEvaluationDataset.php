@@ -1,11 +1,16 @@
 <?php
+
+use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
+use ilub\plugin\SelfEvaluation\Question\QuestionGUI;
+use ilub\plugin\SelfEvaluation\Question\MetaQuestionGUI;
+use ilub\plugin\SelfEvaluation\Question\Question;
+use ilub\plugin\SelfEvaluation\Question\MetaQuestion;
+use ilub\plugin\SelfEvaluation\Identity\Identity;
+
 require_once('class.ilSelfEvaluationData.php');
-require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestionGUI.php');
-require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationQuestion.php');
-require_once(dirname(__FILE__) . '/../Question/class.ilSelfEvaluationMetaQuestionGUI.php');
+
 require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedback.php');
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
-require_once(dirname(__FILE__) . '/../Identity/class.ilSelfEvaluationIdentity.php');
 
 /**
  * ilSelfEvaluationDataset
@@ -14,6 +19,7 @@ require_once(dirname(__FILE__) . '/../Identity/class.ilSelfEvaluationIdentity.ph
  */
 class ilSelfEvaluationDataset
 {
+    use ArrayForDB;
 
     const TABLE_NAME = 'rep_robj_xsev_ds';
     /**
@@ -65,32 +71,6 @@ class ilSelfEvaluationDataset
     }
 
     /**
-     * @return array
-     */
-    public function getArrayForDb()
-    {
-        $e = array();
-        foreach (get_object_vars($this) as $k => $v) {
-            if (!in_array($k, array('db', 'percentage_per_block'))) {
-                $e[$k] = array(self::_getType($v), $this->$k);
-            }
-        }
-
-        return $e;
-    }
-
-    /**
-     * @param ilSelfEvaluationDataset $data_set
-     * @param stdClass                $rec
-     */
-    protected function setObjectValuesFromRecord(ilSelfEvaluationDataset &$data_set, $rec)
-    {
-        foreach ($this->getArrayForDb() as $k => $v) {
-            $data_set->{$k} = $rec->{$k};
-        }
-    }
-
-    /**
      * @param string $postvar_key
      * @return string|false
      */
@@ -98,10 +78,10 @@ class ilSelfEvaluationDataset
     {
         $type = false;
 
-        if (strpos($postvar_key, ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX) === 0) {
+        if (strpos($postvar_key, QuestionGUI::POSTVAR_PREFIX) === 0) {
             $type = ilSelfEvaluationData::QUESTION_TYPE;
         } else {
-            if (strpos($postvar_key, ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX) === 0) {
+            if (strpos($postvar_key, QuestionGUI::POSTVAR_PREFIX) === 0) {
                 $type = ilSelfEvaluationData::META_QUESTION_TYPE;
             }
         }
@@ -119,10 +99,10 @@ class ilSelfEvaluationDataset
         $qid = false;
 
         if ($question_type == ilSelfEvaluationData::QUESTION_TYPE) {
-            $qid = (int) str_replace(ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
+            $qid = (int) str_replace(QuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
         } else {
             if ($question_type == ilSelfEvaluationData::META_QUESTION_TYPE) {
-                $qid = (int) str_replace(ilSelfEvaluationMetaQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
+                $qid = (int) str_replace(MetaQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
             }
         }
 
@@ -137,10 +117,10 @@ class ilSelfEvaluationDataset
     protected function questionExists($qid, $question_type)
     {
         if ($question_type == ilSelfEvaluationData::QUESTION_TYPE) {
-            return ilSelfEvaluationQuestion::_isObject($qid);
+            return Question::_isObject($qid);
         } else {
             if ($question_type == ilSelfEvaluationData::META_QUESTION_TYPE) {
-                return ilSelfEvaluationMetaQuestion::isObject($qid);
+                return MetaQuestion::isObject($qid);
             }
         }
 
@@ -153,7 +133,7 @@ class ilSelfEvaluationDataset
      */
     protected function getDataFromPost($post)
     {
-        $data = array();
+        $data = [];
         foreach ($post as $k => $v) {
             $type = $this->determineQuestionType($k);
             if ($type === false) {
@@ -174,34 +154,11 @@ class ilSelfEvaluationDataset
 
     final function initDB()
     {
-        $fields = array();
-        foreach ($this->getArrayForDb() as $k => $v) {
-            $fields[$k] = array(
-                'type' => $v[0],
-            );
-            switch ($v[0]) {
-                case 'integer':
-                    $fields[$k]['length'] = 4;
-                    break;
-                case 'text':
-                    $fields[$k]['length'] = 1024;
-                    break;
-            }
-            if ($k == 'id') {
-                $fields[$k]['notnull'] = true;
-            }
-        }
         if (!$this->db->tableExists(self::TABLE_NAME)) {
-            $this->db->createTable(self::TABLE_NAME, $fields);
+            $this->db->createTable(self::TABLE_NAME, $this->getArrayForDbWithAttributes());
             $this->db->addPrimaryKey(self::TABLE_NAME, array('id'));
             $this->db->createSequence(self::TABLE_NAME);
         }
-    }
-
-    final private function resetDB()
-    {
-        $this->db->dropTable(self::TABLE_NAME);
-        $this->initDB();
     }
 
     public function create()
@@ -234,12 +191,7 @@ class ilSelfEvaluationDataset
 
             return;
         }
-        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
-            'id' => array(
-                'integer',
-                $this->getId()
-            ),
-        ));
+        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), $this->getIdForDb());
     }
 
     /**
@@ -302,7 +254,7 @@ class ilSelfEvaluationDataset
     public function getDataPerBlock($block_id)
     {
         $sum = array();
-        foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block_id) as $qst) {
+        foreach (Question::_getAllInstancesForParentId($block_id) as $qst) {
             $da = ilSelfEvaluationData::_getInstanceForQuestionId($this->getId(), $qst->getId());
             $sum[$qst->getId()] = (int) $da->getValue();
         }
@@ -591,7 +543,7 @@ class ilSelfEvaluationDataset
         global $DIC;
 
         $return = array();
-        foreach (ilSelfEvaluationIdentity::_getAllInstancesByObjId($obj_id) as $identity) {
+        foreach (Identity::_getAllInstancesByObjId($obj_id) as $identity) {
             $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
                 . $DIC->database()->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
             while ($rec = $DIC->database()->fetchObject($set)) {
@@ -624,13 +576,11 @@ class ilSelfEvaluationDataset
      */
     public static function _getInstanceByIdentifierId($identifier_id)
     {
-        global $ilDB;
-        /**
-         * @var $ilDB ilDB
-         */
-        $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-            . $ilDB->quote($identifier_id, 'integer'));
-        while ($rec = $ilDB->fetchObject($set)) {
+        global $DIC;
+
+        $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+            . $DIC->database()->quote($identifier_id, 'integer'));
+        while ($rec = $DIC->database()->fetchObject($set)) {
             $data_set = new ilSelfEvaluationDataset();
             $data_set->setObjectValuesFromRecord($data_set, $rec);
             return $data_set;
@@ -651,75 +601,50 @@ class ilSelfEvaluationDataset
         return $obj;
     }
 
-    /**
-     * @param $identifier_id
-     * @return bool
-     */
-    public static function _datasetExists($identifier_id)
+    public static function _datasetExists(int $identifier_id) : bool
     {
-        global $ilDB;
-        $set = $ilDB->query('SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-            . $ilDB->quote($identifier_id, 'integer'));
-        while ($rec = $ilDB->fetchObject($set)) {
+        global $DIC;
+
+        $set = $DIC->database()->query('SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+            . $DIC->database()->quote($identifier_id, 'integer'));
+        while ($rec = $DIC->database()->fetchObject($set)) {
             return true;
         }
 
         return false;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function setId(int $id)
     {
         $this->id = $id;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $identifier_id
-     */
-    public function setIdentifierId($identifier_id)
+    public function setIdentifierId(int $identifier_id)
     {
         $this->identifier_id = $identifier_id;
     }
 
-    /**
-     * @return int
-     */
-    public function getIdentifierId()
+    public function getIdentifierId() : int
     {
         return $this->identifier_id;
     }
 
-    /**
-     * @param int $creation_date
-     */
-    public function setCreationDate($creation_date)
+    public function setCreationDate(int $creation_date)
     {
         $this->creation_date = $creation_date;
     }
 
-    /**
-     * @return int
-     */
-    public function getCreationDate()
+    public function getCreationDate() : int
     {
         return $this->creation_date;
     }
 
-    /**
-     * @return int
-     * @throws Exception
-     */
-    public function getSubmitDate()
+    public function getSubmitDate() : int
     {
         $latest_entry = ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId());
         if ($latest_entry) {
@@ -729,11 +654,8 @@ class ilSelfEvaluationDataset
         }
     }
 
-    /**
-     * @return int
-     * @throws Exception
-     */
-    public function getDuration()
+
+    public function getDuration() : int
     {
         $latest_entry = ilSelfEvaluationData::_getLatestInstanceByDatasetId($this->getId());
         if ($latest_entry) {
@@ -742,28 +664,4 @@ class ilSelfEvaluationDataset
             throw new Exception("Invalid Entry");
         }
     }
-
-    //
-    // Helper
-    //
-    /**
-     * @param $var
-     * @return string
-     */
-    public static function _getType($var)
-    {
-        switch (gettype($var)) {
-            case 'string':
-            case 'array':
-            case 'object':
-                return 'text';
-            case 'NULL':
-            case 'boolean':
-                return 'integer';
-            default:
-                return gettype($var);
-        }
-    }
 }
-
-?>

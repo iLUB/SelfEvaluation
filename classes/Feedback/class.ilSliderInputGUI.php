@@ -35,9 +35,10 @@ class ilSliderInputGUI extends ilCustomInputGUI
      */
     protected $ajax = '';
 
-    public function __construct($title, $post_var, $min, $max, $ajax_request = false)
+    public function __construct(ilGlobalPageTemplate $tpl, $title, $post_var, $min, $max, $ajax_request = false)
     {
         parent::__construct($title, $post_var);
+        $this->tpl = $tpl;
         $this->setMin($min);
         $this->setMax($max);
         $this->setAjax($ajax_request);
@@ -50,11 +51,11 @@ class ilSliderInputGUI extends ilCustomInputGUI
 
     private function buildHTML()
     {
-        global $tpl;
-        $tpl->addCss("./libs/bower/bower_components/jquery-ui/themes/base/jquery-ui.css");
-        $tpl->addJavaScript("./libs/bower/bower_components/jquery-ui/jquery-ui.min.js");
+        $this->tpl->addCss("./libs/bower/bower_components/jquery-ui/themes/base/jquery-ui.css");
+        $this->tpl->addJavaScript("./libs/bower/bower_components/jquery-ui/jquery-ui.min.js");
 
         $pl = new ilSelfEvaluationPlugin();
+
         $tpl = $pl->getTemplate('default/Feedback/tpl.slider_input.html');
 
         $values = $this->getValues();

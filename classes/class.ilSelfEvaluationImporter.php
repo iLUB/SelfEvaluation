@@ -18,6 +18,8 @@ class ilSelfEvaluationImporter extends ilXmlImporter
      */
     public function importXmlRepresentation($entity, $id, $xml, $mapping)
     {
+        global $DIC;
+
         $ref_id = false;
         foreach ($mapping->getMappingsOfEntity('Services/Container', 'objs') as $old => $new) {
             if (ilObject::_lookupType($new) == "xsev" && $id == $old) {

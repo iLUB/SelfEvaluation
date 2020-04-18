@@ -10,19 +10,12 @@ require_once('class.ilSelfEvaluationDataset.php');
  */
 class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI
 {
-
-    /**
-     * @param ilSelfEvaluationDatasetGUI $a_parent_obj
-     * @param string                     $a_parent_cmd
-     * @param ilSelfEvaluationPlugin     $plugin
-     * @param int                        $obj_id
-     */
     function __construct(
         ilSelfEvaluationDatasetGUI $a_parent_obj,
-        $a_parent_cmd,
-        $plugin,
-        $obj_id = 0,
-        $identifier = null
+        string $a_parent_cmd,
+        ilSelfEvaluationPlugin $plugin,
+        int $obj_id = 0,
+        string $identifier = ""
     ) {
         global $DIC;
 
@@ -46,7 +39,7 @@ class ilSelfEvaluationDatasetTableGUI extends ilTable2GUI
         $this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Dataset/tpl.template_dataset_row.html');
         $this->addMultiCommand("deleteDatasets", $this->pl->txt("delete_dataset"));
 
-        if ($identifier) {
+        if ($identifier != "") {
             $this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id, true, $identifier));
         } else {
             $this->setData(ilSelfEvaluationDataset::_getAllInstancesByObjectId($obj_id, true));

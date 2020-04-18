@@ -197,12 +197,6 @@ class ilSelfEvaluationFeedback
         }
     }
 
-    final private function resetDB()
-    {
-        $this->db->dropTable(self::TABLE_NAME);
-        $this->initDB();
-    }
-
     public function create()
     {
         if ($this->getId() != 0) {

@@ -1,5 +1,5 @@
 <?php
-
+use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
 /**
  * ilSelfEvaluationData
  * @author  Fabian Schmid <fs@studer-raimann.ch>
@@ -7,6 +7,7 @@
  */
 class ilSelfEvaluationData
 {
+    use ArrayForDB;
 
     const TABLE_NAME = 'rep_robj_xsev_d';
     const QUESTION_TYPE = 'qst';
@@ -37,16 +38,19 @@ class ilSelfEvaluationData
     protected $value = '';
 
     /**
+     * @var ilDBInterface
+     */
+    protected $db;
+
+    /**
      * @param $id
      */
     function __construct($id = 0)
     {
-        global $ilDB;
-        /**
-         * @var $ilDB ilDB
-         */
+        global $DIC;
+
         $this->id = $id;
-        $this->db = $ilDB;
+        $this->db = $DIC->database();
         if ($id != 0) {
             $this->read();
         }
@@ -62,62 +66,19 @@ class ilSelfEvaluationData
     }
 
     /**
-     * @return array
-     */
-    public function getArrayForDb()
-    {
-        $e = array();
-        foreach (get_object_vars($this) as $k => $v) {
-            if (!in_array($k, array('db'))) {
-                $e[$k] = array(self::_getType($v), $this->$k);
-            }
-        }
-        return $e;
-    }
-
-    /**
      * @param $data
      * @param $rec
      * @return $this
      */
-    protected function setObjectValuesFromRecord($data, $rec)
-    {
-        foreach ($data->getArrayForDb() as $k => $v) {
-            $data->{$k} = $rec->{$k};
-        }
-        return $this;
-    }
+
 
     final function initDB()
     {
-        $fields = array();
-        foreach ($this->getArrayForDb() as $k => $v) {
-            $fields[$k] = array(
-                'type' => $v[0],
-            );
-            switch ($v[0]) {
-                case 'integer':
-                    $fields[$k]['length'] = 4;
-                    break;
-                case 'text':
-                    $fields[$k]['length'] = 1024;
-                    break;
-            }
-            if ($k == 'id') {
-                $fields[$k]['notnull'] = true;
-            }
-        }
         if (!$this->db->tableExists(self::TABLE_NAME)) {
-            $this->db->createTable(self::TABLE_NAME, $fields);
+            $this->db->createTable(self::TABLE_NAME, $this->getArrayForDbWithAttributes());
             $this->db->addPrimaryKey(self::TABLE_NAME, array('id'));
             $this->db->createSequence(self::TABLE_NAME);
         }
-    }
-
-    final private function resetDB()
-    {
-        $this->db->dropTable(self::TABLE_NAME);
-        $this->initDB();
     }
 
     public function create()
@@ -151,12 +112,7 @@ class ilSelfEvaluationData
 
             return;
         }
-        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), array(
-            'id' => array(
-                'integer',
-                $this->getId()
-            ),
-        ));
+        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), $this->getIdForDb());
     }
 
 
@@ -201,23 +157,18 @@ class ilSelfEvaluationData
         return null;
     }
 
-    /**
-     * @param int    $dataset_id
-     * @param int    $question_id
-     * @param string $question_type
-     * @return ilSelfEvaluationData
-     */
     public static function _getInstanceForQuestionId(
-        $dataset_id,
-        $question_id,
+        int $dataset_id,
+        int $question_id,
         $question_type = ilSelfEvaluationData::QUESTION_TYPE
-    ) {
+    ) : ilSelfEvaluationData{
 
-        global $ilDB;
-        $stmt = $ilDB->prepare('SELECT * FROM ' . self::TABLE_NAME .
+        global $DIC;
+
+        $stmt = $DIC->database()->prepare('SELECT * FROM ' . self::TABLE_NAME .
             ' WHERE dataset_id = ? AND question_id = ? AND question_type = ?;', array('integer', 'integer', 'text'));
-        $ilDB->execute($stmt, array($dataset_id, $question_id, $question_type));
-        while ($rec = $ilDB->fetchObject($stmt)) {
+        $DIC->database()->execute($stmt, array($dataset_id, $question_id, $question_type));
+        while ($rec = $DIC->database()->fetchObject($stmt)) {
             $data = new ilSelfEvaluationData();
             $data->setObjectValuesFromRecord($data, $rec);
 
@@ -329,30 +280,4 @@ class ilSelfEvaluationData
     {
         return $this->creation_date;
     }
-
-
-
-    //
-    // Helper
-    //
-    /**
-     * @param $var
-     * @return string
-     */
-    public static function _getType($var)
-    {
-        switch (gettype($var)) {
-            case 'string':
-            case 'array':
-            case 'object':
-                return 'text';
-            case 'NULL':
-            case 'boolean':
-                return 'integer';
-            default:
-                return gettype($var);
-        }
-    }
 }
-
-?>

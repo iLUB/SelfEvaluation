@@ -23,11 +23,6 @@ require_once(dirname(dirname(__FILE__)) . '/Block/class.ilSelfEvaluationBlockFac
  */
 class ilSelfEvaluationPresentationGUI
 {
-
-    /**
-     * @var ilTabsGUI
-     */
-    protected $tabs_gui;
     /**
      * @var ilPropertyFormGUI
      */
@@ -42,20 +37,18 @@ class ilSelfEvaluationPresentationGUI
     const SESSION_KEY_CREATION_DATE = "creation_date";
     const SESSION_KEY_SHUFFLE = "shuffled_blocks";
 
-    function __construct(ilObjSelfEvaluationGUI $parent)
+    function __construct(ilObjSelfEvaluationGUI $parent, ilGlobalTemplateInterface $tpl, ilCtrl $ilCtrl)
     {
-        global $tpl, $ilCtrl, $ilUser;
-        /**
-         * @var $tpl    ilTemplate
-         * @var $ilCtrl ilCtrl
-         * @var $ilUser ilObjUser
-         */
         $this->tpl = $tpl;
-        $this->user = $ilUser;
         $this->ctrl = $ilCtrl;
         $this->parent = $parent;
-        $this->tabs_gui = $this->parent->tabs_gui;
-        $this->pl = $parent->getPluginObject();
+        $this->pl =  new ilSelfEvaluationPlugin();
+
+        $this->ref_id = $this->parent->object->getRefId();
+    }
+
+    public function executeCommand()
+    {
         if (!$_GET['uid']) {
             ilUtil::sendFailure($this->pl->txt('uid_not_given'), true);
             $this->ctrl->redirect($this->parent);
@@ -63,21 +56,9 @@ class ilSelfEvaluationPresentationGUI
             $this->identity = new ilSelfEvaluationIdentity($_GET['uid']);
         }
 
-        $this->ref_id = $_GET['ref_id'];
-    }
-
-    public function executeCommand()
-    {
-        $this->tabs_gui->setTabActive('content');
         $this->ctrl->saveParameter($this, 'uid');
-        $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
-        switch ($cmd) {
-            default:
-                $this->performCommand($cmd);
-                break;
-        }
 
-        return true;
+        $this->performCommand();
     }
 
     /**
@@ -88,11 +69,10 @@ class ilSelfEvaluationPresentationGUI
         return 'showContent';
     }
 
-    /**
-     * @param $cmd
-     */
-    function performCommand($cmd)
+    function performCommand()
     {
+        $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
+
         switch ($cmd) {
             case 'editProperties':
                 //				$this->checkPermission('write'); FSX

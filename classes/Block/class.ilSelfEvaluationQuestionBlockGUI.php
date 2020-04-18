@@ -20,8 +20,8 @@ class ilSelfEvaluationQuestionBlockGUI extends ilSelfEvaluationBlockGUI
     {
         parent::initForm($mode);
 
-        $te = new ilTextInputGUI($this->pl->txt('abbreviation'), 'abbreviation');
-        $te->setInfo($this->pl->txt("block_abbreviation_info"));
+        $te = new ilTextInputGUI($this->plugin->txt('abbreviation'), 'abbreviation');
+        $te->setInfo($this->plugin->txt("block_abbreviation_info"));
         $te->setMaxLength(8);
         $this->form->addItem($te);
     }

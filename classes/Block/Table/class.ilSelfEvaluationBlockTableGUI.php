@@ -22,25 +22,25 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI
          * @var $ilCtrl ilCtrl
          * @var $ilTabs ilTabsGUI
          */
-        $this->pl = $a_parent_obj->getPluginObject();
+        $this->plugin = new ilSelfEvaluationPlugin();
         $this->ctrl = $ilCtrl;
         $this->tabs = $ilTabs;
         $this->setId('');
         parent::__construct($a_parent_obj, $a_parent_cmd);
-        $this->setTitle($this->pl->txt('block_table_title'));
+        $this->setTitle($this->plugin->txt('block_table_title'));
 
         // Columns
         $this->addColumn('', '', '20px');
-        $this->addColumn($this->pl->txt('title'), false, 'auto');
-        $this->addColumn($this->pl->txt('abbreviation'), false, 'auto');
-        $this->addColumn($this->pl->txt('description'), false, 'auto');
-        $this->addColumn($this->pl->txt('count_questions'), false, 'auto');
-        $this->addColumn($this->pl->txt('count_feedbacks'), false, 'auto');
-        $this->addColumn($this->pl->txt('feedback_status'), false, 'auto');
-        $this->addColumn($this->pl->txt('actions'), false, 'auto');
+        $this->addColumn($this->plugin->txt('title'), false, 'auto');
+        $this->addColumn($this->plugin->txt('abbreviation'), false, 'auto');
+        $this->addColumn($this->plugin->txt('description'), false, 'auto');
+        $this->addColumn($this->plugin->txt('count_questions'), false, 'auto');
+        $this->addColumn($this->plugin->txt('count_feedbacks'), false, 'auto');
+        $this->addColumn($this->plugin->txt('feedback_status'), false, 'auto');
+        $this->addColumn($this->plugin->txt('actions'), false, 'auto');
         $this->setFormAction($ilCtrl->getFormActionByClass('ilSelfEvaluationListBlocksGUI'));
-        $this->addMultiCommand('saveSorting', $this->pl->txt('save_sorting'));
-        $this->setRowTemplate($this->pl->getDirectory() . '/templates/default/Block/tpl.template_block_row.html');
+        $this->addMultiCommand('saveSorting', $this->plugin->txt('save_sorting'));
+        $this->setRowTemplate($this->plugin->getDirectory() . '/templates/default/Block/tpl.template_block_row.html');
     }
 
     /**
@@ -86,7 +86,7 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI
         require_once('./Services/UIComponent/AdvancedSelectionList/classes/class.ilAdvancedSelectionListGUI.php');
         $ac = new ilAdvancedSelectionListGUI();
         $ac->setId($a_set['position_id']);
-        $ac->setListTitle($this->pl->txt('actions'));
+        $ac->setListTitle($this->plugin->txt('actions'));
         /**
          * @var ilSelfEvaluationTableAction[] $actions
          */
