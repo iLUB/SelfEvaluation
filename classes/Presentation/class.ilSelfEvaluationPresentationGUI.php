@@ -196,14 +196,14 @@ class ilSelfEvaluationPresentationGUI
      */
     protected function orderMixedBlocks($blocks)
     {
-        $return_blocks = array();
+        $return_blocks = [];
         /**
          * ilSelfEvaluationVirtualQuestionBlock[]
          */
-        $virtual_blocks = array();
-        $questions = array();
+        $virtual_blocks = [];
+        $questions = [];
 
-        $meta_blocks_end_form = array();
+        $meta_blocks_end_form = [];
         $meta_block_beginning = true;
 
         foreach ($blocks as $block) {
@@ -300,7 +300,7 @@ class ilSelfEvaluationPresentationGUI
     {
         $dataset = ilSelfEvaluationDataset::_getInstanceByIdentifierId($this->identity->getId());
         $data = ilSelfEvaluationData::_getAllInstancesByDatasetId($dataset->getId());
-        $array = array();
+        $array = [];
         foreach ($data as $d) {
             $array[ilSelfEvaluationQuestionGUI::POSTVAR_PREFIX . $d->getQuestionId()] = $d->getValue();
         }
@@ -370,4 +370,3 @@ class ilSelfEvaluationPresentationGUI
     }
 }
 
-?>

@@ -4,8 +4,6 @@ namespace ilub\plugin\SelfEvaluation\Question;
 
 use iLubFieldDefinitionContainerGUI;
 use ilSelfEvaluationPlugin;
-use iLubFieldDefinitionContainer;
-use iLubFieldDefinitionLng;
 use ilToolbarGUI;
 use ilTemplate;
 use ilCtrl;

@@ -66,7 +66,7 @@ class iLubFieldDefinitionTypeSelect extends iLubFieldDefinitionType
         $ty_se_mu->setRequired(true);
         $ty_se_mu->setSize(32);
         $ty_se_mu->setMaxLength(128);
-        $ty_se_mu->setValues(array(''));
+        $ty_se_mu->setValues(['']);
         $option->addSubItem($ty_se_mu);
 
         return $option;
@@ -76,7 +76,7 @@ class iLubFieldDefinitionTypeSelect extends iLubFieldDefinitionType
      * @param iLubFieldDefinitionTypeOption $item
      * @param array                         $values
      */
-    public function setValues(iLubFieldDefinitionTypeOption $item, $values = array())
+    public function setValues(iLubFieldDefinitionTypeOption $item, $values = [])
     {
         foreach ($item->getSubItems() as $sub_item) {
             if ($sub_item instanceof ilTextWizardInputGUI AND $sub_item->getPostVar() == 'value_' . $this->getId()) {
@@ -105,7 +105,7 @@ class iLubFieldDefinitionTypeSelect extends iLubFieldDefinitionType
         require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/classes/class.ilSelectInputGUIwithDefaultText.php');
         $select = new ilSelectInputGUIwithDefaultText($title, $postvar);
 
-        $options = array();
+        $options = [];
         foreach ($values as $key => $value) {
             $options[$key] = $value;
         }

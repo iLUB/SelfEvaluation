@@ -10,38 +10,38 @@ $conf->setAsync(true);
 <#2>
 <?php
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php');
-$fields = array(
-    'id' => array(
+$fields = [
+    'id' => [
         'type' => 'integer',
         'length' => 4,
         'notnull' => true
-    ),
-    'is_online' => array(
+    ],
+    'is_online' => [
         'type' => 'integer',
         'length' => 1,
-    ),
-    'evaluation_type' => array(
+    ],
+    'evaluation_type' => [
         'type' => 'integer',
         'length' => 1,
-    ),
-    'sort_type' => array(
+    ],
+    'sort_type' => [
         'type' => 'integer',
         'length' => 1,
-    ),
-    'display_type' => array(
+    ],
+    'display_type' => [
         'type' => 'integer',
         'length' => 1,
-    ),
-    'intro' => array(
+    ],
+    'intro' => [
         'type' => 'clob',
-    ),
-    'outro' => array(
+    ],
+    'outro' => [
         'type' => 'clob',
-    ),
-);
+    ],
+];
 if (!$this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
     $this->db->createTable(ilObjSelfEvaluation::TABLE_NAME, $fields);
-    $this->db->addPrimaryKey(ilObjSelfEvaluation::TABLE_NAME, array('id'));
+    $this->db->addPrimaryKey(ilObjSelfEvaluation::TABLE_NAME, ['id']);
 }
 
 ?>
@@ -88,10 +88,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 1,
-    );
+    ];
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_questions', $field);
 
 }
@@ -104,10 +104,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 1,
-    );
+    ];
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs', $field);
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_charts', $field);
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview', $field);
@@ -123,10 +123,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 1,
-    );
+    ];
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_block_titles_sev', $field);
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_block_titles_fb', $field);
     $ilDB->manipulate('UPDATE ' . ilObjSelfEvaluation::TABLE_NAME .
@@ -140,10 +140,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 1,
-    );
+    ];
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_block_desc_sev', $field);
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_block_desc_fb', $field);
     $ilDB->manipulate('UPDATE ' . ilObjSelfEvaluation::TABLE_NAME .
@@ -158,10 +158,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  */
 $block = new ilSelfEvaluationQuestionBlock();
 if (!$ilDB->tableColumnExists($block->getTableName(), 'abbreviation')) {
-    $field = array(
+    $field = [
         'type' => 'text',
         'length' => 1024,
-    );
+    ];
     $ilDB->addTableColumn($block->getTableName(), 'abbreviation', $field);
 }
 ?>
@@ -177,9 +177,9 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'clob',
-    );
+    ];
     $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'identity_selection_info', $field);
 }
 ?>
@@ -196,15 +196,15 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if (!$ilDB->tableColumnExists(ilSelfEvaluationData::TABLE_NAME, 'question_type')) {
-    $field = array(
+    $field = [
         'type' => 'text',
         'length' => 1024,
         'notnull' => true
-    );
+    ];
     $ilDB->addTableColumn(ilSelfEvaluationData::TABLE_NAME, 'question_type', $field);
     $ilDB->manipulate('UPDATE ' . ilSelfEvaluationData::TABLE_NAME .
         ' SET `question_type` = ' . $ilDB->quote(ilSelfEvaluationData::QUESTION_TYPE, 'text') . ';');
-    $ilDB->modifyTableColumn(ilSelfEvaluationData::TABLE_NAME, 'value', array('type' => 'clob'));
+    $ilDB->modifyTableColumn(ilSelfEvaluationData::TABLE_NAME, 'value', ['type' => 'clob']);
 }
 ?>
 <#11>
@@ -215,10 +215,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
     if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'sort_random_nr_items_block')) {
-        $field = array(
+        $field = [
             'type' => 'integer',
             'length' => 4,
-        );
+        ];
         $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'sort_random_nr_items_block', $field);
     }
 }
@@ -231,10 +231,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  */
 if ($this->db->tableExists(ilSelfEvaluationData::TABLE_NAME)) {
     if (!$ilDB->tableColumnExists(ilSelfEvaluationData::TABLE_NAME, 'creation_date')) {
-        $field = array(
+        $field = [
             'type' => 'integer',
             'length' => 4
-        );
+        ];
         $ilDB->addTableColumn(ilSelfEvaluationData::TABLE_NAME, 'creation_date', $field);
     }
 }
@@ -249,11 +249,11 @@ if ($this->db->tableExists(ilSelfEvaluationMetaQuestion::TABLE_NAME)) {
 
     if (!$ilDB->tableColumnExists(ilSelfEvaluationMetaQuestion::TABLE_NAME,
         'short_title')) {
-        $field = array(
+        $field = [
             'type' => 'text',
             'length' => 1024,
             'notnull' => true
-        );
+        ];
         $ilDB->addTableColumn(ilSelfEvaluationMetaQuestion::TABLE_NAME, 'short_title', $field);
     }
 }
@@ -265,10 +265,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 4
-    );
+    ];
     if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_bar')) {
         $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_bar', $field);
     }
@@ -304,9 +304,9 @@ if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
 <#15>
 <?php
 require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Feedback/class.ilSelfEvaluationFeedback.php');
-$ilDB->modifyTableColumn(ilSelfEvaluationFeedback::TABLE_NAME, 'feedback_text', array(
+$ilDB->modifyTableColumn(ilSelfEvaluationFeedback::TABLE_NAME, 'feedback_text', [
     'type' => 'clob'
-));
+]);
 ?>
 <#16>
 <?php
@@ -315,11 +315,11 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'text',
         'length' => 1024,
         'notnull' => true
-    );
+    ];
     if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'outro_title')) {
         $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'outro_title', $field);
     }
@@ -332,10 +332,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 4
-    );
+    ];
     if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'bar_show_label_as_percentage')) {
         $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'bar_show_label_as_percentage', $field);
     }
@@ -348,9 +348,9 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'clob'
-    );
+    ];
     if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'block_option_random_desc')) {
         $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'block_option_random_desc', $field);
     }
@@ -363,10 +363,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilSelfEvaluationFeedback::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 4
-    );
+    ];
     if (!$ilDB->tableColumnExists(ilSelfEvaluationFeedback::TABLE_NAME, 'parent_type_overall')) {
         $ilDB->addTableColumn(ilSelfEvaluationFeedback::TABLE_NAME, 'parent_type_overall', $field);
     }
@@ -379,10 +379,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 4
-    );
+    ];
     if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_text')) {
         $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_text', $field);
     }
@@ -395,10 +395,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 4
-    );
+    ];
     if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_statistics')) {
         $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'show_fbs_overview_statistics', $field);
     }
@@ -411,10 +411,10 @@ require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/
  * @var $ilDB ilDB
  */
 if ($this->db->tableExists(ilObjSelfEvaluation::TABLE_NAME)) {
-    $field = array(
+    $field = [
         'type' => 'integer',
         'length' => 4
-    );
+    ];
     if (!$ilDB->tableColumnExists(ilObjSelfEvaluation::TABLE_NAME, 'identity_selection')) {
         $ilDB->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'identity_selection', $field);
     }
@@ -445,6 +445,6 @@ foreach ($overall_feedbacks as $overall_feedback) {
 <#24>
 <?php
 if (!$ilDB->indexExistsByFields('rep_robj_xsev_d', ['i2'])) {
-    $ilDB->addIndex('rep_robj_xsev_d', array('dataset_id', 'question_id', 'question_type'), 'i2');
+    $ilDB->addIndex('rep_robj_xsev_d', ['dataset_id', 'question_id', 'question_type'], 'i2');
 }
 ?>

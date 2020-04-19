@@ -56,19 +56,19 @@ class ilObjSelfEvaluationListGUI extends ilObjectPluginListGUI
 
     function initCommands()
     {
-        return array(
-            array(
+        return [
+            [
                 'permission' => 'read',
                 'cmd' => 'showContent',
                 'default' => true
-            ),
-            array(
+            ],
+            [
                 'permission' => 'write',
                 'cmd' => 'editProperties',
                 'txt' => $this->txt('edit'),
                 'default' => false
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -76,19 +76,19 @@ class ilObjSelfEvaluationListGUI extends ilObjectPluginListGUI
      */
     function getProperties()
     {
-        $props = array();
+        $props = [];
         $this->plugin->includeClass('class.ilObjSelfEvaluationAccess.php');
         $object = new ilObjSelfEvaluation($this->ref_id);
         if (!$object->getOnline()) {
-            $props[] = array(
+            $props[] = [
                 'alert' => true,
                 'property' => $this->txt('status'),
                 'value' => $this->txt('offline')
-            );
+            ];
         }
 
         return $props;
     }
 }
 
-?>
+

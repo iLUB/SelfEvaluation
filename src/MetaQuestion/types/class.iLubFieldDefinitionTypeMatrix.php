@@ -68,7 +68,7 @@ class iLubFieldDefinitionTypeMatrix extends iLubFieldDefinitionType
         $ty_se_mu->setRequired(true);
         $ty_se_mu->setSize(32);
         $ty_se_mu->setMaxLength(128);
-        $ty_se_mu->setValues(array(''));
+        $ty_se_mu->setValues(['']);
         $ty_se_mu->setInfo($lng->getMatrixScaleDescription());
         $option->addSubItem($ty_se_mu);
 
@@ -78,7 +78,7 @@ class iLubFieldDefinitionTypeMatrix extends iLubFieldDefinitionType
         $ty_se_mu->setRequired(true);
         $ty_se_mu->setSize(64);
         $ty_se_mu->setMaxLength(4096);
-        $ty_se_mu->setValues(array(''));
+        $ty_se_mu->setValues(['']);
         $ty_se_mu->setInfo($lng->getMatrixQuestionDescription());
 
         $option->addSubItem($ty_se_mu);
@@ -90,7 +90,7 @@ class iLubFieldDefinitionTypeMatrix extends iLubFieldDefinitionType
      * @param iLubFieldDefinitionTypeOption $item
      * @param array                         $values
      */
-    public function setValues(iLubFieldDefinitionTypeOption $item, $values = array())
+    public function setValues(iLubFieldDefinitionTypeOption $item, $values = [])
     {
         $scale_values = self::getScaleFromArray($values);
         $question_values = self::getQuestionsFromArray($values);
@@ -108,7 +108,11 @@ class iLubFieldDefinitionTypeMatrix extends iLubFieldDefinitionType
         }
     }
 
-    public static function getQuestionsFromArray($data)
+    /**
+     * @param $data
+     * @return array
+     */
+    public static function getQuestionsFromArray($data) : array
     {
         $questions = [];
 

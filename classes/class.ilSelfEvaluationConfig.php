@@ -60,32 +60,32 @@ class ilSelfEvaluationConfig
     {
         global $ilDB;
         if (!is_string($this->getValue($key))) {
-            $ilDB->insert($this->getTableName(), array(
-                "config_key" => array(
+            $ilDB->insert($this->getTableName(), [
+                "config_key" => [
                     "text",
                     $key
-                ),
-                "config_value" => array(
+                ],
+                "config_value" => [
                     "text",
                     $value
-                )
-            ));
+                ]
+            ]);
         } else {
-            $ilDB->update($this->getTableName(), array(
-                "config_key" => array(
+            $ilDB->update($this->getTableName(), [
+                "config_key" => [
                     "text",
                     $key
-                ),
-                "config_value" => array(
+                ],
+                "config_value" => [
                     "text",
                     $value
-                )
-            ), array(
-                "config_key" => array(
+                ]
+            ], [
+                "config_key" => [
                     "text",
                     $key
-                )
-            ));
+                ]
+            ]);
         }
     }
 
@@ -126,19 +126,19 @@ class ilSelfEvaluationConfig
     {
         global $ilDB;
         if (!$ilDB->tableExists($this->getTableName())) {
-            $fields = array(
-                'config_key' => array(
+            $fields = [
+                'config_key' => [
                     'type' => 'text',
                     'length' => 128,
                     'notnull' => true
-                ),
-                'config_value' => array(
+                ],
+                'config_value' => [
                     'type' => 'clob',
                     'notnull' => false
-                ),
-            );
+                ],
+            ];
             $ilDB->createTable($this->getTableName(), $fields);
-            $ilDB->addPrimaryKey($this->getTableName(), array("config_key"));
+            $ilDB->addPrimaryKey($this->getTableName(), ["config_key"]);
         }
 
         return true;
@@ -178,7 +178,7 @@ class ilSelfEvaluationConfig
         return preg_replace_callback(
             '/-([a-z])/',
             function ($c) {
-                return strtoupper($c[1]);;
+                return strtoupper($c[1]);
             },
             $str);
     }

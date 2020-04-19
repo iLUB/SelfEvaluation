@@ -32,14 +32,13 @@ class ilSelfEvaluationExporter extends ilXmlExporter
 
     public function getValidSchemaVersions($a_entity)
     {
-        return array(
-            "5.3.0" => array(
+        return [
+            "5.3.0" => [
                 "uses_dataset" => false,
                 "min" => "5.3.0",
                 "max" => ""
-            )
-        );
+            ]
+        ];
     }
 }
 
-?>

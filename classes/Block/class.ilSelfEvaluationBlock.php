@@ -73,12 +73,8 @@ abstract class ilSelfEvaluationBlock
      */
     abstract function toXml(SimpleXMLElement $xml);
 
-    /**
-     * @param                  $parent_id
-     * @param SimpleXMLElement $xml
-     * @return mixed
-     */
-    static abstract function fromXml(ilDBInterface $db, $parent_id, SimpleXMLElement $xml);
+
+    static abstract function fromXml(ilDBInterface $db,int $parent_id, SimpleXMLElement $xml);
 
     public function read()
     {
@@ -98,11 +94,11 @@ abstract class ilSelfEvaluationBlock
 
     public function initDB()
     {
-        $fields = array();
+        $fields = [];
         foreach ($this->getArrayForDb() as $k => $v) {
-            $fields[$k] = array(
+            $fields[$k] = [
                 'type' => $v[0],
-            );
+            ];
             switch ($v[0]) {
                 case 'integer':
                     $fields[$k]['length'] = 4;
@@ -117,7 +113,7 @@ abstract class ilSelfEvaluationBlock
         }
         if (!$this->db->tableExists($this->getTableName())) {
             $this->db->createTable($this->getTableName(), $fields);
-            $this->db->addPrimaryKey($this->getTableName(), array('id'));
+            $this->db->addPrimaryKey($this->getTableName(), ['id']);
             $this->db->createSequence($this->getTableName());
         }
     }
@@ -215,14 +211,14 @@ abstract class ilSelfEvaluationBlock
      * @param int $parent_id
      * @return ilSelfEvaluationBlock[]
      */
-    public static function getAllInstancesByParentId($parent_id)
+    public static function _getAllInstancesByParentId($db,$parent_id)
     {
         global $DIC;
         /**
          * @var $DIC ILIAS\DI\Container
          */
 
-        $return = array();
+        $return = [];
         $set = $DIC->database()->query('SELECT * FROM ' . static::getTableName() . ' ' . ' WHERE parent_id = '
             . $DIC->database()->quote($parent_id, 'integer') . ' ORDER BY position ASC');
         while ($rec = $ilDB->fetchObject($set)) {

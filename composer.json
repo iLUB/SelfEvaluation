@@ -19,8 +19,8 @@
       "../../../../../../../Services/Repository",
       "../../../../../../../Services/UIComponent",
       "../../../../../../../Services/Utilities",
-      "../../../../../../../Services/Accordion"
-
+      "../../../../../../../Services/Accordion",
+      "../../../../../../../Services/UICore"
     ]
   },
   "require": {

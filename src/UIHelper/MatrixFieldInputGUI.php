@@ -1,16 +1,10 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs
-/LICENSE */
-include_once('./Services/Form/classes/class.ilCustomInputGUI.php');
-require_once('./Services/Form/classes/class.ilSubEnabledFormPropertyGUI.php');
+namespace ilub\plugin\SelfEvaluation\UIHelper;
 
-/**
- * Class ilMultipleTextInputGUI
- * @author  Fabian Schmid <fs@studer-raimann.ch>
- * @author  Oskar Truffer <ot@studer-raimann.ch>
- * @version $Id:
- */
-class ilMatrixFieldInputGUI extends ilCustomInputGUI
+use ilSubEnabledFormPropertyGUI;
+use ilRepositoryObjectPlugin;
+
+class MatrixFieldInputGUI extends ilSubEnabledFormPropertyGUI
 {
 
     /**
@@ -24,30 +18,28 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI
     /**
      * @var array
      */
-    protected $scale = array();
-
+    protected $scale = [];
     /**
-     * @param string $a_title
-     * @param string $a_postvar
+     * @var ilRepositoryObjectPlugin
      */
-    public function __construct($a_title = '', $a_postvar = '')
+    protected $plugin;
+
+    public function __construct(ilRepositoryObjectPlugin $plugin, $a_title = '', $a_postvar = '')
     {
         parent::__construct($a_title, $a_postvar);
         $this->setType('matrix_field');
+
+        $this->plugin = $plugin;
     }
 
-    public function getHtml()
+    public function getHtml() : string
     {
         return $this->buildHTML();
     }
 
-    /**
-     * @return string
-     */
-    private function buildHTML()
+    private function buildHTML() : string
     {
-        $tpl = new ilTemplate('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/InputGUIs/templates/tpl.matrix_input.html',
-            true, true);
+        $tpl = $this->plugin->getTemplate('default/Matrix/tpl.matrix_input.html');
 
         $even = false;
         $tpl->setVariable('ROW_NAME', $this->getPostVar());
@@ -71,7 +63,12 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI
      */
     public function setValueByArray($value)
     {
-        parent::setValueByArray($value);
+        foreach ($this->getSubItems() as $item) {
+            /**
+             * @var ilMatrixFieldInputGUI $item
+             */
+            $item->setValueByArray($value);
+        }
 
         $post_var_parts = explode("[", str_replace("]", "", $this->getPostVar()));
 
@@ -87,63 +84,40 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI
         $this->setValue($value);
     }
 
-    /**
-     * @param array $scale
-     */
-    public function setScale($scale)
+
+
+    public function setScale(array $scale)
     {
         $this->scale = $scale;
     }
 
-    /**
-     * @return array
-     */
-    public function getScale()
+    public function getScale() : array
     {
         return $this->scale;
     }
 
-    /**
-     * @param string $value
-     */
-    public function setValue($value)
+    public function setValue(string $value)
     {
         $this->value = $value;
     }
 
-    /**
-     * @return string
-     */
-    public function getValue()
+    public function getValue() : string
     {
         return $this->value;
     }
 
-    /**
-     * @param array $values
-     */
-    public function setValues($values)
+    public function setValues(array $values)
     {
         $this->values = $values;
     }
 
-    /**
-     * @return array
-     */
-    public function getValues()
+    public function getValues() : array
     {
         return $this->values;
     }
 
-    /**
-     * Check input, strip slashes etc. set alert, if input is not ok.
-     * Todo: do some check here
-     * @return    boolean        Input ok, true/false
-     */
-    function checkInput()
+    function checkInput() : bool
     {
-        global $DIC;
-
         if ($this->getRequired()) {
 
             $post_var_parts = explode("[", str_replace("]", "", $this->getPostVar()));
@@ -154,7 +128,7 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI
             foreach ($post_var_parts as $part) {
                 if (!is_array($value) || !array_key_exists($part, $value)) {
                     $pass = false;
-                    $this->setAlert($DIC->language()->txt('msg_input_is_required'));
+                    $this->setAlert($this->plugin->txt('msg_input_is_required'));
 
                 } else {
                     $value = $value[$part];
@@ -162,7 +136,7 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI
             }
 
             if (!$pass || trim($value) == '') {
-                $this->setAlert($DIC->language()->txt('msg_input_is_required'));
+                $this->setAlert($this->plugin->txt('msg_input_is_required'));
                 return false;
             }
         }
@@ -171,4 +145,3 @@ class ilMatrixFieldInputGUI extends ilCustomInputGUI
     }
 }
 
-?>

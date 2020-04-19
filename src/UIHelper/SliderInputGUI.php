@@ -1,23 +1,19 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs
-/LICENSE */
-include_once('./Services/Form/classes/class.ilCustomInputGUI.php');
-require_once('./Services/Form/classes/class.ilSubEnabledFormPropertyGUI.php');
 
-/**
- * Class ilMultipleTextInputGUI
- * @author  Fabian Schmid <fs@studer-raimann.ch>
- * @author  Oskar Truffer <ot@studer-raimann.ch>
- * @version $Id:
- */
-class ilSliderInputGUI extends ilCustomInputGUI
+namespace ilub\plugin\SelfEvaluation\UIHelper;
+
+use ilSubEnabledFormPropertyGUI;
+use ilGlobalTemplateInterface;
+use ilRepositoryObjectPlugin;
+
+class SliderInputGUI extends ilSubEnabledFormPropertyGUI
 {
 
-    const PREFIX = 'fsx_sl_';
+    const PREFIX = 'slider_';
     /**
      * @var array
      */
-    protected $values = array(0, 1);
+    protected $values = [0, 1];
     /**
      * @var int
      */
@@ -34,29 +30,44 @@ class ilSliderInputGUI extends ilCustomInputGUI
      * @var string
      */
     protected $ajax = '';
+    /**
+     * @var ilGlobalTemplateInterface
+     */
+    protected $tpl;
 
-    public function __construct(ilGlobalPageTemplate $tpl, $title, $post_var, $min, $max, $ajax_request = false)
-    {
+    /**
+     * @var ilRepositoryObjectPlugin
+     */
+    protected $plugin;
+
+    public function __construct(
+        ilGlobalTemplateInterface $tpl,
+        ilRepositoryObjectPlugin $plugin,
+        string $title,
+        string $post_var,
+        int $min,
+        int $max,
+        bool $ajax_request = false
+    ) {
         parent::__construct($title, $post_var);
         $this->tpl = $tpl;
+        $this->plugin = $plugin;
         $this->setMin($min);
         $this->setMax($max);
         $this->setAjax($ajax_request);
     }
 
-    public function getHtml()
+    public function getHtml() : string
     {
         return $this->buildHTML();
     }
 
-    private function buildHTML()
+    private function buildHTML() : string
     {
         $this->tpl->addCss("./libs/bower/bower_components/jquery-ui/themes/base/jquery-ui.css");
         $this->tpl->addJavaScript("./libs/bower/bower_components/jquery-ui/jquery-ui.min.js");
 
-        $pl = new ilSelfEvaluationPlugin();
-
-        $tpl = $pl->getTemplate('default/Feedback/tpl.slider_input.html');
+        $tpl = $this->plugin->getTemplate('default/Feedback/tpl.slider_input.html');
 
         $values = $this->getValues();
         $tpl->setVariable('VAL_FROM', $values[0]);
@@ -67,22 +78,20 @@ class ilSliderInputGUI extends ilCustomInputGUI
         $tpl->setVariable('UNIT', $this->getUnit());
         if ($this->getAjax()) {
             $tpl->setVariable('AJAX', $this->getAjax());
-            $tpl->setVariable('WARNING', $pl->txt('warning_overlap'));
+            $tpl->setVariable('WARNING', $this->plugin->txt('warning_overlap'));
         }
 
         return $tpl->get();
     }
 
-    /**
-     * @return bool
-     */
-    public function checkInput()
+    public function checkInput() : bool
     {
         global $lng;
-        $_POST[$this->getPostVar()] = array(
+        $_POST[$this->getPostVar()] = [
             $_POST[self::PREFIX . $this->getPostVar() . '_from'],
             $_POST[self::PREFIX . $this->getPostVar() . '_to']
-        );
+        ];
+
         if ($this->getRequired() AND
             trim($_POST[self::PREFIX . $this->getPostVar() . '_from']) == '' AND
             trim($_POST[self::PREFIX . $this->getPostVar() . '_to']) == ''
@@ -95,99 +104,64 @@ class ilSliderInputGUI extends ilCustomInputGUI
         return $this->checkSubItemsInput();
     }
 
-    public function setValueByArray($array)
+    public function setValueByArray(array $array)
     {
-        parent::setValueByArray($array);
+        foreach ($this->getSubItems() as $item) {
+            /**
+             * @var SliderInputGUI $item
+             */
+            $item->setValueByArray($array);
+        }
         $this->setValues($array[$this->getPostVar()]);
     }
 
-    /**
-     * @param array $values
-     */
-    public function setValues($values)
+    public function setValues(array $values)
     {
         $this->values = $values;
     }
 
-    /**
-     * @return array
-     */
-    public function getValues()
+    public function getValues() : array
     {
         return $this->values;
     }
 
-    /**
-     * @return boolean
-     */
-    public function getDisableOldFields()
-    { // TODO obsolete?
-        return $this->disableOldFields;
-    }
-
-    /**
-     * @param int $max
-     */
-    public function setMax($max)
+    public function setMax(int $max)
     {
         $this->max = $max;
     }
 
-    /**
-     * @return int
-     */
-    public function getMax()
+    public function getMax() : int
     {
         return $this->max;
     }
 
-    /**
-     * @param int $min
-     */
-    public function setMin($min)
+    public function setMin(int $min)
     {
         $this->min = $min;
     }
 
-    /**
-     * @return int
-     */
-    public function getMin()
+    public function getMin() : int
     {
         return $this->min;
     }
 
-    /**
-     * @param string $unit
-     */
-    public function setUnit($unit)
+    public function setUnit(string $unit)
     {
         $this->unit = $unit;
     }
 
-    /**
-     * @return string
-     */
-    public function getUnit()
+    public function getUnit() : string
     {
         return $this->unit;
     }
 
-    /**
-     * @param mixed $ajax
-     */
-    public function setAjax($ajax)
+    public function setAjax(string $ajax)
     {
         $this->ajax = $ajax;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAjax()
+    public function getAjax() : string
     {
         return $this->ajax;
     }
 }
-
-?>

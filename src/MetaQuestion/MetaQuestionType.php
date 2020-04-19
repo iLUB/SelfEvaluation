@@ -25,7 +25,7 @@ abstract class MetaQuestionType
      * @param iLubFieldDefinitionTypeOption $item
      * @param array                         $values
      */
-    abstract public function setValues(iLubFieldDefinitionTypeOption $item, $values = array());
+    abstract public function setValues(iLubFieldDefinitionTypeOption $item, $values = []);
 
     /**
      * @param ilPropertyFormGUI $form

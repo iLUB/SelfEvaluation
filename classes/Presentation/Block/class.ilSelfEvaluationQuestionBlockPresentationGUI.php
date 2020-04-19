@@ -56,4 +56,3 @@ class ilSelfEvaluationQuestionBlockPresentationGUI extends ilSelfEvaluationBlock
     }
 }
 
-?>

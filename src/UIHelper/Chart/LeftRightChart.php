@@ -1,18 +1,15 @@
 <?php
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+namespace ilub\plugin\SelfEvaluation\UIHelper\Chart;
 
-include_once "Services/Chart/classes/class.ilChartGrid.php";
-include_once "Services/Chart/classes/class.ilChartDataBars.php";
-include_once "trait.ilSelfEvalChartTrait.php";
+use ilChartGrid;
+use ilChartDataLines;
+use stdClass;
 
-/**
- * Class ilSelfEvalChart
- */
-class ilSelfEvalLeftRightChart extends ilChartGrid
+class LeftRightChart extends ilChartGrid
 {
-    use ilSelfEvalChartTrait;
+    use ChartHelper;
 
-    public function __construct($a_id)
+    public function __construct(int $a_id)
     {
         parent::__construct($a_id);
         $this->setSize($this->getCanvasWidth(), $this->getCanvasHeight());
@@ -29,9 +26,6 @@ class ilSelfEvalLeftRightChart extends ilChartGrid
         return new ilChartDataLines();
     }
 
-    /**
-     * @param stdClass $a_options
-     */
     public function parseGlobalOptions(stdClass $a_options)
     {
         parent::parseGlobalOptions($a_options);

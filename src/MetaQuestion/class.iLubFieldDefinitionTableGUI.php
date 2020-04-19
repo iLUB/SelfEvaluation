@@ -138,10 +138,10 @@ class iLubFieldDefinitionTableGUI extends ilTable2GUI
      */
     public function parse($field_definitions)
     {
-        $rows = array();
+        $rows = [];
         if (count($field_definitions) > 0) {
             foreach ($field_definitions as $field) {
-                $item = array();
+                $item = [];
                 $item['field_id'] = $field->getId();
                 $item['name'] = $field->getName();
                 $item['short_title'] = $field->getShortTitle();

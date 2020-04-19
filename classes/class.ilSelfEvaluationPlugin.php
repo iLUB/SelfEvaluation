@@ -53,4 +53,4 @@ class ilSelfEvaluationPlugin extends ilRepositoryObjectPlugin
     }
 }
 
-?>
+

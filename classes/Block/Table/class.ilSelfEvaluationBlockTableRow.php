@@ -124,7 +124,7 @@ class ilSelfEvaluationBlockTableRow
      */
     public function toArray()
     {
-        $arr = array();
+        $arr = [];
         $arr['block_id'] = $this->getBlockId();
         $arr['position_id'] = $this->getPositionId();
         $arr['title'] = $this->getTitle();

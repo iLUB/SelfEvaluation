@@ -43,4 +43,4 @@ interface ilSelfEvaluationQuestionBlockInterface
     public function getQuestions();
 }
 
-?>
+

@@ -12,7 +12,7 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI
     /**
      * @var array
      */
-    protected $copy_of_buttons = array();
+    protected $copy_of_buttons = [];
 
     /**
      * @var ilKnobGUI
@@ -32,7 +32,7 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI
     public function addCommandButton($a_cmd, $a_text, $a_id = '')
     {
 
-        $this->copy_of_buttons[] = array("cmd" => $a_cmd, "text" => $a_text);
+        $this->copy_of_buttons[] = ["cmd" => $a_cmd, "text" => $a_text];
         parent::addCommandButton($a_cmd, $a_text);
     }
 
@@ -41,7 +41,7 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI
      */
     function clearCommandButtons()
     {
-        $this->copy_of_buttons = array();
+        $this->copy_of_buttons = [];
         parent::clearCommandButtons();
     }
 
@@ -147,4 +147,3 @@ class ilSelfEvaluationPresentationFormGUI extends ilPropertyFormGUI
 
 }
 
-?>

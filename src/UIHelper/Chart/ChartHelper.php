@@ -1,35 +1,28 @@
 <?php
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+namespace ilub\plugin\SelfEvaluation\UIHelper\Chart;
 
-/**
- * Class ilSelfEvalChart
- */
-trait ilSelfEvalChartTrait
+use ilChartLegend;
+
+trait ChartHelper
 {
     protected $canvas_width = "99%";
     protected $canvas_height = "450px";
 
-    protected function getLegend()
+    protected function getLegend() : ilChartLegend
     {
         $legend = new ilChartLegend();
         $legend->setBackground($this->getChartColors()[0]);
         return $legend;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getBackgroundColor()
+    protected function getBackgroundColor() : string
     {
         return $this->getChartColors()[0];
     }
 
-    /**
-     * @return array containing color codes
-     */
-    protected function getChartColors()
+    protected function getChartColors() : array
     {
-        return array(
+        return [
             '#00CCFF',
             '#00CC99',
             '#9999FF',
@@ -42,36 +35,24 @@ trait ilSelfEvalChartTrait
             '#666600',
             '#333399',
             '#0066CC',
-        );
+        ];
     }
 
-    /**
-     * @return string
-     */
     public function getCanvasWidth() : string
     {
         return $this->canvas_width;
     }
 
-    /**
-     * @param string $canvas_width
-     */
     public function setCanvasWidth(string $canvas_width)
     {
         $this->canvas_width = $canvas_width;
     }
 
-    /**
-     * @return string
-     */
     public function getCanvasHeight() : string
     {
         return $this->canvas_height;
     }
 
-    /**
-     * @param string $canvas_height
-     */
     public function setCanvasHeight(string $canvas_height)
     {
         $this->canvas_height = $canvas_height;

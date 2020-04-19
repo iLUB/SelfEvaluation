@@ -37,10 +37,9 @@ class ilSelfEvaluationQuestionBlockGUI extends ilSelfEvaluationBlockGUI
      */
     protected function getObjectValuesAsArray()
     {
-        $values = array('abbreviation' => $this->object->getAbbreviation());
+        $values = ['abbreviation' => $this->object->getAbbreviation()];
 
         return array_merge(parent::getObjectValuesAsArray(), $values);
     }
 }
 
-?>

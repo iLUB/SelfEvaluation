@@ -95,7 +95,7 @@ class ilSelfEvaluationListBlocksGUI
         $factory = new ilSelfEvaluationBlockFactory($this->getSelfEvalId());
         $blocks = $factory->getAllBlocks();
 
-        $table_data = array();
+        $table_data = [];
         foreach ($blocks as $block) {
             $table_data[] = $block->getBlockTableRow()->toArray();
         }

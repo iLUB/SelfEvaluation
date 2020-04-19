@@ -1,36 +1,25 @@
 <?php
-/*
-	+-----------------------------------------------------------------------------+
-	| ILIAS open source                                                           |
-	+-----------------------------------------------------------------------------+
-	| Copyright (c) 1998-2014 ILIAS open source, University of Cologne            |
-	|                                                                             |
-	| This program is free software; you can redistribute it and/or               |
-	| modify it under the terms of the GNU General Public License                 |
-	| as published by the Free Software Foundation; either version 2              |
-	| of the License, or (at your option) any later version.                      |
-	|                                                                             |
-	| This program is distributed in the hope that it will be useful,             |
-	| but WITHOUT ANY WARRANTY; without even the implied warranty of              |
-	| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the               |
-	| GNU General Public License for more details.                                |
-	|                                                                             |
-	| You should have received a copy of the GNU General Public License           |
-	| along with this program; if not, write to the Free Software                 |
-	| Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA. |
-	+-----------------------------------------------------------------------------+
-*/
-require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Export/class.csvExport.php');
-require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeMatrix.php');
-require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSelect.php');
-require_once('./Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/iLubFieldDefinition/classes/types/class.iLubFieldDefinitionTypeSingleChoice.php');
+namespace ilub\plugin\SelfEvaluation\Dataset;
 
-/**
- * Class ilSelfEvaluationCsvExport
- * @author       Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- * @version      $Id$
- */
-class ilSelfEvaluationCsvExport extends csvExport
+use ilub\plugin\SelfEvaluation\CsvExport\csvExport;
+use ilub\plugin\SelfEvaluation\CsvExport\csvExportRow;
+use ilub\plugin\SelfEvaluation\CsvExport\csvExportValue;
+
+use ilSelfEvaluationPlugin;
+use ilub\plugin\SelfEvaluation\Question\MetaQuestion;
+use ilub\plugin\SelfEvaluation\Question\Question;
+use ilub\plugin\SelfEvaluation\CsvExport\csvExportColumn;
+use ilDBInterface;
+use ilSelfEvaluationMetaBlock;
+use ilSelfEvaluationBlock;
+use iLubFieldDefinitionTypeMatrix;
+use Exception;
+use iLubFieldDefinitionTypeSelect;
+use iLubFieldDefinitionTypeSingleChoice;
+use ilub\plugin\SelfEvaluation\Identity\Identity;
+use ilObjUser;
+
+class DatasetCsvExport extends csvExport
 {
     /**
      * @var int
@@ -38,17 +27,17 @@ class ilSelfEvaluationCsvExport extends csvExport
     protected $object_id = 0;
 
     /**
-     * @var ilSelfEvaluationMetaQuestion[]
+     * @var MetaQuestion[]
      */
-    protected $meta_questions = array();
+    protected $meta_questions = [];
     /**
-     * @var ilSelfEvaluationQuestion[]
+     * @var Question[]
      */
-    protected $questions = array();
+    protected $questions = [];
     /**
-     * @var ilSelfEvaluationDataset[]
+     * @var Dataset[]
      */
-    protected $datasets = array();
+    protected $datasets = [];
 
     /**
      * @var string
@@ -58,21 +47,23 @@ class ilSelfEvaluationCsvExport extends csvExport
     /**
      * @var ilSelfEvaluationPlugin
      */
-    protected $pl = null;
+    protected $pl;
 
     /**
-     * @param ilSelfEvaluationPlugin $pl
-     * @param int                    $object_id
+     * @var ilDBInterface
      */
-    function __construct(ilSelfEvaluationPlugin $pl, $object_id = 0)
+    protected $db;
+
+    function __construct(ilDBInterface $db, ilSelfEvaluationPlugin $pl, $object_id = 0)
     {
         parent::__construct();
         $this->setObjectId($object_id);
         $this->pl = $pl;
+        $this->db = $db;
 
     }
 
-    public function getCsvExport($delimiter = ";", $enclosure = '"')
+    public function getCsvExport(string $delimiter = ";", string $enclosure = '"')
     {
         $this->getData();
         $this->setColumns();
@@ -82,16 +73,16 @@ class ilSelfEvaluationCsvExport extends csvExport
 
     protected function getData()
     {
-        $meta_blocks = ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->getObjectId());
+        $meta_blocks = ilSelfEvaluationMetaBlock::_getAllInstancesByParentId($this->db,$this->getObjectId());
         foreach ($meta_blocks as $meta_block) {
-            $this->addMetaQuestions(ilSelfEvaluationMetaQuestion::_getAllInstancesForParentId($meta_block->getId()));
+            $this->addMetaQuestions(MetaQuestion::_getAllInstancesForParentId($this->db, $meta_block->getId()));
         }
-        $blocks = ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getObjectId());
+        $blocks = ilSelfEvaluationBlock::_getAllInstancesByParentId($this->db,$this->getObjectId());
         foreach ($blocks as $block) {
-            $this->addQuestions(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()));
+            $this->addQuestions(Question::_getAllInstancesForParentId($this->db,$block->getId()));
         }
 
-        $this->setDatasets(ilSelfEvaluationDataset::_getAllInstancesByObjectId($this->getObjectId()));
+        $this->setDatasets(Dataset::_getAllInstancesByObjectId($this->db,$this->getObjectId()));
     }
 
     protected function setColumns()
@@ -169,15 +160,11 @@ class ilSelfEvaluationCsvExport extends csvExport
         }
     }
 
-    /**
-     * @param $dataset
-     * @return csvExportValue
-     */
-    protected function getIdentity($dataset)
+    protected function getIdentity(Dataset $dataset) : csvExportValue
     {
-        $identifier = new ilSelfEvaluationIdentity($dataset->getIdentifierId());
+        $identifier = new Identity($this->db,$dataset->getIdentifierId());
         $id = $identifier->getIdentifier();
-        if ($identifier->getType() == ilSelfEvaluationIdentity::TYPE_LOGIN) {
+        if ($identifier->getType() == Identity::TYPE_LOGIN) {
             $username = ilObjUser::_lookupName($identifier->getIdentifier());
             $id = $username['login'];
         }
@@ -185,7 +172,7 @@ class ilSelfEvaluationCsvExport extends csvExport
         return new csvExportValue("identity", $id);
     }
 
-    protected function getDateValues($dataset)
+    protected function getDateValues(Dataset $dataset) : array
     {
         $meta_csv_values = [];
 
@@ -216,11 +203,7 @@ class ilSelfEvaluationCsvExport extends csvExport
         return $meta_csv_values;
     }
 
-    /**
-     * @param ilSelfEvaluationDataset $dataset
-     * @return array
-     */
-    protected function getStatisticValues($dataset)
+    protected function getStatisticValues(Dataset $dataset) : array
     {
         $meta_csv_values = [];
         $min = $dataset->getMinPercentageBlock();
@@ -242,7 +225,7 @@ class ilSelfEvaluationCsvExport extends csvExport
         return $meta_csv_values;
     }
 
-    protected function getQuestionValues($row, $entry)
+    protected function getQuestionValues($row, Data $entry)
     {
 
         $column_name = $this->getTitleForQuestion($this->getQuestion($entry->getQuestionId()));
@@ -254,7 +237,7 @@ class ilSelfEvaluationCsvExport extends csvExport
         return new csvExportValue($column_name, $value);
     }
 
-    protected function generateUniqueName($row, $column_name)
+    protected function generateUniqueName(csvExportRow $row, $column_name)
     {
         while ($row->getColumns()->columnIdExists($column_name)) {
             $column_name = $column_name . "_duplicate";
@@ -270,13 +253,7 @@ class ilSelfEvaluationCsvExport extends csvExport
         return $value;
     }
 
-    /**
-     * @param $row
-     * @param $entry
-     * @param $meta_question
-     * @return array
-     */
-    protected function getMetaQuestionValues($row, $entry, $meta_question)
+    protected function getMetaQuestionValues($row, Data $entry, MetaQuestion $meta_question) : array
     {
         $meta_csv_values = [];
 
@@ -316,6 +293,7 @@ class ilSelfEvaluationCsvExport extends csvExport
                     $meta_csv_values[] = new csvExportValue($column_name, $entry_value);
                 } else {
                     //legacy issue, get ID from time with none JSON-Save of values.
+                    $value = "";
                     foreach ($question_values as $qkey => $qvalue) {
                         if ($qvalue == $key) {
                             $key = $qkey;
@@ -351,10 +329,10 @@ class ilSelfEvaluationCsvExport extends csvExport
             foreach ($values as $value) {
                 $row->addValue($value);
             }
-            $entries = ilSelfEvaluationData::_getAllInstancesByDatasetId($dataset->getId());
+            $entries = Data::_getAllInstancesByDatasetId($this->db,$dataset->getId());
             foreach ($entries as $entry) {
                 if ($this->getMetaQuestion($entry->getQuestionId()) || $this->getQuestion($entry->getQuestionId())) {
-                    if ($entry->getQuestionType() == ilSelfEvaluationData::META_QUESTION_TYPE) {
+                    if ($entry->getQuestionType() == Data::META_QUESTION_TYPE) {
                         $meta_question = $this->getMetaQuestion($entry->getQuestionId());
                         $values = $this->getMetaQuestionValues($row, $entry,
                             $meta_question);
@@ -373,35 +351,25 @@ class ilSelfEvaluationCsvExport extends csvExport
         }
     }
 
-    /**
-     * @param ilSelfEvaluationQuestion $question
-     * @return string
-     */
-    protected function getTitleForQuestion(ilSelfEvaluationQuestion $question)
+    protected function getTitleForQuestion(Question $question) : string
     {
-        $block = new ilSelfEvaluationQuestionBlock($question->getParentId());
+        $block = new Question($this->db, $question->getParentId());
         $title = $question->getTitle() ? $question->getTitle() : $this->pl->txt('question') . ' ' . $block->getPosition() . '.' . $question->getPosition();
         return $title;
     }
 
-    /**
-     * @param int $object_id
-     */
-    public function setObjectId($object_id)
+    public function setObjectId(int $object_id)
     {
         $this->object_id = $object_id;
     }
 
-    /**
-     * @return int
-     */
-    public function getObjectId()
+    public function getObjectId() : int
     {
         return $this->object_id;
     }
 
     /**
-     * @param \ilSelfEvaluationDataset[] $datasets
+     * @param Dataset[] $datasets
      */
     public function setDatasets($datasets)
     {
@@ -409,7 +377,7 @@ class ilSelfEvaluationCsvExport extends csvExport
     }
 
     /**
-     * @return \ilSelfEvaluationDataset[]
+     * @return Dataset[]
      */
     public function getDatasets()
     {
@@ -417,7 +385,7 @@ class ilSelfEvaluationCsvExport extends csvExport
     }
 
     /**
-     * @param \ilSelfEvaluationMetaQuestion[] $meta_questions
+     * @param MetaQuestion[] $meta_questions
      */
     public function setMetaQuestions($meta_questions)
     {
@@ -425,7 +393,7 @@ class ilSelfEvaluationCsvExport extends csvExport
     }
 
     /**
-     * @param \ilSelfEvaluationMetaQuestion[] $meta_questions
+     * @param MetaQuestion[] $meta_questions
      */
     public function addMetaQuestions($meta_questions)
     {
@@ -433,24 +401,21 @@ class ilSelfEvaluationCsvExport extends csvExport
     }
 
     /**
-     * @return \ilSelfEvaluationMetaQuestion[]
+     * @return MetaQuestion[]
      */
     public function getMetaQuestions()
     {
         return $this->meta_questions;
     }
 
-    /**
-     * @param $id
-     * @return ilSelfEvaluationMetaQuestion
-     */
-    public function getMetaQuestion($id)
+
+    public function getMetaQuestion(int $id) : MetaQuestion
     {
         return $this->meta_questions[$id];
     }
 
     /**
-     * @param \ilSelfEvaluationQuestion[] $questions
+     * @param Question[] $questions
      */
     public function setQuestions($questions)
     {
@@ -458,7 +423,7 @@ class ilSelfEvaluationCsvExport extends csvExport
     }
 
     /**
-     * @param \ilSelfEvaluationQuestion[] $questions
+     * @param Question[] $questions
      */
     public function addQuestions($questions)
     {
@@ -466,18 +431,14 @@ class ilSelfEvaluationCsvExport extends csvExport
     }
 
     /**
-     * @return \ilSelfEvaluationQuestion[]
+     * @return Question[]
      */
     public function getQuestions()
     {
         return $this->questions;
     }
 
-    /**
-     * @param $id
-     * @return ilSelfEvaluationQuestion
-     */
-    public function getQuestion($id)
+    public function getQuestion(int $id) : Question
     {
         return $this->questions[$id];
     }
@@ -485,7 +446,7 @@ class ilSelfEvaluationCsvExport extends csvExport
     /**
      * @param string $date_format
      */
-    public function setDateFormat($date_format)
+    public function setDateFormat(string $date_format)
     {
         $this->date_format = $date_format;
     }
@@ -493,7 +454,7 @@ class ilSelfEvaluationCsvExport extends csvExport
     /**
      * @return string
      */
-    public function getDateFormat()
+    public function getDateFormat() : string
     {
         return $this->date_format;
     }

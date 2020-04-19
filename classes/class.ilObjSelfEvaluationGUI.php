@@ -362,10 +362,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
         // DisplayType
         $se = new ilSelectInputGUI($this->txt('display_type'), 'display_type');
         $se->setInfo($this->txt("display_type_info"));
-        $opt = array(
+        $opt = [
             ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE => $this->txt('single_page'),
             ilObjSelfEvaluation::DISPLAY_TYPE_MULTIPLE_PAGES => $this->txt('multiple_pages'),
-        );
+        ];
         $se->setOptions($opt);
         $this->form->addItem($se);
 

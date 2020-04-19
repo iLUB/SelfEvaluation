@@ -1,8 +1,12 @@
 <?php
-require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
-require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
-require_once('class.ilSelfEvaluationScale.php');
-require_once(dirname(__FILE__) . '/../Form/class.ilMultipleFieldInputGUI.php');
+namespace ilub\plugin\SelfEvaluation\UIHelper\Scale;
+
+use ilPropertyFormGUI;
+use ilGlobalTemplateInterface;
+use ilRepositoryObjectPlugin;
+use ilDBInterface;
+use ilFormSectionHeaderGUI;
+use ilMultipleFieldInputGUI;
 
 /**
  * GUI-Class ilSelfEvaluationScaleGUI
@@ -11,50 +15,71 @@ require_once(dirname(__FILE__) . '/../Form/class.ilMultipleFieldInputGUI.php');
  * @ilCtrl_Calls      ilSelfEvaluationScaleGUI: ilObjSelfEvaluationGUI
  * @ilCtrl_IsCalledBy ilSelfEvaluationScaleGUI: ilCommonActionDispatcherGUI, ilObjSelfEvaluationGUI
  */
-class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI
+class ScaleFormGUI extends ilPropertyFormGUI
 {
 
     const FIELD_NAME = 'scale';
-    /**
-     * @var ilTabsGUI
-     */
-    protected $tabs_gui;
-    /**
-     * @var ilSelfEvaluationScale
-     */
-    protected $obj;
 
     /**
-     * @param int  $parent_id
-     * @param bool $locked
+     * @var Scale
      */
-    public function __construct($parent_obj_id, $locked = false)
-    {
-        global $tpl, $ilCtrl;
-        /**
-         * @var $tpl    ilTemplate
-         * @var $ilCtrl ilCtrl
-         */
+    protected $scale;
+
+    /**
+     * @var ilRepositoryObjectPlugin
+     */
+    protected $plugin;
+
+    /**
+     * @var ilGlobalTemplateInterface
+     */
+    protected $tpl;
+
+    /**
+     * @var ilDBInterface
+     */
+    protected $db;
+
+    /**
+     * @var bool
+     */
+    protected $locked;
+
+    /**
+     * @var int
+     */
+    protected $parent_id;
+
+    public function __construct(
+        ilGlobalTemplateInterface $tpl,
+        ilRepositoryObjectPlugin $plugin,
+        ilDBInterface $db,
+        $parent_obj_id,
+        $locked = false
+    ) {
+        parent::__construct();
+
+        $this->plugin = $plugin;
         $this->tpl = $tpl;
         $this->locked = $locked;
-        $this->ctrl = $ilCtrl;
-        $this->pl = new ilSelfEvaluationPlugin();
         $this->parent_id = $parent_obj_id;
-        $this->obj = ilSelfEvaluationScale::_getInstanceByObjId($this->parent_id);
+        $this->db = $db;
+
+        $this->scale = Scale::_getInstanceByObjId($db, $this->parent_id);
         $this->initForm();
-        $this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/sortable.js');
+        $this->tpl->addJavaScript($this->plugin->getDirectory() . '/templates/sortable.js');
     }
 
     protected function initForm()
     {
         // Header
         $te = new ilFormSectionHeaderGUI();
-        $te->setTitle($this->pl->txt('scale_form'));
+        $te->setTitle($this->plugin->txt('scale_form'));
         $this->addItem($te);
-        $te = new ilMultipleFieldInputGUI($this->pl->txt('scale'), 'scale', self::FIELD_NAME);
-        $te->setPlaceholderValue($this->pl->txt('multinput_value'));
-        $te->setPlaceholderTitle($this->pl->txt('multinput_title'));
-        $te->setDescription($this->pl->txt('multinput_description'));
+        $te = new ilMultipleFieldInputGUI($this->plugin->txt('scale'), 'scale', self::FIELD_NAME);
+        $te->setPlaceholderValue($this->plugin->txt('multinput_value'));
+        $te->setPlaceholderTitle($this->plugin->txt('multinput_title'));
+        $te->setDescription($this->plugin->txt('multinput_description'));
         $te->setDisabled($this->locked);
         $this->addItem($te);
         // FillForm
@@ -66,16 +91,16 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI
      */
     public function fillForm()
     {
-        $array = array();
-        foreach ($this->obj->units as $u) {
+        $array = [];
+        foreach ($this->scale->getUnitsAsRelativeArray() as $unit) {
             /**
-             * @var $u ilSelfEvaluationScaleUnit
+             * @var $unit ScaleUnit
              */
-            $array[$u->getId()] = array('title' => $u->getTitle(), 'value' => $u->getValue());
+            $array[$unit->getId()] = ['title' => $unit->getTitle(), 'value' => $unit->getValue()];
         }
-        $array = array(
+        $array = [
             'scale' => $array,
-        );
+        ];
         $this->setValuesByArray($array);
 
         return $array;
@@ -94,19 +119,16 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI
         return $form_gui;
     }
 
-    //
-    // Create & Update Object
-    //
     public function updateObject()
     {
-        $this->obj->update();
-        $units = array();
-        $positions = @array_flip($_POST[self::FIELD_NAME . '_position']);
+        $this->scale->update();
+        $units = [];
+        $positions = array_flip($_POST[self::FIELD_NAME . '_position']);
         if (is_array($_POST[self::FIELD_NAME . '_new']['value'])) {
             foreach ($_POST[self::FIELD_NAME . '_new']['value'] as $k => $v) {
                 if ($v !== false AND $v !== null AND $v !== '') {
-                    $obj = new ilSelfEvaluationScaleUnit();
-                    $obj->setParentId($this->obj->getId());
+                    $obj = new ScaleUnit($this->db);
+                    $obj->setParentId($this->scale->getId());
                     $obj->setTitle($_POST['scale_new']['title'][$k]);
                     $obj->setValue($v);
                     $obj->create();
@@ -117,14 +139,14 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI
         if (is_array($_POST[self::FIELD_NAME . '_old']['value'])) {
             foreach ($_POST[self::FIELD_NAME . '_old']['value'] as $k => $v) {
                 if ($v !== false AND $v !== null AND $v !== '') {
-                    $obj = new ilSelfEvaluationScaleUnit(str_replace('id_', '', $k));
+                    $obj = new ScaleUnit(str_replace('id_', '', $k));
                     $obj->setTitle($_POST['scale_old']['title'][$k]);
                     $obj->setValue($v);
                     $obj->setPosition($positions[str_replace('id_', '', $k)]);
                     $obj->update();
                     $units[] = $obj;
                 } else {
-                    $obj = new ilSelfEvaluationScaleUnit(str_replace('id_', '', $k));
+                    $obj = new ScaleUnit(str_replace('id_', '', $k));
                     $obj->delete();
                 }
             }
@@ -132,4 +154,3 @@ class ilSelfEvaluationScaleFormGUI extends ilPropertyFormGUI
     }
 }
 
-?>

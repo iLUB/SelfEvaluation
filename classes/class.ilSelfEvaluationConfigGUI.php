@@ -22,7 +22,7 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
     /**
      * @var array
      */
-    protected $fields = array();
+    protected $fields = [];
     /**
      * @var string
      */
@@ -55,18 +55,18 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
      */
     public function getFields()
     {
-        $this->fields = array(
-            'async' => array(
+        $this->fields = [
+            'async' => [
                 'type' => self::TYPE_CHECKBOX,
                 'info' => false,
                 'subelements' => null
-            ),
-            'identity_selection' => array(
+            ],
+            'identity_selection' => [
                 'type' => self::TYPE_RTE_TEXT_AREA,
                 'info' => true,
                 'subelements' => null
-            )
-        );
+            ]
+        ];
 
         return $this->fields;
     }
@@ -110,7 +110,7 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
 
     public function getValues()
     {
-        $values = array();
+        $values = [];
         foreach ($this->getFields() as $key => $item) {
             $values[$key] = $this->object->getValue($key);
             if (is_array($item['subelements'])) {
@@ -187,4 +187,4 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
     }
 }
 
-?>
+

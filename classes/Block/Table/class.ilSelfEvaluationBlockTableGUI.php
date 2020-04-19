@@ -101,4 +101,3 @@ class ilSelfEvaluationBlockTableGUI extends ilTable2GUI
     }
 }
 
-?>

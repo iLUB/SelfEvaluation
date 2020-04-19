@@ -41,7 +41,7 @@ class ilSelectInputGUIwithDefaultText extends ilSelectInputGUIwrapper
     {
         global $lng;
 
-        parent::setOptions(array(self::IGNORE_KEY => $lng->txt('select_one')) + $a_options);
+        parent::setOptions([self::IGNORE_KEY => $lng->txt('select_one')] + $a_options);
     }
 
     /**

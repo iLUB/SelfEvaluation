@@ -3,12 +3,6 @@ require_once(dirname(__FILE__) . '/class.ilSelfEvaluationBlock.php');
 require_once(dirname(__FILE__) . '/../Scale/class.ilSelfEvaluationScale.php');
 require_once('int.ilSelfEvaluationQuestionBlockInterface.php');
 
-/**
- * Class ilSelfEvaluationQuestionBlock
- * @author  Fabian Schmid <fs@studer-raimann.ch>
- * @author  Fabio Heer <fabio.heer@ilub.unibe.ch>
- * @version $Id$
- */
 class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilSelfEvaluationQuestionBlockInterface
 {
     /**
@@ -70,12 +64,7 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
         return $xml;
     }
 
-    /**
-     * @param                  $parent_id
-     * @param SimpleXMLElement $xml
-     * @return SimpleXMLElement
-     */
-    static function fromXml($parent_id, SimpleXMLElement $xml)
+    static function fromXml(ilDBInterface $db, int $parent_id, SimpleXMLElement $xml)
     {
         $attributes = $xml->attributes();
         $block = new self();
@@ -111,7 +100,7 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
      */
     protected function getNonDbFields()
     {
-        return array_merge(parent::getNonDbFields(), array('scale'));
+        return array_merge(parent::getNonDbFields(), ['scale']);
     }
 
     /**
@@ -158,4 +147,3 @@ class ilSelfEvaluationQuestionBlock extends ilSelfEvaluationBlock implements ilS
     }
 }
 
-?>

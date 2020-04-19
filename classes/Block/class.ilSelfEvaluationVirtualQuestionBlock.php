@@ -35,7 +35,7 @@ class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQuestionBl
     /**
      * @var ilSelfEvaluationQuestion[]
      */
-    protected $questions = array();
+    protected $questions = [];
 
     /**
      * @param $parent_id
@@ -159,4 +159,3 @@ class ilSelfEvaluationVirtualQuestionBlock implements ilSelfEvaluationQuestionBl
 
 }
 
-?>

@@ -380,16 +380,16 @@ abstract class iLubFieldDefinitionContainerGUI
 
         if (!$type instanceof iLubFieldDefinitionType) {
 
-            return array();
+            return [];
         }
 
         $post_values = $type->getValues($this->form);
         if (!is_array($post_values)) {
 
-            return array();
+            return [];
         }
 
-        $values = array();
+        $values = [];
         foreach ($post_values as $key => $value) {
             $value = trim(ilUtil::stripSlashes($value));
             if (strlen($value)) {

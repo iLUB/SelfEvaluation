@@ -20,4 +20,3 @@ class ilSelfEvaluationVirtualOverallBlock extends ilSelfEvaluationVirtualQuestio
     }
 }
 
-?>

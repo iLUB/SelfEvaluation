@@ -1,12 +1,12 @@
 <?php
 namespace ilub\plugin\SelfEvaluation\Question;
 
+use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
 use SimpleXMLElement;
 use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
-use stdClass;
 use ilDBInterface;
 
-class MetaQuestion
+class MetaQuestion implements hasDBFields
 {
     use ArrayForDB;
 
@@ -118,7 +118,7 @@ class MetaQuestion
         if ($this->getTableName() != '' AND !$this->db->tableExists($this->getTableName())) {
             $this->db->createTable($this->getTableName(), $this->getDbFields());
             $this->db->createSequence($this->getTableName());
-            $this->db->addPrimaryKey($this->getTableName(), array('field_id'));
+            $this->db->addPrimaryKey($this->getTableName(), ['field_id']);
         }
     }
 
@@ -157,32 +157,18 @@ class MetaQuestion
     public function delete()
     {
         $stmt = $this->db->prepare('DELETE FROM ' . $this->getTableName() . ' WHERE field_id = ?;',
-            array('integer'));
-        $this->db->execute($stmt, array($this->getId()));
+            ['integer']);
+        $this->db->execute($stmt, [$this->getId()]);
     }
 
     protected function read()
     {
         $stmt = $this->db->prepare('SELECT * FROM ' . $this->getTableName() . ' WHERE field_id = ? ORDER BY position ASC;',
-            array('integer'));
-        $this->db->execute($stmt, array($this->getId()));
+            ['integer']);
+        $this->db->execute($stmt, [$this->getId()]);
         $row = $stmt->fetchObject();
 
-        $this->setValuesFromRecord($row);
-    }
-
-    /**
-     * @param stdClass $rec
-     */
-    protected function setValuesFromRecord($rec)
-    {
-        $this->setContainerId($rec->container_id);
-        $this->setName($rec->field_name);
-        $this->setShortTitle($rec->short_title);
-        $this->setTypeId($rec->field_type);
-        $this->setValues(unserialize($rec->field_values));
-        $this->enableRequired($rec->field_required);
-        $this->setPosition($rec->position);
+        $this->setObjectValuesFromRecord($this,$row);
     }
 
     public function setId(int $id)
@@ -237,7 +223,7 @@ class MetaQuestion
 
     public function getValues(): array
     {
-        return $this->values ? $this->values : array();
+        return $this->values ? $this->values : [];
     }
 
     public function setValues(array $values)
@@ -268,7 +254,7 @@ class MetaQuestion
         return $this->position;
     }
 
-    public static function isObject(ilDBInterface $db, int $field_id)
+    public static function _isObject(ilDBInterface $db, int $field_id)
     {
         $set = $db->query('SELECT field_id FROM '.self::TABLE_NAME.' WHERE field_id = '.$field_id);
 

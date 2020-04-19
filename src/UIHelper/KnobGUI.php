@@ -1,13 +1,11 @@
 <?php
+namespace ilub\plugin\SelfEvaluation\UIHelper;
 
-/**
- * GUI-Class ilKnobGUI
- * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * @version           $Id:
- */
-class ilKnobGUI
+use ilRepositoryObjectPlugin;
+use ilGlobalTemplateInterface;
+
+class KnobGUI
 {
-
     const CAP_BUTT = '\'butt\'';
     const CAP_ROUND = '\'round\'';
     const CAP_GAUGE = '\'gauge\'';
@@ -34,15 +32,15 @@ class ilKnobGUI
     /**
      * @var array
      */
-    protected $fg_color = array(208, 232, 255);
+    protected $fg_color = [208, 232, 255];
     /**
      * @var array
      */
-    protected $input_color = array(208, 232, 255);
+    protected $input_color = [208, 232, 255];
     /**
      * @var array
      */
-    protected $bg_color = array(240, 240, 240);
+    protected $bg_color = [240, 240, 240];
     /**
      * @var bool
      */
@@ -80,26 +78,12 @@ class ilKnobGUI
      */
     protected $display_previous = false;
 
-    public function __construct()
-    {
-        global $tpl, $ilCtrl, $ilToolbar;
-        /**
-         * @var $tpl       ilTemplate
-         * @var $ilCtrl    ilCtrl
-         * @var $ilToolbar ilToolbarGUI
-         */
-        $this->tpl = $tpl;
-        $this->ctrl = $ilCtrl;
-        $this->toolbar = $ilToolbar;
-        $this->pl = new ilSelfEvaluationPlugin();
-    }
-
-    public function render()
+    public function render(ilGlobalTemplateInterface $tpl, ilRepositoryObjectPlugin $plugin)
     {
         self::$num++;
-        $this->tpl->addJavaScript($this->pl->getDirectory() . '/templates/js/jquery.knob.js');
-        $knob = $this->pl->getTemplate('default/Form/tpl.knob.html', false, false);
-        $knob->setVariable('ID', 'knob_' . $this->getNum());
+        $tpl->addJavaScript($plugin->getDirectory() . '/templates/js/jquery.knob.js');
+        $knob = $plugin->getTemplate('default/Form/tpl.knob.html', false, false);
+        $knob->setVariable('ID', 'knob_' . self::getNum());
         $knob->setVariable('VALUE', $this->getValue());
         $knob->setVariable('MIN', $this->getMin());
         $knob->setVariable('MAX', $this->getMax());
@@ -118,20 +102,14 @@ class ilKnobGUI
         $this->setHtml($knob->get());
     }
 
-    /**
-     * @param string $html
-     */
-    public function setHtml($html)
+    public function setHtml(string $html)
     {
         $this->html = $html;
     }
 
-    /**
-     * @return string
-     */
-    public function getHtml()
+    public function getHtml(ilGlobalTemplateInterface $tpl, ilRepositoryObjectPlugin $plugin) : string
     {
-        $this->render();
+        $this->render($tpl, $plugin);
 
         return $this->html;
     }
@@ -392,5 +370,3 @@ class ilKnobGUI
         return $this->height;
     }
 }
-
-?>

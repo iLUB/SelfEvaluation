@@ -1,57 +1,92 @@
 <?php
-require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
-require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
-require_once(dirname(__FILE__) . '/../Block/class.ilSelfEvaluationVirtualOverallBlock.php');
-require_once('class.ilSelfEvaluationFeedback.php');
-require_once('class.ilSelfEvaluationFeedbackTableGUI.php');
-require_once('class.ilSliderInputGUI.php');
-require_once('./Services/Utilities/classes/class.ilConfirmationGUI.php');
+namespace ilub\plugin\SelfEvaluation\Feedback;
+
+use ilSelfEvaluationQuestionBlockInterface;
+use ilSelfEvaluationPlugin;
+use ilToolbarGUI;
+use ilTemplate;
+use ilCtrl;
+use ilObjSelfEvaluationGUI;
+use ilGlobalTemplateInterface;
+use ilAccess;
+use ilSelfEvaluationVirtualOverallBlock;
+use ilSelfEvaluationQuestionBlock;
+use ilDBInterface;
+use ilPropertyFormGUI;
+use ilUtil;
+use ilNonEditableValueGUI;
+use ilTextInputGUI;
+use ilConfirmationGUI;
+use ilub\plugin\SelfEvaluation\UIHelper\TinyMceTextAreaInputGUI;
+use ilRadioGroupInputGUI;
+use ilRadioOption;
+use ilub\plugin\SelfEvaluation\UIHelper\SliderInputGUI;
 
 /**
- * GUI-Class ilSelfEvaluationFeedbackGUI
- * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * @author            Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- * @author            Fabio Heer
- * @version           $Id:
  * @ilCtrl_Calls      ilSelfEvaluationFeedbackGUI:
  * @ilCtrl_IsCalledBy ilSelfEvaluationFeedbackGUI:
  */
-class ilSelfEvaluationFeedbackGUI
+class FeedbackGUI
 {
     /**
      * @var ilPropertyFormGUI
      */
     protected $form;
     /**
-     * @var ilGlobalPageTemplate
+     * @var ilTemplate
      */
-    protected $ov;
+    protected $overview;
     /**
      * @var int
      */
     protected $total;
-
     /**
      * @var ilSelfEvaluationQuestionBlockInterface
      */
     protected $block;
-
     /**
-     * @var ilSelfEvaluationFeedback
+     * @var Feedback
      */
-    protected $object;
-
+    protected $feedback;
     /**
-     * @var array
+     * @var ilDBInterface
      */
+    protected $db;
+    /**
+     * @var ilGlobalTemplateInterface
+     */
+    protected $tpl;
+    /**
+     * @var ilCtrl
+     */
+    protected $ctrl;
+    /**
+     * @var ilObjSelfEvaluationGUI
+     */
+    protected $parent;
+    /**
+     * @var ilToolbarGUI
+     */
+    protected $toolbar;
+    /**
+     * @var ilAccess
+     */
+    protected $access;
+    /**
+     * @var ilSelfEvaluationPlugin
+     */
+    protected $plugin;
+
     function __construct(
+        ilDBInterface $db,
         ilObjSelfEvaluationGUI $parent,
-        ilGlobalPageTemplate $tpl,
+        ilGlobalTemplateInterface $tpl,
         ilCtrl $ilCtrl,
         ilToolbarGUI $ilToolbar,
         ilAccess $access,
         ilSelfEvaluationPlugin $plugin
     ) {
+        $this->db = $db;
         $this->tpl = $tpl;
         $this->ctrl = $ilCtrl;
         $this->parent = $parent;
@@ -69,12 +104,12 @@ class ilSelfEvaluationFeedbackGUI
         }
 
         if ($_GET['feedback_id']) {
-            $this->object = new ilSelfEvaluationFeedback($_GET['feedback_id']);
+            $this->feedback = new Feedback($_GET['feedback_id']);
         } else {
-            $this->object = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->getBlock()->getId());
+            $this->feedback = Feedback::_getNewInstanceByParentId($this->db,$this->getBlock()->getId());
         }
         if ($_GET['parent_overall']) {
-            $this->object->setParentTypeOverall(true);
+            $this->feedback->setParentTypeOverall(true);
         }
 
         $this->performCommand();
@@ -130,17 +165,17 @@ class ilSelfEvaluationFeedbackGUI
         $this->toolbar->addButton($this->plugin->txt('add_new_feedback'), $this->ctrl->getLinkTarget($this, 'addNew'));
 
         $ov = $this->getOverview();
-        $table = new ilSelfEvaluationFeedbackTableGUI($this, 'listObjects', $this->block);
+        $table = new FeedbackTableGUI($this->db, $this,$this->plugin,'listObjects', $this->block);
         $this->tpl->setContent($ov->get() . '<br><br>' . $table->getHTML());
     }
 
     protected function addNew()
     {
         $this->initForm();
-        $this->object->setStartValue(ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(),
-            $_GET['start_value'] ? $_GET['start_value'] : 0), 0, $this->object->isParentTypeOverall());
-        $this->object->setEndValue(ilSelfEvaluationFeedback::_getNextMaxValueForParentId($this->block->getId(),
-            $this->object->getStartValue()), 0, $this->object->isParentTypeOverall());
+        $this->feedback->setStartValue(Feedback::_getNextMinValueForParentId($this->db,$this->block->getId(),
+            $_GET['start_value'] ? $_GET['start_value'] : 0, 0, $this->feedback->isParentTypeOverall()));
+        $this->feedback->setEndValue(Feedback::_getNextMaxValueForParentId($this->db,$this->block->getId(),
+            $this->feedback->getStartValue(), 0, $this->feedback->isParentTypeOverall()));
         $this->setValues();
         $this->tpl->setContent($this->form->getHTML());
     }
@@ -150,18 +185,18 @@ class ilSelfEvaluationFeedbackGUI
         header('Cache-Control: no-cache, must-revalidate');
         header('Content-type: application/json');
         $ignore = ($_GET['feedback_id'] ? $_GET['feedback_id'] : 0);
-        $start = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(),
-            $_GET['start_value'] ? $_GET['start_value'] : 0, $ignore, $this->object->isParentTypeOverall());
-        $end = ilSelfEvaluationFeedback::_getNextMaxValueForParentId($this->block->getID(), $start, $ignore,
-            $this->object->isParentTypeOverall());
+        $start = Feedback::_getNextMinValueForParentId($this->db,$this->block->getId(),
+            $_GET['start_value'] ? $_GET['start_value'] : 0, $ignore, $this->feedback->isParentTypeOverall());
+        $end = Feedback::_getNextMaxValueForParentId($this->db,$this->block->getID(), $start, $ignore,
+            $this->feedback->isParentTypeOverall());
 
         $state = (($_GET['from'] < $start) OR ($_GET['to'] > $end)) ? false : true;
-        echo json_encode(array(
+        echo json_encode([
             'check' => $state,
             'start_value' => $_GET['start_value'],
             'next_from' => $start,
             'next_to' => $end
-        ));
+        ]);
         //$this->tpl->hide = true; // TODO this looks very nasty (writing to the global template object)
         exit;
     }
@@ -191,11 +226,11 @@ class ilSelfEvaluationFeedbackGUI
             $option_auto->setInfo($this->plugin->txt("option_auto_info"));
 
             $option_slider = new ilRadioOption($this->plugin->txt("option_slider"), 'option_slider');
-            $sl = new ilSliderInputGUI($this->tpl, $this->plugin->txt('slider'), 'slider', 0, 100,
+            $sl = new SliderInputGUI($this->tpl, $this->plugin, $this->plugin->txt('slider'), 'slider', 0, 100,
                 $this->ctrl->getLinkTarget($this, 'checkNextValue'));
             $option_slider->addSubItem($sl);
 
-            if (ilSelfEvaluationFeedback::_isComplete($this->block->getId(), $this->object->isParentTypeOverall())) {
+            if (Feedback::_isComplete($this->db,$this->block->getId(), $this->feedback->isParentTypeOverall())) {
                 $option_slider->setDisabled(true);
             }
 
@@ -206,14 +241,12 @@ class ilSelfEvaluationFeedbackGUI
 
             $this->form->addItem($radio_options);
         } else {
-            $sl = new ilSliderInputGUI($this->tpl, $this->plugin->txt('slider'), 'slider', 0, 100,
+            $sl = new SliderInputGUI($this->tpl, $this->plugin,$this->plugin->txt('slider'), 'slider', 0, 100,
                 $this->ctrl->getLinkTarget($this, 'checkNextValue'));
             $this->form->addItem($sl);
         }
 
-        // Feedbacktext
-        require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Form/class.ilTinyMceTextAreaInputGUI.php');
-        $te = new ilTinyMceTextAreaInputGUI($this->parent->object, $this->plugin->txt('feedback_text'), 'feedback_text');
+        $te = new TinyMceTextAreaInputGUI($this->feedback->getId(), $this->plugin->txt('feedback_text'), 'feedback_text');
         $te->setRequired(true);
         $this->form->addItem($te);
     }
@@ -222,13 +255,13 @@ class ilSelfEvaluationFeedbackGUI
     {
         $this->initForm();
         if ($this->form->checkInput()) {
-            $obj = ilSelfEvaluationFeedback::_getNewInstanceByParentId($this->block->getId(),
-                $this->object->isParentTypeOverall());
+            $obj = Feedback::_getNewInstanceByParentId($this->db,$this->block->getId(),
+                $this->feedback->isParentTypeOverall());
             $obj->setTitle($this->form->getInput('title'));
             $obj->setDescription($this->form->getInput('description'));
             if ($this->form->getInput('feedback_range_type') == 'option_auto') {
-                $range = ilSelfEvaluationFeedback::_rearangeFeedbackLinear($this->block->getId(),
-                    $this->object->isParentTypeOverall());
+                $range = Feedback::_rearangeFeedbackLinear($this->db,$this->block->getId(),
+                    $this->feedback->isParentTypeOverall());
                 $obj->setStartValue(100 - $range);
                 $obj->setEndValue(100);
             } else {
@@ -248,13 +281,13 @@ class ilSelfEvaluationFeedbackGUI
 
     protected function setValues()
     {
-        $values['title'] = $this->object->getTitle();
-        $values['description'] = $this->object->getDescription();
-        $values['start_value'] = $this->object->getStartValue();
-        $values['end_value'] = $this->object->getEndValue();
-        $values['feedback_text'] = $this->object->getFeedbackText();
-        $values['slider'] = array($this->object->getStartValue(), $this->object->getEndValue());
-        if (ilSelfEvaluationFeedback::_isComplete($this->block->getId(), $this->object->isParentTypeOverall())) {
+        $values['title'] = $this->feedback->getTitle();
+        $values['description'] = $this->feedback->getDescription();
+        $values['start_value'] = $this->feedback->getStartValue();
+        $values['end_value'] = $this->feedback->getEndValue();
+        $values['feedback_text'] = $this->feedback->getFeedbackText();
+        $values['slider'] = [$this->feedback->getStartValue(), $this->feedback->getEndValue()];
+        if (Feedback::_isComplete($this->db,$this->block->getId(), $this->feedback->isParentTypeOverall())) {
             $values['feedback_range_type'] = 'option_auto';
         } else {
             $values['feedback_range_type'] = 'option_slider';
@@ -273,13 +306,13 @@ class ilSelfEvaluationFeedbackGUI
     {
         $this->initForm('update');
         if ($this->form->checkInput()) {
-            $this->object->setTitle($this->form->getInput('title'));
-            $this->object->setDescription($this->form->getInput('description'));
+            $this->feedback->setTitle($this->form->getInput('title'));
+            $this->feedback->setDescription($this->form->getInput('description'));
             $slider = $this->form->getInput('slider');
-            $this->object->setStartValue($slider[0]);
-            $this->object->setEndValue($slider[1]);
-            $this->object->setFeedbackText($this->form->getInput('feedback_text'));
-            $this->object->update();
+            $this->feedback->setStartValue($slider[0]);
+            $this->feedback->setEndValue($slider[1]);
+            $this->feedback->setFeedbackText($this->form->getInput('feedback_text'));
+            $this->feedback->update();
             ilUtil::sendSuccess($this->plugin->txt('msg_feedback_created'));
             $this->cancel();
         }
@@ -289,7 +322,7 @@ class ilSelfEvaluationFeedbackGUI
 
     protected function deleteFeedback()
     {
-        $this->deleteFeedbacksConfirmation([$this->object->getId()]);
+        $this->deleteFeedbacksConfirmation([$this->feedback->getId()]);
     }
 
     protected function deleteFeedbacks()
@@ -305,7 +338,7 @@ class ilSelfEvaluationFeedbackGUI
         $conf->setCancel($this->plugin->txt('cancel'), 'cancel');
         $conf->setConfirm($this->plugin->txt('delete_feedback'), 'deleteObject');
         foreach ($ids as $id) {
-            $obj = new ilSelfEvaluationFeedback($id);
+            $obj = new Feedback($this->db, $id);
             $conf->addItem('id[]', $obj->getId(), $obj->getTitle());
 
         }
@@ -318,7 +351,7 @@ class ilSelfEvaluationFeedbackGUI
 
         $ids = $_POST["id"];
         foreach ($ids as $id) {
-            $obj = new ilSelfEvaluationFeedback($id);
+            $obj = new Feedback($this->db,$id);
             $obj->delete();
         }
         $this->cancel();
@@ -326,15 +359,17 @@ class ilSelfEvaluationFeedbackGUI
 
     protected function getOverview() : ilTemplate
     {
+        $this->overview= $this->plugin->getTemplate('default/Feedback/tpl.feedback_overview.html');
+
         $this->getMeasurement();
-        $min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), 0, 0,
-            $this->object->isParentTypeOverall());
-        $feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->block->getId(), false,
-            $this->object->isParentTypeOverall());
+        $min = Feedback::_getNextMinValueForParentId($this->db,$this->block->getId(), 0, 0,
+            $this->feedback->isParentTypeOverall());
+        $feedbacks = Feedback::_getAllInstancesForParentId($this->db,$this->block->getId(), false,
+            $this->feedback->isParentTypeOverall());
 
         if (count($feedbacks) == 0) {
             $this->parseOverviewBlock('blank', 100, 0);
-            return $this->ov;
+            return $this->overview;
         }
         $fb = null;
         foreach ($feedbacks as $fb) {
@@ -342,29 +377,28 @@ class ilSelfEvaluationFeedbackGUI
                 $this->parseOverviewBlock('blank', $fb->getStartValue() - $min, $min);
             }
             $this->parseOverviewBlock('fb', $fb->getEndValue() - $fb->getStartValue(), $fb->getId(), $fb->getTitle());
-            $min = ilSelfEvaluationFeedback::_getNextMinValueForParentId($this->block->getId(), $fb->getEndValue(), 0,
-                $this->object->isParentTypeOverall());
+            $min = Feedback::_getNextMinValueForParentId($this->db,$this->block->getId(), $fb->getEndValue(), 0,
+                $this->feedback->isParentTypeOverall());
         }
         if ($min != 100 AND is_object($fb)) {
             $this->parseOverviewBlock('blank', 100 - $min, $min);
         }
 
-        return $this->ov;
+        return $this->overview;
     }
 
-    public function getMeasurement()
+    protected function getMeasurement()
     {
-        $this->ov = $this->plugin->getTemplate('default/Feedback/tpl.feedback_overview.html');
         for ($x = 1; $x <= 100; $x += 1) {
-            $this->ov->setCurrentBlock('line');
+            $this->overview->setCurrentBlock('line');
             if ($x % 5 == 0) {
-                $this->ov->setVariable('INT', $x . '&nbsp;');
-                $this->ov->setVariable('LINE_CSS', '_double');
+                $this->overview->setVariable('INT', $x . '&nbsp;');
+                $this->overview->setVariable('LINE_CSS', '_double');
             } else {
-                $this->ov->setVariable('INT', '');
+                $this->overview->setVariable('INT', '');
             }
-            $this->ov->setVariable('WIDTH', 10);
-            $this->ov->parseCurrentBlock();
+            $this->overview->setVariable('WIDTH', 10);
+            $this->overview->parseCurrentBlock();
         }
     }
 
@@ -386,12 +420,12 @@ class ilSelfEvaluationFeedbackGUI
                 break;
         }
         $this->total += $width;
-        $this->ov->setCurrentBlock('fb');
-        $this->ov->setVariable('FEEDBACK', $title);
-        $this->ov->setVariable('HREF', $href);
-        $this->ov->setVariable('WIDTH', $width);
-        $this->ov->setVariable('CSS', $css);
-        $this->ov->parseCurrentBlock();
+        $this->overview->setCurrentBlock('fb');
+        $this->overview->setVariable('FEEDBACK', $title);
+        $this->overview->setVariable('HREF', $href);
+        $this->overview->setVariable('WIDTH', $width);
+        $this->overview->setVariable('CSS', $css);
+        $this->overview->parseCurrentBlock();
     }
 
     /**

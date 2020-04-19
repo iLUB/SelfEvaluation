@@ -2,10 +2,11 @@
 namespace ilub\plugin\SelfEvaluation\Question;
 
 use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
+use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
 use SimpleXMLElement;
 use ilDBInterface;
 
-class Question
+class Question implements hasDBFields
 {
     use ArrayForDB;
 
@@ -99,13 +100,9 @@ class Question
 
     public function read()
     {
-        $set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '
-            . $this->db->quote($this->getId(), 'integer'));
-        while ($rec = $this->db->fetchObject($set)) {
-            foreach ($this->getArrayForDb() as $k => $v) {
-                $this->{$k} = $rec->{$k};
-            }
-        }
+        $set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '.$this->getId());
+
+        $this->setObjectValuesFromRecord($this,$this->db->fetchObject($set));
     }
 
 
@@ -158,9 +155,13 @@ class Question
         $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), $this->getIdForDb());
     }
 
-
-
-    public static function _getAllInstancesForParentId(ilDBInterface $db, int $parent_id, bool $as_array = false): Question
+    /**
+     * @param ilDBInterface $db
+     * @param int           $parent_id
+     * @param bool          $as_array
+     * @return Question[]
+     */
+    public static function _getAllInstancesForParentId(ilDBInterface $db, int $parent_id, bool $as_array = false)
     {
         $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
             . $db->quote($parent_id, 'integer') . ' ORDER BY position ASC');
@@ -196,7 +197,7 @@ class Question
         return false;
     }
 
-    public static function _getNextPosition(ilDBInterface $db, int $parent_id): bool
+    public static function _getNextPosition(ilDBInterface $db, int $parent_id): int
     {
         $set = $db->query('SELECT MAX(position) next_pos FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '.$parent_id);
         while ($rec = $db->fetchObject($set)) {

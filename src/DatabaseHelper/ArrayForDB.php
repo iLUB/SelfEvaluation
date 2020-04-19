@@ -2,6 +2,8 @@
 
 namespace ilub\plugin\SelfEvaluation\DatabaseHelper;
 
+use stdClass;
+
 trait ArrayForDB
 {
     protected function getArrayForDbWithAttributes(): array
@@ -51,7 +53,7 @@ trait ArrayForDB
         return ['db'];
     }
 
-    protected function setObjectValuesFromRecord(hasDBFields $data, $rec)
+    protected function setObjectValuesFromRecord(hasDBFields $data, stdClass $rec)
     {
         foreach ($data->getArrayForDb() as $k => $v) {
             $this->{$k} = $rec->{$k};

@@ -1,18 +1,11 @@
 <?php
-require_once(dirname(__FILE__) . '/../class.ilObjSelfEvaluationGUI.php');
-require_once(dirname(__FILE__) . '/../Feedback/class.ilSelfEvaluationFeedbackGUI.php');
-require_once('./Services/Form/classes/class.ilPropertyFormGUI.php');
-require_once('class.ilSelfEvaluationDatasetTableGUI.php');
-require_once('class.ilSelfEvaluationCsvExport.php');
+namespace ilub\plugin\SelfEvaluation\Dataset;
 
 /**
- * GUI-Class ilSelfEvaluationResultsGUI
- * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * @version           $Id:
  * @ilCtrl_Calls      ilSelfEvaluationResultsGUI:
  * @ilCtrl_IsCalledBy ilSelfEvaluationResultsGUI:
  */
-class ilSelfEvaluationDatasetGUI
+class DatasetGUI
 {
     function __construct(
         ilObjSelfEvaluationGUI $parent,
@@ -166,4 +159,3 @@ class ilSelfEvaluationDatasetGUI
     }
 }
 
-?>

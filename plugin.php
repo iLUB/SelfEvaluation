@@ -7,4 +7,4 @@ $supports_export = true;
 
 $responsible = "Timon Amstutz - University of Bern";
 $responsible_mail = "timon.amstutz@ilub.unibe.ch";
-?>
+

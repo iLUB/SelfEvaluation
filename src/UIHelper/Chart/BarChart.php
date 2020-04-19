@@ -1,16 +1,13 @@
 <?php
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+namespace ilub\plugin\SelfEvaluation\UIHelper\Chart;
 
-include_once "Services/Chart/classes/class.ilChartGrid.php";
-include_once "Services/Chart/classes/class.ilChartDataBars.php";
-include_once "trait.ilSelfEvalChartTrait.php";
+use ilChartGrid;
+use ilChartDataBars;
+use stdClass;
 
-/**
- * Class ilSelfEvalBarChart
- */
-class ilSelfEvalBarChart extends ilChartGrid
+class BarChart extends ilChartGrid
 {
-    use ilSelfEvalChartTrait;
+    use ChartHelper;
 
     const BAR_WIDTH = 0.5;
 
@@ -18,11 +15,6 @@ class ilSelfEvalBarChart extends ilChartGrid
      * @var bool
      */
     protected $show_average_line = false;
-
-    /**
-     * @var bool
-     */
-    protected $show_varianz = false;
 
     /**
      * @var array
@@ -35,11 +27,16 @@ class ilSelfEvalBarChart extends ilChartGrid
     protected $values_for_standardabweichung = [];
 
     /**
+     * @var bool
+     */
+    protected $show_varianz;
+
+    /**
      * @var int
      */
     protected $average = 0;
 
-    public function __construct($a_id)
+    public function __construct(string $a_id)
     {
         parent::__construct($a_id);
         $this->setSize($this->getCanvasWidth(), $this->getCanvasHeight());
@@ -51,16 +48,13 @@ class ilSelfEvalBarChart extends ilChartGrid
 
     }
 
-    public function getDataInstance($type = null)
+    public function getDataInstance($type = null) : ilChartDataBars
     {
         $data = new ilChartDataBars();
         $data->setBarOptions(self::BAR_WIDTH, 'center');
         return $data;
     }
 
-    /**
-     * @param stdClass $a_options
-     */
     public function parseGlobalOptions(stdClass $a_options)
     {
         parent::parseGlobalOptions($a_options);
@@ -96,90 +90,52 @@ class ilSelfEvalBarChart extends ilChartGrid
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function isShowAverageLine()
+    public function isShowAverageLine() : bool
     {
         return $this->show_average_line;
     }
 
-    /**
-     * @param bool $show_average_line
-     */
-    public function setShowAverageLine($show_average_line)
+    public function setShowAverageLine(bool $show_average_line)
     {
         $this->show_average_line = $show_average_line;
     }
 
-    /**
-     * @return int
-     */
     public function getAverage() : int
     {
         return $this->average;
     }
 
-    /**
-     * @param int $average
-     */
     public function setAverage(int $average)
     {
         $this->average = $average;
     }
 
-    /**
-     * @return bool
-     */
-    public function isShowVarianz()
+    public function isShowVarianz() : bool
     {
         return $this->show_varianz;
     }
 
-    /**
-     * @param bool $show_varianz
-     */
-    public function setShowVarianz($show_varianz)
+    public function setShowVarianz(bool $show_varianz)
     {
         $this->show_varianz = $show_varianz;
     }
 
-    /**
-     * @return array
-     */
-    public function getVarianzData() : array
-    {
-        return $this->varianz_data;
-    }
-
-    /**
-     * @return array
-     */
-    public function getStandardabweichungData()
+    public function getStandardabweichungData() : array
     {
         return $this->standardabweichung_data;
     }
 
-    /**
-     * @param array $standardabweichung_data
-     */
-    public function setStandardabweichungData($standardabweichung_data)
+    public function setStandardabweichungData(array $standardabweichung_data)
     {
         $this->standardabweichung_data = $standardabweichung_data;
     }
 
-    /**
-     * @return array
-     */
-    public function getValuesForStandardabweichung()
+    public function getValuesForStandardabweichung() : array
     {
         return $this->values_for_standardabweichung;
     }
 
-    /**
-     * @param array $values_for_standardabweichung
-     */
-    public function setValuesForStandardabweichung($values_for_standardabweichung)
+    public function setValuesForStandardabweichung(array $values_for_standardabweichung)
     {
         $this->values_for_standardabweichung = $values_for_standardabweichung;
     }

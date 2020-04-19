@@ -1,16 +1,10 @@
 <?php
-/* Copyright (c) 1998-2009 ILIAS open source, Extended GPL, see docs
-/LICENSE */
-include_once('./Services/Form/classes/class.ilCustomInputGUI.php');
-require_once('./Services/Form/classes/class.ilSubEnabledFormPropertyGUI.php');
+namespace ilub\plugin\SelfEvaluation\UIHelper\Scale;
 
-/**
- * Class ilMultipleTextInputGUI
- * @author  Fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * @author  Oskar Truffer <ot@studer-raimann.ch>
- * @version $Id:
- */
-class ilMultipleFieldInputGUI extends ilCustomInputGUI
+use ilSubEnabledFormPropertyGUI;
+use ilRepositoryObjectPlugin;
+
+class MultipleFieldInputGUI extends ilSubEnabledFormPropertyGUI
 {
 
     /**
@@ -40,26 +34,23 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI
     protected $description = "";
 
     /**
-     * @param string $title
-     * @param string $post_var
-     * @param        $field_name
+     * @var ilRepositoryObjectPlugin
      */
-    public function __construct($title, $post_var, $field_name)
+    protected $plugin;
+
+    public function __construct(ilRepositoryObjectPlugin $plugin, string $title, string $post_var, string $field_name)
     {
         parent::__construct($title, $post_var);
         $this->setFieldName($field_name);
+        $this->plugin = $plugin;
     }
 
-    /**
-     * @return string
-     */
-    public function getHtml()
+    public function getHtml() : string
     {
-        $pl = new ilSelfEvaluationPlugin();
-        $tpl = $pl->getTemplate('default/Form/tpl.multiple_input.html', true, true);
+        $tpl = $this->plugin->getTemplate('default/Form/tpl.multiple_input.html', true, true);
         $tpl->setVariable('LOCK_CSS', $this->getDisabled() ? 'locked' : '');
         if ($this->getDisabled()) {
-            $this->setInfo($pl->txt('locked'));
+            $this->setInfo($this->plugin->txt('locked'));
         }
         if (count($this->getValues()) > 0) {
             foreach ($this->getValues() as $id => $value) {
@@ -81,7 +72,6 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI
             $tpl->setVariable('TITLE_N_NEW', $this->getFieldName() . '_new[title][]');
             $tpl->setVariable('DISABLED_N', $this->getDisabled() ? 'disabled' : '');
             $tpl->setVariable('PLACEHOLDER_VALUE', $this->getPlaceholderValue());
-//            $tpl->setVariable('DEFAULT_VALUE', $this->getDefaultValue());
             $tpl->setVariable('PLACEHOLDER_TITLE', $this->getPlaceholderTitle());
             $tpl->setVariable('LOCK_CSS', $this->getDisabled() ? 'locked' : '');
             $tpl->parseCurrentBlock();
@@ -91,114 +81,75 @@ class ilMultipleFieldInputGUI extends ilCustomInputGUI
         return $tpl->get();
     }
 
-    /**
-     * @param $value array form $value[$postvar] = array(id, array(name, value))
-     */
-    public function setValueByArray($value)
+    public function setValueByArray(array $value)
     {
-        parent::setValueByArray($value);
-        $this->setValues(is_array($value[$this->getPostVar()]) ? $value[$this->getPostVar()] : array());
+        foreach ($this->getSubItems() as $item) {
+            /**
+             * @var self $item
+             */
+            $item->setValueByArray($value);
+        }
+        $this->setValues(is_array($value[$this->getPostVar()]) ? $value[$this->getPostVar()] : []);
     }
 
-
-    //
-    // Setter&Getter
-    //
-    /**
-     * @param array $values
-     */
-    public function setValues($values)
+    public function setValues(array $values)
     {
         $this->values = $values;
     }
 
-    /**
-     * @return array
-     */
-    public function getValues()
+    public function getValues() : array
     {
         return $this->values;
     }
 
-    /**
-     * @param string $field_name
-     */
-    public function setFieldName($field_name)
+    public function setFieldName(string $field_name)
     {
         $this->field_name = $field_name;
     }
 
-    /**
-     * @return string
-     */
-    public function getFieldName()
+    public function getFieldName() : string
     {
         return $this->field_name;
     }
 
-    /**
-     * @param string $placeholder_title
-     */
-    public function setPlaceholderTitle($placeholder_title)
+    public function setPlaceholderTitle(string $placeholder_title)
     {
         $this->placeholder_title = $placeholder_title;
     }
 
-    /**
-     * @return string
-     */
-    public function getPlaceholderTitle()
+    public function getPlaceholderTitle() : string
     {
         return $this->placeholder_title;
     }
 
-    /**
-     * @param string $placeholder_value
-     */
-    public function setPlaceholderValue($placeholder_value)
+    public function setPlaceholderValue(string $placeholder_value)
     {
         $this->placeholder_value = $placeholder_value;
     }
 
-    /**
-     * @return string
-     */
-    public function getPlaceholderValue()
+    public function getPlaceholderValue() : string
     {
         return $this->placeholder_value;
     }
 
-    /**
-     * @param string $default_value
-     */
-    public function setDefaultValue($default_value)
+    public function setDefaultValue(string $default_value)
     {
         $this->default_value = $default_value;
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultValue()
+    public function getDefaultValue() : string
     {
         return $this->default_value;
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description)
+    public function setDescription(string $description)
     {
         $this->description = $description;
     }
 
-    /**
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription() : string
     {
         return $this->description;
     }
 }
 
-?>

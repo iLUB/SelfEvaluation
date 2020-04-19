@@ -1,11 +1,11 @@
 <?php
+namespace ilub\plugin\SelfEvaluation\Dataset;
+
 use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
-/**
- * ilSelfEvaluationData
- * @author  Fabian Schmid <fs@studer-raimann.ch>
- * @version
- */
-class ilSelfEvaluationData
+use ilDBInterface;
+use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
+
+class Data implements hasDBFields
 {
     use ArrayForDB;
 
@@ -42,15 +42,11 @@ class ilSelfEvaluationData
      */
     protected $db;
 
-    /**
-     * @param $id
-     */
-    function __construct($id = 0)
-    {
-        global $DIC;
 
+    function __construct(ilDBInterface $db, int $id = 0)
+    {
         $this->id = $id;
-        $this->db = $DIC->database();
+        $this->db = $db;
         if ($id != 0) {
             $this->read();
         }
@@ -65,18 +61,11 @@ class ilSelfEvaluationData
         }
     }
 
-    /**
-     * @param $data
-     * @param $rec
-     * @return $this
-     */
-
-
     final function initDB()
     {
         if (!$this->db->tableExists(self::TABLE_NAME)) {
             $this->db->createTable(self::TABLE_NAME, $this->getArrayForDbWithAttributes());
-            $this->db->addPrimaryKey(self::TABLE_NAME, array('id'));
+            $this->db->addPrimaryKey(self::TABLE_NAME, ['id']);
             $this->db->createSequence(self::TABLE_NAME);
         }
     }
@@ -93,18 +82,12 @@ class ilSelfEvaluationData
         $this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
     }
 
-    /**
-     * @return int
-     */
-    public function delete()
+    public function delete() : int
     {
         return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
             . $this->db->quote($this->getId(), 'integer'));
     }
 
-    /**
-     * @return bool
-     */
     public function update()
     {
         if ($this->getId() == 0) {
@@ -116,21 +99,18 @@ class ilSelfEvaluationData
     }
 
 
-    //
-    // Static
-    //
+
     /**
-     * @param $dataset_id
-     * @return ilSelfEvaluationData[]
+     * @param ilDBInterface $db
+     * @param int           $dataset_id
+     * @return Data[]
      */
-    public static function _getAllInstancesByDatasetId($dataset_id)
+    public static function _getAllInstancesByDatasetId(ilDBInterface $db, int $dataset_id)
     {
-        global $ilDB;
-        $return = array();
-        $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = '
-            . $ilDB->quote($dataset_id, 'integer'));
-        while ($rec = $ilDB->fetchObject($set)) {
-            $data = new ilSelfEvaluationData();
+        $return = [];
+        $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = ' .$dataset_id);
+        while ($rec = $db->fetchObject($set)) {
+            $data = new self($db);
             $data->setObjectValuesFromRecord($data, $rec);
 
             $return[] = $data;
@@ -140,17 +120,15 @@ class ilSelfEvaluationData
     }
 
     /**
+     * @param ilDBInterface $db
      * @param $dataset_id
-     * @return ilSelfEvaluationData
+     * @return Data|null
      */
-    public static function _getLatestInstanceByDatasetId($dataset_id)
+    public static function _getLatestInstanceByDatasetId(ilDBInterface $db, int $dataset_id)
     {
-        global $ilDB;
-
-        $set = $ilDB->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = '
-            . $ilDB->quote($dataset_id, 'integer') . ' ORDER BY creation_date LIMIT 1');
-        while ($rec = $ilDB->fetchObject($set)) {
-            $data = new ilSelfEvaluationData();
+        $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = '.$dataset_id. ' ORDER BY creation_date LIMIT 1');
+        while ($rec = $db->fetchObject($set)) {
+            $data = new Data($db);
             return $data->setObjectValuesFromRecord($data, $rec);
         }
 
@@ -158,105 +136,75 @@ class ilSelfEvaluationData
     }
 
     public static function _getInstanceForQuestionId(
+        ilDBInterface $db,
         int $dataset_id,
         int $question_id,
-        $question_type = ilSelfEvaluationData::QUESTION_TYPE
-    ) : ilSelfEvaluationData{
+        string $question_type = Data::QUESTION_TYPE
+    ) : Data{
 
-        global $DIC;
+        $stmt = $db->prepare('SELECT * FROM ' . self::TABLE_NAME .
+            ' WHERE dataset_id = ? AND question_id = ? AND question_type = ?;', ['integer', 'integer', 'text']);
+        $db->execute($stmt, [$dataset_id, $question_id, $question_type]);
 
-        $stmt = $DIC->database()->prepare('SELECT * FROM ' . self::TABLE_NAME .
-            ' WHERE dataset_id = ? AND question_id = ? AND question_type = ?;', array('integer', 'integer', 'text'));
-        $DIC->database()->execute($stmt, array($dataset_id, $question_id, $question_type));
-        while ($rec = $DIC->database()->fetchObject($stmt)) {
-            $data = new ilSelfEvaluationData();
+        while ($rec = $db->fetchObject($stmt)) {
+            $data = new self($db);
             $data->setObjectValuesFromRecord($data, $rec);
 
             return $data;
         }
-        $obj = new self();
+        $obj = new self($db);
         $obj->setQuestionId($question_id);
         $obj->setDatasetId($dataset_id);
 
         return $obj;
     }
 
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function setId(int $id)
     {
         $this->id = $id;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId() : int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $dataset_id
-     */
-    public function setDatasetId($dataset_id)
+    public function setDatasetId(int $dataset_id)
     {
         $this->dataset_id = $dataset_id;
     }
 
-    /**
-     * @return int
-     */
-    public function getDatasetId()
+    public function getDatasetId() : int
     {
         return $this->dataset_id;
     }
 
-    /**
-     * @param int $question_id
-     */
-    public function setQuestionId($question_id)
+    public function setQuestionId(int $question_id)
     {
         $this->question_id = $question_id;
     }
 
-    /**
-     * @return int
-     */
-    public function getQuestionId()
+    public function getQuestionId() : int
     {
         return $this->question_id;
     }
 
-    /**
-     * @param string $question_type
-     */
-    public function setQuestionType($question_type)
+    public function setQuestionType(string $question_type)
     {
         $this->question_type = $question_type;
     }
 
-    /**
-     * @return string
-     */
-    public function getQuestionType()
+    public function getQuestionType() : string
     {
         return $this->question_type;
     }
 
-    /**
-     * @param string $value
-     */
-    public function setValue($value)
+    public function setValue(string $value)
     {
         $this->value = serialize($value);
     }
 
-    /**
-     * @return string
-     */
-    public function getValue()
+    public function getValue() : string
     {
         $unserialized = unserialize($this->value);
         if ($unserialized !== false) {
@@ -265,18 +213,12 @@ class ilSelfEvaluationData
         return $this->value;
     }
 
-    /**
-     * @param int $creation_date
-     */
-    public function setCreationDate($creation_date)
+    public function setCreationDate(int $creation_date)
     {
         $this->creation_date = $creation_date;
     }
 
-    /**
-     * @return int
-     */
-    public function getCreationDate()
+    public function getCreationDate() : int
     {
         return $this->creation_date;
     }

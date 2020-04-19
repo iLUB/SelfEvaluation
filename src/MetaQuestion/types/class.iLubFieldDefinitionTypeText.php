@@ -65,7 +65,7 @@ class iLubFieldDefinitionTypeText extends iLubFieldDefinitionType
      * @param iLubFieldDefinitionTypeOption $item
      * @param array                         $values
      */
-    public function setValues(iLubFieldDefinitionTypeOption $item, $values = array())
+    public function setValues(iLubFieldDefinitionTypeOption $item, $values = [])
     {
     }
 
@@ -75,7 +75,7 @@ class iLubFieldDefinitionTypeText extends iLubFieldDefinitionType
      */
     public function getValues(ilPropertyFormGUI $form)
     {
-        return array();
+        return [];
     }
 
     /**

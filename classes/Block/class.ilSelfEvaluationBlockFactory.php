@@ -101,6 +101,6 @@ class ilSelfEvaluationBlockFactory
      */
     public function sortByPosition(&$blocks)
     {
-        return usort($blocks, array(get_class(), "positionSort"));
+        return usort($blocks, [get_class(), "positionSort"]);
     }
 }
