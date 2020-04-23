@@ -1,13 +1,65 @@
 <?php
 namespace ilub\plugin\SelfEvaluation\Dataset;
 
+use ilSelfEvaluationPlugin;
+use ilToolbarGUI;
+use ilGlobalPageTemplate;
+use ilCtrl;
+use ilObjSelfEvaluationGUI;
+use ilAccess;
+use ilUtil;
+use ilConfirmationGUI;
+use ilDBInterface;
+use ilub\plugin\SelfEvaluation\Feedback\FeedbackChartGUI;
+use ilObjUser;
+use ilub\plugin\SelfEvaluation\Identity\Identity;
+use ilObject2;
+
 /**
  * @ilCtrl_Calls      ilSelfEvaluationResultsGUI:
  * @ilCtrl_IsCalledBy ilSelfEvaluationResultsGUI:
  */
 class DatasetGUI
 {
+    /**
+     * @var ilDBInterface
+     */
+    protected $db;
+    /**
+     * @var ilGlobalPageTemplate
+     */
+    protected $tpl;
+    /**
+     * @var ilCtrl
+     */
+    protected $ctrl;
+    /**
+     * @var ilObjSelfEvaluationGUI
+     */
+    protected $parent;
+    /**
+     * @var ilToolbarGUI
+     */
+    protected $toolbar;
+    /**
+     * @var ilAccess
+     */
+    protected $access;
+    /**
+     * @var ilSelfEvaluationPlugin
+     */
+    protected $plugin;
+    /**
+     * @var string
+     */
+    protected $identifier;
+    /**
+     * @var Dataset
+     */
+    protected $dataset;
+
     function __construct(
+        ilDBInterface $db,
         ilObjSelfEvaluationGUI $parent,
         ilGlobalPageTemplate $tpl,
         ilCtrl $ilCtrl,
@@ -16,6 +68,7 @@ class DatasetGUI
         ilSelfEvaluationPlugin $plugin,
         string $identifier = ""
     ) {
+        $this->db = $db;
         $this->tpl = $tpl;
         $this->ctrl = $ilCtrl;
         $this->parent = $parent;
@@ -23,6 +76,8 @@ class DatasetGUI
         $this->plugin = $plugin;
         $this->access = $access;
         $this->identifier = $identifier;
+
+        $this->dataset = new Dataset($this->db,$_GET['dataset_id'] ? $_GET['dataset_id'] : 0);
     }
 
     public function executeCommand()
@@ -65,9 +120,9 @@ class DatasetGUI
                 $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'confirmDeleteAll'));
             $this->toolbar->addButton($this->plugin->txt('export_csv'),
                 $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'exportCSV'));
-            $table = new ilSelfEvaluationDatasetTableGUI($this, 'index', $this->plugin, $this->parent->object->getId());
+            $table = new DatasetTableGUI($this->db, $this->ctrl, $this, 'index', $this->plugin, $this->parent->object->getId());
         } else {
-            $table = new ilSelfEvaluationDatasetTableGUI($this, 'index', $this->plugin, $this->parent->object->getId(),$this->identifier);
+            $table = new DatasetTableGUI($this->db, $this->ctrl, $this, 'index', $this->plugin, $this->parent->object->getId(),$this->identifier);
         }
 
         $this->tpl->setContent($table->getHTML());
@@ -80,14 +135,10 @@ class DatasetGUI
         $content->setVariable('INTRO_BODY', $this->parent->object->getOutro());
         $feedback = '';
         if ($this->parent->object->getAllowShowResults()) {
-            $this->tpl->addJavaScript('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/bar_spider_chart_toggle.js');
-            require_once('Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/Feedback/class.ilSelfEvaluationFeedbackChartGUI.php');
-            $charts = new ilSelfEvaluationFeedbackChartGUI($this->tpl);
-            $this->dataset = new ilSelfEvaluationDataset($_GET['dataset_id'] ? $_GET['dataset_id'] : 0);
+            $this->tpl->addJavaScript($this->plugin->getDirectory() . '/templates/js/bar_spider_chart_toggle.js');
+            $charts = new FeedbackChartGUI($this->db,$this->tpl,$this->plugin,$this->toolbar, $this->parent->object);
             $feedback = $charts->getPresentationOfFeedback($this->dataset);
         }
-        require_once('Services/PDFGeneration/classes/factory/class.ilHtmlToPdfTransformerFactory.php');
-
         $this->tpl->setContent($content->get() . $feedback);
     }
 
@@ -112,8 +163,8 @@ class DatasetGUI
         $conf->setCancel($this->plugin->txt('cancel'), 'index');
         $conf->setConfirm($this->plugin->txt('delete_dataset'), 'delete');
         foreach ($ids as $id) {
-            $dataset = new ilSelfEvaluationDataset($id);
-            $identifier = new ilSelfEvaluationIdentity($dataset->getIdentifierId());
+            $dataset = new Dataset($this->db, $id);
+            $identifier = new Identity($this->db,$dataset->getIdentifierId());
             $user = $identifier->getIdentifier();
             if ($identifier->getType() == $identifier::TYPE_LOGIN) {
                 $user = (new ilObjUser($identifier->getIdentifier()))->getPublicName();
@@ -127,8 +178,8 @@ class DatasetGUI
     {
         ilUtil::sendSuccess($this->plugin->txt('msg_dataset_deleted'), true);
         foreach ($_POST['dataset_ids'] as $id) {
-            $this->dataset = new ilSelfEvaluationDataset($id);
-            $this->dataset->delete();
+            $dataset = new Dataset($this->db,$id);
+            $dataset->delete();
         }
 
         $this->ctrl->redirect($this, 'index');
@@ -146,14 +197,14 @@ class DatasetGUI
 
     public function deleteAll()
     {
-        ilSelfEvaluationDataset::_deleteAllInstancesByObjectId(ilObject2::_lookupObjectId($_GET['ref_id']));
+        Dataset::_deleteAllInstancesByObjectId($this->db, ilObject2::_lookupObjectId($_GET['ref_id']));
         ilUtil::sendSuccess($this->plugin->txt('all_datasets_deleted'));
         $this->ctrl->redirect($this, 'index');
     }
 
     public function exportCsv()
     {
-        $csvExport = new ilSelfEvaluationCsvExport($this->plugin, ilObject2::_lookupObjectId($_GET['ref_id']));
+        $csvExport = new DatasetCsvExport($this->db, $this->plugin, ilObject2::_lookupObjectId($_GET['ref_id']));
         $csvExport->getCsvExport();
         exit;
     }

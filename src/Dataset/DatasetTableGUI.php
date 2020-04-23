@@ -56,9 +56,9 @@ class DatasetTableGUI extends ilTable2GUI
         $this->addMultiCommand("deleteDatasets", $this->plugin->txt("delete_dataset"));
 
         if ($identifier != "") {
-            $this->setData(Dataset::_getAllInstancesByObjectId($obj_id, true, $identifier));
+            $this->setData(Dataset::_getAllInstancesByObjectId($this->db,$obj_id, true, $identifier));
         } else {
-            $this->setData(Dataset::_getAllInstancesByObjectId($obj_id, true));
+            $this->setData(Dataset::_getAllInstancesByObjectId($this->db,$obj_id, true));
         }
     }
 

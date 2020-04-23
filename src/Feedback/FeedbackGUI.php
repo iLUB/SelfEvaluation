@@ -197,7 +197,6 @@ class FeedbackGUI
             'next_from' => $start,
             'next_to' => $end
         ]);
-        //$this->tpl->hide = true; // TODO this looks very nasty (writing to the global template object)
         exit;
     }
 

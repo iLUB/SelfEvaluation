@@ -215,9 +215,18 @@ class DatasetCsvExport extends csvExport
             $statistics_sd_per_block .= $dataset->getBlockById($key)->getTitle() . ": " . $sd . "; ";
         }
 
+        $min_block = $min['block'];
+        /**
+         * @var $min_block ilSelfEvaluationBlock
+         */
+        $max_block = $max['block'];
+        /**
+         * @var $max_block ilSelfEvaluationBlock
+         */
+
         $meta_csv_values[] = new csvExportValue("mean", $dataset->getOverallPercentage());
-        $meta_csv_values[] = new csvExportValue("max", $max['block']->getTitle() . ": " . $max['percentage'] . "%");
-        $meta_csv_values[] = new csvExportValue("min", $min['block']->getTitle() . ": " . $min['percentage'] . "%");
+        $meta_csv_values[] = new csvExportValue("max", $max_block->getTitle() . ": " . $max['percentage'] . "%");
+        $meta_csv_values[] = new csvExportValue("min", $min_block->getTitle() . ": " . $min['percentage'] . "%");
         $meta_csv_values[] = new csvExportValue("variance", $dataset->getOverallVarianz());
         $meta_csv_values[] = new csvExportValue("sd", $dataset->getOverallStandardabweichung());
         $meta_csv_values[] = new csvExportValue("sd_per_block", $statistics_sd_per_block);

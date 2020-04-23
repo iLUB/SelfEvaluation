@@ -587,7 +587,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
         if ($DIC->user()->isAnonymous()) {
             $this->ctrl->redirectByClass('ilSelfEvaluationIdentityGUI', 'show');
         } else {
-            $id = ilSelfEvaluationIdentity::_getInstanceForObjIdAndIdentifier($this->object->getId(),
+            $id =  ilSelfEvaluationIdentity::_getInstanceForObjIdAndIdentifier($this->object->getId(),
                 $DIC->user()->getId());
             if (!$id) {
                 $id = ilSelfEvaluationIdentity::_getNewInstanceForObjIdAndUserId($this->object->getId(),

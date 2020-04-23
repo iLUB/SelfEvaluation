@@ -114,7 +114,7 @@ class Identity implements hasDBFields
      * @param string        $identifier
      * @return Identity[]
      */
-    public static function _getAllInstancesByObjId(int $obj_id, ilDBInterface $db, string $identifier = "") : array
+    public static function _getAllInstancesByObjId(ilDBInterface $db,int $obj_id,  string $identifier = "") : array
     {
         $return = [];
         if ($identifier != "") {
@@ -132,7 +132,7 @@ class Identity implements hasDBFields
         return $return;
     }
 
-    public static function _getInstanceForObjIdAndIdentifier(int $obj_id, string $identifier, ilDBInterface $db) : Identity
+    public static function _getInstanceForObjIdAndIdentifier(ilDBInterface $db,int $obj_id, string $identifier) : Identity
     {
         $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
             . $obj_id . ' AND identifier = ' . $db->quote($identifier, 'text'));
@@ -149,16 +149,16 @@ class Identity implements hasDBFields
      * @param ilDBInterface $db
      * @return array
      */
-    public static function _getAllInstancesForObjIdAndIdentifier(int $obj_id, string $identifier, ilDBInterface $db) : array
+    public static function _getAllInstancesForObjIdAndIdentifier( ilDBInterface $db, int $obj_id, string $identifier) : array
     {
-        return self::_getAllInstancesByObjId($obj_id, $db, $identifier);
+        return self::_getAllInstancesByObjId( $db, $obj_id,$identifier);
     }
 
-    public static function _getNewHashInstanceForObjId(int $obj_id, ilDBInterface $db) : Identity
+    public static function _getNewHashInstanceForObjId(ilDBInterface $db, int $obj_id) : Identity
     {
         do {
             $identifier = strtoupper(substr(md5(rand(1, 99999)), 0, self::LENGTH));
-        } while (self::_identityExists($obj_id, $identifier,$db));
+        } while (self::_identityExists($db, $obj_id, $identifier));
 
         $obj = new self($db);
         $obj->setObjId($obj_id);
@@ -169,7 +169,7 @@ class Identity implements hasDBFields
         return $obj;
     }
 
-    public static function _getNewInstanceForObjIdAndUserId(int $obj_id, int $user_id, ilDBInterface $db) : Identity
+    public static function _getNewInstanceForObjIdAndUserId(ilDBInterface $db, int $obj_id, int $user_id) : Identity
     {
         $obj = new self($db);
         $obj->setObjId($obj_id);
@@ -179,7 +179,7 @@ class Identity implements hasDBFields
         return $obj;
     }
 
-    public static function _getNewInstanceForObjId(int $obj_id, ilDBInterface $db) : Identity
+    public static function _getNewInstanceForObjId(ilDBInterface $db, int $obj_id) : Identity
     {
         $obj = new self($db);
         $obj->setObjId($obj_id);
@@ -187,7 +187,7 @@ class Identity implements hasDBFields
         return $obj;
     }
 
-    public static function _identityExists(int $obj_id, string $identifier, ilDBInterface $db) : bool
+    public static function _identityExists(ilDBInterface $db, int $obj_id, string $identifier) : bool
     {
         $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE obj_id = '
             . $obj_id . ' AND identifier = ' . $db->quote($identifier, 'text'));
@@ -198,7 +198,7 @@ class Identity implements hasDBFields
         return false;
     }
 
-    public static function _getObjIdForIdentityId(string $identity_id, ilDBInterface $db): bool
+    public static function _getObjIdForIdentityId(ilDBInterface $db, string $identity_id): bool
     {
         $set = $db->query('SELECT obj_id FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '.$identity_id);
         while ($rec = $db->fetchObject($set)) {

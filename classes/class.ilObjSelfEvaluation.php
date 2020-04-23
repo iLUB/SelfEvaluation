@@ -593,6 +593,18 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         return $this->sort_type;
     }
 
+    public function areBlocksSortable() : bool
+    {
+        switch ($this->getSortType()) {
+            case self::SHUFFLE_OFF:
+                return true;
+            case self::SHUFFLE_IN_BLOCKS:
+                return false;
+            default:
+                return false;
+        }
+    }
+
     /**
      * @param int $evaluation_type
      */

@@ -12,6 +12,8 @@ use ilub\plugin\SelfEvaluation\Feedback\Feedback;
 use ilSelfEvaluationBlock;
 use ilDBInterface;
 use Exception;
+use ilSelfEvaluationQuestionBlock;
+use ilub\plugin\SelfEvaluation\UIHelper\Scale\Scale;
 
 class Dataset implements hasDBFields
 {
@@ -227,7 +229,7 @@ class Dataset implements hasDBFields
     public function updateValuesByArray($array)
     {
         foreach ($array as $item) {
-            $da = Data::_getInstanceForQuestionId($this->getId(), $item['qid'], $item['type']);
+            $da = Data::_getInstanceForQuestionId($this->db, $this->getId(), $item['qid'], $item['type']);
             $da->setValue($item['value']);
             $da->update();
         }
@@ -248,7 +250,7 @@ class Dataset implements hasDBFields
     public function getDataPerBlock($block_id)
     {
         $sum = [];
-        foreach (Question::_getAllInstancesForParentId($block_id) as $qst) {
+        foreach (Question::_getAllInstancesForParentId($this->db, $block_id) as $qst) {
             $da = Data::_getInstanceForQuestionId($this->db,$this->getId(), $qst->getId());
             $sum[$qst->getId()] = (int) $da->getValue();
         }
@@ -256,10 +258,7 @@ class Dataset implements hasDBFields
         return $sum;
     }
 
-    /**
-     * @return ilSelfEvaluationBlock[]
-     */
-    public function getMinPercentageBlock()
+    public function getMinPercentageBlock() : array
     {
         $min = 100;
         $min_block_id = null;
@@ -275,10 +274,7 @@ class Dataset implements hasDBFields
         return ['block' => $this->getBlockById($min_block_id), 'percentage' => $min];
     }
 
-    /**
-     * @return ilSelfEvaluationBlock[]
-     */
-    public function getMaxPercentageBlock()
+    public function getMaxPercentageBlock() : array
     {
         $max = 0;
         $max_block_id = null;
@@ -302,11 +298,11 @@ class Dataset implements hasDBFields
     public function getPercentagePerBlock()
     {
         if (!$this->percentage_per_block) {
-            $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+            $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
 
             $this->percentage_per_block = [];
             $highest = $this->getHighestValueFromScale();
-            foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
+            foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->db, $obj_id) as $block) {
                 $answer_data = $this->getDataPerBlock($block->getId());
                 if (count($answer_data) == 0) {
                     continue;
@@ -327,14 +323,11 @@ class Dataset implements hasDBFields
         return $this->percentage_per_block;
     }
 
-    /**
-     * @return mixed
-     */
     public function getHighestValueFromScale()
     {
         if (!self::$highest_scale) {
-            $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
-            $scale = ilSelfEvaluationScale::_getInstanceByObjId($obj_id)->getUnitsAsArray();
+            $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
+            $scale = Scale::_getInstanceByObjId($this->db, $obj_id)->getUnitsAsArray();
             $sorted_scale = array_keys($scale);
             sort($sorted_scale);
             self::$highest_scale = $sorted_scale[count($sorted_scale) - 1];
@@ -343,25 +336,19 @@ class Dataset implements hasDBFields
 
     }
 
-    /**
-     * @param $block_id
-     * @return ilSelfEvaluationBlock
-     */
-    public function getBlockById($block_id)
+    public function getBlockById(int $block_id) : ilSelfEvaluationBlock
     {
-        $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+        $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
 
-        foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
+        foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->db,$obj_id) as $block) {
             if ($block->getId() == $block_id) {
                 return $block;
             }
         }
+        throw new \ILIAS\DI\Exceptions\Exception("Block not found, ID: ".$block_id. " Parent Object-ID: ".$obj_id);
     }
 
-    /**
-     * @return float
-     */
-    public function getOverallPercentage()
+    public function getOverallPercentage() : float
     {
         $sum = 0;
         $x = 0;
@@ -394,6 +381,7 @@ class Dataset implements hasDBFields
 
     /**
      * @param $data
+     * @param $average
      * @return float|int
      */
     protected function getVarianz($data, $average)
@@ -428,10 +416,10 @@ class Dataset implements hasDBFields
     public function getStandardabweichungPerBlock()
     {
         $return = [];
-        $obj_id = ilSelfEvaluationIdentity::_getObjIdForIdentityId($this->getIdentifierId());
+        $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
         $highest = $this->getHighestValueFromScale();
 
-        foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($obj_id) as $block) {
+        foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->db,$obj_id) as $block) {
             $answer_data_mean_percentage = $this->getPercentagePerBlock()[$block->getId()];
             $data_as_percentage = [];
 
@@ -498,15 +486,15 @@ class Dataset implements hasDBFields
     {
         $return = [];
         if ($identifier == "") {
-            $identities = Identity::_getAllInstancesByObjId($obj_id);
+            $identities = Identity::_getAllInstancesByObjId($db, $obj_id);
         } else {
-            $identities = Identity::_getAllInstancesForObjIdAndIdentifier($obj_id, $identifier);
+            $identities = Identity::_getAllInstancesForObjIdAndIdentifier($db, $obj_id, $identifier);
         }
 
         foreach ($identities as $identity) {
-            $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-                . $DIC->database()->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
-            while ($rec = $DIC->database()->fetchObject($set)) {
+            $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+                . $db->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
+            while ($rec = $db->fetchObject($set)) {
                 if ($as_array) {
                     $return[] = (array) $rec;
                 } else {
@@ -521,19 +509,17 @@ class Dataset implements hasDBFields
     }
 
     /**
-     * @param      $obj_id
-     * @param bool $as_array
+     * @param ilDBInterface $db
+     * @param int             $obj_id
      * @return Dataset[]
      */
-    public static function _getAllInstancesByObjectIdOfCurrentUser(ilDBInterface $db, $obj_id)
+    public static function _getAllInstancesByObjectIdOfCurrentUser(ilDBInterface $db, int $obj_id)
     {
-        global $DIC;
-
         $return = [];
-        foreach (Identity::_getAllInstancesByObjId($obj_id) as $identity) {
-            $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-                . $DIC->database()->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
-            while ($rec = $DIC->database()->fetchObject($set)) {
+        foreach (Identity::_getAllInstancesByObjId($db, $obj_id) as $identity) {
+            $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+                . $db->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
+            while ($rec = $db->fetchObject($set)) {
 
                 $data_set = new Dataset($db);
                 $data_set->setObjectValuesFromRecord($data_set, $rec);
@@ -544,13 +530,9 @@ class Dataset implements hasDBFields
         return $return;
     }
 
-    /**
-     * @param $obj_id
-     * @return bool
-     */
-    public static function _deleteAllInstancesByObjectId(ilDBInterface $db, $obj_id)
+    public static function _deleteAllInstancesByObjectId(ilDBInterface $db, int $obj_id) : bool
     {
-        foreach (self::_getAllInstancesByObjectId($obj_id) as $obj) {
+        foreach (self::_getAllInstancesByObjectId($db, $obj_id) as $obj) {
             $obj->delete();
         }
 
@@ -558,17 +540,16 @@ class Dataset implements hasDBFields
     }
 
     /**
-     * @param $identifier_id
+     * @param ilDBInterface $db
+     * @param int           $identifier_id
      * @return bool|Dataset
      */
-    public static function _getInstanceByIdentifierId(ilDBInterface $db, $identifier_id)
+    public static function _getInstanceByIdentifierId(ilDBInterface $db, int $identifier_id)
     {
-        global $DIC;
-
-        $set = $DIC->database()->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-            . $DIC->database()->quote($identifier_id, 'integer'));
-        while ($rec = $DIC->database()->fetchObject($set)) {
-            $data_set = new Dataset($this->db);
+        $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+            . $db->quote($identifier_id, 'integer'));
+        while ($rec = $db->fetchObject($set)) {
+            $data_set = new Dataset($db);
             $data_set->setObjectValuesFromRecord($data_set, $rec);
             return $data_set;
         }
@@ -577,12 +558,13 @@ class Dataset implements hasDBFields
     }
 
     /**
-     * @param $identifier_id
+     * @param ilDBInterface $db
+     * @param               $identifier_id
      * @return Dataset
      */
-    public static function _getNewInstanceForIdentifierId(ilDBInterface $db, $identifier_id)
+    public static function _getNewInstanceForIdentifierId(ilDBInterface $db, int $identifier_id)
     {
-        $obj = new self();
+        $obj = new self($db);
         $obj->setIdentifierId($identifier_id);
 
         return $obj;
@@ -590,11 +572,9 @@ class Dataset implements hasDBFields
 
     public static function _datasetExists(ilDBInterface $db, int $identifier_id) : bool
     {
-        global $DIC;
-
-        $set = $DIC->database()->query('SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-            . $DIC->database()->quote($identifier_id, 'integer'));
-        while ($rec = $DIC->database()->fetchObject($set)) {
+        $set = $db->query('SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
+            . $db->quote($identifier_id, 'integer'));
+        while ($rec = $db->fetchObject($set)) {
             return true;
         }
 

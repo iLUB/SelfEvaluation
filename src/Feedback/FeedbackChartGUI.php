@@ -6,7 +6,7 @@ use ilGlobalPageTemplate;
 use ilRepositoryObjectPlugin;
 use ilDBInterface;
 use ilToolbarGUI;
-use ilSelfEvaluationDataset;
+use ilub\plugin\SelfEvaluation\Dataset\Dataset;
 use ilButton;
 use ilObjSelfEvaluation;
 use ilSelfEvaluationQuestionBlock;
@@ -42,9 +42,9 @@ class FeedbackChartGUI
     protected $evaluation;
 
     public function __construct(
+        ilDBInterface $db,
         ilGlobalPageTemplate $tpl,
         ilRepositoryObjectPlugin $plugin,
-        ilDBInterface $db,
         ilToolbarGUI $toolbar,
         ilObjSelfEvaluation $evaluation
     ) {
@@ -55,7 +55,7 @@ class FeedbackChartGUI
         $this->evaluation = $evaluation;
     }
 
-    public function getPresentationOfFeedback(ilSelfEvaluationDataset $data_set)
+    public function getPresentationOfFeedback(Dataset $data_set)
     {
         $tpl = $this->initTemplate();
 
@@ -186,7 +186,7 @@ class FeedbackChartGUI
         ilTemplate $tpl,
         ilSelfEvaluationQuestionBlock $block,
         Feedback $feedback,
-        ilSelfEvaluationDataset $data_set
+        Dataset $data_set
     ) {
         $show_feedback_charts = $this->showAnyFeedbackCharts();
 
@@ -246,7 +246,7 @@ class FeedbackChartGUI
         }
     }
 
-    protected function getFeedbackBarChart(ilSelfEvaluationDataset $data_set, string $block_id, array $scale_units) : BarChart
+    protected function getFeedbackBarChart(Dataset $data_set, string $block_id, array $scale_units) : BarChart
     {
         $chart = new BarChart($block_id . "_feedback_bar_chart");
         $ticks = [];
@@ -269,7 +269,7 @@ class FeedbackChartGUI
     }
 
     protected function getFeedbackLeftRightChart(
-        ilSelfEvaluationDataset $data_set,
+        Dataset $data_set,
         string $block_id,
         array $scale_units
     ) : LeftRightChart {
@@ -295,7 +295,7 @@ class FeedbackChartGUI
     }
 
     protected function getFeedbackSpiderChart(
-        ilSelfEvaluationDataset $data_set,
+        Dataset $data_set,
         string $block_id,
         int $max_level
     ) : SpiderChart {

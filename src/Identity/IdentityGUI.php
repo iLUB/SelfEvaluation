@@ -135,9 +135,9 @@ class IdentityGUI
         $this->initExistingForm();
         if ($this->ex->checkInput()) {
             $identifier = $this->ex->getInput('uid');
-            if (Identity::_identityExists($this->parent->object->getId(), $identifier,$this->db)) {
-                $id = Identity::_getInstanceForObjIdAndIdentifier($this->parent->object->getId(),
-                    $identifier,$this->db);
+            if (Identity::_identityExists($this->db, $this->parent->object->getId(), $identifier)) {
+                $id = Identity::_getInstanceForObjIdAndIdentifier($this->db, $this->parent->object->getId(),
+                    $identifier);
                 $this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
                 $this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
             } else {
@@ -151,7 +151,7 @@ class IdentityGUI
 
     public function startWithNewUid()
     {
-        $id = Identity::_getNewHashInstanceForObjId($this->parent->object->getId(),$this->db);
+        $id = Identity::_getNewHashInstanceForObjId($this->db, $this->parent->object->getId());
         $this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
         $this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
     }
