@@ -5,6 +5,8 @@ use ilTable2GUI;
 use ilub\plugin\SelfEvaluation\Block\Block;
 use ilSelfEvaluationPlugin;
 use ilAdvancedSelectionListGUI;
+use QuestionGUI;
+use ilGlobalTemplateInterface;
 
 class QuestionTableGUI extends ilTable2GUI
 {
@@ -23,7 +25,9 @@ class QuestionTableGUI extends ilTable2GUI
      */
     protected $sortable;
 
-    function __construct(QuestionGUI $a_parent_obj,ilSelfEvaluationPlugin $plugin, string $a_parent_cmd, Block $block, bool $sortable)
+
+
+    function __construct(QuestionGUI $a_parent_obj,ilSelfEvaluationPlugin $plugin, ilGlobalTemplateInterface $global_template, string $a_parent_cmd, Block $block, bool $sortable)
     {
         $this->setId('sev_feedbacks');
         parent::__construct($a_parent_obj, $a_parent_cmd);
@@ -34,15 +38,15 @@ class QuestionTableGUI extends ilTable2GUI
 
         $this->setTitle($block->getTitle() . ': ' . $this->plugin->txt('question_table_title'));
         $this->setFormAction($this->ctrl->getFormAction($a_parent_obj));
-        $this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', null);
-        $this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $block->getId());
+        $this->ctrl->setParameterByClass('QuestionGUI', 'question_id', null);
+        $this->ctrl->setParameterByClass('QuestionGUI', 'block_id', $block->getId());
         $this->setRowTemplate($this->plugin->getDirectory() . '/templates/default/Question/tpl.template_question_row.html');
-        $this->initColumns();
+        $this->initColumns($global_template);
     }
 
-    protected function initColumns(){
+    protected function initColumns(ilGlobalTemplateInterface $global_template){
         if ($this->sortable) {
-            $this->tpl->addJavaScript($this->plugin->getDirectory() . '/templates/js/sortable.js');
+            $global_template->addJavaScript($this->plugin->getDirectory() . '/templates/js/sortable.js');
             $this->addColumn('', 'position', '20px');
             $this->addMultiCommand('saveSorting', $this->plugin->txt('save_sorting'));
         }
@@ -58,27 +62,31 @@ class QuestionTableGUI extends ilTable2GUI
      */
     public function fillRow($a_set)
     {
-        $obj = new Question($a_set['id']);
-        $this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'question_id', $obj->getId());
+        $this->ctrl->setParameterByClass('QuestionGUI', 'question_id', $a_set['id']);
+
         if ($this->sortable) {
-            $this->tpl->setVariable('ID', $obj->getId());
+            $this->tpl->setCurrentBlock("sortable");
+            $this->tpl->setVariable('MOVE_IMG_SRC',$this->plugin->getDirectory()."/templates/images/move.png");
+            $this->tpl->setVariable('ID', $a_set['id']);
+            $this->tpl->parseCurrentBlock();
         }
-        $this->tpl->setVariable('TITLE', $obj->getTitle() ? $obj->getTitle() :
-            $this->plugin->txt('question') . ' ' . $this->block->getPosition() . '.' . $obj->getPosition());
+
+        $this->tpl->setVariable('TITLE', $a_set['title'] ? $a_set['title'] :
+            $this->plugin->txt('question') . ' ' . $this->block->getPosition() . '.' . $a_set['position']);
         $this->tpl->setVariable('EDIT_LINK',
-            $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion'));
-        $this->tpl->setVariable('BODY', strip_tags($obj->getQuestionBody()));
+            $this->ctrl->getLinkTargetByClass('QuestionGUI', 'editQuestion'));
+        $this->tpl->setVariable('BODY', strip_tags($a_set['question_body']));
+
         $this->tpl->setVariable('IS_INVERTED',
-            $obj->getIsInverse() ? './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/ok.png' : './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/images/blank.png');
+            $a_set['is_inverse'] ? $this->plugin->getDirectory().'/templates/images/icon_ok.svg' : $this->plugin->getDirectory().'/templates/images/empty.png');
         // Actions
         $ac = new ilAdvancedSelectionListGUI();
-        $ac->setId('question_' . $obj->getId());
+        $ac->setId('question_' . $a_set['id']);
         $ac->addItem($this->plugin->txt('edit_question'), 'edit_question',
-            $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'editQuestion'));
+            $this->ctrl->getLinkTargetByClass('QuestionGUI', 'editQuestion'));
         $ac->addItem($this->plugin->txt('delete_question'), 'delete_question',
-            $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'deleteQuestion'));
+            $this->ctrl->getLinkTargetByClass('QuestionGUI', 'confirmDeleteQuestion'));
         $ac->setListTitle($this->plugin->txt('actions'));
-        //
         $this->tpl->setVariable('ACTIONS', $ac->getHTML());
     }
 }

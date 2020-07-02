@@ -1,20 +1,17 @@
 <?php
 namespace ilub\plugin\SelfEvaluation\Question\Matrix;
 
-use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
-use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
+use ilub\plugin\SelfEvaluation\Question\Question as BaseQuestion;
+
 use SimpleXMLElement;
 use ilDBInterface;
 
-class Question implements hasDBFields
+class Question extends BaseQuestion
 {
-    use ArrayForDB;
-
     const TABLE_NAME = 'rep_robj_xsev_qst';
-    /**
-     * @var int
-     */
-    public $id = 0;
+
+    const POSTVAR_PREFIX = 'qst_';
+
     /**
      * @var string
      */
@@ -23,10 +20,6 @@ class Question implements hasDBFields
      * @var string
      */
     protected $question_body = '';
-    /**
-     * @var int
-     */
-    protected $position = 99;
     /**
      * @var bool
      */
@@ -47,21 +40,11 @@ class Question implements hasDBFields
     static protected $instances_for_parent_id = [];
 
     /**
-     * @var \ilDBInterface
+     * @var int
      */
-    protected $db;
+    protected $position;
 
-
-    function __construct(ilDBInterface $db, $id = 0)
-    {
-        $this->db = $db;
-
-        if ($id != 0) {
-            $this->read();
-        }
-    }
-
-    public function cloneTo(int $parent_id): Question
+    public function cloneTo(int $parent_id): BaseQuestion
     {
         $clone = new self($this->db);
         $clone->setParentId($parent_id);
@@ -98,135 +81,40 @@ class Question implements hasDBFields
         return $xml;
     }
 
-    public function read()
-    {
-        $set = $this->db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE id = '.$this->getId());
-
-        $this->setObjectValuesFromRecord($this,$this->db->fetchObject($set));
-    }
-
-
-    final function initDB()
-    {
-        if (!$this->db->tableExists(self::TABLE_NAME)) {
-            $this->db->createTable(self::TABLE_NAME, $this->getArrayForDbWithAttributes());
-            $this->db->addPrimaryKey(self::TABLE_NAME, ['id']);
-            $this->db->createSequence(self::TABLE_NAME);
-        }
-    }
-
-    final function updateDB()
-    {
-        if (!$this->db->tableExists(self::TABLE_NAME)) {
-            $this->initDB();
-            return;
-        }
-        foreach ($this->getArrayForDbWithAttributes() as $property => $attributes) {
-            if (!$this->db->tableColumnExists(self::TABLE_NAME, $property)) {
-                $this->db->addTableColumn(self::TABLE_NAME, $property, $attributes);
-            }
-        }
-    }
-
-    public function create()
-    {
-        if ($this->getId() != 0) {
-            $this->update();
-
-            return;
-        }
-        $this->setId($this->db->nextID(self::TABLE_NAME));
-        $this->setPosition(self::_getNextPosition($this->db,$this->getParentId()));
-        $this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-    }
-
-    public function delete(): int
-    {
-        return $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE id = '
-            . $this->db->quote($this->getId(), 'integer'));
-    }
-
-    public function update()
-    {
-        if ($this->getId() == 0) {
-            $this->create();
-            return;
-        }
-        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), $this->getIdForDb());
-    }
-
     /**
      * @param ilDBInterface $db
      * @param int           $parent_id
-     * @param bool          $as_array
      * @return Question[]
      */
-    public static function _getAllInstancesForParentId(ilDBInterface $db, int $parent_id, bool $as_array = false)
+    public static function _getAllInstancesForParentId(ilDBInterface $db, int $parent_id) : array
     {
-        $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '
-            . $db->quote($parent_id, 'integer') . ' ORDER BY position ASC');
+        if (!self::$instances_for_parent_id[$parent_id]) {
+            self::$instances_for_parent_id[$parent_id] = [];
+            $stmt = self::_getAllInstancesForParentIdQuery($db, $parent_id);
 
-        if ($as_array) {
-            if (!self::$instances_for_parent_id_array[$parent_id]) {
-                self::$instances_for_parent_id_array[$parent_id] = [];
-                while ($rec = $db->fetchObject($set)) {
-                    self::$instances_for_parent_id_array[$parent_id][$rec->id] = (array) new self($db,$rec->id);
-                }
+            while ($rec = $db->fetchObject($stmt)) {
+                $question = new self($db);
+                $question->setId($rec->id);
+                $question->setParentId($parent_id);
+                $question->setTitle($rec->title);
+                $question->setQuestionBody($rec->question_body);
+                $question->setIsInverse((int)$rec->is_inverse);
+                $question->setPosition((int)$rec->position);
+                self::$instances_for_parent_id[$parent_id][$rec->id] = $question;
             }
-            return self::$instances_for_parent_id_array[$parent_id];
-        } else {
-            if (!self::$instances_for_parent_id[$parent_id]) {
-                self::$instances_for_parent_id[$parent_id] = [];
+        }
+        return self::$instances_for_parent_id[$parent_id];
+    }
 
-                while ($rec = $db->fetchObject($set)) {
-                    self::$instances_for_parent_id[$parent_id][$rec->id] = new self($db,$rec->id);
-                }
+    public static function _getAllInstancesForParentIdAsArray(ilDBInterface $db, int $parent_id) : array{
+        if (!self::$instances_for_parent_id_array[$parent_id]) {
+            self::$instances_for_parent_id_array[$parent_id] = [];
+            foreach (self::_getAllInstancesForParentId( $db,  $parent_id) as $question){
+                self::$instances_for_parent_id_array[$parent_id][$question->getId()] = $question->getArray();
             }
-            return self::$instances_for_parent_id[$parent_id];
         }
-
+        return self::$instances_for_parent_id_array[$parent_id];
     }
-
-    public static function _isObject(ilDBInterface $db, int $id): bool
-    {
-        $set = $db->query('SELECT id FROM ' . self::TABLE_NAME . ' WHERE id = ' .$id);
-        while ($rec = $db->fetchObject($set)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public static function _getNextPosition(ilDBInterface $db, int $parent_id): int
-    {
-        $set = $db->query('SELECT MAX(position) next_pos FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = '.$parent_id);
-        while ($rec = $db->fetchObject($set)) {
-            return $rec->next_pos + 1;
-        }
-
-        return 1;
-    }
-
-    public function setId(int $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setPosition(int $position)
-    {
-        $this->position = $position;
-    }
-
-    public function getPosition(): int
-    {
-        return $this->position;
-    }
-
 
     public function setIsInverse(bool $is_inverse)
     {
@@ -238,15 +126,6 @@ class Question implements hasDBFields
         return $this->is_inverse;
     }
 
-    public function setParentId(int $parent_id)
-    {
-        $this->parent_id = $parent_id;
-    }
-
-    public function getParentId(): int
-    {
-        return $this->parent_id;
-    }
 
     public function setQuestionBody(string $question_body)
     {

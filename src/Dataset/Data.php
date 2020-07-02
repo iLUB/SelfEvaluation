@@ -5,6 +5,12 @@ use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
 use ilDBInterface;
 use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
 
+/**
+ * Class Data
+ *
+ * Note, the naming is not ideal and should be changed to "answer" sinde "1 data" directly corresponds to "1 answer"
+ * from 1 user to 1 question (meta or matrix).
+ */
 class Data implements hasDBFields
 {
     use ArrayForDB;
@@ -155,6 +161,7 @@ class Data implements hasDBFields
         $obj = new self($db);
         $obj->setQuestionId($question_id);
         $obj->setDatasetId($dataset_id);
+        $obj->setQuestionType($question_type);
 
         return $obj;
     }
@@ -199,17 +206,20 @@ class Data implements hasDBFields
         return $this->question_type;
     }
 
-    public function setValue(string $value)
+    public function setValue($value)
     {
-        $this->value = serialize($value);
+        $this->value = $value;
     }
 
-    public function getValue() : string
+    public function getValue()
     {
-        $unserialized = unserialize($this->value);
-        if ($unserialized !== false) {
-            return $unserialized;
+        if(is_string($this->value)){
+            $unserialized = unserialize($this->value);
+            if ($unserialized !== false) {
+                return $unserialized;
+            }
         }
+
         return $this->value;
     }
 

@@ -138,8 +138,8 @@ class IdentityGUI
             if (Identity::_identityExists($this->db, $this->parent->object->getId(), $identifier)) {
                 $id = Identity::_getInstanceForObjIdAndIdentifier($this->db, $this->parent->object->getId(),
                     $identifier);
-                $this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
-                $this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
+                $this->ctrl->setParameterByClass('PresentationGUI', 'uid', $id->getId());
+                $this->ctrl->redirectByClass('PresentationGUI', 'startScreen');
             } else {
                 ilUtil::sendFailure($this->plugin->txt('uid_not_exists'), true);
                 $this->ctrl->redirect($this, 'show');
@@ -152,8 +152,8 @@ class IdentityGUI
     public function startWithNewUid()
     {
         $id = Identity::_getNewHashInstanceForObjId($this->db, $this->parent->object->getId());
-        $this->ctrl->setParameterByClass('ilSelfEvaluationPresentationGUI', 'uid', $id->getId());
-        $this->ctrl->redirectByClass('ilSelfEvaluationPresentationGUI', 'startScreen');
+        $this->ctrl->setParameterByClass('PresentationGUI', 'uid', $id->getId());
+        $this->ctrl->redirectByClass('PresentationGUI', 'startScreen');
     }
 
     public function cancel()

@@ -186,10 +186,13 @@ class Feedback implements hasDBFields
         $set = $db->query($q);
 
         while ($rec = $db->fetchObject($set)) {
+            $feedback = new self($db);
+            $feedback->setObjectValuesFromRecord($feedback,$rec);
+
             if ($as_array) {
-                $return[] = (array) new self($db, $rec->id);
+                $return[] = (array) $feedback;
             } else {
-                $return[] = new self($db, $rec->id);
+                $return[] = $feedback;
             }
         }
 
@@ -212,26 +215,21 @@ class Feedback implements hasDBFields
         $set = $db->query($q);
 
         while ($rec = $db->fetchObject($set)) {
-            $return[] = new self($db, $rec->id);
+            $feedback = new self($db);
+            $feedback->setObjectValuesFromRecord($feedback,$rec);
+            $return[] = $feedback;
 
         }
 
         return $return;
     }
 
-    /**
-     * @param ilDBInterface $db
-     * @param int           $parent_id
-     * @param float         $percentage
-     * @param bool          $is_overall
-     * @return bool|Feedback
-     */
     public static function _getFeedbackForPercentage(
         ilDBInterface $db,
         int $parent_id,
         float $percentage,
         bool $is_overall = false
-    ) {
+    ) : ?Feedback {
         $q = 'SELECT id FROM ' . self::TABLE_NAME . ' ' . ' WHERE parent_id = ' . $db->quote($parent_id, 'integer')
             . ' AND start_value <= ' . $db->quote($percentage, 'float')
             . ' AND end_value >= ' . $db->quote($percentage, 'float');
@@ -240,11 +238,11 @@ class Feedback implements hasDBFields
         }
         $set = $db->query($q);
 
-        while ($res = $db->fetchObject($set)) {
-            return new self($db, $res->id);
+        while ($rec = $db->fetchObject($set)) {
+            $feedback = new self($db,$rec->id);
+            return $feedback;
         }
-
-        return false;
+        return null;
     }
 
     public static function _getNextMinValueForParentId(

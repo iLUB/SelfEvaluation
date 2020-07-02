@@ -2,10 +2,11 @@
 namespace ilub\plugin\SelfEvaluation\Feedback;
 
 use ilTable2GUI;
-use ilSelfEvaluationQuestionBlockInterface;
+use ilub\plugin\SelfEvaluation\Block\Matrix\QuestionBlockInterface;
 use ilRepositoryObjectPlugin;
 use ilAdvancedSelectionListGUI;
 use ilDBInterface;
+use FeedbackGUI;
 
 class FeedbackTableGUI extends ilTable2GUI
 {
@@ -25,7 +26,7 @@ class FeedbackTableGUI extends ilTable2GUI
         FeedbackGUI $a_parent_obj,
         ilRepositoryObjectPlugin $plugin,
         string $a_parent_cmd,
-        ilSelfEvaluationQuestionBlockInterface $block,
+        QuestionBlockInterface $block,
         bool $is_ovarall = false
     ) {
         $this->db = $db;

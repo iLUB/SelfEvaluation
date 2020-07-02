@@ -1,20 +1,23 @@
 <?php
+
 namespace ilub\plugin\SelfEvaluation\Dataset;
 
 use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
 use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
-use ilub\plugin\SelfEvaluation\Question\QuestionGUI;
-use ilub\plugin\SelfEvaluation\Question\MetaQuestionGUI;
-use ilub\plugin\SelfEvaluation\Question\Question;
-use ilub\plugin\SelfEvaluation\Question\MetaQuestion;
+use ilub\plugin\SelfEvaluation\Question\Matrix\Question;
+use ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion;
 use ilub\plugin\SelfEvaluation\Identity\Identity;
-use ilub\plugin\SelfEvaluation\Feedback\Feedback;
-use ilSelfEvaluationBlock;
+use ilub\plugin\SelfEvaluation\Block\Matrix\QuestionBlock;
 use ilDBInterface;
 use Exception;
-use ilSelfEvaluationQuestionBlock;
 use ilub\plugin\SelfEvaluation\UIHelper\Scale\Scale;
 
+/**
+ * Class Dataset
+ *
+ * Note, the naming is not ideal and should be changed to "answers" since "1 dataset" directly corresponds to "1 set of answers"
+ * from 1 user to questions from 1 self evaluation.
+ */
 class Dataset implements hasDBFields
 {
     use ArrayForDB;
@@ -36,7 +39,7 @@ class Dataset implements hasDBFields
     /**
      * @var int
      */
-    static protected $highest_scale = 0;
+    protected $highest_scale = 0;
 
     /**
      * @var bool
@@ -48,6 +51,21 @@ class Dataset implements hasDBFields
      */
     protected $db;
 
+    /**
+     * @var QuestionBlock[]
+     */
+    protected $question_blocks;
+
+    /**
+     * @var Data[][]
+     */
+    protected $questions_data_for_blocks;
+
+    /**
+     * @var Statistics
+     */
+    protected $statistics;
+
     function __construct(ilDBInterface $db, int $id = 0)
     {
         $this->id = $id;
@@ -55,6 +73,8 @@ class Dataset implements hasDBFields
         if ($id != 0) {
             $this->read();
         }
+
+        $this->statistics = new Statistics();
     }
 
     public function read()
@@ -66,86 +86,9 @@ class Dataset implements hasDBFields
         }
     }
 
-    /**
-     * @param string $postvar_key
-     * @return string|false
-     */
-    protected function determineQuestionType($postvar_key)
+    protected function getNonDbFields() : array
     {
-        $type = false;
-
-        if (strpos($postvar_key, QuestionGUI::POSTVAR_PREFIX) === 0) {
-            $type = Data::QUESTION_TYPE;
-        } else {
-            if (strpos($postvar_key, QuestionGUI::POSTVAR_PREFIX) === 0) {
-                $type = Data::META_QUESTION_TYPE;
-            }
-        }
-
-        return $type;
-    }
-
-    /**
-     * @param string $question_type
-     * @param string $postvar_key
-     * @return int|false
-     */
-    protected function getQuestionId($question_type, $postvar_key)
-    {
-        $qid = false;
-
-        if ($question_type == Data::QUESTION_TYPE) {
-            $qid = (int) str_replace(QuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
-        } else {
-            if ($question_type == Data::META_QUESTION_TYPE) {
-                $qid = (int) str_replace(MetaQuestionGUI::POSTVAR_PREFIX, '', $postvar_key);
-            }
-        }
-
-        return $qid;
-    }
-
-    /**
-     * @param int    $qid
-     * @param string $question_type
-     * @return bool
-     */
-    protected function questionExists($qid, $question_type)
-    {
-        if ($question_type == Data::QUESTION_TYPE) {
-            return Question::_isObject($this->db,$qid);
-        } else {
-            if ($question_type == Data::META_QUESTION_TYPE) {
-                return MetaQuestion::_isObject($this->db,$qid);
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $post
-     * @return array
-     */
-    protected function getDataFromPost($post)
-    {
-        $data = [];
-        foreach ($post as $k => $v) {
-            $type = $this->determineQuestionType($k);
-            if ($type === false) {
-                continue;
-            }
-            $qid = $this->getQuestionId($type, $k);
-            if ($qid === false) {
-                continue;
-            }
-
-            if ($this->questionExists($qid, $type)) {
-                $data[] = ['qid' => $qid, 'value' => $v, 'type' => $type];
-            }
-        }
-
-        return $data;
+        return ['db', 'percentage_per_block', 'question_blocks','questions_data_for_blocks','highest_scale','statistics'];
     }
 
     final function initDB()
@@ -164,14 +107,11 @@ class Dataset implements hasDBFields
 
             return;
         }
-        $this->setId($this->db->nextID(self::TABLE_NAME));
+        $this->setId($this->db->nextId(self::TABLE_NAME));
         $this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
     }
 
-    /**
-     * @return int
-     */
-    public function delete()
+    public function delete() : int
     {
         $this->db->manipulate('DELETE FROM ' . Data::TABLE_NAME . ' WHERE dataset_id = '
             . $this->db->quote($this->getId(), 'integer'));
@@ -190,269 +130,246 @@ class Dataset implements hasDBFields
         $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), $this->getIdForDb());
     }
 
-    /**
-     * @param $array array (qid => int, value => string, type => string)
-     */
-    public function saveValuesByArray($array)
-    {
-        if ($this->getId() == 0) {
-            $this->create();
-        }
-
-        $qids = [];
-
-        foreach ($array as $item) {
-            if (!array_key_exists($item['type'] . $item['qid'], $qids)) {
-                $da = new Data($this->db);
-                $da->setDatasetId($this->getId());
-                $da->setQuestionId($item['qid']);
-                $da->setValue($item['value']);
-                $da->setQuestionType($item['type']);
-                $da->setCreationDate(time());
-                $da->create();
-                $qids[$item['type'] . $item['qid']] = true;
-            }
-        }
-    }
-
-    /**
-     * @param $post
-     */
-    public function saveValuesByPost($post)
-    {
-        $this->saveValuesByArray($this->getDataFromPost($post));
-    }
-
-    /**
-     * @param $array array (qid => int, value => string, type => string)
-     */
-    public function updateValuesByArray($array)
-    {
-        foreach ($array as $item) {
-            $da = Data::_getInstanceForQuestionId($this->db, $this->getId(), $item['qid'], $item['type']);
-            $da->setValue($item['value']);
-            $da->update();
-        }
-    }
-
-    /**
-     * @param $post
-     */
-    public function updateValuesByPost($post)
+    public function updateValuesByPost(array $post)
     {
         $this->updateValuesByArray($this->getDataFromPost($post));
     }
 
     /**
-     * @param $block_id
-     * @return mixed
+     * @param $array array (qid => int, value => string, type => string)
      */
-    public function getDataPerBlock($block_id)
+    protected function updateValuesByArray(array $array)
     {
-        $sum = [];
-        foreach (Question::_getAllInstancesForParentId($this->db, $block_id) as $qst) {
-            $da = Data::_getInstanceForQuestionId($this->db,$this->getId(), $qst->getId());
-            $sum[$qst->getId()] = (int) $da->getValue();
+        if ($this->getId() == 0) {
+            $this->create();
         }
 
-        return $sum;
-    }
-
-    public function getMinPercentageBlock() : array
-    {
-        $min = 100;
-        $min_block_id = null;
-
-        $blocks_percentage = $this->getPercentagePerBlock();
-
-        foreach ($blocks_percentage as $block_id => $percentage) {
-            if ($percentage <= $min) {
-                $min = round($percentage, 2);
-                $min_block_id = $block_id;
+        foreach ($array as $item) {
+            $da = Data::_getInstanceForQuestionId($this->db, $this->getId(), $item['qid'], $item['type']);
+            if(is_array($item['value'])){
+                $item['value'] = serialize($item['value']);
             }
+            $da->setValue($item['value']);
+            $da->setCreationDate(time());
+            $da->update();
         }
-        return ['block' => $this->getBlockById($min_block_id), 'percentage' => $min];
     }
 
-    public function getMaxPercentageBlock() : array
+    protected function getDataFromPost(array $post) : array
     {
-        $max = 0;
-        $max_block_id = null;
-
-        $blocks_percentage = $this->getPercentagePerBlock();
-
-        foreach ($blocks_percentage as $block_id => $percentage) {
-            if ($percentage >= $max) {
-                $max = round($percentage, 2);
-                $max_block_id = $block_id;
+        $data = [];
+        foreach ($post as $k => $v) {
+            $type = $this->determineQuestionType($k);
+            if ($type === false) {
+                continue;
             }
+            $qid = $this->getQuestionId($type, $k);
+            if ($qid === false) {
+                continue;
+            }
+            $data[] = ['qid' => $qid, 'value' => $v, 'type' => $type];
         }
 
-        return ['block' => $this->getBlockById($max_block_id), 'percentage' => $max];
+        return $data;
     }
 
-    /**
-     * @return array
-     * @description return array(block_id => percentage)
-     */
-    public function getPercentagePerBlock()
+    protected function determineQuestionType(string $postvar_key) : string
+    {
+        if (strpos($postvar_key, Question::POSTVAR_PREFIX) === 0) {
+            return Data::QUESTION_TYPE;
+        }
+        return Data::META_QUESTION_TYPE;
+
+    }
+
+    protected function getQuestionId(string $question_type, string $postvar_key) : int
+    {
+        if ($question_type == Data::QUESTION_TYPE) {
+            return (int) str_replace(Question::POSTVAR_PREFIX, '', $postvar_key);
+        }
+        return (int) str_replace(MetaQuestion::POSTVAR_PREFIX, '', $postvar_key);
+    }
+
+    public function getPercentagePerBlock() : array
     {
         if (!$this->percentage_per_block) {
-            $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
-
             $this->percentage_per_block = [];
             $highest = $this->getHighestValueFromScale();
-            foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->db, $obj_id) as $block) {
-                $answer_data = $this->getDataPerBlock($block->getId());
-                if (count($answer_data) == 0) {
-                    continue;
+            foreach ($this->getQuestionBlocks() as $block) {
+                $values = [];
+                foreach($this->getQuestionsDataPerBlock($block->getId()) as $data){
+                    $values[] = (int)$data->getValue();
                 }
-                $answer_total = array_sum($answer_data);
-                $anzahl_fragen = count($answer_data);
-                $possible_per_block = $anzahl_fragen * $highest;
-                if ($possible_per_block != 0) {
-                    $percentage = $answer_total / $possible_per_block * 100;
-                } else {
-                    $percentage = 0;
-                }
-
-                $this->percentage_per_block[$block->getId()] = $percentage;
+                $fraction =  $this->statistics->arraySumFractionOfMaxSumPossible($values,$highest);
+                $this->percentage_per_block[$block->getId()] = $this->statistics->valueToPercentage($fraction);
             }
         }
 
         return $this->percentage_per_block;
     }
 
-    public function getHighestValueFromScale()
-    {
-        if (!self::$highest_scale) {
-            $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
-            $scale = Scale::_getInstanceByObjId($this->db, $obj_id)->getUnitsAsArray();
-            $sorted_scale = array_keys($scale);
-            sort($sorted_scale);
-            self::$highest_scale = $sorted_scale[count($sorted_scale) - 1];
-        }
-        return self::$highest_scale;
 
+    public function getPercentageForBlock(int $block_id) : ?float
+    {
+        return $this->getPercentagePerBlock()[$block_id];
     }
 
-    public function getBlockById(int $block_id) : ilSelfEvaluationBlock
+    public function getMinPercentageBlockAndMin() : array
     {
-        $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
+        [$key, $min] = $this->statistics->getMinKeyAndValueFromArray($this->getPercentagePerBlock());
+        return [$this->getBlockById($key),$min];
+    }
 
-        foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->db,$obj_id) as $block) {
-            if ($block->getId() == $block_id) {
-                return $block;
-            }
-        }
-        throw new \ILIAS\DI\Exceptions\Exception("Block not found, ID: ".$block_id. " Parent Object-ID: ".$obj_id);
+    public function getMaxPercentageBlockAndMax() : array
+    {
+        [$key, $max] = $this->statistics->getMaxKeyAndValueFromArray($this->getPercentagePerBlock());
+        return [$this->getBlockById($key),$max];
+    }
+
+    public function getBlockById(int $block_id) : QuestionBlock
+    {
+        return $this->getQuestionBlocks()[$block_id];
     }
 
     public function getOverallPercentage() : float
     {
-        $sum = 0;
-        $x = 0;
-        foreach ($this->getPercentagePerBlock() as $percentage) {
-            $sum += $percentage;
-            $x++;
-        }
-
-        if ($x == 0) {
-            return 100;
-        }
-        return round($sum / $x, 2);
+        return $this->statistics->getMeanFromData($this->getPercentagePerBlock());
     }
 
-    /**
-     * @return float
-     */
-    public function getOverallVarianz()
+    public function getOverallPercentageVarianz() : float
     {
-        return round(sqrt($this->getVarianz($this->getPercentagePerBlock(), $this->getOverallPercentage())), 2);
+        return $this->statistics->getVarianzFromValues($this->getPercentagePerBlock());
     }
 
-    /**
-     * @return float
-     */
-    public function getOverallStandardabweichung()
+    public function getOverallPercentageStandardabweichung() : float
     {
-        return round(sqrt($this->getOverallVarianz()), 2);
+        return $this->statistics->getStandardDeviation($this->getPercentagePerBlock());
     }
 
-    /**
-     * @param $data
-     * @param $average
-     * @return float|int
-     */
-    protected function getVarianz($data, $average)
-    {
-        $squared_sum = 0;
-        $x = 0;
-        foreach ($data as $percentage) {
-            $squared_sum += pow($average - $percentage, 2);
-            $x++;
-        }
-
-        if ($x == 0) {
-            return 0;
-        }
-        return $squared_sum / $x;
-    }
-
-    /**
-     * @param $data
-     * @param $average
-     * @return float
-     */
-    protected function getStandardabweichung($data, $average)
-    {
-        return sqrt($this->getVarianz($data, $average));
-    }
-
-    /**
-     * @return array
-     * @description return array(block_id => percentage)
-     */
-    public function getStandardabweichungPerBlock()
+    public function getPercentageStandardabweichungPerBlock() : array
     {
         $return = [];
-        $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
         $highest = $this->getHighestValueFromScale();
 
-        foreach (ilSelfEvaluationQuestionBlock::_getAllInstancesByParentId($this->db,$obj_id) as $block) {
-            $answer_data_mean_percentage = $this->getPercentagePerBlock()[$block->getId()];
+        foreach ($this->getQuestionBlocks() as $block) {
             $data_as_percentage = [];
-
-            $answer_data = $this->getDataPerBlock($block->getId());
-            if (count($answer_data) == 0) {
-                continue;
-            }
-
+            $answer_data = $this->getQuestionsDataPerBlock($block->getId());
             foreach ($answer_data as $data) {
-                $data_as_percentage[] = $data / $highest * 100;
+                $data_as_percentage[] = $this->statistics->percentageOf((int)$data->getValue(), $highest);
             }
-
-            $return[$block->getId()] = round($this->getStandardabweichung($data_as_percentage,
-                $answer_data_mean_percentage), 2);
+            $return[$block->getId()] = $this->statistics->getStandardDeviation($data_as_percentage);
         }
-
         return $return;
     }
 
-    /**
-     * @param null $a_block_id
-     * @return Feedback[]
-     */
-    public function getFeedbacksPerBlock($a_block_id = null)
+    public function setId(int $id)
     {
-        $return = [];
-        foreach ($this->getPercentagePerBlock() as $block_id => $percentage) {
-            $return[$block_id] = Feedback::_getFeedbackForPercentage($this->db,$block_id, $percentage);;
+        $this->id = $id;
+    }
+
+    public function getId() : int
+    {
+        return $this->id;
+    }
+
+    public function setIdentifierId(int $identifier_id)
+    {
+        $this->identifier_id = $identifier_id;
+    }
+
+    public function getIdentifierId() : int
+    {
+        return $this->identifier_id;
+    }
+
+    public function setCreationDate(int $creation_date)
+    {
+        $this->creation_date = $creation_date;
+    }
+
+    public function getCreationDate() : int
+    {
+        return $this->creation_date;
+    }
+
+    /**
+     * @param QuestionBlock[] $blocks
+     */
+    public function setQuestionBlocks(array $blocks)
+    {
+        $this->question_blocks = $blocks;
+    }
+
+    /**
+     * @return QuestionBlock[]
+     */
+    public function getQuestionBlocks() : array
+    {
+        if (!is_array($this->question_blocks)) {
+            foreach (QuestionBlock::_getAllInstancesByIdentifierId($this->db, $this->getIdentifierId()) as $block) {
+                $this->question_blocks[$block->getId()] = $block;
+            }
         }
-        if ($a_block_id) {
-            return $return[$a_block_id];
+        return $this->question_blocks;
+    }
+
+    public function setQuestionsDataForBlocks(array $questions_data_for_blocks)
+    {
+        $this->questions_data_for_blocks = $questions_data_for_blocks;
+    }
+
+    /**
+     * @param int $block_id
+     * @return Data[]
+     */
+    public function getQuestionsDataPerBlock(int $block_id) : array
+    {
+        if(!is_array($this->questions_data_for_blocks) || ! is_array($this->questions_data_for_blocks[$block_id])){
+            foreach (Question::_getAllInstancesForParentId($this->db, $block_id) as $qst) {
+                $data = Data::_getInstanceForQuestionId($this->db, $this->getId(), $qst->getId());
+                $this->questions_data_for_blocks[$block_id][$qst->getId()] = $data;
+            }
+        }
+
+        return $this->questions_data_for_blocks[$block_id];
+    }
+
+
+
+    /**
+     * @param int $highest_scale
+     */
+    public function setHighestScale(int $highest_scale) : void
+    {
+        $this->highest_scale = $highest_scale;
+    }
+
+    public function getHighestValueFromScale()
+    {
+        if (!$this->highest_scale) {
+            $obj_id = Identity::_getObjIdForIdentityId($this->db, $this->getIdentifierId());
+            $this->highest_scale = Scale::_getHighestScaleByObjId($this->db, $obj_id);
+        }
+        return $this->highest_scale;
+    }
+
+    public function getSubmitDate() : int
+    {
+        $latest_entry = Data::_getLatestInstanceByDatasetId($this->db, $this->getId());
+        if ($latest_entry) {
+            return $latest_entry->getCreationDate();
         } else {
-            return $return;
+            throw new Exception("Invalid Entry");
+        }
+    }
+
+    public function getDuration() : int
+    {
+        $latest_entry = Data::_getLatestInstanceByDatasetId($this->db, $this->getId());
+        if ($latest_entry) {
+            return $latest_entry->getCreationDate() - $this->getCreationDate();
+        } else {
+            throw new Exception("Invalid Entry");
         }
     }
 
@@ -465,7 +382,7 @@ class Dataset implements hasDBFields
     {
         $return = [];
         $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-                .$identifier_id . ' ORDER BY creation_date ASC');
+            . $identifier_id . ' ORDER BY creation_date ASC');
         while ($rec = $db->fetchObject($set)) {
             $data_set = new Dataset($db);
             $data_set->setObjectValuesFromRecord($data_set, $rec);
@@ -482,8 +399,12 @@ class Dataset implements hasDBFields
      * @param string        $identifier
      * @return Dataset[]
      */
-    public static function _getAllInstancesByObjectId(ilDBInterface $db,int $obj_id, bool $as_array = false, string $identifier = "")
-    {
+    public static function _getAllInstancesByObjectId(
+        ilDBInterface $db,
+        int $obj_id,
+        bool $as_array = false,
+        string $identifier = ""
+    ) {
         $return = [];
         if ($identifier == "") {
             $identities = Identity::_getAllInstancesByObjId($db, $obj_id);
@@ -508,27 +429,6 @@ class Dataset implements hasDBFields
         return $return;
     }
 
-    /**
-     * @param ilDBInterface $db
-     * @param int             $obj_id
-     * @return Dataset[]
-     */
-    public static function _getAllInstancesByObjectIdOfCurrentUser(ilDBInterface $db, int $obj_id)
-    {
-        $return = [];
-        foreach (Identity::_getAllInstancesByObjId($db, $obj_id) as $identity) {
-            $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-                . $db->quote($identity->getId(), 'integer') . ' ORDER BY creation_date ASC');
-            while ($rec = $db->fetchObject($set)) {
-
-                $data_set = new Dataset($db);
-                $data_set->setObjectValuesFromRecord($data_set, $rec);
-                $return[] = $data_set;
-            }
-        }
-
-        return $return;
-    }
 
     public static function _deleteAllInstancesByObjectId(ilDBInterface $db, int $obj_id) : bool
     {
@@ -579,56 +479,5 @@ class Dataset implements hasDBFields
         }
 
         return false;
-    }
-
-    public function setId(int $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getId() : int
-    {
-        return $this->id;
-    }
-
-    public function setIdentifierId(int $identifier_id)
-    {
-        $this->identifier_id = $identifier_id;
-    }
-
-    public function getIdentifierId() : int
-    {
-        return $this->identifier_id;
-    }
-
-    public function setCreationDate(int $creation_date)
-    {
-        $this->creation_date = $creation_date;
-    }
-
-    public function getCreationDate() : int
-    {
-        return $this->creation_date;
-    }
-
-    public function getSubmitDate() : int
-    {
-        $latest_entry = Data::_getLatestInstanceByDatasetId($this->db,$this->getId());
-        if ($latest_entry) {
-            return $latest_entry->getCreationDate();
-        } else {
-            throw new Exception("Invalid Entry");
-        }
-    }
-
-
-    public function getDuration() : int
-    {
-        $latest_entry = Data::_getLatestInstanceByDatasetId($this->db,$this->getId());
-        if ($latest_entry) {
-            return $latest_entry->getCreationDate() - $this->getCreationDate();
-        } else {
-            throw new Exception("Invalid Entry");
-        }
     }
 }

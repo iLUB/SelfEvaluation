@@ -207,6 +207,14 @@ class Scale implements hasDBFields
         return $obj;
     }
 
+    public static function _getHighestScaleByObjId(ilDBInterface $db, int $parent_obj_id) : int
+    {
+        $scale = self::_getInstanceByObjId($db, $parent_obj_id)->getUnitsAsArray();
+        $sorted_scale = array_keys($scale);
+        sort($sorted_scale);
+        return $sorted_scale[count($sorted_scale) - 1];
+    }
+
     public function setId(int $id)
     {
         $this->id = $id;

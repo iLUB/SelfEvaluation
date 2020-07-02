@@ -3,6 +3,8 @@ namespace ilub\plugin\SelfEvaluation\UIHelper\Scale;
 
 use ilSubEnabledFormPropertyGUI;
 use ilRepositoryObjectPlugin;
+use ilTemplate;
+use ilUtil;
 
 class MultipleFieldInputGUI extends ilSubEnabledFormPropertyGUI
 {
@@ -81,6 +83,13 @@ class MultipleFieldInputGUI extends ilSubEnabledFormPropertyGUI
         return $tpl->get();
     }
 
+    public function insert(ilTemplate $a_tpl)
+    {
+        $a_tpl->setCurrentBlock("prop_custom");
+        $a_tpl->setVariable("CUSTOM_CONTENT", $this->getHtml());
+        $a_tpl->parseCurrentBlock();
+    }
+
     public function setValueByArray(array $value)
     {
         foreach ($this->getSubItems() as $item) {
@@ -90,6 +99,20 @@ class MultipleFieldInputGUI extends ilSubEnabledFormPropertyGUI
             $item->setValueByArray($value);
         }
         $this->setValues(is_array($value[$this->getPostVar()]) ? $value[$this->getPostVar()] : []);
+    }
+
+    public function checkInput()
+    {
+        $lng = $this->lng;
+
+        if ($this->getPostVar()) {
+            $_POST[$this->getPostVar()] = ilUtil::stripSlashes($_POST[$this->getPostVar()]);
+            if ($this->getRequired() && trim($_POST[$this->getPostVar()]) == "") {
+                $this->setAlert($lng->txt("msg_input_is_required"));
+                return false;
+            }
+        }
+        return $this->checkSubItemsInput();
     }
 
     public function setValues(array $values)

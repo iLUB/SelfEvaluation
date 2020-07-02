@@ -145,7 +145,7 @@ class ScaleUnit implements hasDBFields
      * @param int           $parent_id
      * @return self[]
      */
-    public static function _getAllInstancesByParentId(ilDBInterface $db, int $parent_id) : self
+    public static function _getAllInstancesByParentId(ilDBInterface $db, int $parent_id) : array
     {
         $return = [];
         $set = $db->query('SELECT * FROM '.self::TABLE_NAME.' '.' WHERE parent_id = '.$parent_id.' ORDER BY position ASC');

@@ -9,13 +9,15 @@ use ilToolbarGUI;
 use ilub\plugin\SelfEvaluation\Dataset\Dataset;
 use ilButton;
 use ilObjSelfEvaluation;
-use ilSelfEvaluationQuestionBlock;
+use ilub\plugin\SelfEvaluation\Block\Matrix\QuestionBlock;
 use ilTemplate;
 use ilub\plugin\SelfEvaluation\UIHelper\Scale\Scale;
 use ilub\plugin\SelfEvaluation\UIHelper\Chart\SpiderChart;
 use ilub\plugin\SelfEvaluation\UIHelper\Chart\BarChart;
 use ilub\plugin\SelfEvaluation\UIHelper\Chart\LeftRightChart;
-use ilub\plugin\SelfEvaluation\Question\Question;
+use ilub\plugin\SelfEvaluation\Question\Matrix\Question;
+use ilub\plugin\SelfEvaluation\Block\Block;
+use ilub\plugin\SelfEvaluation\Dataset\Data;
 
 class FeedbackChartGUI
 {
@@ -55,43 +57,44 @@ class FeedbackChartGUI
         $this->evaluation = $evaluation;
     }
 
-    public function getPresentationOfFeedback(Dataset $data_set)
+    public function getPresentationOfFeedback(Dataset $dataset)
     {
         $tpl = $this->initTemplate();
 
-        $percentages = $data_set->getPercentagePerBlock();
-        $blocks = [];
-        foreach ($data_set->getFeedbacksPerBlock() as $block_id => $feedback) {
-            $block = new ilSelfEvaluationQuestionBlock($block_id);
-            $this->parseBlockFeedback($tpl, $block, $feedback, $data_set);
-            $blocks[] = [
-                'block_id' => $block->getId(),
-                'percentage' => $percentages[$block->getId()],
-                'label' => $this->getBlockLabel($block)
-            ];
+        $blocks = $dataset->getQuestionBlocks();
+
+        foreach ($blocks as $block) {
+            $this->parseBlockFeedback($tpl, $block, $dataset);
         }
 
-        if (count($data_set->getFeedbacksPerBlock()) > 0 AND $this->showOverview()) {
+        if (count($blocks) > 0 AND $this->showOverview()) {
             $tpl->setCurrentBlock('overview');
 
             $tpl->setVariable('BLOCK_OVERVIEW_TITLE', $this->plugin->txt('block_overview_title'));
 
-            $mean = $data_set->getOverallPercentage();
-            $min = $data_set->getMinPercentageBlock();
-            $max = $data_set->getMaxPercentageBlock();
-            $sd_per_block = $data_set->getStandardabweichungPerBlock();
-            $scale_max = $data_set->getHighestValueFromScale();
+            $mean = $dataset->getOverallPercentage();
+            /**
+             * @var Block $min_block
+             * @var Block $max_block
+             */
+            list($min_block, $min_percentage) = $dataset->getMinPercentageBlockAndMin();
+            list($max_block, $max_percentage) = $dataset->getMaxPercentageBlockAndMax();
+            $sd_per_block = $dataset->getPercentageStandardabweichungPerBlock();
+            $scale_max = $dataset->getHighestValueFromScale();
 
             $statistics_median = $this->plugin->txt("overview_statistics_median") . " " . round($scale_max * $mean / 100,
                     2);//." (".$mean."%)";
-            $statistics_max = $this->plugin->txt("overview_statistics_max") . " " . $max['block']->getTitle() . ": " . round($scale_max * $max['percentage'] / 100,
+            $statistics_max = $this->plugin->txt("overview_statistics_max") . " " . $max_block->getTitle() . ": " . round($scale_max * $max_percentage / 100,
                     2);// ." (".$max['percentage']."%)";
-            $statistics_min = $this->plugin->txt("overview_statistics_min") . " " . $min['block']->getTitle() . ": " . round($scale_max * $min['percentage'] / 100,
+            $statistics_min = $this->plugin->txt("overview_statistics_min") . " " . $min_block->getTitle() . ": " . round($scale_max * $min_percentage / 100,
                     2);// ." (".$min['percentage']."%)";
 
             $statistics_sd_per_block = $this->plugin->txt("overview_statistics_standardabweichung_per_plock") . ": ";
             foreach ($sd_per_block as $key => $sd) {
-                $statistics_sd_per_block .= $data_set->getBlockById($key)->getTitle() . ": " . $sd . "; ";
+                /**
+                 * @var
+                 */
+                $statistics_sd_per_block .= $dataset->getBlockById($key)->getTitle() . ": " . $sd . "; ";
             }
 
             if ($this->evaluation->isShowFbsOverviewStatistics()) {
@@ -110,27 +113,30 @@ class FeedbackChartGUI
                 //$tpl->setVariable('OVERVIEW_STANDARDABWEICHUNG_PER_BLOCK', $statistics_sd_per_block);
             }
 
+            $percentage_per_block = $dataset->getPercentagePerBlock();
+
             if ($this->evaluation->isShowFbsOverviewBar()) {
                 $tpl->setVariable('SHOW_BAR_CHART', $this->plugin->txt('show_bar_chart'));
-                $chart = $this->getOverviewBarChart($blocks, $data_set->getOverallPercentage());
+
+                $chart = $this->getOverviewBarChart($blocks,$percentage_per_block, $dataset->getOverallPercentage());
                 if ($this->evaluation->isShowFbsOverviewStatistics()) {
                     $chart->setShowVarianz(false);
                     $chart->setStandardabweichungData($sd_per_block);
-                    $chart->setValuesForStandardabweichung($data_set->getPercentagePerBlock());
+                    $chart->setValuesForStandardabweichung($dataset->getPercentagePerBlock());
                 }
                 $tpl->setVariable('OVERVIEW_BAR_CHART', $chart->getHTML());
             }
             if ($this->evaluation->isShowFbsOverviewSpider()) {
-                $tpl->setVariable('OVERVIEW_SPIDER_CHART', $this->getOverviewSpiderChart($blocks)->getHTML());
+                $tpl->setVariable('OVERVIEW_SPIDER_CHART', $this->getOverviewSpiderChart($blocks,$percentage_per_block)->getHTML());
                 $tpl->setVariable('SHOW_SPIDER_CHART', $this->plugin->txt('show_spider_chart'));
             }
             if ($this->evaluation->isShowFbsOverviewLeftRight()) {
-                $tpl->setVariable('OVERVIEW_LEFT_RIGHT_CHART', $this->getOverviewLeftRightChart($blocks)->getHTML());
+                $tpl->setVariable('OVERVIEW_LEFT_RIGHT_CHART', $this->getOverviewLeftRightChart($blocks,$percentage_per_block)->getHTML());
                 $tpl->setVariable('SHOW_LEFT_RIGHT_CHART', $this->plugin->txt('show_left_right_chart'));
             }
 
             if ($this->evaluation->isShowFbsOverviewText()) {
-                $feedback = Feedback::_getFeedbackForPercentage($this->db,$this->evaluation->getId(), $mean);;
+                $feedback = Feedback::_getFeedbackForPercentage($this->db, $this->evaluation->getId(), $mean);;
                 if ($feedback) {
                     $tpl->setVariable('FEEDBACK_OVERVIEW_TITLE', $feedback->getTitle());
                     $tpl->setVariable('FEEDBACK_OVERVIEW_BODY', $feedback->getFeedbackText());
@@ -146,20 +152,20 @@ class FeedbackChartGUI
     protected function showAnyFeedbackCharts()
     {
         $any_active = $this->evaluation->isShowFbsChartBar() || $this->evaluation->isShowFbsChartSpider() || $this->evaluation->isShowFbsChartLeftRight();
-        return $this->evaluation->getShowFeedbacksCharts() && $any_active;
+        return $this->evaluation->isShowFeedbacksCharts() && $any_active;
     }
 
     protected function showOverview()
     {
         $any_overview_active = $this->evaluation->isShowFbsOverviewBar() || $this->evaluation->isShowFbsOverviewSpider() ||
             $this->evaluation->isShowFbsOverviewLeftRight() || $this->evaluation->isShowFbsOverviewStatistics();
-        return $this->evaluation->getShowFeedbacksOverview() && $any_overview_active;
+        return $this->evaluation->isShowFeedbacksOverview() && $any_overview_active;
     }
 
     protected function showAnyFeedback()
     {
-        return $this->showAnyFeedbackCharts() || $this->evaluation->getShowBlockTitlesDuringFeedback() ||
-            $this->evaluation->getShowBlockDescriptionsDuringFeedback() || $this->evaluation->getShowFeedbacks();
+        return $this->showAnyFeedbackCharts() || $this->evaluation->isShowBlockTitlesDuringFeedback() ||
+            $this->evaluation->isShowBlockDescriptionsDuringFeedback() || $this->evaluation->isShowFeedbacks();
     }
 
     protected function initTemplate() : ilTemplate
@@ -171,30 +177,30 @@ class FeedbackChartGUI
         $this->toolbar->addButtonInstance($btn);
 
         $tpl = $this->plugin->getTemplate('default/Feedback/tpl.feedback.html');
-        $this->tpl->addCss("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/css/feedback.css");
-        $this->tpl->addJavaScript("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/bar_spider_chart_toggle.js");
-        $this->tpl->addJavaScript("Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/templates/js/print.js");
+        $this->tpl->addCss($this->plugin->getDirectory() . "templates/css/feedback.css");
+        $this->tpl->addJavaScript($this->plugin->getDirectory() . "templates/js/bar_spider_chart_toggle.js");
+        $this->tpl->addJavaScript($this->plugin->getDirectory() . "templates/js/print.js");
         return $tpl;
     }
 
-    protected function getBlockLabel(ilSelfEvaluationQuestionBlock $block)
+    protected function getBlockLabel(QuestionBlock $block)
     {
         return $this->plugin->txt('block') . ' ' . ($block->getId() + 1);
     }
 
     protected function parseBlockFeedback(
         ilTemplate $tpl,
-        ilSelfEvaluationQuestionBlock $block,
-        Feedback $feedback,
-        Dataset $data_set
+        QuestionBlock $block,
+        Dataset $dataset
     ) {
-        $show_feedback_charts = $this->showAnyFeedbackCharts();
 
         if ($this->showAnyFeedback()) {
+            $percentage = $dataset->getPercentageForBlock($block->getId());
+            $feedback = Feedback::_getFeedbackForPercentage($this->db,$block->getId(),$percentage);
             $tpl->setCurrentBlock('feedback');
             $tpl->setVariable('FEEDBACK_ID', 'xsev_fb_id_' . $feedback->getId());
 
-            if ($this->evaluation->getShowBlockTitlesDuringFeedback()) {
+            if ($this->evaluation->isShowBlockTitlesDuringFeedback()) {
                 $abbreviation = $block->getAbbreviation();
                 $tpl->setVariable('BLOCK_TITLE', $block->getTitle());
                 if ($abbreviation != '') {
@@ -206,29 +212,29 @@ class FeedbackChartGUI
             } else {
                 $tpl->setVariable('BLOCK_TITLE', $this->getBlockLabel($block));
             }
-            if ($this->evaluation->getShowBlockDescriptionsDuringFeedback()) {
+            if ($this->evaluation->isShowBlockDescriptionsDuringFeedback()) {
                 $tpl->setVariable('BLOCK_DESCRIPTION', $block->getDescription());
             }
 
-            if ($show_feedback_charts) {
+            if ($this->showAnyFeedbackCharts()) {
                 $scale = Scale::_getInstanceByObjId($this->db, $this->evaluation->getId());
                 $units = $scale->getUnitsAsArray();
                 $max_cnt = max(array_keys($units));
 
                 if ($this->evaluation->isShowFbsChartBar()) {
-                    $bar_chart = $this->getFeedbackBarChart($data_set, $block->getId(), $units);
+                    $bar_chart = $this->getFeedbackBarChart($dataset, $block->getId(), $units);
                     $tpl->setVariable('BAR_CHART', $bar_chart->getHTML());
                     $tpl->setVariable('SHOW_BAR_CHART', $this->plugin->txt('show_bar_chart'));
                 }
 
                 if ($this->evaluation->isShowFbsChartLeftRight()) {
-                    $left_right_chart = $this->getFeedbackLeftRightChart($data_set, $block->getId(), $units);
+                    $left_right_chart = $this->getFeedbackLeftRightChart($dataset, $block->getId(), $units);
                     $tpl->setVariable('LEFT_RIGHT_CHART', $left_right_chart->getHTML());
                     $tpl->setVariable('SHOW_LEFT_RIGHT_CHART', $this->plugin->txt('show_left_right_chart'));
                 }
 
                 if ($this->evaluation->isShowFbsChartSpider()) {
-                    $spider_chart = $this->getFeedbackSpiderChart($data_set, $block->getId(), $max_cnt);
+                    $spider_chart = $this->getFeedbackSpiderChart($dataset, $block->getId(), $max_cnt);
                     $tpl->setVariable('SPIDER_CHART', $spider_chart->getHTML());
                     $tpl->setVariable('SHOW_SPIDER_CHART', $this->plugin->txt('show_spider_chart'));
                 }
@@ -237,7 +243,7 @@ class FeedbackChartGUI
                 $tpl->setVariable('VISIBILITY_GRAPH', "visibility: hidden");
             }
 
-            if ($this->evaluation->getShowFeedbacks()) {
+            if ($this->evaluation->isShowFeedbacks()) {
                 $tpl->setVariable('FEEDBACK_TITLE', $feedback->getTitle());
                 $tpl->setVariable('FEEDBACK_BODY', $feedback->getFeedbackText());
 
@@ -246,15 +252,15 @@ class FeedbackChartGUI
         }
     }
 
-    protected function getFeedbackBarChart(Dataset $data_set, string $block_id, array $scale_units) : BarChart
+    protected function getFeedbackBarChart(Dataset $dataset, string $block_id, array $scale_units) : BarChart
     {
         $chart = new BarChart($block_id . "_feedback_bar_chart");
         $ticks = [];
         $x = 1;
-        foreach ($data_set->getDataPerBlock($block_id) as $qst_id => $value) {
-            $qst = new Question($this->db,$qst_id);
-            $data = $chart->getDataInstance();
 
+        foreach (Question::_getAllInstancesForParentId($this->db, $block_id) as $qst) {
+            $value = Data::_getInstanceForQuestionId($this->db, $dataset->getId(), $qst->getId())->getValue();
+            $data = $chart->getDataInstance();
             $data->addPoint($x, $value);
             $ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $this->plugin->txt
                 ('question') . ' ' . $x;
@@ -269,7 +275,7 @@ class FeedbackChartGUI
     }
 
     protected function getFeedbackLeftRightChart(
-        Dataset $data_set,
+        Dataset $dataset,
         string $block_id,
         array $scale_units
     ) : LeftRightChart {
@@ -278,11 +284,11 @@ class FeedbackChartGUI
         $data = $chart->getDataInstance();
         $ticks = [];
         $x = 99999;
-        foreach ($data_set->getDataPerBlock($block_id) as $qst_id => $value) {
-            $qst = new Question($this->db, $qst_id);
+        foreach (Question::_getAllInstancesForParentId($this->db, $block_id) as $qst) {
+            $value = Data::_getInstanceForQuestionId($this->db, $dataset->getId(), $qst->getId())->getValue();
             $data->addPoint($value, $x);
             $ticks[$x] = $qst->getTitle() ? $qst->getTitle() : $this->plugin->txt
-                ('question') . ' ' . $qst_id;
+                ('question') . ' ' . $qst->getId();
             $x--;
 
         }
@@ -295,7 +301,7 @@ class FeedbackChartGUI
     }
 
     protected function getFeedbackSpiderChart(
-        Dataset $data_set,
+        Dataset $dataset,
         string $block_id,
         int $max_level
     ) : SpiderChart {
@@ -303,8 +309,8 @@ class FeedbackChartGUI
         $data = $chart->getDataInstance();
         $leg_labels = [];
         $cnt = 0;
-        foreach ($data_set->getDataPerBlock($block_id) as $qst_id => $value) {
-            $qst = new Question($this->db, $qst_id);
+        foreach (Question::_getAllInstancesForParentId($this->db, $block_id) as $qst) {
+            $value = Data::_getInstanceForQuestionId($this->db, $dataset->getId(), $qst->getId())->getValue();
             $data->addPoint($cnt, $value);
             $leg_labels[] = $qst->getTitle() ? $qst->getTitle() : $this->plugin->txt('question') . ' ' . ($cnt + 1);
             $cnt++;
@@ -327,16 +333,21 @@ class FeedbackChartGUI
         return $scale_unit;
     }
 
-    protected function getOverviewBarChart(array $block_data, $average) : BarChart
+    /**
+     * @param QuestionBlock[] $blocks
+     * @param float[] $block_percentages
+     * @param float $average_percantage
+     * @return BarChart
+     */
+    protected function getOverviewBarChart(array $blocks, array $block_percentages, float $average_percantage) : BarChart
     {
         $chart = new BarChart('bar_overview');
-
         $x_axis = [];
-        foreach ($block_data as $block_d) {
+
+        foreach ($blocks as $block) {
             $data = $chart->getDataInstance();
-            $block = new ilSelfEvaluationQuestionBlock($block_d['block_id']);
-            $data->addPoint($block->getPosition(), $block_d['percentage']);
-            $x_axis[$block->getPosition()] = $block_d['label'];
+            $data->addPoint($block->getPosition(), $block_percentages[$block->getId()]);
+            $x_axis[$block->getPosition()] = $block->getLabel();
             $chart->addData($data);
         }
 
@@ -355,12 +366,17 @@ class FeedbackChartGUI
         }
 
         $chart->setShowAverageLine(true);
-        $chart->setAverage($average);
+        $chart->setAverage($average_percantage);
 
         return $chart;
     }
 
-    protected function getOverviewLeftRightChart(array $block_data) : LeftRightChart
+    /**
+     * @param QuestionBlock[] $blocks
+     * @param int[] $block_percentages
+     * @return LeftRightChart
+     */
+    protected function getOverviewLeftRightChart(array $blocks, array $block_percentages) : LeftRightChart
     {
 
         $chart = new LeftRightChart('left_right_overview');
@@ -369,10 +385,9 @@ class FeedbackChartGUI
         $y_axis = [];
         $y = 999999;
 
-        foreach ($block_data as $block_d) {
-            $block = new ilSelfEvaluationQuestionBlock($block_d['block_id']);
-            $data->addPoint($block_d['percentage'], $y - $block->getPosition());
-            $y_axis[$y - $block->getPosition()] = $block_d['label'];
+        foreach ($blocks as $block) {
+            $data->addPoint($block_percentages[$block->getId()], $y - $block->getPosition());
+            $y_axis[$y - $block->getPosition()] = $block->getLabel();
             $chart->addData($data);
         }
         // display y-axis in 10% steps
@@ -385,16 +400,21 @@ class FeedbackChartGUI
         return $chart;
     }
 
-    protected function getOverviewSpiderChart(array $block_data) : SpiderChart
+    /**
+     * @param QuestionBlock[] $blocks
+     * @param int[] $block_percentages
+     * @return SpiderChart
+     */
+    protected function getOverviewSpiderChart(array $blocks, array $block_percentages) : SpiderChart
     {
         $chart = new SpiderChart('spider_chart_overview');
         $data = $chart->getDataInstance();
 
         $cnt = 0;
         $leg_labels = [];
-        foreach ($block_data as $block_d) {
-            $leg_labels[] = $block_d['label'];
-            $data->addPoint($cnt, $block_d['percentage'] / 10);
+        foreach ($blocks as $block) {
+            $leg_labels[] = $block->getLabel();
+            $data->addPoint($cnt, $block_percentages[$block->getId()] / 10);
             $cnt++;
         }
 

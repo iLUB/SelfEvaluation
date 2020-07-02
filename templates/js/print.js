@@ -20,4 +20,4 @@ printFeedback = function () {
                 }, 500)
         }
     );
-}
+};

@@ -6,16 +6,16 @@ use ilub\plugin\SelfEvaluation\CsvExport\csvExportRow;
 use ilub\plugin\SelfEvaluation\CsvExport\csvExportValue;
 
 use ilSelfEvaluationPlugin;
-use ilub\plugin\SelfEvaluation\Question\MetaQuestion;
-use ilub\plugin\SelfEvaluation\Question\Question;
+use ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion;
+use ilub\plugin\SelfEvaluation\Question\Matrix\Question;
 use ilub\plugin\SelfEvaluation\CsvExport\csvExportColumn;
 use ilDBInterface;
-use ilSelfEvaluationMetaBlock;
-use ilSelfEvaluationBlock;
-use iLubFieldDefinitionTypeMatrix;
+use ilub\plugin\SelfEvaluation\Block\Meta\MetaBlock;
+use ilub\plugin\SelfEvaluation\Block\Block;
+use ilub\plugin\SelfEvaluation\Question\Meta\Type\MetaTypeMatrix;
 use Exception;
-use iLubFieldDefinitionTypeSelect;
-use iLubFieldDefinitionTypeSingleChoice;
+use ilub\plugin\SelfEvaluation\Question\Meta\Type\MetaTypeSelect;
+use ilub\plugin\SelfEvaluation\Question\Meta\Type\MetaTypeSingleChoice;
 use ilub\plugin\SelfEvaluation\Identity\Identity;
 use ilObjUser;
 
@@ -73,11 +73,11 @@ class DatasetCsvExport extends csvExport
 
     protected function getData()
     {
-        $meta_blocks = ilSelfEvaluationMetaBlock::_getAllInstancesByParentId($this->db,$this->getObjectId());
+        $meta_blocks = MetaBlock::_getAllInstancesByParentId($this->db,$this->getObjectId());
         foreach ($meta_blocks as $meta_block) {
             $this->addMetaQuestions(MetaQuestion::_getAllInstancesForParentId($this->db, $meta_block->getId()));
         }
-        $blocks = ilSelfEvaluationBlock::_getAllInstancesByParentId($this->db,$this->getObjectId());
+        $blocks = MetaBlock::_getAllInstancesByParentId($this->db,$this->getObjectId());
         foreach ($blocks as $block) {
             $this->addQuestions(Question::_getAllInstancesForParentId($this->db,$block->getId()));
         }
@@ -106,8 +106,8 @@ class DatasetCsvExport extends csvExport
 
         foreach ($this->getMetaQuestions() as $meta_question) {
 
-            if ($meta_question->getTypeId() == iLubFieldDefinitionTypeMatrix::TYPE_ID) {
-                $questions = iLubFieldDefinitionTypeMatrix::getQuestionsFromArray(
+            if ($meta_question->getTypeId() == MetaTypeMatrix::TYPE_ID) {
+                $questions = MetaTypeMatrix::getQuestionsFromArray(
                     $meta_question->getValues());
                 foreach ($questions as $question) {
                     $this->getTable()->addColumn(
@@ -139,8 +139,8 @@ class DatasetCsvExport extends csvExport
                         $position
                     ));
 
-                if ($meta_question->getTypeId() == iLubFieldDefinitionTypeSelect::TYPE_ID ||
-                    $meta_question->getTypeId() == iLubFieldDefinitionTypeSingleChoice::TYPE_ID) {
+                if ($meta_question->getTypeId() == MetaTypeSelect::TYPE_ID ||
+                    $meta_question->getTypeId() == MetaTypeSingleChoice::TYPE_ID) {
                     $this->getTable()->addColumn(
                         new csvExportColumn(
                             $column_name . " ID",
@@ -206,30 +206,25 @@ class DatasetCsvExport extends csvExport
     protected function getStatisticValues(Dataset $dataset) : array
     {
         $meta_csv_values = [];
-        $min = $dataset->getMinPercentageBlock();
-        $max = $dataset->getMaxPercentageBlock();
-        $sd_per_block = $dataset->getStandardabweichungPerBlock();
+        /**
+         * @var $max_block Block
+         * @var $min_block Block
+         */
+        [$min_block,$min_percentage] = $dataset->getMinPercentageBlockAndMin();
+        [$max_block,$max_percentage] = $dataset->getMaxPercentageBlockAndMax();
+        $sd_per_block = $dataset->getPercentageStandardabweichungPerBlock();
 
         $statistics_sd_per_block = "";
         foreach ($sd_per_block as $key => $sd) {
             $statistics_sd_per_block .= $dataset->getBlockById($key)->getTitle() . ": " . $sd . "; ";
         }
 
-        $min_block = $min['block'];
-        /**
-         * @var $min_block ilSelfEvaluationBlock
-         */
-        $max_block = $max['block'];
-        /**
-         * @var $max_block ilSelfEvaluationBlock
-         */
-
         $meta_csv_values[] = new csvExportValue("mean", $dataset->getOverallPercentage());
-        $meta_csv_values[] = new csvExportValue("max", $max_block->getTitle() . ": " . $max['percentage'] . "%");
-        $meta_csv_values[] = new csvExportValue("min", $min_block->getTitle() . ": " . $min['percentage'] . "%");
-        $meta_csv_values[] = new csvExportValue("variance", $dataset->getOverallVarianz());
-        $meta_csv_values[] = new csvExportValue("sd", $dataset->getOverallStandardabweichung());
-        $meta_csv_values[] = new csvExportValue("sd_per_block", $statistics_sd_per_block);
+        $meta_csv_values[] = new csvExportValue("max", $max_block->getTitle() . ": " .$max_percentage . "%");
+        $meta_csv_values[] = new csvExportValue("min", $min_block->getTitle() . ": " . $min_percentage . "%");
+        $meta_csv_values[] = new csvExportValue("percentage_variance", $dataset->getOverallPercentageVarianz());
+        $meta_csv_values[] = new csvExportValue("percentage_sd", $dataset->getOverallPercentageStandardabweichung());
+        $meta_csv_values[] = new csvExportValue("percentage_sd_per_block", $statistics_sd_per_block);
 
         return $meta_csv_values;
     }
@@ -266,10 +261,10 @@ class DatasetCsvExport extends csvExport
     {
         $meta_csv_values = [];
 
-        if ($meta_question->getTypeId() == iLubFieldDefinitionTypeMatrix::TYPE_ID) {
+        if ($meta_question->getTypeId() == MetaTypeMatrix::TYPE_ID) {
 
             $question_values = $meta_question->getValues();
-            $questions = iLubFieldDefinitionTypeMatrix::getQuestionsFromArray($question_values);
+            $questions = MetaTypeMatrix::getQuestionsFromArray($question_values);
             foreach ($questions as $key => $question) {
                 $entry_keys = $entry->getValue();
                 if (is_array($entry_keys) && array_key_exists($key, $entry_keys)) {
@@ -293,8 +288,8 @@ class DatasetCsvExport extends csvExport
             $column_name = $this->generateUniqueName($row, $column_name);
             $key = $this->handledSkipped($entry->getValue());
 
-            if ($meta_question->getTypeId() == iLubFieldDefinitionTypeSelect::TYPE_ID ||
-                $meta_question->getTypeId() == iLubFieldDefinitionTypeSingleChoice::TYPE_ID) {
+            if ($meta_question->getTypeId() == MetaTypeSelect::TYPE_ID ||
+                $meta_question->getTypeId() == MetaTypeSingleChoice::TYPE_ID) {
                 $question_values = $meta_question->getValues();
                 if (is_array($question_values) && array_key_exists($key, $question_values)) {
                     $meta_csv_values[] = new csvExportValue($column_name . " ID", $key);
@@ -340,19 +335,16 @@ class DatasetCsvExport extends csvExport
             }
             $entries = Data::_getAllInstancesByDatasetId($this->db,$dataset->getId());
             foreach ($entries as $entry) {
-                if ($this->getMetaQuestion($entry->getQuestionId()) || $this->getQuestion($entry->getQuestionId())) {
-                    if ($entry->getQuestionType() == Data::META_QUESTION_TYPE) {
-                        $meta_question = $this->getMetaQuestion($entry->getQuestionId());
-                        $values = $this->getMetaQuestionValues($row, $entry,
-                            $meta_question);
-                        foreach ($values as $value) {
-                            $row->addValue($value);
-                        }
-                    } else {
-                        $row->addValue($this->getQuestionValues($row, $entry));
-
+                if ($this->getMetaQuestion($entry->getQuestionId())) {
+                    $meta_question = $this->getMetaQuestion($entry->getQuestionId());
+                    $values = $this->getMetaQuestionValues($row, $entry,
+                        $meta_question);
+                    foreach ($values as $value) {
+                        $row->addValue($value);
                     }
-
+                }
+                else if($this->getQuestion($entry->getQuestionId())) {
+                    $row->addValue($this->getQuestionValues($row, $entry));
                 }
             }
             $this->getTable()->addRow($row);
@@ -418,7 +410,7 @@ class DatasetCsvExport extends csvExport
     }
 
 
-    public function getMetaQuestion(int $id) : MetaQuestion
+    public function getMetaQuestion(int $id) : ?MetaQuestion
     {
         return $this->meta_questions[$id];
     }
@@ -447,7 +439,7 @@ class DatasetCsvExport extends csvExport
         return $this->questions;
     }
 
-    public function getQuestion(int $id) : Question
+    public function getQuestion(int $id) : ?Question
     {
         return $this->questions[$id];
     }

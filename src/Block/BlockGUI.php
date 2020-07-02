@@ -4,7 +4,6 @@ namespace ilub\plugin\SelfEvaluation\Block;
 use ilDBInterface;
 use ilGlobalTemplateInterface;
 use ilCtrl;
-use ilAccess;
 use ilSelfEvaluationPlugin;
 use ilPropertyFormGUI;
 use ilObjSelfEvaluationGUI;
@@ -13,6 +12,7 @@ use ilTextInputGUI;
 use ilTextAreaInputGUI;
 use ilUtil;
 use ilConfirmationGUI;
+use ilAccessHandler;
 
 abstract class BlockGUI
 {
@@ -38,7 +38,7 @@ abstract class BlockGUI
      */
     protected $parent;
     /**
-     * @var ilAccess
+     * @var ilAccessHandler
      */
     protected $access;
     /**
@@ -55,7 +55,7 @@ abstract class BlockGUI
         ilDBInterface $db,
         ilGlobalTemplateInterface $tpl,
         ilCtrl $ilCtrl,
-        ilAccess $access,
+        ilAccessHandler $access,
         ilSelfEvaluationPlugin $plugin,
         ilObjSelfEvaluationGUI $parent
     ) {
@@ -65,9 +65,6 @@ abstract class BlockGUI
         $this->access = $access;
         $this->plugin = $plugin;
         $this->parent = $parent;
-
-        $this->object = new QuestionBlock($this->db, (int) $_GET['block_id']);
-        $this->object->setParentId($this->parent->obj_id);
     }
 
     public function executeCommand()
@@ -120,7 +117,7 @@ abstract class BlockGUI
 
     protected function cancel()
     {
-        $this->ctrl->redirectByClass('ilSelfEvaluationListBlocksGUI', 'showContent');
+        $this->ctrl->redirectByClass('ListBlocksGUI', 'showContent');
     }
 
     protected function initForm(string $mode = 'create')

@@ -32,12 +32,18 @@ class csvExport
         $output = fopen('php://output', 'w');
 
         foreach ($this->getTable()->getTableAsArray() as $row) {
+
             $utf8_row = [];
             foreach ($row as $entry) {
+                if(is_array($entry)){
+                    continue;
+                }
                 $utf8_row[] = $this->convertExcelUtf8($entry);
             }
-            fputcsv($output, $utf8_row, $delimiter, $enclosure);
+
+            fputcsv($output,$row, $delimiter, $enclosure);
         }
+
     }
 
     /**

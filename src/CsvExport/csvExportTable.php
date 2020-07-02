@@ -166,10 +166,10 @@ class csvExportTable
         foreach ($this->getRowsValuesAsArray() as $row_id => $row_array) {
             $values[1 + $row_id] = [];
             foreach ($this->getColumnsArray() as $column) {
-                if (!array_key_exists($column->getColumnId(), $row_array)) {
-                    $values[1 + $row_id][] = null;
-                } else {
+                if (array_key_exists($column->getColumnId(), $row_array)) {
                     $values[1 + $row_id][] = $row_array[$column->getColumnId()];
+                } else {
+                    $values[1 + $row_id][] = "";
                 }
 
             }

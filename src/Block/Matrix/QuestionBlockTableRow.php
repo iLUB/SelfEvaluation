@@ -47,15 +47,15 @@ class QuestionBlockTableRow extends BlockTableRow
 
     protected function saveCtrlParameters()
     {
-        $this->ctrl->setParameterByClass('ilSelfEvaluationQuestionBlockGUI', 'block_id', $this->getBlockId());
-        $this->ctrl->setParameterByClass('ilSelfEvaluationQuestionGUI', 'block_id', $this->getBlockId());
-        $this->ctrl->setParameterByClass('ilSelfEvaluationFeedbackGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('QuestionBlockGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('QuestionGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('FeedbackGUI', 'block_id', $this->getBlockId());
     }
 
     protected function getQuestionAction() : BlockTableAction
     {
         $title = $this->plugin->txt('edit_questions');
-        $link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationQuestionGUI', 'showContent');
+        $link = $this->ctrl->getLinkTargetByClass('QuestionGUI', 'showContent');
         $cmd = 'edit_questions';
 
         return new BlockTableAction($title, $cmd, $link);
@@ -64,7 +64,7 @@ class QuestionBlockTableRow extends BlockTableRow
     protected function getFeedbackAction() : BlockTableAction
     {
         $title = $this->plugin->txt('edit_feedback');
-        $link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationFeedbackGUI', 'listObjects');
+        $link = $this->ctrl->getLinkTargetByClass('FeedbackGUI', 'listObjects');
         $cmd = 'listObjects';
         $position = 2;
         return new BlockTableAction($title, $cmd, $link, $position);

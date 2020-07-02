@@ -41,7 +41,6 @@ class MetaTypeMatrix extends MetaQuestionType
         $ty_se_mu->setMaxLength(4096);
         $ty_se_mu->setValues(['']);
         $ty_se_mu->setInfo($plugin->txt("matrix_scale_description"));
-
         $option->addSubItem($ty_se_mu);
 
         return $option;
@@ -117,7 +116,7 @@ class MetaTypeMatrix extends MetaQuestionType
 
         $matrix_items = [];
 
-        $header = new MatrixHeaderGUI($plugin, $postvar);
+        $header = new MatrixHeaderGUI($plugin, $title);
         $header->setScale($scale_values);
         $matrix_items[] = $header;
 

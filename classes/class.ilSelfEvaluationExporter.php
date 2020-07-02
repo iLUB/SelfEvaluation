@@ -1,13 +1,6 @@
 <?php
-/* Copyright (c) 1998-2010 ILIAS open source, Extended GPL, see docs/LICENSE */
+require_once __DIR__ . '/../vendor/autoload.php';
 
-include_once './Services/Export/classes/class.ilXmlExporter.php';
-
-/**
- * ilSelfEvaluationExporter
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- * @version $Id$
- */
 class ilSelfEvaluationExporter extends ilXmlExporter
 {
 
@@ -25,7 +18,7 @@ class ilSelfEvaluationExporter extends ilXmlExporter
         $ref_id = end(ilObject::_getAllReferences($a_id));
 
         $obj_self_eval = new ilObjSelfEvaluation($ref_id);
-        $dom = dom_import_simplexml($obj_self_eval->toXML($a_entity, $a_schema_version));
+        $dom = dom_import_simplexml($obj_self_eval->toXML());
         $xml_string = $dom->ownerDocument->saveXML($dom->ownerDocument->documentElement);
         return $xml_string;
     }

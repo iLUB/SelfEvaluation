@@ -1,0 +1,83 @@
+<div class="self-evaluation-presentation">
+    <div class="container-fluid">
+        <!-- BEGIN item -->
+        <!-- BEGIN header -->
+        <div class="row block-header">
+            <div class="col-xs-10 block-title">
+                <div>
+                    <h1>{TXT_TITLE}</h1>
+                    <p>{TXT_DESCRIPTION}</p>
+                </div>
+            </div>
+            <div class="col-xs-2 knob-col">
+                {PROGRESS_KNOB}
+            </div>
+        </div>
+        <!-- END header -->
+
+        <!-- BEGIN prop -->
+        <div class="row block-question self-{TYPE}">
+            <div class="col-md-{QUESTION_SIZE} question-text" id="il_prop_cont_{LAB_ID}">
+                <label for="{LAB_ID}">{PROPERTY_TITLE}<!-- BEGIN std_hid_title --> <span class="ilAccHeadingHidden">{PHID_TITLE}</span>
+                    <!-- END std_hid_title --><!-- BEGIN required --> <span class="asterisk">*</span>
+                    <!-- END required --></label>
+            </div>
+            <div class="col-md-{RATING_SIZE} rating">
+
+                <!-- added std_prop_start block to ommit warning (during selfEval start) when in devmode -->
+                <!-- BEGIN std_prop_start -->
+                <!-- END std_prop_start -->
+
+                <!-- BEGIN prop_custom -->
+                {CUSTOM_CONTENT}
+                <!-- END prop_custom -->
+
+                <!-- BEGIN prop_generic -->
+                <div class="inputs">
+                    <!-- BEGIN multi_in -->
+                    <div id="ilFormField~{ID}~0">
+                        <!-- END multi_in -->
+                        {PROP_GENERIC}
+                        <!-- BEGIN multi_out -->
+                    </div>
+                    <!-- END multi_out -->
+                </div>
+                <!-- END prop_generic -->
+
+                <!-- BEGIN description -->
+                <div class="ilFormInfo">{PROPERTY_DESCRIPTION}</div>
+                <!-- END description -->
+                <!-- BEGIN alert -->
+                <div class="ilFormInfo">
+                    <img border="0" src="{IMG_ALERT}" alt="{ALT_ALERT}"/> {TXT_ALERT}
+                </div>
+                <!-- END alert -->
+            </div>
+        </div>
+        <!-- END prop -->
+        <!-- END item -->
+        <!-- BEGIN commands -->
+        <div class="row sev-commands">
+            <div class="col-md-{QUESTION_SIZE_COMMAND}">
+
+                <!-- BEGIN required_text -->
+                <span class="asterisk">*</span><span class="small"> {TXT_REQUIRED}</span>
+                <!-- END required_text -->
+                &nbsp;
+            </div>
+            <div class="col-md-{RATING_SIZE_COMMAND} block-commands">
+                <div class="ilFormFooter">
+                    <!-- BEGIN hidden -->
+                    <input type="{PROP_INPUT_TYPE}" id="{ID}" name="{POST_VAR}" value="{PROPERTY_VALUE}"/>
+                    <!-- END hidden -->
+                    <div class="ilFormFooter ilFormCommands">
+                        <!-- BEGIN cmd -->
+                        <input class="btn btn-sm btn-default" type="SUBMIT" name="cmd[{CMD}]" value="{CMD_TXT}"/>
+                        <!-- END cmd -->
+                    </div>
+                </div>
+            </div>
+            <!-- END commands -->
+        </div>
+    </div>
+</div>

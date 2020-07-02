@@ -76,7 +76,7 @@ class BlockTableRow
     ) {
         $this->ctrl = $ilCtrl;
         $this->plugin = $plugin;
-        $this->block_gui_class = get_class($block) . 'GUI';
+        $this->block_gui_class = (new \ReflectionClass($block))->getShortName() . 'GUI';
 
         $this->setBlockId($block->getId());
         $this->setPositionId($block->getPositionId());
@@ -122,7 +122,7 @@ class BlockTableRow
         $this->abbreviation = $abbreviation;
     }
 
-    public function getAbbreviation() : string
+    public function getAbbreviation() : ?string
     {
         return $this->abbreviation;
     }
@@ -162,7 +162,7 @@ class BlockTableRow
         $this->feedback_count = $feedback_count;
     }
 
-    public function getFeedbackCount() : int
+    public function getFeedbackCount() : ?int
     {
         return $this->feedback_count;
     }
@@ -172,17 +172,17 @@ class BlockTableRow
         $this->feedback_link = $feedback_link;
     }
 
-    public function getFeedbackLink() : string
+    public function getFeedbackLink() : ?string
     {
         return $this->feedback_link;
     }
 
-    public function setPositionId(int $position_id)
+    public function setPositionId(string $position_id)
     {
         $this->position_id = $position_id;
     }
 
-    public function getPositionId() : int
+    public function getPositionId() : string
     {
         return $this->position_id;
     }
@@ -250,7 +250,7 @@ class BlockTableRow
 
     protected function saveCtrlParameters()
     {
-        $this->ctrl->setParameterByClass('ilSelfEvaluationBlockGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('BlockGUI', 'block_id', $this->getBlockId());
     }
 
     protected function getEditAction() : BlockTableAction

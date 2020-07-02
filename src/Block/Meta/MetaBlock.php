@@ -29,11 +29,6 @@ class MetaBlock extends Block
      */
     protected $parent_id = 0;
 
-    /**
-     * @var MetaQuestion
-     */
-    protected $meta_container;
-
     public function cloneTo($parent_id) : self
     {
         $clone = new self($this->db);
@@ -46,7 +41,7 @@ class MetaBlock extends Block
         $old_questions = MetaQuestion::_getAllInstancesForParentId($this->db, $this->getId());
 
         foreach ($old_questions as $question) {
-            $question->cloneTo($this->db, $clone->getId());
+            $question->cloneTo($clone->getId());
         }
 
         return $clone;
@@ -86,14 +81,9 @@ class MetaBlock extends Block
         return $xml;
     }
 
-    public static function getTableName() : string
+    public static function _getTableName() : string
     {
         return 'rep_robj_xsev_mblock';
-    }
-
-    public function getMetaContainer() : MetaQuestion
-    {
-        return $this->meta_container;
     }
 
     public function delete()
@@ -104,6 +94,14 @@ class MetaBlock extends Block
             $question->delete();
         }
         return parent::delete();
+    }
+
+    /**
+     * @return MetaQuestion[]
+     */
+    public function getQuestions() : array
+    {
+        return (MetaQuestion::_getAllInstancesForParentId($this->db,$this->getId()));
     }
 
     public function getBlockTableRow(ilDBInterface $db,ilCtrl $ilCtrl, ilSelfEvaluationPlugin $plugin) : BlockTableRow

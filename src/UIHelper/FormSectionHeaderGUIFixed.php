@@ -20,4 +20,9 @@ class FormSectionHeaderGUIFixed extends ilFormSectionHeaderGUI
 
         $a_tpl->parseCurrentBlock();
     }
+
+    public function getRequired() : bool
+    {
+        return true;
+    }
 }

@@ -29,7 +29,7 @@ class BarChart extends ilChartGrid
     /**
      * @var bool
      */
-    protected $show_varianz;
+    protected $show_varianz = false;
 
     /**
      * @var int

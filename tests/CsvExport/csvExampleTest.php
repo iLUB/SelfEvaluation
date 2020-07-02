@@ -32,17 +32,20 @@ class csvExampleTest extends TestCase
                               ["columnX" => "e2r4cX", "column1" => "e2r4c1"]
     ];
 
-    protected $csvExport = null;
+    /**
+     * @var csvExport;
+     */
+    protected $csvExport;
 
-    public function setUp()
+    public function setUp():void
     {
         $this->csvExport = new csvExport();
     }
 
     public function testInitTable()
     {
-        $this->assertEquals($this->csvExport->getTable()->getColumns()->count(), 0);
-        $this->assertEquals($this->csvExport->getTable()->getColumns()->count(), 0);
+        self::assertEquals($this->csvExport->getTable()->getColumns()->count(), 0);
+        self::assertEquals($this->csvExport->getTable()->getColumns()->count(), 0);
     }
 
     /**
@@ -51,9 +54,9 @@ class csvExampleTest extends TestCase
     public function testAddFromArray()
     {
         $this->csvExport->getTable()->addColumnsAndValuesFromArrays($this->columns, $this->rows_values);
-        $this->assertEquals($this->csvExport->getTable()->getColumns()->count(), 3);
-        $this->assertEquals($this->csvExport->getTable()->getColumns()->count(), 3);
-        $this->assertEquals($this->csvExport->getTable()->getColumns()->getColumnNamesAsArray(),
+        self::assertEquals($this->csvExport->getTable()->getColumns()->count(), 3);
+        self::assertEquals($this->csvExport->getTable()->getColumns()->count(), 3);
+        self::assertEquals($this->csvExport->getTable()->getColumns()->getColumnNamesAsArray(),
             ['column1' => 'column1', 'column2' => 'column2', 'column3' => 'column3']);
         $expected_table = [
             0 => ["column1" => "column1", "column2" => "column2", "column3" => "column3"],
@@ -61,7 +64,7 @@ class csvExampleTest extends TestCase
             2 => [0 => "ae1r2c1", 1 => "e1r2c2", 2 => "e1r2c3"],
             3 => [0 => "be1r3c1", 1 => "e1r3c2", 2 => "e1r3c3"]
         ];
-        $this->assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
+        self::assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
 
     }
 
@@ -81,7 +84,7 @@ class csvExampleTest extends TestCase
             2 => [0 => "e1r2c2", 1 => "e1r2c3", 2 => "ae1r2c1"],
             3 => [0 => "e1r3c2", 1 => "e1r3c3", 2 => "be1r3c1"]
         ];
-        $this->assertEquals($this->csvExport->getTable()->getTableAsArray(), $expectd_table);
+        self::assertEquals($this->csvExport->getTable()->getTableAsArray(), $expectd_table);
         return $this->csvExport->getTable();
 
     }
@@ -100,7 +103,7 @@ class csvExampleTest extends TestCase
             2 => [0 => "be1r3c1", 1 => "e1r3c2", 2 => "e1r3c3"],
             3 => [0 => "ce1r1c1", 1 => "e1r1c2", 2 => "e1r1c3"]
         ];
-        $this->assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
+        self::assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
 
     }
 
@@ -121,7 +124,7 @@ class csvExampleTest extends TestCase
             3 => [0 => null, 1 => null, 2 => "e2r3c3", 3 => null],
             4 => [0 => "e2r4c1", 1 => null, 2 => null, 3 => "e2r4cX"],
         ];
-        $this->assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
+        self::assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
 
     }
 
@@ -146,7 +149,7 @@ class csvExampleTest extends TestCase
             6 => [0 => "ae1r2c1", 1 => "e1r2c2", 2 => "e1r2c3", 3 => null],
             7 => [0 => "be1r3c1", 1 => "e1r3c2", 2 => "e1r3c3", 3 => null]
         ];
-        $this->assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
+        self::assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
 
     }
 
@@ -172,7 +175,7 @@ class csvExampleTest extends TestCase
             6 => [0 => null, 1 => null, 2 => "e2r3c3", 3 => null],
             7 => [0 => "e2r4c1", 1 => null, 2 => null, 3 => "e2r4cX"],
         ];
-        $this->assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
+        self::assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
     }
 
     /**
@@ -202,7 +205,7 @@ class csvExampleTest extends TestCase
             7 => [0 => "e2r1c2", 1 => "e2r1c1", 2 => "e2r1c3", 3 => null],
 
         ];
-        $this->assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
+        self::assertEquals($this->csvExport->getTable()->getTableAsArray(), $expected_table);
 
     }
 }

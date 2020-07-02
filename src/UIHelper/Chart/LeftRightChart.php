@@ -9,7 +9,7 @@ class LeftRightChart extends ilChartGrid
 {
     use ChartHelper;
 
-    public function __construct(int $a_id)
+    public function __construct(string $a_id)
     {
         parent::__construct($a_id);
         $this->setSize($this->getCanvasWidth(), $this->getCanvasHeight());

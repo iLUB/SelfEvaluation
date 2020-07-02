@@ -9,6 +9,7 @@ class MetaTypeSelect extends MetaQuestionType
 {
 
     const TYPE_ID = 2;
+    const IGNORE_KEY = 'ilsel_dummy';
 
     public function getId() : int
     {
@@ -50,7 +51,8 @@ class MetaTypeSelect extends MetaQuestionType
     {
         $select = new ilSelectInputGUI($title, $postvar);
 
-        $options = [];
+        $options = [null => $plugin->txt('select_one')];
+
         foreach ($values as $key => $value) {
             $options[$key] = $value;
         }

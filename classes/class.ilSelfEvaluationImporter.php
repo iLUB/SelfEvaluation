@@ -1,11 +1,6 @@
 <?php
-/* Copyright (c) 1998-2016 ILIAS open source, Extended GPL, see docs/LICENSE */
-include_once './Services/Export/classes/class.ilXmlImporter.php';
-include_once './Customizing/global/plugins/Services/Repository/RepositoryObject/SelfEvaluation/classes/class.ilObjSelfEvaluation.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-/***
- * @author  Timon Amstutz <timon.amstutz@ilub.unibe.ch>
- */
 class ilSelfEvaluationImporter extends ilXmlImporter
 {
     /**
@@ -18,8 +13,6 @@ class ilSelfEvaluationImporter extends ilXmlImporter
      */
     public function importXmlRepresentation($entity, $id, $xml, $mapping)
     {
-        global $DIC;
-
         $ref_id = false;
         foreach ($mapping->getMappingsOfEntity('Services/Container', 'objs') as $old => $new) {
             if (ilObject::_lookupType($new) == "xsev" && $id == $old) {
@@ -28,7 +21,7 @@ class ilSelfEvaluationImporter extends ilXmlImporter
         }
 
         $obj_self_eval = new ilObjSelfEvaluation($ref_id);
-        $obj_self_eval->fromXML($entity, $id, $xml, $mapping);
+        $obj_self_eval->fromXML($xml);
         return $obj_self_eval->getId();
     }
 }

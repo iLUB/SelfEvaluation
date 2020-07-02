@@ -117,7 +117,7 @@ td.feedback_ov_item, td.feedback_ov_item_blank {
     border: 1px solid #808080;
     border-left: none;
     height: 20px;
-    line-height: 20px;
+    line-height: 25px;
     text-align: center;
 
 }
@@ -140,4 +140,8 @@ a.il_ContainerItemCommand {
 
 .add_button, .delete_button {
     padding-left: 4px;
+}
+
+.table-responsive img.icon_ok{
+    width: 25px;
 }

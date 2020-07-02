@@ -3,21 +3,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
 use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
+use ilub\plugin\SelfEvaluation\UIHelper\Scale\Scale;
+use ilub\plugin\SelfEvaluation\Block\Matrix\QuestionBlock;
+use ilub\plugin\SelfEvaluation\Block\Meta\MetaBlock;
+use ilub\plugin\SelfEvaluation\Identity\Identity;
+use ilub\plugin\SelfEvaluation\Feedback\Feedback;
+use ilub\plugin\SelfEvaluation\UIHelper\Scale\ScaleUnit;
+use ilub\plugin\SelfEvaluation\Question\Matrix\Question;
+use ilub\plugin\SelfEvaluation\Dataset\Data;
+use ilub\plugin\SelfEvaluation\Dataset\Dataset;
+use ilub\plugin\SelfEvaluation\Block\BlockFactory;
 
-require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlock.php');
-require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationBlockFactory.php');
-require_once(dirname(__FILE__) . '/Block/class.ilSelfEvaluationMetaBlock.php');
-require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScale.php');
-require_once(dirname(__FILE__) . '/Scale/class.ilSelfEvaluationScaleUnit.php');
-require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationDataset.php');
-require_once(dirname(__FILE__) . '/Dataset/class.ilSelfEvaluationData.php');
-require_once(dirname(__FILE__) . '/Feedback/class.ilSelfEvaluationFeedback.php');
-
-/**
- * Application class for SelfEvaluation repository object.
- * @author Fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * $Id$
- */
 class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
 {
     use ArrayForDB;
@@ -160,6 +156,67 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
      */
     protected $block_option_random_desc = "";
 
+    /**
+     * @return array
+     */
+    protected function getNonDbFields()
+    {
+        return ['db'];
+    }
+
+    /**
+     * @param                     $a_target_id
+     * @param                     $a_copy_id
+     * @param ilObjSelfEvaluation $new_obj
+     */
+    protected function doCloneObject($new_obj, $a_target_id, $a_copy_id = null)
+    {
+        $new_obj->setOnline(false);
+        $new_obj->setIdentitySelection($this->isIdentitySelection());
+        $new_obj->setEvaluationType($this->getEvaluationType());
+        $new_obj->setSortType($this->getSortType());
+        $new_obj->setDisplayType($this->getDisplayType());
+        $new_obj->setIntro($this->getIntro());
+        $new_obj->setOutro($this->getOutro());
+        $new_obj->setOutroTitle($this->getOutroTitle());
+        $new_obj->setIdentitySelectionInfoText($this->getIdentitySelectionInfoText());
+        $new_obj->setShowFeedbacks($this->isShowFeedbacks());
+        $new_obj->setShowFeedbacksCharts($this->isShowFeedbacksCharts());
+        $new_obj->setShowFeedbacksOverview($this->isShowFeedbacksOverview());
+        $new_obj->setShowFbsOverviewStatistics($this->isShowFbsOverviewStatistics());
+        $new_obj->setShowBlockTitlesDuringEvaluation($this->isShowBlockTitlesDuringEvaluation());
+        $new_obj->setShowBlockDescriptionsDuringEvaluation($this->isShowBlockDescriptionsDuringEvaluation());
+        $new_obj->setShowBlockTitlesDuringFeedback($this->isShowBlockTitlesDuringFeedback());
+        $new_obj->setShowBlockDescriptionsDuringFeedback($this->isShowBlockDescriptionsDuringFeedback());
+        $new_obj->setSortRandomNrItemBlock($this->getSortRandomNrItemBlock());
+        $new_obj->setBlockOptionRandomDesc($this->getBlockOptionRandomDesc());
+        $new_obj->setShowFbsOverviewBar($this->isShowFbsOverviewBar());
+        $new_obj->setShowFbsOverviewText($this->isShowFbsOverviewText());
+        $new_obj->setOverviewBarShowLabelAsPercentage($this->isOverviewBarShowLabelAsPercentage());
+        $new_obj->setShowFbsOverviewSpider($this->isShowFbsOverviewSpider());
+        $new_obj->setShowFbsOverviewLeftRight($this->isShowFbsOverviewLeftRight());
+        $new_obj->setShowFbsChartBar($this->isShowFbsChartBar());
+        $new_obj->setShowFbsChartSpider($this->isShowFbsChartSpider());
+        $new_obj->setShowFbsChartLeftRight($this->isShowFbsChartLeftRight());
+        $new_obj->update();
+
+        //Copy Scale
+        $old_scale = Scale::_getInstanceByObjId($this->db, $this->getId());
+        $old_scale->cloneTo($new_obj->getId());
+
+        //Copy Blocks
+        $block_factory = new BlockFactory($this->db, $this->getId());
+        foreach ($block_factory->getAllBlocks() as $block) {
+            $block->cloneTo($new_obj->getId());
+        }
+
+        //Copy Overall Feedback
+        $old_feedbacks = Feedback::_getAllInstancesForParentId($this->db, $this->getId(), false, true);
+        foreach ($old_feedbacks as $feedback) {
+            $feedback->cloneTo($new_obj->getId());
+        }
+
+    }
 
     final function initType()
     {
@@ -175,6 +232,558 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         $this->setOutroTitle($this->txt('outro_header'));
         $this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
     }
+
+    public function getArrayForDb() : array
+    {
+        return [
+            'id' => [
+                'integer',
+                $this->getId()
+            ],
+            'is_online' => [
+                'integer',
+                $this->isOnline()
+            ],
+            'identity_selection' => [
+                'integer',
+                $this->isIdentitySelection()
+            ],
+            'evaluation_type' => [
+                'integer',
+                $this->getEvaluationType()
+            ],
+            'sort_type' => [
+                'integer',
+                $this->getSortType()
+            ],
+            'display_type' => [
+                'integer',
+                $this->getDisplayType()
+            ],
+            'intro' => [
+                'text',
+                $this->getIntro()
+            ],
+            'outro_title' => [
+                'text',
+                $this->getOutroTitle()
+            ],
+            'outro' => [
+                'text',
+                $this->getOutro()
+            ],
+            'identity_selection_info' => [
+                'text',
+                $this->getIdentitySelectionInfoText()
+            ],
+            'show_fbs' => [
+                'integer',
+                $this->isShowFeedbacks()
+            ],
+            'show_fbs_charts' => [
+                'integer',
+                $this->isShowFeedbacksCharts()
+            ],
+            'show_fbs_overview' => [
+                'integer',
+                $this->isShowFeedbacksOverview()
+            ],
+            'show_fbs_overview_text' => [
+                'integer',
+                $this->isShowFbsOverviewText()
+            ],
+            'show_fbs_overview_statistics' => [
+                'integer',
+                $this->isShowFbsOverviewStatistics()
+            ],
+            'show_block_titles_sev' => [
+                'integer',
+                $this->isShowBlockTitlesDuringEvaluation()
+            ],
+            'show_block_desc_sev' => [
+                'integer',
+                $this->isShowBlockDescriptionsDuringEvaluation()
+            ],
+            'show_block_titles_fb' => [
+                'integer',
+                $this->isShowBlockTitlesDuringFeedback()
+            ],
+            'show_block_desc_fb' => [
+                'integer',
+                $this->isShowBlockDescriptionsDuringFeedback()
+            ],
+            'sort_random_nr_items_block' => [
+                'integer',
+                $this->getSortRandomNrItemBlock()
+            ],
+            'block_option_random_desc' => [
+                'text',
+                $this->getBlockOptionRandomDesc()
+            ],
+            'show_fbs_overview_bar' => [
+                'integer',
+                $this->isShowFbsOverviewBar()
+            ],
+            'bar_show_label_as_percentage' => [
+                'integer',
+                $this->isOverviewBarShowLabelAsPercentage()
+            ],
+            'show_fbs_overview_spider' => [
+                'integer',
+                $this->isShowFbsOverviewSpider()
+            ],
+            'show_fbs_overview_left_right' => [
+                'integer',
+                $this->isShowFbsOverviewLeftRight()
+            ],
+            'show_fbs_chart_bar' => [
+                'integer',
+                $this->isShowFbsChartBar()
+            ],
+            'show_fbs_chart_spider' => [
+                'integer',
+                $this->isShowFbsChartSpider()
+            ],
+            'show_fbs_chart_left_right' => [
+                'integer',
+                $this->isShowFbsChartLeftRight()
+            ],
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOnline() : bool
+    {
+        return $this->online;
+    }
+
+    /**
+     * @param bool $online
+     */
+    public function setOnline(bool $online) : void
+    {
+        $this->online = $online;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEvaluationType() : int
+    {
+        return $this->evaluation_type;
+    }
+
+    /**
+     * @param int $evaluation_type
+     */
+    public function setEvaluationType(int $evaluation_type) : void
+    {
+        $this->evaluation_type = $evaluation_type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortType() : int
+    {
+        return $this->sort_type;
+    }
+
+    /**
+     * @param int $sort_type
+     */
+    public function setSortType(int $sort_type) : void
+    {
+        $this->sort_type = $sort_type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDisplayType() : int
+    {
+        return $this->display_type;
+    }
+
+    /**
+     * @param int $display_type
+     */
+    public function setDisplayType(int $display_type) : void
+    {
+        $this->display_type = $display_type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIntro() : string
+    {
+        return $this->intro;
+    }
+
+    /**
+     * @param string $intro
+     */
+    public function setIntro(string $intro) : void
+    {
+        $this->intro = $intro;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOutroTitle() : string
+    {
+        return $this->outro_title;
+    }
+
+    /**
+     * @param string $outro_title
+     */
+    public function setOutroTitle(string $outro_title) : void
+    {
+        $this->outro_title = $outro_title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getOutro() : string
+    {
+        return $this->outro;
+    }
+
+    /**
+     * @param string $outro
+     */
+    public function setOutro(string $outro) : void
+    {
+        $this->outro = $outro;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIdentitySelection() : bool
+    {
+        return $this->identity_selection;
+    }
+
+    /**
+     * @param bool $identity_selection
+     */
+    public function setIdentitySelection(bool $identity_selection) : void
+    {
+        $this->identity_selection = $identity_selection;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentitySelectionInfoText() : string
+    {
+        return $this->identity_selection_info_text;
+    }
+
+    /**
+     * @param string $identity_selection_info_text
+     */
+    public function setIdentitySelectionInfoText(string $identity_selection_info_text) : void
+    {
+        $this->identity_selection_info_text = $identity_selection_info_text;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFeedbacks() : bool
+    {
+        return $this->show_feedbacks;
+    }
+
+    /**
+     * @param bool $show_feedbacks
+     */
+    public function setShowFeedbacks(bool $show_feedbacks) : void
+    {
+        $this->show_feedbacks = $show_feedbacks;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFeedbacksCharts() : bool
+    {
+        return $this->show_feedbacks_charts;
+    }
+
+    /**
+     * @param bool $show_feedbacks_charts
+     */
+    public function setShowFeedbacksCharts(bool $show_feedbacks_charts) : void
+    {
+        $this->show_feedbacks_charts = $show_feedbacks_charts;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFeedbacksOverview() : bool
+    {
+        return $this->show_feedbacks_overview;
+    }
+
+    /**
+     * @param bool $show_feedbacks_overview
+     */
+    public function setShowFeedbacksOverview(bool $show_feedbacks_overview) : void
+    {
+        $this->show_feedbacks_overview = $show_feedbacks_overview;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowBlockTitlesDuringEvaluation() : bool
+    {
+        return $this->show_block_titles_during_evaluation;
+    }
+
+    /**
+     * @param bool $show_block_titles_during_evaluation
+     */
+    public function setShowBlockTitlesDuringEvaluation(bool $show_block_titles_during_evaluation) : void
+    {
+        $this->show_block_titles_during_evaluation = $show_block_titles_during_evaluation;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowBlockDescriptionsDuringEvaluation() : bool
+    {
+        return $this->show_block_descriptions_during_evaluation;
+    }
+
+    /**
+     * @param bool $show_block_descriptions_during_evaluation
+     */
+    public function setShowBlockDescriptionsDuringEvaluation(bool $show_block_descriptions_during_evaluation) : void
+    {
+        $this->show_block_descriptions_during_evaluation = $show_block_descriptions_during_evaluation;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowBlockTitlesDuringFeedback() : bool
+    {
+        return $this->show_block_titles_during_feedback;
+    }
+
+    /**
+     * @param bool $show_block_titles_during_feedback
+     */
+    public function setShowBlockTitlesDuringFeedback(bool $show_block_titles_during_feedback) : void
+    {
+        $this->show_block_titles_during_feedback = $show_block_titles_during_feedback;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowBlockDescriptionsDuringFeedback() : bool
+    {
+        return $this->show_block_descriptions_during_feedback;
+    }
+
+    /**
+     * @param bool $show_block_descriptions_during_feedback
+     */
+    public function setShowBlockDescriptionsDuringFeedback(bool $show_block_descriptions_during_feedback) : void
+    {
+        $this->show_block_descriptions_during_feedback = $show_block_descriptions_during_feedback;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsOverviewBar() : bool
+    {
+        return $this->show_fbs_overview_bar;
+    }
+
+    /**
+     * @param bool $show_fbs_overview_bar
+     */
+    public function setShowFbsOverviewBar(bool $show_fbs_overview_bar) : void
+    {
+        $this->show_fbs_overview_bar = $show_fbs_overview_bar;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsOverviewText() : bool
+    {
+        return $this->show_fbs_overview_text;
+    }
+
+    /**
+     * @param bool $show_fbs_overview_text
+     */
+    public function setShowFbsOverviewText(bool $show_fbs_overview_text) : void
+    {
+        $this->show_fbs_overview_text = $show_fbs_overview_text;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsOverviewStatistics() : bool
+    {
+        return $this->show_fbs_overview_statistics;
+    }
+
+    /**
+     * @param bool $show_fbs_overview_statistics
+     */
+    public function setShowFbsOverviewStatistics(bool $show_fbs_overview_statistics) : void
+    {
+        $this->show_fbs_overview_statistics = $show_fbs_overview_statistics;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsOverviewSpider() : bool
+    {
+        return $this->show_fbs_overview_spider;
+    }
+
+    /**
+     * @param bool $show_fbs_overview_spider
+     */
+    public function setShowFbsOverviewSpider(bool $show_fbs_overview_spider) : void
+    {
+        $this->show_fbs_overview_spider = $show_fbs_overview_spider;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsOverviewLeftRight() : bool
+    {
+        return $this->show_fbs_overview_left_right;
+    }
+
+    /**
+     * @param bool $show_fbs_overview_left_right
+     */
+    public function setShowFbsOverviewLeftRight(bool $show_fbs_overview_left_right) : void
+    {
+        $this->show_fbs_overview_left_right = $show_fbs_overview_left_right;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsChartBar() : bool
+    {
+        return $this->show_fbs_chart_bar;
+    }
+
+    /**
+     * @param bool $show_fbs_chart_bar
+     */
+    public function setShowFbsChartBar(bool $show_fbs_chart_bar) : void
+    {
+        $this->show_fbs_chart_bar = $show_fbs_chart_bar;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsChartSpider() : bool
+    {
+        return $this->show_fbs_chart_spider;
+    }
+
+    /**
+     * @param bool $show_fbs_chart_spider
+     */
+    public function setShowFbsChartSpider(bool $show_fbs_chart_spider) : void
+    {
+        $this->show_fbs_chart_spider = $show_fbs_chart_spider;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowFbsChartLeftRight() : bool
+    {
+        return $this->show_fbs_chart_left_right;
+    }
+
+    /**
+     * @param bool $show_fbs_chart_left_right
+     */
+    public function setShowFbsChartLeftRight(bool $show_fbs_chart_left_right) : void
+    {
+        $this->show_fbs_chart_left_right = $show_fbs_chart_left_right;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortRandomNrItemBlock() : int
+    {
+        return $this->sort_random_nr_item_block;
+    }
+
+    /**
+     * @param int $sort_random_nr_item_block
+     */
+    public function setSortRandomNrItemBlock(int $sort_random_nr_item_block) : void
+    {
+        $this->sort_random_nr_item_block = $sort_random_nr_item_block;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOverviewBarShowLabelAsPercentage() : bool
+    {
+        return $this->overview_bar_show_label_as_percentage;
+    }
+
+    /**
+     * @param bool $overview_bar_show_label_as_percentage
+     */
+    public function setOverviewBarShowLabelAsPercentage(bool $overview_bar_show_label_as_percentage) : void
+    {
+        $this->overview_bar_show_label_as_percentage = $overview_bar_show_label_as_percentage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBlockOptionRandomDesc() : string
+    {
+        return $this->block_option_random_desc;
+    }
+
+    /**
+     * @param string $block_option_random_desc
+     */
+    public function setBlockOptionRandomDesc(string $block_option_random_desc) : void
+    {
+        $this->block_option_random_desc = $block_option_random_desc;
+    }
+
+
 
     function doRead()
     {
@@ -215,35 +824,35 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
     function doUpdate()
     {
 
-        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(),$this->getId());
+        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), $this->getIdForDb());
     }
 
     public function doDelete()
     {
-        $scale = ilSelfEvaluationScale::_getInstanceByObjId($this->getId());
-        foreach (ilSelfEvaluationScaleUnit::_getAllInstancesByParentId($scale->getId()) as $u) {
+        $scale = Scale::_getInstanceByObjId($this->db, $this->getId());
+        foreach (ScaleUnit::_getAllInstancesByParentId($this->db, $scale->getId()) as $u) {
             $u->delete();
         }
         $scale->delete();
-        foreach (ilSelfEvaluationIdentity::_getAllInstancesByObjId($this->getId()) as $id) {
-            foreach (ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId()) as $ds) {
-                foreach (ilSelfEvaluationData::_getAllInstancesByDatasetId($ds->getId()) as $d) {
+        foreach (Identity::_getAllInstancesByObjId($this->db, $this->getId()) as $id) {
+            foreach (Dataset::_getAllInstancesByIdentifierId($this->db, $id->getId()) as $ds) {
+                foreach (Data::_getAllInstancesByDatasetId($this->db, $ds->getId()) as $d) {
                     $d->delete();
                 }
                 $ds->delete();
             }
             $id->delete();
         }
-        foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
-            foreach (ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId()) as $qst) {
+        foreach (QuestionBlock::_getAllInstancesByParentId($this->db, $this->getId()) as $block) {
+            foreach (Question::_getAllInstancesForParentId($this->db, $block->getId()) as $qst) {
                 $qst->delete();
             }
-            foreach (ilSelfEvaluationFeedback::_getAllInstancesForParentId($block->getId()) as $fb) {
+            foreach (Feedback::_getAllInstancesForParentId($this->db, $block->getId()) as $fb) {
                 $fb->delete();
             }
             $block->delete();
         }
-        foreach (ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->getId()) as $block) {
+        foreach (MetaBlock::_getAllInstancesByParentId($this->db, $this->getId()) as $block) {
             $block->delete();
         }
         $this->db->manipulate('DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . ' id = '
@@ -252,71 +861,13 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         return true;
     }
 
-    /**
-     * @param                     $a_target_id
-     * @param                     $a_copy_id
-     * @param ilObjSelfEvaluation $new_obj
-     */
-    protected function doCloneObject($new_obj, $a_target_id, $a_copy_id = null)
-    {
-        $new_obj->setOnline(false);
-        $new_obj->setIdentitySelection($this->isIdentitySelection());
-        $new_obj->setEvaluationType($this->getEvaluationType());
-        $new_obj->setSortType($this->getSortType());
-        $new_obj->setDisplayType($this->getDisplayType());
-        $new_obj->setIntro($this->getIntro());
-        $new_obj->setOutro($this->getOutro());
-        $new_obj->setOutroTitle($this->getOutroTitle());
-        $new_obj->setIdentitySelectionInfoText($this->getIdentitySelectionInfoText());
-        $new_obj->setShowFeedbacks($this->getShowFeedbacks());
-        $new_obj->setShowFeedbacksCharts($this->getShowFeedbacksCharts());
-        $new_obj->setShowFeedbacksOverview($this->getShowFeedbacksOverview());
-        $new_obj->setShowFbsOverviewStatistics($this->isShowFbsOverviewStatistics());
-        $new_obj->setShowBlockTitlesDuringEvaluation($this->getShowBlockTitlesDuringEvaluation());
-        $new_obj->setShowBlockDescriptionsDuringEvaluation($this->getShowBlockDescriptionsDuringEvaluation());
-        $new_obj->setShowBlockTitlesDuringFeedback($this->getShowBlockTitlesDuringFeedback());
-        $new_obj->setShowBlockDescriptionsDuringFeedback($this->getShowBlockDescriptionsDuringFeedback());
-        $new_obj->setSortRandomNrItemBlock($this->getSortRandomNrItemBlock());
-        $new_obj->setBlockOptionRandomDesc($this->getBlockOptionRandomDesc());
-        $new_obj->setShowFbsOverviewBar($this->isShowFbsOverviewBar());
-        $new_obj->setShowFbsOverviewText($this->isShowFbsOverviewText());
-        $new_obj->setOverviewBarShowLabelAsPercentage($this->isOverviewBarShowLabelAsPercentage());
-        $new_obj->setShowFbsOverviewSpider($this->isShowFbsOverviewSpider());
-        $new_obj->setShowFbsOverviewLeftRight($this->isShowFbsOverviewLeftRight());
-        $new_obj->setShowFbsChartBar($this->isShowFbsChartBar());
-        $new_obj->setShowFbsChartSpider($this->isShowFbsChartSpider());
-        $new_obj->setShowFbsChartLeftRight($this->isShowFbsChartLeftRight());
-        $new_obj->update();
-
-        //Copy Scale
-        $old_scale = ilSelfEvaluationScale::_getInstanceByObjId($this->getId());
-        $old_scale->cloneTo($new_obj->getId());
-
-        //Copy Blocks
-        $block_factory = new ilSelfEvaluationBlockFactory($this->getId());
-        foreach ($block_factory->getAllBlocks() as $block) {
-            $block->cloneTo($new_obj->getId());
-        }
-
-        //Copy Overall Feedback
-        $old_feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getId(), false, true);
-        foreach ($old_feedbacks as $feedback) {
-            $feedback->cloneTo($new_obj->getId());
-        }
-
-    }
-
-    /**
-     * @param $a_entity
-     * @return SimpleXMLElement
-     */
-    public function toXML($a_entity)
+    public function toXML()
     {
         $xml = new SimpleXMLElement('<SelfEvaluation/>');
         $xml->addAttribute("xmlns", "http://www.w3.org");
         $xml->addAttribute("title", $this->getTitle());
         $xml->addAttribute("description", $this->getDescription());
-        $xml->addAttribute("online", $this->getOnline());
+        $xml->addAttribute("online", $this->isOnline());
         $xml->addAttribute("identitySelection", $this->isIdentitySelection());
         $xml->addAttribute("evaluationType", $this->getEvaluationType());
         $xml->addAttribute("sortType", $this->getSortType());
@@ -325,14 +876,14 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         $xml->addAttribute("outro", $this->getOutro());
         $xml->addAttribute("outroTitle", $this->getOutroTitle());
         $xml->addAttribute("identitySelectionInfoText", $this->getIdentitySelectionInfoText());
-        $xml->addAttribute("showFeedbacks", $this->getShowFeedbacks());
-        $xml->addAttribute("showFeedbacksCharts", $this->getShowFeedbacksCharts());
-        $xml->addAttribute("showFeedbacksOverview", $this->getShowFeedbacksOverview());
-        $xml->addAttribute("showFbsOverviewStatistics", $this->getShowFeedbacksOverview());
-        $xml->addAttribute("showBlockTitlesDuringEvaluation", $this->getShowBlockTitlesDuringEvaluation());
-        $xml->addAttribute("showBlockDescriptionsDuringEvaluation", $this->getShowBlockDescriptionsDuringEvaluation());
-        $xml->addAttribute("showBlockTitlesDuringFeedback", $this->getShowBlockTitlesDuringFeedback());
-        $xml->addAttribute("showBlockDescriptionsDuringFeedback", $this->getShowBlockDescriptionsDuringFeedback());
+        $xml->addAttribute("showFeedbacks", $this->isShowFeedbacks());
+        $xml->addAttribute("showFeedbacksCharts", $this->isShowFeedbacksCharts());
+        $xml->addAttribute("showFeedbacksOverview", $this->isShowFeedbacksOverview());
+        $xml->addAttribute("showFbsOverviewStatistics", $this->isShowFeedbacksOverview());
+        $xml->addAttribute("showBlockTitlesDuringEvaluation", $this->isShowBlockTitlesDuringEvaluation());
+        $xml->addAttribute("showBlockDescriptionsDuringEvaluation", $this->isShowBlockDescriptionsDuringEvaluation());
+        $xml->addAttribute("showBlockTitlesDuringFeedback", $this->isShowBlockTitlesDuringFeedback());
+        $xml->addAttribute("showBlockDescriptionsDuringFeedback", $this->isShowBlockDescriptionsDuringFeedback());
         $xml->addAttribute("sortRandomNrItemBlock", $this->getSortRandomNrItemBlock());
         $xml->addAttribute("blockOptionRandomDesc", $this->getBlockOptionRandomDesc());
         $xml->addAttribute("showFbsOverviewBar", $this->isShowFbsOverviewBar());
@@ -345,17 +896,17 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         $xml->addAttribute("showFbsChartLeftRight", $this->isShowFbsChartLeftRight());
 
         //Export Scale
-        $scale = ilSelfEvaluationScale::_getInstanceByObjId($this->getId());
+        $scale = Scale::_getInstanceByObjId($this->db, $this->getId());
         $xml = $scale->toXML($xml);
 
         //Export Blocks
-        $block_factory = new ilSelfEvaluationBlockFactory($this->getId());
+        $block_factory = new BlockFactory($this->db, $this->getId());
         foreach ($block_factory->getAllBlocks() as $block) {
             $xml = $block->toXML($xml);
         }
 
         //Export Overall Feedback
-        $feedbacks = ilSelfEvaluationFeedback::_getAllInstancesForParentId($this->getId(), false, true);
+        $feedbacks = Feedback::_getAllInstancesForParentId($this->db, $this->getId(), false, true);
         foreach ($feedbacks as $feedback) {
             $xml = $feedback->toXML($xml);
         }
@@ -363,14 +914,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
 
     }
 
-    /**
-     * @param string          $entity
-     * @param string          $id
-     * @param string          $xml
-     * @param ilImportMapping $mapping
-     * @return $this
-     */
-    public function fromXML(string $entity, string $id, string $xml, ilImportMapping $mapping)
+    public function fromXML(string $xml)
     {
 
         if (!$this->getId()) {
@@ -384,50 +928,50 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         $this->setTitle($xml_attributes["title"]);
         $this->setDescription($xml_attributes["description"]);
         $this->setOnline(false);
-        $this->setIdentitySelection($xml_attributes["identitySelection"]);
-        $this->setEvaluationType($xml_attributes["evaluationType"]);
-        $this->setSortType($xml_attributes["sortType"]);
-        $this->setDisplayType($xml_attributes["displayType"]);
+        $this->setIdentitySelection($xml_attributes["identitySelection"] == "1");
+        $this->setEvaluationType((int) $xml_attributes["evaluationType"]);
+        $this->setSortType((int) $xml_attributes["sortType"]);
+        $this->setDisplayType((int) $xml_attributes["displayType"]);
         $this->setIntro($xml_attributes["intro"]);
         $this->setOutro($xml_attributes["outro"]);
         $this->setOutroTitle($xml_attributes["outroTitle"]);
-        $this->setIdentitySelectionInfoText($xml_attributes["identitySelectionInfoText"]);
-        $this->setShowFeedbacks($xml_attributes["showFeedbacks"]);
-        $this->setShowFeedbacksCharts($xml_attributes["showFeedbacksCharts"]);
-        $this->setShowFeedbacksOverview($xml_attributes["showFeedbacksOverview"]);
-        $this->setShowFbsOverviewStatistics($xml_attributes["showFbsOverviewStatistics"]);
-        $this->setShowBlockTitlesDuringEvaluation($xml_attributes["showBlockTitlesDuringEvaluation"]);
-        $this->setShowBlockDescriptionsDuringEvaluation($xml_attributes["showBlockDescriptionsDuringEvaluation"]);
-        $this->setShowBlockTitlesDuringFeedback($xml_attributes["showBlockTitlesDuringEvaluation"]);
-        $this->setShowBlockDescriptionsDuringFeedback($xml_attributes["online"]);
-        $this->setSortRandomNrItemBlock($xml_attributes["sortRandomNrItemBlock"]);
-        $this->setBlockOptionRandomDesc($xml_attributes["blockOptionRandomDesc"]);
-        $this->setShowFbsOverviewBar($xml_attributes["showFbsOverviewBar"]);
-        $this->setShowFbsOverviewText($xml_attributes["showFbsOverviewText"]);
-        $this->setOverviewBarShowLabelAsPercentage($xml_attributes["overviewBarShowLabelAsPercentage"]);
-        $this->setShowFbsOverviewSpider($xml_attributes["showFbsOverviewSpider"]);
-        $this->setShowFbsOverviewLeftRight($xml_attributes["showFbsOverviewLeftRight"]);
-        $this->setShowFbsChartBar($xml_attributes["showFbsChartBar"]);
-        $this->setShowFbsChartSpider($xml_attributes["showFbsChartSpider"]);
-        $this->setShowFbsChartLeftRight($xml_attributes["showFbsChartLeftRight"]);
+        $this->setIdentitySelectionInfoText((string) $xml_attributes["identitySelectionInfoText"]);
+        $this->setShowFeedbacks( $xml_attributes["showFeedbacks"] == "1");
+        $this->setShowFeedbacksCharts($xml_attributes["showFeedbacksCharts"] == "1");
+        $this->setShowFeedbacksOverview($xml_attributes["showFeedbacksOverview"] == "1");
+        $this->setShowFbsOverviewStatistics( $xml_attributes["showFbsOverviewStatistics"] == "1");
+        $this->setShowBlockTitlesDuringEvaluation( $xml_attributes["showBlockTitlesDuringEvaluation"] == "1");
+        $this->setShowBlockDescriptionsDuringEvaluation( $xml_attributes["showBlockDescriptionsDuringEvaluation"] == "1");
+        $this->setShowBlockTitlesDuringFeedback( $xml_attributes["showBlockTitlesDuringEvaluation"] == "1");
+        $this->setShowBlockDescriptionsDuringFeedback((bool) $xml_attributes["online"] == "1");
+        $this->setSortRandomNrItemBlock($xml_attributes["sortRandomNrItemBlock"] == "1");
+        $this->setBlockOptionRandomDesc( $xml_attributes["blockOptionRandomDesc"] == "1");
+        $this->setShowFbsOverviewBar($xml_attributes["showFbsOverviewBar"] == "1");
+        $this->setShowFbsOverviewText($xml_attributes["showFbsOverviewText"] == "1");
+        $this->setOverviewBarShowLabelAsPercentage( $xml_attributes["overviewBarShowLabelAsPercentage"] == "1");
+        $this->setShowFbsOverviewSpider($xml_attributes["showFbsOverviewSpider"] == "1");
+        $this->setShowFbsOverviewLeftRight($xml_attributes["showFbsOverviewLeftRight"] == "1");
+        $this->setShowFbsChartBar($xml_attributes["showFbsChartBar"] == "1");
+        $this->setShowFbsChartSpider( $xml_attributes["showFbsChartSpider"] == "1");
+        $this->setShowFbsChartLeftRight($xml_attributes["showFbsChartLeftRight"] == "1");
         $this->update();
 
         //Import Scale
         if ($xml->scale) {
-            ilSelfEvaluationScale::fromXml($this->db,$this->getId(), $xml->scale);
+            Scale::fromXml($this->db, $this->getId(), $xml->scale);
         }
 
         //Import Blocks
         foreach ($xml->metaBlock as $block) {
-            ilSelfEvaluationMetaBlock::fromXml($this->db,$this->getId(), $block);
+            MetaBlock::fromXml($this->db, $this->getId(), $block);
         }
         foreach ($xml->questionBlock as $block) {
-            ilSelfEvaluationQuestionBlock::fromXml($this->db,$this->getId(), $block);
+            QuestionBlock::fromXml($this->db, $this->getId(), $block);
         }
 
         //Import Overall Feedback
         foreach ($xml->feedback as $feedback) {
-            ilSelfEvaluationFeedback::fromXml($this->db,$this->getId(), $feedback);
+            Feedback::fromXml($this->db, $this->getId(), $feedback);
         }
 
         return $this;
@@ -436,47 +980,20 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
     /**
      * @return bool
      */
-    public function isActive()
+    public function isActive() : bool
     {
-        return ((boolean) $this->getOnline() AND $this->hasBlocks() AND $this->areFeedbacksComplete() AND $this->hasScale()) ? true : false;
+        return ((bool) $this->isOnline() AND $this->hasBlocks() AND $this->areFeedbacksComplete() AND $this->hasScale()) ? true : false;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasScale()
+    public function hasBLocks() : bool
     {
-        return ilSelfEvaluationScale::_getInstanceByObjId($this->getId())->hasUnits();
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasDatasets()
-    {
-        foreach (ilSelfEvaluationIdentity::_getAllInstancesByObjId($this->getId()) as $id) {
-            if (count(ilSelfEvaluationDataset::_getAllInstancesByIdentifierId($id->getId())) > 0) {
+        foreach (QuestionBlock::_getAllInstancesByParentId($this->db, $this->getId()) as $block) {
+            if (count(Question::_getAllInstancesForParentId($this->db, $block->getId())) > 0) {
                 return true;
             }
         }
-
-        return false;
-    }
-
-    /**
-     * Return if there are any blocks with at least one question
-     * @return bool
-     */
-    public function hasBLocks()
-    {
-        foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
-            if (count(ilSelfEvaluationQuestion::_getAllInstancesForParentId($block->getId())) > 0) {
-                return true;
-            }
-        }
-        foreach (ilSelfEvaluationMetaBlock::getAllInstancesByParentId($this->getId()) as $block) {
-            /** @var ilSelfEvaluationMetaBlock $block */
-            if (count($block->getMetaContainer()->getFieldDefinitions()) > 0) {
+        foreach (MetaBlock::_getAllInstancesByParentId($this->db, $this->getId()) as $block) {
+            if (count($block->getQuestions()) > 0) {
                 return true;
             }
         }
@@ -487,110 +1004,36 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
     /**
      * @return bool
      */
-    public function areFeedbacksComplete()
+    public function areFeedbacksComplete() : bool
     {
         $return = true;
-        foreach (ilSelfEvaluationQuestionBlock::getAllInstancesByParentId($this->getId()) as $block) {
-            $return = ilSelfEvaluationFeedback::_isComplete($block->getId()) ? $return : false;
+        foreach (QuestionBlock::_getAllInstancesByParentId($this->db, $this->getId()) as $block) {
+            $return = Feedback::_isComplete($this->db, $block->getId()) ? $return : false;
         }
 
         return $return;
     }
 
     /**
-     * @param string $intro
+     * @return bool
      */
-    public function setIntro($intro)
+    public function hasScale() : bool
     {
-        $this->intro = $intro;
+        return Scale::_getInstanceByObjId($this->db, $this->getId())->hasUnits();
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getIntro()
+    public function hasDatasets() : bool
     {
-        return $this->intro;
-    }
+        foreach (Identity::_getAllInstancesByObjId($this->db, $this->getId()) as $id) {
+            if (count(Dataset::_getAllInstancesByIdentifierId($this->db, $id->getId())) > 0) {
+                return true;
+            }
+        }
 
-    /**
-     * @param boolean $online
-     */
-    public function setOnline($online)
-    {
-        $this->online = $online;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getOnline()
-    {
-        return $this->online;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOutroTitle()
-    {
-        return $this->outro_title;
-    }
-
-    /**
-     * @param string $outro_title
-     */
-    public function setOutroTitle($outro_title)
-    {
-        $this->outro_title = $outro_title;
-    }
-
-    /**
-     * @param string $outro
-     */
-    public function setOutro($outro)
-    {
-        $this->outro = $outro;
-    }
-
-    /**
-     * @return string
-     */
-    public function getOutro()
-    {
-        return $this->outro;
-    }
-
-    /**
-     * @param string $info
-     */
-    public function setIdentitySelectionInfoText($info)
-    {
-        $this->identity_selection_info_text = $info;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdentitySelectionInfoText()
-    {
-        return $this->identity_selection_info_text;
-    }
-
-    /**
-     * @param int $sort_type
-     */
-    public function setSortType($sort_type)
-    {
-        $this->sort_type = $sort_type;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSortType()
-    {
-        return $this->sort_type;
+        return false;
     }
 
     public function areBlocksSortable() : bool
@@ -606,402 +1049,67 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
     }
 
     /**
-     * @param int $evaluation_type
+     * @return bool
      */
-    public function setEvaluationType($evaluation_type)
-    {
-        $this->evaluation_type = $evaluation_type;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEvaluationType()
-    {
-        return $this->evaluation_type;
-    }
-
-    /**
-     * @param int $display_type
-     */
-    public function setDisplayType($display_type)
-    {
-        $this->display_type = $display_type;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDisplayType()
-    {
-        return $this->display_type;
-    }
-
-    /**
-     * @param boolean $show_charts
-     */
-    public function setShowCharts($show_charts)
-    {
-        $this->show_charts = $show_charts;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getShowCharts()
+    public function isShowCharts() : bool
     {
         return $this->show_charts;
     }
 
     /**
-     * @param boolean $allow_multiple_datasets
+     * @param bool $show_charts
      */
-    public function setAllowMultipleDatasets($allow_multiple_datasets)
+    public function setShowCharts(bool $show_charts) : void
     {
-        $this->allow_multiple_datasets = $allow_multiple_datasets;
+        $this->show_charts = $show_charts;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function getAllowMultipleDatasets()
+    public function isAllowMultipleDatasets() : bool
     {
         return $this->allow_multiple_datasets;
     }
 
     /**
-     * @param boolean $allow_dataset_editing
+     * @param bool $allow_multiple_datasets
      */
-    public function setAllowDatasetEditing($allow_dataset_editing)
+    public function setAllowMultipleDatasets(bool $allow_multiple_datasets) : void
     {
-        $this->allow_dataset_editing = $allow_dataset_editing;
+        $this->allow_multiple_datasets = $allow_multiple_datasets;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function getAllowDatasetEditing()
+    public function isAllowDatasetEditing() : bool
     {
         return $this->allow_dataset_editing;
     }
 
     /**
-     * @param boolean $allow_show_results
+     * @param bool $allow_dataset_editing
      */
-    public function setAllowShowResults($allow_show_results)
+    public function setAllowDatasetEditing(bool $allow_dataset_editing) : void
     {
-        $this->allow_show_results = $allow_show_results;
+        $this->allow_dataset_editing = $allow_dataset_editing;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function getAllowShowResults()
+    public function isAllowShowResults() : bool
     {
         return $this->allow_show_results;
     }
 
     /**
-     * @param boolean $show_feedbacks
+     * @param bool $allow_show_results
      */
-    public function setShowFeedbacks($show_feedbacks)
+    public function setAllowShowResults(bool $allow_show_results) : void
     {
-        $this->show_feedbacks = $show_feedbacks;
+        $this->allow_show_results = $allow_show_results;
     }
 
-    /**
-     * @return boolean
-     */
-    public function getShowFeedbacks()
-    {
-        return $this->show_feedbacks;
-    }
-
-    /**
-     * @param boolean $show_feedbacks_charts
-     */
-    public function setShowFeedbacksCharts($show_feedbacks_charts)
-    {
-        $this->show_feedbacks_charts = $show_feedbacks_charts;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getShowFeedbacksCharts()
-    {
-        return $this->show_feedbacks_charts;
-    }
-
-    /**
-     * @param boolean $show_feedbacks_overview
-     */
-    public function setShowFeedbacksOverview($show_feedbacks_overview)
-    {
-        $this->show_feedbacks_overview = $show_feedbacks_overview;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getShowFeedbacksOverview()
-    {
-        return $this->show_feedbacks_overview;
-    }
-
-    /**
-     * @param boolean $show_block_titles_during_evaluation
-     */
-    public function setShowBlockTitlesDuringEvaluation($show_block_titles_during_evaluation)
-    {
-        $this->show_block_titles_during_evaluation = $show_block_titles_during_evaluation;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getShowBlockTitlesDuringEvaluation()
-    {
-        return $this->show_block_titles_during_evaluation;
-    }
-
-    /**
-     * @param boolean $show_block_descriptions_during_evaluation
-     */
-    public function setShowBlockDescriptionsDuringEvaluation($show_block_descriptions_during_evaluation)
-    {
-        $this->show_block_descriptions_during_evaluation = $show_block_descriptions_during_evaluation;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getShowBlockDescriptionsDuringEvaluation()
-    {
-        return $this->show_block_descriptions_during_evaluation;
-    }
-
-    /**
-     * @param boolean $show_block_titles_during_feedback
-     */
-    public function setShowBlockTitlesDuringFeedback($show_block_titles_during_feedback)
-    {
-        $this->show_block_titles_during_feedback = $show_block_titles_during_feedback;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getShowBlockTitlesDuringFeedback()
-    {
-        return $this->show_block_titles_during_feedback;
-    }
-
-    /**
-     * @param boolean $show_block_descriptions_during_feedback
-     */
-    public function setShowBlockDescriptionsDuringFeedback($show_block_descriptions_during_feedback)
-    {
-        $this->show_block_descriptions_during_feedback = $show_block_descriptions_during_feedback;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getShowBlockDescriptionsDuringFeedback()
-    {
-        return $this->show_block_descriptions_during_feedback;
-    }
-
-    /**
-     * @param int $sort_random_nr_item_block
-     */
-    public function setSortRandomNrItemBlock($sort_random_nr_item_block)
-    {
-        $this->sort_random_nr_item_block = $sort_random_nr_item_block;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSortRandomNrItemBlock()
-    {
-        return $this->sort_random_nr_item_block;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isShowFbsOverviewBar()
-    {
-        return $this->show_fbs_overview_bar;
-    }
-
-    /**
-     * @param boolean $show_fbs_overview_bar
-     */
-    public function setShowFbsOverviewBar($show_fbs_overview_bar)
-    {
-        $this->show_fbs_overview_bar = $show_fbs_overview_bar;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isShowFbsOverviewSpider()
-    {
-        return $this->show_fbs_overview_spider;
-    }
-
-    /**
-     * @param boolean $show_fbs_overview_spider
-     */
-    public function setShowFbsOverviewSpider($show_fbs_overview_spider)
-    {
-        $this->show_fbs_overview_spider = $show_fbs_overview_spider;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isShowFbsOverviewLeftRight()
-    {
-        return $this->show_fbs_overview_left_right;
-    }
-
-    /**
-     * @param boolean $show_fbs_overview_left_right
-     */
-    public function setShowFbsOverviewLeftRight($show_fbs_overview_left_right)
-    {
-        $this->show_fbs_overview_left_right = $show_fbs_overview_left_right;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isShowFbsChartBar()
-    {
-        return $this->show_fbs_chart_bar;
-    }
-
-    /**
-     * @param boolean $show_fbs_chart_bar
-     */
-    public function setShowFbsChartBar($show_fbs_chart_bar)
-    {
-        $this->show_fbs_chart_bar = $show_fbs_chart_bar;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isShowFbsChartSpider()
-    {
-        return $this->show_fbs_chart_spider;
-    }
-
-    /**
-     * @param boolean $show_fbs_chart_spider
-     */
-    public function setShowFbsChartSpider($show_fbs_chart_spider)
-    {
-        $this->show_fbs_chart_spider = $show_fbs_chart_spider;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isShowFbsChartLeftRight()
-    {
-        return $this->show_fbs_chart_left_right;
-    }
-
-    /**
-     * @param boolean $show_fbs_chart_left_right
-     */
-    public function setShowFbsChartLeftRight($show_fbs_chart_left_right)
-    {
-        $this->show_fbs_chart_left_right = $show_fbs_chart_left_right;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isOverviewBarShowLabelAsPercentage()
-    {
-        return $this->overview_bar_show_label_as_percentage;
-    }
-
-    /**
-     * @param bool $overview_bar_show_label_as_percentage
-     */
-    public function setOverviewBarShowLabelAsPercentage($overview_bar_show_label_as_percentage)
-    {
-        $this->overview_bar_show_label_as_percentage = $overview_bar_show_label_as_percentage;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockOptionRandomDesc()
-    {
-        return $this->block_option_random_desc;
-    }
-
-    /**
-     * @param string $block_option_random_desc
-     */
-    public function setBlockOptionRandomDesc($block_option_random_desc)
-    {
-        $this->block_option_random_desc = $block_option_random_desc;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShowFbsOverviewText()
-    {
-        return $this->show_fbs_overview_text;
-    }
-
-    /**
-     * @param bool $show_fbs_overview_text
-     */
-    public function setShowFbsOverviewText($show_fbs_overview_text)
-    {
-        $this->show_fbs_overview_text = $show_fbs_overview_text;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShowFbsOverviewStatistics()
-    {
-        return $this->show_fbs_overview_statistics;
-    }
-
-    /**
-     * @param bool $show_fbs_overview_statistics
-     */
-    public function setShowFbsOverviewStatistics($show_fbs_overview_statistics)
-    {
-        $this->show_fbs_overview_statistics = $show_fbs_overview_statistics;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isIdentitySelection()
-    {
-        return $this->identity_selection;
-    }
-
-    /**
-     * @param bool $identity_selection
-     */
-    public function setIdentitySelection($identity_selection)
-    {
-        $this->identity_selection = $identity_selection;
-    }
 }

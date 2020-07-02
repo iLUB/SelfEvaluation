@@ -16,26 +16,25 @@ class MetaBlockTableRow extends BlockTableRow
     {
         parent::__construct($ilCtrl,$plugin,$block);
 
-        $this->setQuestionCount(count($block->getMetaContainer()->ge()));
+        $this->setQuestionCount(count($block->getQuestions()));
         $question_action = $this->getQuestionAction();
         $this->setQuestionsLink($question_action->getLink());
         $this->addAction($question_action);
 
-        $this->setFeedbackCount('-');
         $img_path = ilUtil::getImagePath('icon_ok.svg');
         $this->setStatusImg($img_path);
     }
 
     protected function saveCtrlParameters()
     {
-        $this->ctrl->setParameterByClass('ilSelfEvaluationMetaBlockGUI', 'block_id', $this->getBlockId());
-        $this->ctrl->setParameterByClass('ilSelfEvaluationMetaQuestionGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('MetaBlockGUI', 'block_id', $this->getBlockId());
+        $this->ctrl->setParameterByClass('MetaQuestionGUI', 'block_id', $this->getBlockId());
     }
 
     protected function getQuestionAction() : BlockTableAction
     {
         $title = $this->plugin->txt('edit_questions');
-        $link = $this->ctrl->getLinkTargetByClass('ilSelfEvaluationMetaQuestionGUI', 'listFields');
+        $link = $this->ctrl->getLinkTargetByClass('MetaQuestionGUI', 'listFields');
         $cmd = 'edit_questions';
 
         return new BlockTableAction($title, $cmd, $link);

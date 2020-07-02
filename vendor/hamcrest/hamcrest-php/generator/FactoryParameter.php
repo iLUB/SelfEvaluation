@@ -49,7 +49,6 @@ class FactoryParameter
                 $default = 'array()';
             } else {
                 echo 'Warning: unknown default type for ' . $this->getMethod()->getFullName() . PHP_EOL;
-                var_dump($default);
                 $default = 'null';
             }
             $code .= ' = ' . $default;

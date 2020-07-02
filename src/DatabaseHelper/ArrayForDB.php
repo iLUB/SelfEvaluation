@@ -33,7 +33,22 @@ trait ArrayForDB
         $array = [];
         foreach (get_object_vars($this) as $property => $value) {
             if (!in_array($property, $this->getNonDbFields())) {
-                $array[$property] = [$this->getType($value), $value];
+                if(is_array($value)){
+                    $value = serialize($value);
+                }
+                $array[$property] = [$this->getDBFieldType($value), $value];
+            }
+        }
+
+        return $array;
+    }
+
+    public function getArray() : array
+    {
+        $array = [];
+        foreach (get_object_vars($this) as $property => $value) {
+            if (!in_array($property, $this->getNonDbFields())) {
+                $array[$property] = $value;
             }
         }
 
@@ -56,12 +71,19 @@ trait ArrayForDB
     protected function setObjectValuesFromRecord(hasDBFields $data, stdClass $rec)
     {
         foreach ($data->getArrayForDb() as $k => $v) {
-            $this->{$k} = $rec->{$k};
+            $serialized = unserialize($rec->{$k});
+            if(is_array($serialized)){
+                $this->{$k} = $serialized;
+            }
+            else{
+                $this->{$k} = $rec->{$k};
+            }
+
         }
         return $this;
     }
 
-    protected function getType($var) : string
+    protected function getDBFieldType($var) : string
     {
         switch (gettype($var)) {
             case 'string':

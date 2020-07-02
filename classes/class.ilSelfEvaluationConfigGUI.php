@@ -1,15 +1,6 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
 
-include_once('./Services/Component/classes/class.ilPluginConfigGUI.php');
-require_once('class.ilSelfEvaluationConfig.php');
-require_once('class.ilSelfEvaluationPlugin.php');
-
-/**
- * SelfEvaluation Configuration
- * @author  Alex Killing <alex.killing@gmx.de>
- * @author  Fabian Schmid <fs@studer-raimann.ch>
- * @version $Id$
- */
 class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
 {
     const TYPE_TEXT = 'ilTextInputGUI';
@@ -31,23 +22,34 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
      * @var ilPropertyFormGUI
      */
     protected $form;
+    /**
+     * @var ilCtrl
+     */
+    protected $ctrl;
+    /**
+     * @var ilTemplate
+     */
+    protected $tpl;
+    /**
+     * @var ilTabsGUI
+     */
+    protected $tabs;
+    /**
+     * @var ilSelfEvaluationPlugin
+     */
+    protected $plugin;
 
     function __construct()
     {
-        global $ilCtrl, $tpl, $ilTabs;
-        /**
-         * @var $ilCtrl ilCtrl
-         * @var $tpl    ilTemplate
-         * @var $ilTabs ilTabsGUI
-         */
-        $this->ctrl = $ilCtrl;
-        $this->tpl = $tpl;
-        $this->tabs = $ilTabs;
-        $this->pl = new ilSelfEvaluationPlugin();
-        if ($_GET['rl'] == 'true') {
-            $this->pl->updateLanguages();
-        }
-        $this->object = new ilSelfEvaluationConfig($this->pl->getConfigTableName());
+        global $DIC;
+
+        $this->ctrl = $DIC->ctrl();
+        $this->tpl =  $DIC["tpl"];
+        $this->tabs = $DIC->tabs();
+
+        $this->plugin = new ilSelfEvaluationPlugin();
+
+        $this->object = new ilSelfEvaluationConfig($this->plugin->getConfigTableName());
     }
 
     /**
@@ -56,11 +58,6 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
     public function getFields()
     {
         $this->fields = [
-            'async' => [
-                'type' => self::TYPE_CHECKBOX,
-                'info' => false,
-                'subelements' => null
-            ],
             'identity_selection' => [
                 'type' => self::TYPE_RTE_TEXT_AREA,
                 'info' => true,
@@ -127,12 +124,10 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
      */
     public function initConfigurationForm()
     {
-        global $lng, $ilCtrl;
-        require_once('Services/Form/classes/class.ilPropertyFormGUI.php');
         $this->form = new ilPropertyFormGUI();
         foreach ($this->getFields() as $key => $item) {
             /** @var ilFormPropertyGUI $field */
-            $field = new $item['type']($this->pl->txt($key), $key);
+            $field = new $item['type']($this->plugin->txt($key), $key);
             if ($item['type'] === self::TYPE_RTE_TEXT_AREA) {
                 /** @var ilTextAreaInputGUI $field */
                 $field->setUseRte(true);
@@ -143,31 +138,30 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
                 $field->setRteTagSet('extended_img');
             }
             if ($item['info']) {
-                $field->setInfo($this->pl->txt($key . '_info'));
+                $field->setInfo($this->plugin->txt($key . '_info'));
             }
             if (is_array($item['subelements'])) {
                 /** @var ilSubEnabledFormPropertyGUI $field */
                 foreach ($item['subelements'] as $subkey => $subitem) {
-                    $subfield = new $subitem['type']($this->pl->txt($key . '_' . $subkey), $key . '_' . $subkey);
+                    $subfield = new $subitem['type']($this->plugin->txt($key . '_' . $subkey), $key . '_' . $subkey);
                     if ($subitem['info']) {
                         /** @var ilFormPropertyGUI $subfield */
-                        $subfield->setInfo($this->pl->txt($key . '_info'));
+                        $subfield->setInfo($this->plugin->txt($key . '_info'));
                     }
                     $field->addSubItem($subfield);
                 }
             }
             $this->form->addItem($field);
         }
-        $this->form->addCommandButton('save', $lng->txt('save'));
-        $this->form->setTitle($this->pl->txt('configuration'));
-        $this->form->setFormAction($ilCtrl->getFormAction($this));
+        $this->form->addCommandButton('save', $this->plugin->txt('save'));
+        $this->form->setTitle($this->plugin->txt('configuration'));
+        $this->form->setFormAction($this->ctrl->getFormAction($this));
 
         return $this->form;
     }
 
     public function save()
     {
-        global $tpl, $ilCtrl;
         $this->initConfigurationForm();
         if ($this->form->checkInput()) {
             foreach ($this->getFields() as $key => $item) {
@@ -178,11 +172,11 @@ class ilSelfEvaluationConfigGUI extends ilPluginConfigGUI
                     }
                 }
             }
-            ilUtil::sendSuccess($this->pl->txt('conf_saved'));
-            $ilCtrl->redirect($this, 'configure');
+            ilUtil::sendSuccess($this->plugin->txt('conf_saved'));
+            $this->ctrl->redirect($this, 'configure');
         } else {
             $this->form->setValuesByPost();
-            $tpl->setContent($this->form->getHtml());
+            $this->tpl->setContent($this->form->getHtml());
         }
     }
 }

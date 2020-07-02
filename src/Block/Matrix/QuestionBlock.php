@@ -100,7 +100,15 @@ class QuestionBlock extends Block implements QuestionBlockInterface
         return $this->abbreviation;
     }
 
-    public static function getTableName() : string
+    public function getLabel() : string
+    {
+        if($this->getAbbreviation() != ''){
+            return $this->getAbbreviation();
+        }
+        return $this->getTitle();
+    }
+
+    public static function _getTableName() : string
     {
         return 'rep_robj_xsev_block';
     }
@@ -108,9 +116,17 @@ class QuestionBlock extends Block implements QuestionBlockInterface
     /**
      * @return Question[]
      */
-    public function getQuestions()
+    public function getQuestions() : array
     {
         return (Question::_getAllInstancesForParentId($this->db,$this->getId()));
+    }
+
+    /**
+     * @return Feedback[]
+     */
+    public function getFeedbacks() : array
+    {
+        return (Feedback::_getAllInstancesForParentId($this->db,$this->getId()));
     }
 
     public function getBlockTableRow(ilDBInterface $db,ilCtrl $ilCtrl, ilSelfEvaluationPlugin $plugin) : BlockTableRow

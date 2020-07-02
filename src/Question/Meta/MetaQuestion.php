@@ -1,26 +1,25 @@
 <?php
 namespace ilub\plugin\SelfEvaluation\Question\Meta;
 
-use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
+use ilub\plugin\SelfEvaluation\Question\Question as BaseQuestion;
 use SimpleXMLElement;
-use ilub\plugin\SelfEvaluation\DatabaseHelper\ArrayForDB;
 use ilDBInterface;
 
-class MetaQuestion implements hasDBFields
+class MetaQuestion extends BaseQuestion
 {
-    use ArrayForDB;
-
     const TABLE_NAME = 'rep_robj_xsev_mqst';
 
+    const POSTVAR_PREFIX = 'mqst_';
+
     /**
-     * @var int
+     * @var string
      */
-    protected $id;
+    const PRIMARY_KEY = 'id';
 
     /**
      * @var int
      */
-    protected $container_id;
+    protected $parent_id;
 
     /**
      * @var string
@@ -47,41 +46,17 @@ class MetaQuestion implements hasDBFields
      */
     protected $required;
 
-    /**
-     * @var int
-     */
-    protected $position;
 
-    /**
-     * @var \ilDBInterface
-     */
-    protected $db;
-
-
-    public function __construct(ilDBInterface $db, int $container_id, int $id = 0)
+    public function cloneTo(int $parent_id): BaseQuestion
     {
-
-        $this->db = $db;
-
-        $this->setId($id);
-        $this->setContainerId($container_id);
-
-        if ($this->getId() > 0) {
-            $this->read();
-        }
-    }
-
-    public function cloneTo(ilDBInterface $db, int $parent_id): MetaQuestion
-    {
-        $clone = new self($db, $parent_id);
-        $clone->setContainerId($this->getContainerId());
+        $clone = new self($this->db, $parent_id);
         $clone->setName($this->getName());
         $clone->setShortTitle($this->getShortTitle());
         $clone->setTypeId($this->getTypeId());
         $clone->setValues($this->getValues());
         $clone->enableRequired($this->isRequired());
         $clone->setPosition($this->getPosition());
-        $clone->setContainerId($parent_id);
+        $clone->setParentId($parent_id);
         $clone->update();
         return $clone;
     }
@@ -89,7 +64,7 @@ class MetaQuestion implements hasDBFields
     public function toXml(SimpleXMLElement $xml): SimpleXMLElement
     {
         $child_xml = $xml->addChild("metaQuestion");
-        $child_xml->addAttribute("containerId", $this->getContainerId());
+        $child_xml->addAttribute("containerId", $this->getParentId());
         $child_xml->addAttribute("name", $this->getName());
         $child_xml->addAttribute("shortTitle", $this->getShortTitle());
         $child_xml->addAttribute("typeId", $this->getTypeId());
@@ -102,7 +77,8 @@ class MetaQuestion implements hasDBFields
     public static function fromXml(ilDBInterface $db, int $parent_id, SimpleXMLElement $xml): SimpleXMLElement
     {
         $attributes = $xml->attributes();
-        $question = new self($db, $parent_id);
+        $question = new self($db);
+        $question->setParentId($parent_id);
         $question->setName($attributes["name"]);
         $question->setShortTitle($attributes["shortTitle"]);
         $question->setTypeId((int) $attributes["typeId"]);
@@ -111,84 +87,6 @@ class MetaQuestion implements hasDBFields
         $question->setPosition((int) $attributes["position"]);
         $question->update();
         return $xml;
-    }
-
-    public function initDB()
-    {
-        if (self::TABLE_NAME != '' AND !$this->db->tableExists(self::TABLE_NAME)) {
-            $this->db->createTable(self::TABLE_NAME, $this->getArrayForDbWithAttributes());
-            $this->db->createSequence(self::TABLE_NAME);
-            $this->db->addPrimaryKey(self::TABLE_NAME, ['field_id']);
-        }
-    }
-
-
-    protected function getNextPosition(): int
-    {
-        $stmt = $this->db->query('SELECT MAX(position) next_pos FROM ' .self::TABLE_NAME.
-            ' WHERE container_id = '.$this->getContainerId().';');
-        while ($rec = $this->db->fetchObject($stmt)) {
-            return $rec->next_pos + 1;
-        }
-
-        return 1;
-    }
-
-    public function create()
-    {
-        if ($this->getId() != 0) {
-            $this->update();
-            return;
-        }
-        $this->setId($this->db->nextID(self::TABLE_NAME));
-        $this->setPosition($this->getNextPosition());
-        $this->db->insert(self::TABLE_NAME, $this->getArrayForDb());
-    }
-
-    public function update()
-    {
-        if ($this->getId() == 0) {
-            $this->create();
-            return;
-        }
-        $this->db->update(self::TABLE_NAME, $this->getArrayForDb(), $this->getIdForDb());
-    }
-
-    public function delete()
-    {
-        $stmt = $this->db->prepare('DELETE FROM ' . self::TABLE_NAME . ' WHERE field_id = ?;',
-            ['integer']);
-        $this->db->execute($stmt, [$this->getId()]);
-    }
-
-    protected function read()
-    {
-        $stmt = $this->db->prepare('SELECT * FROM ' . self::TABLE_NAME . ' WHERE field_id = ? ORDER BY position ASC;',
-            ['integer']);
-        $this->db->execute($stmt, [$this->getId()]);
-        $row = $stmt->fetchObject();
-
-        $this->setObjectValuesFromRecord($this,$row);
-    }
-
-    public function setId(int $id)
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setContainerId(int $container_id)
-    {
-        $this->container_id = $container_id;
-    }
-
-    public function getContainerId(): int
-    {
-        return $this->container_id;
     }
 
     public function getTypeId(): int
@@ -204,6 +102,11 @@ class MetaQuestion implements hasDBFields
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getTitle(): string
+    {
+        return $this->getName();
     }
 
     public function setName(string $name)
@@ -241,52 +144,36 @@ class MetaQuestion implements hasDBFields
         $this->required = $status;
     }
 
-    public function setPosition(int $position)
-    {
-        $this->position = $position;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPosition():int
-    {
-        return $this->position;
-    }
-
-    public static function _isObject(ilDBInterface $db, int $field_id)
-    {
-        $set = $db->query('SELECT field_id FROM '.self::TABLE_NAME.' WHERE field_id = '.$field_id);
-
-        while ($rec = $db->fetchObject($set)) {
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * @param ilDBInterface $db
      * @param int           $parent_id
-     * @param bool          $as_array
-     * @return self[]
+     * @return MetaQuestion[]
      */
-    public static function _getAllInstancesForParentId(ilDBInterface $db, int $parent_id, bool $as_array = false) : array
+    public static function _getAllInstancesForParentId(ilDBInterface $db, int $parent_id) : array
     {
-        $query = 'SELECT * FROM '.self::TABLE_NAME.' WHERE container_id = '.$parent_id.' ORDER BY position ASC';
-
-        $set = $db->query($query);
-
-        $return = [];
-
-        while ($rec = $db->fetchObject($set)) {
-            if ($as_array) {
-                $return[$rec->field_id] = (array) new self($db, $parent_id, $rec->field_id);
-            } else {
-                $return[$rec->field_id] = new self($db, $parent_id, $rec->field_id);
-            }
+        $questions = [];
+        $stmt = self::_getAllInstancesForParentIdQuery($db, $parent_id);
+        while ($rec = $db->fetchObject($stmt)) {
+            $question = new self($db);
+            $question->setId($rec->id);
+            $question->setParentId($rec->parent_id);
+            $question->setName($rec->name);
+            $question->setShortTitle($rec->short_title);
+            $question->setTypeId((int)$rec->type_id);
+            $question->setValues(unserialize($rec->values));
+            $question->enableRequired((bool)$rec->required);
+            $question->setPosition((int)$rec->position);
+            $questions[] = $question;
         }
+        return $questions;
+    }
 
-        return $return;
+    public static function _getAllInstancesForParentIdAsArray(ilDBInterface $db, int $parent_id) : array{
+        $questions = [];
+
+        foreach (self::_getAllInstancesForParentId( $db,  $parent_id) as $question){
+            $questions[] = $question->getArray();
+        }
+        return $questions;
     }
 }

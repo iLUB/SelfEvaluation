@@ -7,6 +7,8 @@ use ilub\plugin\SelfEvaluation\DatabaseHelper\hasDBFields;
 use SimpleXMLElement;
 use ilCtrl;
 use ilSelfEvaluationPlugin;
+use ilub\plugin\SelfEvaluation\Question\Question as BaseQuestion;
+use ilub\plugin\SelfEvaluation\Identity\Identity;
 
 abstract class Block implements hasDBFields
 {
@@ -54,43 +56,48 @@ abstract class Block implements hasDBFields
 
     static abstract function fromXml(ilDBInterface $db,int $parent_id, SimpleXMLElement $xml) : SimpleXMLElement;
 
+    /**
+     * @return BaseQuestion[]
+     */
+    abstract public function getQuestions(): array;
+
     public function read()
     {
-        $set = $this->db->query('SELECT * FROM ' . self::getTableName() . ' ' . ' WHERE id = '
+        $set = $this->db->query('SELECT * FROM ' . static::_getTableName() . ' ' . ' WHERE id = '
             . $this->db->quote($this->getId(), 'integer'));
         $this->setObjectValuesFromRecord($this,$this->db->fetchObject($set));
     }
 
-    abstract static public function getTableName() : string;
+    abstract static public function _getTableName() : string;
 
     public function initDB()
     {
-        if (!$this->db->tableExists(self::getTableName())) {
-            $this->db->createTable(self::getTableName(), $this->getArrayForDbWithAttributes());
-            $this->db->addPrimaryKey(self::getTableName(), ['id']);
-            $this->db->createSequence(self::getTableName());
+        if (!$this->db->tableExists(static::_getTableName())) {
+            $this->db->createTable(static::_getTableName(), $this->getArrayForDbWithAttributes());
+            $this->db->addPrimaryKey(static::_getTableName(), ['id']);
+            $this->db->createSequence(static::_getTableName());
         }
     }
 
     final function updateDB()
     {
-        if (!$this->db->tableExists(self::getTableName())) {
+        if (!$this->db->tableExists(static::_getTableName())) {
             $this->initDB();
 
             return;
         }
         foreach ($this->getArrayForDbWithAttributes() as $property => $attributes) {
-            if (!$this->db->tableColumnExists(self::getTableName(), $property)) {
-                $this->db->addTableColumn(self::getTableName(), $property, $attributes);
+            if (!$this->db->tableColumnExists(static::_getTableName(), $property)) {
+                $this->db->addTableColumn(static::_getTableName(), $property, $attributes);
             }
         }
     }
 
     public function create()
     {
-        $this->setId($this->db->nextID(self::getTableName()));
+        $this->setId($this->db->nextID(static::_getTableName()));
         $this->setPosition(BlockFactory::_getNextPositionAcrossBlocks($this->db, $this->getParentId()));
-        $this->db->insert(self::getTableName(), $this->getArrayForDb());
+        $this->db->insert(static::_getTableName(), $this->getArrayForDb());
     }
 
     /**
@@ -99,7 +106,7 @@ abstract class Block implements hasDBFields
     public function delete()
     {
 
-        return $this->db->manipulate('DELETE FROM ' . self::getTableName() . ' WHERE id = '
+        return $this->db->manipulate('DELETE FROM ' . static::_getTableName() . ' WHERE id = '
             . $this->db->quote($this->getId(), 'integer'));
     }
 
@@ -110,18 +117,18 @@ abstract class Block implements hasDBFields
 
             return;
         }
-        $this->db->update(self::getTableName(), $this->getArrayForDb(), $this->getIdForDb());
+        $this->db->update(static::_getTableName(), $this->getArrayForDb(), $this->getIdForDb());
     }
 
     /**
      * @param ilDBInterface $db
      * @param int           $parent_id
-     * @return self[]
+     * @return static[]
      */
     public static function _getAllInstancesByParentId(ilDBInterface $db, int $parent_id)
     {
         $return = [];
-        $set = $db->query('SELECT * FROM ' . static::getTableName() . ' ' . ' WHERE parent_id = '.$parent_id. ' ORDER BY position ASC');
+        $set = $db->query('SELECT * FROM ' . static::_getTableName() . ' ' . ' WHERE parent_id = '.$parent_id. ' ORDER BY position ASC');
         while ($rec = $db->fetchObject($set)) {
             $block = new static($db);
             $block->setObjectValuesFromRecord( $block, $rec);
@@ -131,9 +138,19 @@ abstract class Block implements hasDBFields
         return $return;
     }
 
+    /**
+     * @param ilDBInterface $db
+     * @param int $identity_id
+     * @return static[]
+     */
+    public static function _getAllInstancesByIdentifierId(ilDBInterface $db, int $identity_id)
+    {
+        return self::_getAllInstancesByParentId($db, Identity::_getObjIdForIdentityId($db,$identity_id));
+    }
+
     public function getNextPosition(int $parent_id)
     {
-        $set = $this->db->query('SELECT MAX(position) next_pos FROM ' . self::getTableName() . ' ' . ' WHERE parent_id = '
+        $set = $this->db->query('SELECT MAX(position) next_pos FROM ' . static::_getTableName() . ' ' . ' WHERE parent_id = '
             . $this->db->quote($parent_id, 'integer'));
         while ($rec = $this->db->fetchObject($set)) {
             return $rec->next_pos + 1;

@@ -6,12 +6,8 @@ use ilGlobalTemplateInterface;
 use ilRepositoryObjectPlugin;
 use ilDBInterface;
 use ilFormSectionHeaderGUI;
-use ilMultipleFieldInputGUI;
 
 /**
- * GUI-Class ilSelfEvaluationScaleGUI
- * @author            Fabian Schmid <fabian.schmid@ilub.unibe.ch>
- * @version           $Id:
  * @ilCtrl_Calls      ilSelfEvaluationScaleGUI: ilObjSelfEvaluationGUI
  * @ilCtrl_IsCalledBy ilSelfEvaluationScaleGUI: ilCommonActionDispatcherGUI, ilObjSelfEvaluationGUI
  */
@@ -51,9 +47,9 @@ class ScaleFormGUI extends ilPropertyFormGUI
     protected $parent_id;
 
     public function __construct(
+        ilDBInterface $db,
         ilGlobalTemplateInterface $tpl,
         ilRepositoryObjectPlugin $plugin,
-        ilDBInterface $db,
         $parent_obj_id,
         $locked = false
     ) {
@@ -76,7 +72,7 @@ class ScaleFormGUI extends ilPropertyFormGUI
         $te = new ilFormSectionHeaderGUI();
         $te->setTitle($this->plugin->txt('scale_form'));
         $this->addItem($te);
-        $te = new ilMultipleFieldInputGUI($this->plugin->txt('scale'), 'scale', self::FIELD_NAME);
+        $te = new MultipleFieldInputGUI($this->plugin, $this->plugin->txt('scale'), 'scale', self::FIELD_NAME);
         $te->setPlaceholderValue($this->plugin->txt('multinput_value'));
         $te->setPlaceholderTitle($this->plugin->txt('multinput_title'));
         $te->setDescription($this->plugin->txt('multinput_description'));
@@ -92,7 +88,7 @@ class ScaleFormGUI extends ilPropertyFormGUI
     public function fillForm()
     {
         $array = [];
-        foreach ($this->scale->getUnitsAsRelativeArray() as $unit) {
+        foreach ($this->scale->getUnits() as $unit) {
             /**
              * @var $unit ScaleUnit
              */
@@ -122,7 +118,12 @@ class ScaleFormGUI extends ilPropertyFormGUI
     public function updateObject()
     {
         $this->scale->update();
+
+        if(!is_array($_POST[self::FIELD_NAME . '_position'])){
+            return;
+        }
         $units = [];
+
         $positions = array_flip($_POST[self::FIELD_NAME . '_position']);
         if (is_array($_POST[self::FIELD_NAME . '_new']['value'])) {
             foreach ($_POST[self::FIELD_NAME . '_new']['value'] as $k => $v) {
@@ -139,7 +140,7 @@ class ScaleFormGUI extends ilPropertyFormGUI
         if (is_array($_POST[self::FIELD_NAME . '_old']['value'])) {
             foreach ($_POST[self::FIELD_NAME . '_old']['value'] as $k => $v) {
                 if ($v !== false AND $v !== null AND $v !== '') {
-                    $obj = new ScaleUnit(str_replace('id_', '', $k));
+                    $obj = new ScaleUnit($this->db, str_replace('id_', '', $k));
                     $obj->setTitle($_POST['scale_old']['title'][$k]);
                     $obj->setValue($v);
                     $obj->setPosition($positions[str_replace('id_', '', $k)]);

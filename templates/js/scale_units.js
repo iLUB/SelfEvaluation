@@ -1,5 +1,5 @@
-function scaleUnits() {
-    this.full_unit_titels = new Array();
+(function ($) {
+    this.full_unit_titels = [];
     /** Fix bootstrap naming collision with tooltip in ILIAS 4.3 **/
     il.Tooltip.add = function (el_id, cfg) {
     };
@@ -24,14 +24,14 @@ function scaleUnits() {
                 $(this).text(self.full_unit_titels[id]);
             }
         });
-    }
+    };
 
     this.scaleMatrix = function () {
         $(".matrix-row-input").each(function () {
             parent_object = $(this).parents(".block-question");
             $(this).height(parent_object.children(".question-text").outerHeight());
         });
-    }
+    };
 
     $(window).resize(function () {
         self.updateScaleUnits();
@@ -40,6 +40,7 @@ function scaleUnits() {
     });
 
     $(window).load(function () {
+        console.log("hello Scale units");
         var self = this;
         $(".scale-units td div").each(function () {
             var id = $(this).attr("id");
@@ -49,4 +50,4 @@ function scaleUnits() {
         self.updateScaleUnits();
         self.scaleMatrix();
     });
-}
+})(jQuery);

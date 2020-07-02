@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
 
 class ilSelfEvaluationConfig
 {
@@ -7,12 +8,19 @@ class ilSelfEvaluationConfig
      * @var string
      */
     protected $table_name = '';
+    /**
+     * @var ilDBInterface
+     */
+    protected $db;
 
     /**
      * @param $table_name
      */
     function __construct($table_name)
     {
+        global $DIC;
+
+        $this->db = $DIC->database();
         $this->table_name = $table_name;
     }
 
@@ -58,9 +66,8 @@ class ilSelfEvaluationConfig
      */
     public function setValue($key, $value)
     {
-        global $ilDB;
         if (!is_string($this->getValue($key))) {
-            $ilDB->insert($this->getTableName(), [
+            $this->db->insert($this->getTableName(), [
                 "config_key" => [
                     "text",
                     $key
@@ -71,7 +78,7 @@ class ilSelfEvaluationConfig
                 ]
             ]);
         } else {
-            $ilDB->update($this->getTableName(), [
+            $this->db->update($this->getTableName(), [
                 "config_key" => [
                     "text",
                     $key
@@ -95,13 +102,12 @@ class ilSelfEvaluationConfig
      */
     public function getValue($key)
     {
-        global $ilDB;
-        $result = $ilDB->query("SELECT config_value FROM " . $this->getTableName() . " WHERE config_key = "
-            . $ilDB->quote($key, "text"));
+        $result = $this->db->query("SELECT config_value FROM " . $this->getTableName() . " WHERE config_key = "
+            . $this->db->quote($key, "text"));
         if ($result->numRows() == 0) {
             return false;
         }
-        $record = $ilDB->fetchAssoc($result);
+        $record = $this->db->fetchAssoc($result);
 
         return (string) $record['config_value'];
     }
@@ -124,8 +130,7 @@ class ilSelfEvaluationConfig
      */
     public function initDB()
     {
-        global $ilDB;
-        if (!$ilDB->tableExists($this->getTableName())) {
+        if (!$this->db->tableExists($this->getTableName())) {
             $fields = [
                 'config_key' => [
                     'type' => 'text',
@@ -137,8 +142,8 @@ class ilSelfEvaluationConfig
                     'notnull' => false
                 ],
             ];
-            $ilDB->createTable($this->getTableName(), $fields);
-            $ilDB->addPrimaryKey($this->getTableName(), ["config_key"]);
+            $this->db->createTable($this->getTableName(), $fields);
+            $this->db->addPrimaryKey($this->getTableName(), ["config_key"]);
         }
 
         return true;

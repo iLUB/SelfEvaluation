@@ -3,6 +3,7 @@ namespace ilub\plugin\SelfEvaluation\UIHelper;
 
 use ilSubEnabledFormPropertyGUI;
 use ilRepositoryObjectPlugin;
+use ilTemplate;
 
 class MatrixFieldInputGUI extends ilSubEnabledFormPropertyGUI
 {
@@ -10,7 +11,7 @@ class MatrixFieldInputGUI extends ilSubEnabledFormPropertyGUI
     /**
      * @var string
      */
-    protected $value;
+    protected $value = "";
     /**
      * @var array
      */
@@ -58,6 +59,13 @@ class MatrixFieldInputGUI extends ilSubEnabledFormPropertyGUI
         return $tpl->get();
     }
 
+    public function insert(ilTemplate $a_tpl)
+    {
+        $a_tpl->setCurrentBlock('prop_custom');
+        $a_tpl->setVariable('CUSTOM_CONTENT', $this->getHtml());
+        $a_tpl->parseCurrentBlock();
+    }
+
     /**
      * @param $value array form $value[$postvar] = array(id, array(name, value))
      */
@@ -65,7 +73,7 @@ class MatrixFieldInputGUI extends ilSubEnabledFormPropertyGUI
     {
         foreach ($this->getSubItems() as $item) {
             /**
-             * @var ilMatrixFieldInputGUI $item
+             * @var MatrixFieldInputGUI $item
              */
             $item->setValueByArray($value);
         }

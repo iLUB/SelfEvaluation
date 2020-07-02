@@ -8,6 +8,7 @@ use ilCtrl;
 use ilub\plugin\SelfEvaluation\Identity\Identity;
 use ilObjUser;
 use ilAdvancedSelectionListGUI;
+use DatasetGUI;
 
 class DatasetTableGUI extends ilTable2GUI
 {
@@ -50,8 +51,8 @@ class DatasetTableGUI extends ilTable2GUI
         $this->addColumn($this->plugin->txt('identity'), false, 'auto');
         $this->addColumn($this->plugin->txt('average_all'), false, 'auto');
         $this->addColumn($this->plugin->txt('actions'), false, 'auto');
-        $this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', null);
-        $this->setFormAction($this->ctrl->getFormActionByClass('ilSelfEvaluationDatasetGUI'));
+        $this->ctrl->setParameterByClass('DatasetGUI', 'dataset_id', null);
+        $this->setFormAction($this->ctrl->getFormActionByClass('DatasetGUI'));
         $this->setRowTemplate($this->plugin->getDirectory() . '/templates/default/Dataset/tpl.template_dataset_row.html');
         $this->addMultiCommand("deleteDatasets", $this->plugin->txt("delete_dataset"));
 
@@ -69,11 +70,11 @@ class DatasetTableGUI extends ilTable2GUI
     {
         $obj = new Dataset($this->db, $a_set['id']);
         $identifier = new Identity($this->db, $obj->getIdentifierId());
-        $this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', $obj->getId());
+        $this->ctrl->setParameterByClass('DatasetGUI', 'dataset_id', $obj->getId());
         // Row
         $this->tpl->setVariable("ID", $obj->getId());
         $this->tpl->setVariable('DATE', date('d.m.Y - H:i:s', $obj->getCreationDate()));
-        $this->tpl->setVariable('EDIT_LINK', $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'));
+        $this->tpl->setVariable('EDIT_LINK', $this->ctrl->getLinkTargetByClass('DatasetGUI', 'show'));
         switch ($identifier->getType()) {
             case Identity::TYPE_EXTERNAL:
                 $this->tpl->setVariable('TYPE', $this->plugin->txt('identity_type_'
@@ -93,12 +94,12 @@ class DatasetTableGUI extends ilTable2GUI
         $ac = new ilAdvancedSelectionListGUI();
         $ac->setId('dataset_' . $obj->getId());
         $ac->addItem($this->plugin->txt('show_feedback'), 'show_dataset',
-            $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'show'), true);
+            $this->ctrl->getLinkTargetByClass('DatasetGUI', 'show'), true);
         $ac->addItem($this->plugin->txt('delete_dataset'), 'delete_dataset',
-            $this->ctrl->getLinkTargetByClass('ilSelfEvaluationDatasetGUI', 'deleteDataset'));
+            $this->ctrl->getLinkTargetByClass('DatasetGUI', 'deleteDataset'));
         $ac->setListTitle($this->plugin->txt('actions'));
         //
-        $this->ctrl->setParameterByClass('ilSelfEvaluationDatasetGUI', 'dataset_id', 0);
+        $this->ctrl->setParameterByClass('DatasetGUI', 'dataset_id', 0);
         $this->tpl->setVariable('ACTIONS', $ac->getHTML());
     }
 }

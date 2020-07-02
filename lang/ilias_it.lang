@@ -89,6 +89,16 @@ multinput_title#:#Bezeichnung
 multinput_description#:#Es empfiehlt sich, als ersten numerischen Wert die 0 zu wählen, damit die Einstellungen der Prozentbereiche bei Feedbacktexten mit den Ergebnissen der Selbstevaluation übereinstimmen.
 sort_type#:#Sortierung
 
+field_added#:#Eine neues Datenfeld wurde angelegt.
+confirm_delete#:#'Sind Sie sicher, dass Sie dieses Datenfeld löschen möchten?'
+add_question#:#Neues Datenfeld anlegen
+sorting_saved#:#Reihenfolge gespeichert
+required_field#:#Erforderliche Angabe
+matrix_scale#:#Skala
+matrix_scale_description#:#Skala der Matrixfrage (horizontal)
+matrix_scale_question#:#Fragen
+matrix_scale_question_description#:#Liste mit Fragen (vertikal)
+
 shuffle_in_blocks#:#Fragen pro Block mischen
 no_questions_per_page#:#Anzahl Fragen pro Seite
 
@@ -111,7 +121,8 @@ add_new_meta_block#:#Stammdatenblock hinzufügen
 edit_question#:#Frage bearbeiten
 delete_question#:#Frage löschen
 sorting_saved#:#Reihenfolge gespeichert
-save_sorting#:#Reihenfolge speichern
+save_positions#:#Reihenfolge speichern
+cont_save_positions#:#Reihenfolge speichern
 msg_block_updated#:#Änderungen gespeichert
 msg_question_updated#:#Änderungen gespeichert
 question_table_title#:#Fragen bearbeiten
@@ -209,6 +220,7 @@ configuration#:#Konfiguration
 identity_type_1#:#ILIAS-Benutzer
 identity_type_2#:#Anonym
 identity_type#:#Typ
+type#:#Typ
 dataset_table_title#:#Datensätze
 identity#:#Benutzer-Kennung
 
@@ -236,3 +248,11 @@ ending_date#:#Enddatum
 duration#:#Bearbeitungsdauer (s)
 
 print_pdf#:#Drucken (PDF)
+
+MetaTypeSelect#:#Auswahlliste (feste Werte)
+MetaTypeText#:#Textfeld (beliebige Werte)
+MetaTypeSingleChoice#:#Single Choice Frage
+MatrixQuestion#:#Matrixfrage
+name#:#Name
+value#:#Wert
+matrix_question#:#Question

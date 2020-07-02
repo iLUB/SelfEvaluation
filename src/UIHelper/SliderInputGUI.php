@@ -5,6 +5,7 @@ namespace ilub\plugin\SelfEvaluation\UIHelper;
 use ilSubEnabledFormPropertyGUI;
 use ilGlobalTemplateInterface;
 use ilRepositoryObjectPlugin;
+use ilTemplate;
 
 class SliderInputGUI extends ilSubEnabledFormPropertyGUI
 {
@@ -82,6 +83,13 @@ class SliderInputGUI extends ilSubEnabledFormPropertyGUI
         }
 
         return $tpl->get();
+    }
+
+    public function insert(ilTemplate $a_tpl)
+    {
+        $a_tpl->setCurrentBlock("prop_custom");
+        $a_tpl->setVariable("CUSTOM_CONTENT", $this->getHtml());
+        $a_tpl->parseCurrentBlock();
     }
 
     public function checkInput() : bool
