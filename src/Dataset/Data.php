@@ -118,7 +118,6 @@ class Data implements hasDBFields
         while ($rec = $db->fetchObject($set)) {
             $data = new self($db);
             $data->setObjectValuesFromRecord($data, $rec);
-
             $return[] = $data;
         }
 

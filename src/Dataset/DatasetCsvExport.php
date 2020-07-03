@@ -1,6 +1,7 @@
 <?php
 namespace ilub\plugin\SelfEvaluation\Dataset;
 
+use ilub\plugin\SelfEvaluation\Block\Matrix\QuestionBlock;
 use ilub\plugin\SelfEvaluation\CsvExport\csvExport;
 use ilub\plugin\SelfEvaluation\CsvExport\csvExportRow;
 use ilub\plugin\SelfEvaluation\CsvExport\csvExportValue;
@@ -77,7 +78,8 @@ class DatasetCsvExport extends csvExport
         foreach ($meta_blocks as $meta_block) {
             $this->addMetaQuestions(MetaQuestion::_getAllInstancesForParentId($this->db, $meta_block->getId()));
         }
-        $blocks = MetaBlock::_getAllInstancesByParentId($this->db,$this->getObjectId());
+
+        $blocks = QuestionBlock::_getAllInstancesByParentId($this->db,$this->getObjectId());
         foreach ($blocks as $block) {
             $this->addQuestions(Question::_getAllInstancesForParentId($this->db,$block->getId()));
         }
@@ -92,65 +94,20 @@ class DatasetCsvExport extends csvExport
         $this->getTable()->addColumn(new csvExportColumn("starting_date", $this->pl->txt("starting_date"), -90));
         $this->getTable()->addColumn(new csvExportColumn("ending_date", $this->pl->txt("ending_date"), -80));
         $this->getTable()->addColumn(new csvExportColumn("duration", $this->pl->txt("duration"), -70));
-        $this->getTable()->addColumn(new csvExportColumn("average", $this->pl->txt("overview_statistics_median"), -60));
+        $this->getTable()->addColumn(new csvExportColumn("mean", $this->pl->txt("overview_statistics_median"), -60));
         $this->getTable()->addColumn(new csvExportColumn("max", $this->pl->txt("overview_statistics_max"), -50));
         $this->getTable()->addColumn(new csvExportColumn("min", $this->pl->txt("overview_statistics_min"), -40));
-        $this->getTable()->addColumn(new csvExportColumn("variance", $this->pl->txt("overview_statistics_varianz"),
+        $this->getTable()->addColumn(new csvExportColumn("percentage_variance", $this->pl->txt("overview_statistics_varianz"),
             -30));
-        $this->getTable()->addColumn(new csvExportColumn("sd", $this->pl->txt("overview_statistics_standardabweichung"),
+        $this->getTable()->addColumn(new csvExportColumn("percentage_sd", $this->pl->txt("overview_statistics_standardabweichung"),
             -20));
-        $this->getTable()->addColumn(new csvExportColumn("sd_per_block",
+        $this->getTable()->addColumn(new csvExportColumn("percentage_sd_per_block",
             $this->pl->txt("overview_statistics_standardabweichung_per_plock"), -10));
 
         $this->getTable()->setSortColumn("starting_date");
 
         foreach ($this->getMetaQuestions() as $meta_question) {
-
-            if ($meta_question->getTypeId() == MetaTypeMatrix::TYPE_ID) {
-                $questions = MetaTypeMatrix::getQuestionsFromArray(
-                    $meta_question->getValues());
-                foreach ($questions as $question) {
-                    $this->getTable()->addColumn(
-                        new csvExportColumn(
-                            $question,
-                            $question,
-                            $position
-                        ));
-                    $this->getTable()->addColumn(
-                        new csvExportColumn(
-                            $question . " ID",
-                            $question . " ID",
-                            $position
-                        ));
-                    $position++;
-                }
-
-            } else {
-                if ($meta_question->getShortTitle()) {
-                    $column_name = $meta_question->getShortTitle();
-
-                } else {
-                    $column_name = $meta_question->getName();
-                }
-                $this->getTable()->addColumn(
-                    new csvExportColumn(
-                        $column_name,
-                        $column_name,
-                        $position
-                    ));
-
-                if ($meta_question->getTypeId() == MetaTypeSelect::TYPE_ID ||
-                    $meta_question->getTypeId() == MetaTypeSingleChoice::TYPE_ID) {
-                    $this->getTable()->addColumn(
-                        new csvExportColumn(
-                            $column_name . " ID",
-                            $column_name . " ID",
-                            $position
-                        ));
-                }
-                $position++;
-            }
-
+            $position = $this->setMetaQuestionColumn($meta_question,$position);
         }
 
         foreach ($this->getQuestions() as $question) {
@@ -160,6 +117,88 @@ class DatasetCsvExport extends csvExport
         }
     }
 
+    protected function setMetaQuestionColumn(MetaQuestion $meta_question, int $position):int{
+        if ($meta_question->getTypeId() == MetaTypeMatrix::TYPE_ID) {
+            $questions = MetaTypeMatrix::getQuestionsFromArray(
+                $meta_question->getValues());
+
+            foreach ($questions as $question) {
+                $this->getTable()->addColumn(
+                    new csvExportColumn(
+                        $question,
+                        $question,
+                        $position
+                    ));
+                $this->getTable()->addColumn(
+                    new csvExportColumn(
+                        $question . " ID",
+                        $question . " ID",
+                        $position
+                    ));
+                $position++;
+            }
+
+        } else {
+            if ($meta_question->getShortTitle()) {
+                $column_name = $meta_question->getShortTitle();
+
+            } else {
+                $column_name = $meta_question->getName();
+            }
+            $this->getTable()->addColumn(
+                new csvExportColumn(
+                    $column_name,
+                    $column_name,
+                    $position
+                ));
+
+            if ($meta_question->getTypeId() == MetaTypeSelect::TYPE_ID ||
+                $meta_question->getTypeId() == MetaTypeSingleChoice::TYPE_ID) {
+                $this->getTable()->addColumn(
+                    new csvExportColumn(
+                        $column_name . " ID",
+                        $column_name . " ID",
+                        $position
+                    ));
+            }
+            $position++;
+        }
+        return $position;
+    }
+
+
+
+    protected function setRows()
+    {
+        foreach ($this->getDatasets() as $dataset) {
+            $row = new csvExportRow();
+            $row->addValue($this->getIdentity($dataset));
+            $values = $this->getDateValues($dataset);
+            foreach ($values as $value) {
+                $row->addValue($value);
+            }
+            $values = $this->getStatisticValues($dataset);
+            foreach ($values as $value) {
+                $row->addValue($value);
+            }
+            $entries = Data::_getAllInstancesByDatasetId($this->db,$dataset->getId());
+            foreach ($entries as $entry) {
+                if ($this->getMetaQuestion($entry->getQuestionId())) {
+                    $meta_question = $this->getMetaQuestion($entry->getQuestionId());
+                    $values = $this->getMetaQuestionValues($row, $entry,
+                        $meta_question);
+                    foreach ($values as $value) {
+                        $row->addValue($value);
+                    }
+                }
+                else if($this->getQuestion($entry->getQuestionId())) {
+                    $row->addValue($this->getQuestionValues($row, $entry));
+                }
+            }
+            $this->getTable()->addRow($row);
+
+        }
+    }
     protected function getIdentity(Dataset $dataset) : csvExportValue
     {
         $identifier = new Identity($this->db,$dataset->getIdentifierId());
@@ -219,7 +258,8 @@ class DatasetCsvExport extends csvExport
             $statistics_sd_per_block .= $dataset->getBlockById($key)->getTitle() . ": " . $sd . "; ";
         }
 
-        $meta_csv_values[] = new csvExportValue("mean", $dataset->getOverallPercentage());
+
+        $meta_csv_values[] = new csvExportValue("mean", $dataset->getOverallPercentage(). "%");
         $meta_csv_values[] = new csvExportValue("max", $max_block->getTitle() . ": " .$max_percentage . "%");
         $meta_csv_values[] = new csvExportValue("min", $min_block->getTitle() . ": " . $min_percentage . "%");
         $meta_csv_values[] = new csvExportValue("percentage_variance", $dataset->getOverallPercentageVarianz());
@@ -228,6 +268,7 @@ class DatasetCsvExport extends csvExport
 
         return $meta_csv_values;
     }
+
 
     protected function getQuestionValues($row, Data $entry)
     {
@@ -315,46 +356,9 @@ class DatasetCsvExport extends csvExport
         return $meta_csv_values;
     }
 
-    protected function getMetaQuestionValueForSelections()
-    {
-
-    }
-
-    protected function setRows()
-    {
-        foreach ($this->getDatasets() as $dataset) {
-            $row = new csvExportRow();
-            $row->addValue($this->getIdentity($dataset));
-            $values = $this->getDateValues($dataset);
-            foreach ($values as $value) {
-                $row->addValue($value);
-            }
-            $values = $this->getStatisticValues($dataset);
-            foreach ($values as $value) {
-                $row->addValue($value);
-            }
-            $entries = Data::_getAllInstancesByDatasetId($this->db,$dataset->getId());
-            foreach ($entries as $entry) {
-                if ($this->getMetaQuestion($entry->getQuestionId())) {
-                    $meta_question = $this->getMetaQuestion($entry->getQuestionId());
-                    $values = $this->getMetaQuestionValues($row, $entry,
-                        $meta_question);
-                    foreach ($values as $value) {
-                        $row->addValue($value);
-                    }
-                }
-                else if($this->getQuestion($entry->getQuestionId())) {
-                    $row->addValue($this->getQuestionValues($row, $entry));
-                }
-            }
-            $this->getTable()->addRow($row);
-
-        }
-    }
-
     protected function getTitleForQuestion(Question $question) : string
     {
-        $block = new Question($this->db, $question->getParentId());
+        $block = new QuestionBlock($this->db, $question->getParentId());
         $title = $question->getTitle() ? $question->getTitle() : $this->pl->txt('question') . ' ' . $block->getPosition() . '.' . $question->getPosition();
         return $title;
     }
@@ -396,7 +400,7 @@ class DatasetCsvExport extends csvExport
     /**
      * @param MetaQuestion[] $meta_questions
      */
-    public function addMetaQuestions($meta_questions)
+    public function addMetaQuestions(array $meta_questions)
     {
         $this->meta_questions = $this->meta_questions + $meta_questions;
     }

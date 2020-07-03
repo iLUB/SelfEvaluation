@@ -18,44 +18,28 @@ class csvExportValue
      */
     protected $value = "";
 
-    /**
-     * @param string $column_name
-     * @param string $value
-     */
-    function __construct($column_name, $value)
+    function __construct(string $column_name, string $value)
     {
         $this->column = new csvExportColumn($column_name);
         $this->value = $value;
     }
 
-    /**
-     * @param csvExportColumn $column
-     */
-    public function setColumn($column)
+    public function setColumn(csvExportColumn $column)
     {
         $this->column = $column;
     }
 
-    /**
-     * @return csvExportColumn
-     */
-    public function getColumn()
+    public function getColumn(): csvExportColumn
     {
         return $this->column;
     }
 
-    /**
-     * @param string $value
-     */
-    public function setValue($value)
+    public function setValue(string $value)
     {
         $this->value = $value;
     }
 
-    /**
-     * @return string
-     */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }

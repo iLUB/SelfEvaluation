@@ -170,9 +170,9 @@ block_overview_title#:#Übersicht
 overview_statistics_median#:#Arithmetisches Mittel über alle Fragenblöcke hinweg:
 overview_statistics_max#:#Höchste Einschätzung Frageblock
 overview_statistics_min#:#Tiefste Einschätzung Frageblock
-overview_statistics_varianz#:#Varianz (n)
-overview_statistics_standardabweichung_per_plock#:#Standardabweichung (n) pro Block in % (siehe Säulendiagramm)
-overview_statistics_standardabweichung#:#Standardabweichung (n) in %
+overview_statistics_varianz#:#Varianz (n) der Werte in %
+overview_statistics_standardabweichung_per_plock#:#Standardabweichung (n) pro Block der Werte in % (siehe Säulendiagramm)
+overview_statistics_standardabweichung#:#Standardabweichung (n) pro Block der Werte in %
 fb_title#:#Titel
 fb_body#:#Feedback
 fb_start#:#Ab
