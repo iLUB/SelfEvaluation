@@ -159,7 +159,7 @@ abstract class iLubFieldDefinitionContainerGUI {
 	protected function confirmDeleteFields() {
 		global $lng;
 		$field_id = $_GET['field_id'];
-		if (! count($field_id)) {
+		if ( !empty($field_id)) {
 			ilUtil::sendFailure($lng->txt('select_one'));
 			$this->listFields();
 
