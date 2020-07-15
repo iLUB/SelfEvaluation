@@ -118,13 +118,15 @@ class ScaleFormGUI extends ilPropertyFormGUI
     public function updateObject()
     {
         $this->scale->update();
+        if (!is_array($_POST[self::FIELD_NAME . '_new'])) {
 
-        if(!is_array($_POST[self::FIELD_NAME . '_position'])){
             return;
         }
         $units = [];
 
-        $positions = array_flip($_POST[self::FIELD_NAME . '_position']);
+        if (is_array($_POST[self::FIELD_NAME . '_position'])) {
+            $positions = array_flip($_POST[self::FIELD_NAME . '_position']);
+        }
         if (is_array($_POST[self::FIELD_NAME . '_new']['value'])) {
             foreach ($_POST[self::FIELD_NAME . '_new']['value'] as $k => $v) {
                 if ($v !== false AND $v !== null AND $v !== '') {
@@ -146,8 +148,9 @@ class ScaleFormGUI extends ilPropertyFormGUI
                     $obj->setPosition($positions[str_replace('id_', '', $k)]);
                     $obj->update();
                     $units[] = $obj;
+
                 } else {
-                    $obj = new ScaleUnit(str_replace('id_', '', $k));
+                    $obj = new ScaleUnit($this->db, str_replace('id_', '', $k));
                     $obj->delete();
                 }
             }
