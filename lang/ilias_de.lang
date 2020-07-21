@@ -181,6 +181,7 @@ warning_overlap#:#Die eingegeben Werte überschneiden sich mit einem anderen Fee
 feedback_complete#:#Dieser Feedback-Block ist bereits komplett (100%). Es können keine weiteren Feedbacks hinzugefügt werden.
 qst_delete_feedback#:#Möchten Sie das folgende Feedback wirklich löschen?
 msg_feedback_deleted#:#Das Feedback wurde gelöscht
+msg_no_feedback_selected#:#Es wurde kein Feedback ausgewählt.
 delete_feedback#:#Feedback löschen
 slider#:#Prozentbereich
 start_new_button#:#Neuen Durchgang starten

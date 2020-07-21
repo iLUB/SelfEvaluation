@@ -309,10 +309,16 @@ class FeedbackGUI
 
     protected function deleteFeedbacks()
     {
-        $this->deleteFeedbacksConfirmation($_POST["id"]);
+        $ids = $_POST["id"];
+        if(!is_array($ids)){
+            ilUtil::sendFailure($this->plugin->txt('msg_no_feedback_selected'));
+            $this->listObjects();
+            return;
+        }
+        $this->deleteFeedbacksConfirmation($ids);
     }
 
-    protected function deleteFeedbacksConfirmation($ids = [])
+    protected function deleteFeedbacksConfirmation(array $ids = [])
     {
         ilUtil::sendQuestion($this->plugin->txt('qst_delete_feedback'));
         $conf = new ilConfirmationGUI();

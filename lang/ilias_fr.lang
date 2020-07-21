@@ -170,9 +170,9 @@ block_overview_title#:#Übersicht
 overview_statistics_median#:#Arithmetisches Mittel über alle Fragenblöcke hinweg:
 overview_statistics_max#:#Höchste Einschätzung Frageblock
 overview_statistics_min#:#Tiefste Einschätzung Frageblock
-overview_statistics_varianz#:#Varianz (n)
-overview_statistics_standardabweichung_per_plock#:#Standardabweichung (n) pro Block in % (siehe Säulendiagramm)
-overview_statistics_standardabweichung#:#Standardabweichung (n) in %
+overview_statistics_varianz#:#Varianz (n) der Werte in %
+overview_statistics_standardabweichung_per_plock#:#Standardabweichung (n) pro Block der Werte in % (siehe Säulendiagramm)
+overview_statistics_standardabweichung#:#Standardabweichung (n) pro Block der Werte in %
 fb_title#:#Titel
 fb_body#:#Feedback
 fb_start#:#Ab
@@ -181,6 +181,7 @@ warning_overlap#:#Die eingegeben Werte überschneiden sich mit einem anderen Fee
 feedback_complete#:#Dieser Feedback-Block ist bereits komplett (100%). Es können keine weiteren Feedbacks hinzugefügt werden.
 qst_delete_feedback#:#Möchten Sie das folgende Feedback wirklich löschen?
 msg_feedback_deleted#:#Das Feedback wurde gelöscht
+msg_no_feedback_selected#:#Es wurde kein Feedback ausgewählt.
 delete_feedback#:#Feedback löschen
 slider#:#Prozentbereich
 start_new_button#:#Neuen Durchgang starten
@@ -256,3 +257,6 @@ MatrixQuestion#:#Matrixfrage
 name#:#Name
 value#:#Wert
 matrix_question#:#Question
+select_one#:#Bitte treffen Sie eine Auswahl
+msg_invalid_post_input#:#Dieses Feld muss ausgefüllt werden. Bitte geben Sie etwas ein.
+msg_input_is_required#:#Dieses Feld muss ausgefüllt werden. Bitte geben Sie etwas ein.
