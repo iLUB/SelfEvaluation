@@ -15,7 +15,7 @@ use ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion;
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: ilPermissionGUI, ilInfoScreenGUI, ilObjectCopyGUI, ilCommonActionDispatcherGUI, ilExportGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: PlayerGUI, QuestionGUI, ListBlocksGUI
  * @ilCtrl_Calls      ilObjSelfEvaluationGUI: DatasetGUI, FeedbackGUI, QuestionBlockGUI, MetaBlockGUI
- * @ilCtrl_Calls      ilObjSelfEvaluationGUI: MetaQuestionGUI
+ * @ilCtrl_Calls      ilObjSelfEvaluationGUI: MetaQuestionGUI, IdentityGUI
  */
 class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
 {
@@ -162,6 +162,10 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
                     $gui = new FeedbackGUI($this->db, $this, $this->tpl, $this->ctrl, $this->toolbar,
                         $this->access, $this->plugin);
                     $this->tabs->activateTab('administration');
+                    $this->ctrl->forwardCommand($gui);
+                    break;
+                case 'identitygui':
+                    $gui = new IdentityGUI($this->db, $this, $this->tpl, $this->ctrl, $this->plugin);
                     $this->ctrl->forwardCommand($gui);
                     break;
                 case 'ilexportgui':

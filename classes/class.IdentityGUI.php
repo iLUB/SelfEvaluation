@@ -1,17 +1,6 @@
 <?php
 
-namespace ilub\plugin\SelfEvaluation\Identity;
-
-use ilAccordionGUI;
-use ilPropertyFormGUI;
-use ilObjSelfEvaluationGUI;
-use ilGlobalPageTemplate;
-use ilSelfEvaluationPlugin;
-use ilCtrl;
-use ilTextInputGUI;
-use ilNonEditableValueGUI;
-use ilUtil;
-use ilDBInterface;
+use ilub\plugin\SelfEvaluation\Identity\Identity;
 
 class IdentityGUI
 {
@@ -50,11 +39,11 @@ class IdentityGUI
     protected $parent;
 
     function __construct(
+        ilDBInterface $db,
         ilObjSelfEvaluationGUI $parent,
         ilGlobalPageTemplate $tpl,
         ilCtrl $ilCtrl,
-        ilSelfEvaluationPlugin $plugin,
-        ilDBInterface $db
+        ilSelfEvaluationPlugin $plugin
     ) {
         $this->tpl = $tpl;
         $this->ctrl = $ilCtrl;
@@ -138,8 +127,8 @@ class IdentityGUI
             if (Identity::_identityExists($this->db, $this->parent->object->getId(), $identifier)) {
                 $id = Identity::_getInstanceForObjIdAndIdentifier($this->db, $this->parent->object->getId(),
                     $identifier);
-                $this->ctrl->setParameterByClass('PresentationGUI', 'uid', $id->getId());
-                $this->ctrl->redirectByClass('PresentationGUI', 'startScreen');
+                $this->ctrl->setParameterByClass('PlayerGUI', 'uid', $id->getId());
+                $this->ctrl->redirectByClass('PlayerGUI', 'startScreen');
             } else {
                 ilUtil::sendFailure($this->plugin->txt('uid_not_exists'), true);
                 $this->ctrl->redirect($this, 'show');
@@ -152,8 +141,8 @@ class IdentityGUI
     public function startWithNewUid()
     {
         $id = Identity::_getNewHashInstanceForObjId($this->db, $this->parent->object->getId());
-        $this->ctrl->setParameterByClass('PresentationGUI', 'uid', $id->getId());
-        $this->ctrl->redirectByClass('PresentationGUI', 'startScreen');
+        $this->ctrl->setParameterByClass('PlayerGUI', 'uid', $id->getId());
+        $this->ctrl->redirectByClass('PlayerGUI', 'startScreen');
     }
 
     public function cancel()
