@@ -792,31 +792,31 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         while ($rec = $this->db->fetchObject($set)) {
             $this->setOnline($rec->is_online);
             $this->setIdentitySelection((bool)$rec->identity_selection);
-            $this->setEvaluationType($rec->evaluation_type);
-            $this->setSortType($rec->sort_type);
-            $this->setDisplayType($rec->display_type);
-            $this->setIntro($rec->intro);
-            $this->setOutro($rec->outro);
-            $this->setOutroTitle($rec->outro_title);
-            $this->setIdentitySelectionInfoText($rec->identity_selection_info);
-            $this->setShowFeedbacks($rec->show_fbs);
-            $this->setShowFeedbacksCharts($rec->show_fbs_charts);
-            $this->setShowFeedbacksOverview($rec->show_fbs_overview);
-            $this->setShowFbsOverviewText($rec->show_fbs_overview_text);
-            $this->setShowFbsOverviewStatistics($rec->show_fbs_overview_statistics);
-            $this->setShowBlockTitlesDuringEvaluation($rec->show_block_titles_sev);
-            $this->setShowBlockDescriptionsDuringEvaluation($rec->show_block_desc_sev);
-            $this->setShowBlockTitlesDuringFeedback($rec->show_block_titles_fb);
-            $this->setShowBlockDescriptionsDuringFeedback($rec->show_block_desc_fb);
-            $this->setSortRandomNrItemBlock($rec->sort_random_nr_items_block);
-            $this->setBlockOptionRandomDesc($rec->block_option_random_desc);
-            $this->setShowFbsOverviewBar($rec->show_fbs_overview_bar);
-            $this->setOverviewBarShowLabelAsPercentage($rec->bar_show_label_as_percentage);
-            $this->setShowFbsOverviewSpider($rec->show_fbs_overview_spider);
-            $this->setShowFbsOverviewLeftRight($rec->show_fbs_overview_left_right);
-            $this->setShowFbsChartBar($rec->show_fbs_chart_bar);
-            $this->setShowFbsChartSpider($rec->show_fbs_chart_spider);
-            $this->setShowFbsChartLeftRight($rec->show_fbs_chart_left_right);
+            $this->setEvaluationType((int)$rec->evaluation_type);
+            $this->setSortType((int)$rec->sort_type);
+            $this->setDisplayType((int)$rec->display_type);
+            $this->setIntro((string)$rec->intro);
+            $this->setOutro((string)$rec->outro);
+            $this->setOutroTitle((string)$rec->outro_title);
+            $this->setIdentitySelectionInfoText((string)$rec->identity_selection_info);
+            $this->setShowFeedbacks((bool)$rec->show_fbs);
+            $this->setShowFeedbacksCharts((bool)$rec->show_fbs_charts);
+            $this->setShowFeedbacksOverview((bool)$rec->show_fbs_overview);
+            $this->setShowFbsOverviewText((bool)$rec->show_fbs_overview_text);
+            $this->setShowFbsOverviewStatistics((bool)$rec->show_fbs_overview_statistics);
+            $this->setShowBlockTitlesDuringEvaluation((bool)$rec->show_block_titles_sev);
+            $this->setShowBlockDescriptionsDuringEvaluation((bool)$rec->show_block_desc_sev);
+            $this->setShowBlockTitlesDuringFeedback((bool)$rec->show_block_titles_fb);
+            $this->setShowBlockDescriptionsDuringFeedback((bool)$rec->show_block_desc_fb);
+            $this->setSortRandomNrItemBlock((int)$rec->sort_random_nr_items_block);
+            $this->setBlockOptionRandomDesc((string)$rec->block_option_random_desc);
+            $this->setShowFbsOverviewBar((bool)$rec->show_fbs_overview_bar);
+            $this->setOverviewBarShowLabelAsPercentage((bool)$rec->bar_show_label_as_percentage);
+            $this->setShowFbsOverviewSpider((bool)$rec->show_fbs_overview_spider);
+            $this->setShowFbsOverviewLeftRight((bool)$rec->show_fbs_overview_left_right);
+            $this->setShowFbsChartBar((bool)$rec->show_fbs_chart_bar);
+            $this->setShowFbsChartSpider((bool)$rec->show_fbs_chart_spider);
+            $this->setShowFbsChartLeftRight((bool)$rec->show_fbs_chart_left_right);
 
         }
     }
