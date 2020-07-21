@@ -791,7 +791,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
             . $this->db->quote($this->getId(), 'integer'));
         while ($rec = $this->db->fetchObject($set)) {
             $this->setOnline($rec->is_online);
-            $this->setIdentitySelection($rec->identity_selection);
+            $this->setIdentitySelection((bool)$rec->identity_selection);
             $this->setEvaluationType($rec->evaluation_type);
             $this->setSortType($rec->sort_type);
             $this->setDisplayType($rec->display_type);
