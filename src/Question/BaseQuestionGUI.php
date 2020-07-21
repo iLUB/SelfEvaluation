@@ -221,7 +221,12 @@ abstract class BaseQuestionGUI
         $conf->setFormAction($this->ctrl->getFormAction($this));
         $conf->setCancel($this->plugin->txt('cancel'), 'cancel');
         $conf->setConfirm($this->plugin->txt('delete_question'), 'deleteQuestion');
-        $conf->addItem('question_id', $this->question->getId(), $this->question->getTitle());
+        $title = $this->question->getTitle();
+        if($title == ""){
+           $title = $this->plugin->txt('question') . ' ' . $this->block->getPosition() . '.' . $this->question->getPosition();
+        }
+
+        $conf->addItem('question_id', $this->question->getId(), $title);
         $this->tpl->setContent($conf->getHTML());
     }
 
