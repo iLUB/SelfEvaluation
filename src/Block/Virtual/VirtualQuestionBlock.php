@@ -3,8 +3,9 @@ namespace ilub\plugin\SelfEvaluation\Block\Virtual;
 
 use ilub\plugin\SelfEvaluation\Block\Matrix\QuestionBlockInterface;
 use ilub\plugin\SelfEvaluation\Question\Matrix\Question;
+use ilub\plugin\SelfEvaluation\Block\BlockType;
 
-class VirtualQuestionBlock implements QuestionBlockInterface
+class VirtualQuestionBlock implements QuestionBlockInterface, BlockType
 {
 
     /**

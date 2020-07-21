@@ -55,6 +55,20 @@ trait ArrayForDB
         return $array;
     }
 
+    public function fromArray(array $array) : self
+    {
+        foreach ($array as $k => $v) {
+            $serialized = unserialize($v);
+            if(is_array($serialized)){
+                $this->{$k} = $serialized;
+            }
+            else{
+                $this->{$k} = $v;
+            }
+        }
+        return $this;
+    }
+
     protected function getIdForDb() : array
     {
         return ['id' => ['integer', $this->getId()]];

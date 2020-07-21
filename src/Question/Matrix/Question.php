@@ -6,7 +6,7 @@ use ilub\plugin\SelfEvaluation\Question\Question as BaseQuestion;
 use SimpleXMLElement;
 use ilDBInterface;
 
-class Question extends BaseQuestion
+class Question extends BaseQuestion implements \Serializable
 {
     const TABLE_NAME = 'rep_robj_xsev_qst';
 
@@ -145,5 +145,13 @@ class Question extends BaseQuestion
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    public function serialize(){
+        return serialize($this->getArray());
+    }
+
+    public function unserialize($serialized){
+        return $this->fromArray(unserialize($serialized));
     }
 }

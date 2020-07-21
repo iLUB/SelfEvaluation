@@ -10,7 +10,7 @@ use ilSelfEvaluationPlugin;
 use ilub\plugin\SelfEvaluation\Question\Question as BaseQuestion;
 use ilub\plugin\SelfEvaluation\Identity\Identity;
 
-abstract class Block implements hasDBFields
+abstract class Block implements hasDBFields, BlockType
 {
     use ArrayForDB;
 

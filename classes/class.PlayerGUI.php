@@ -5,7 +5,6 @@ use ilub\plugin\SelfEvaluation\Block\Block;
 use ilub\plugin\SelfEvaluation\Dataset\Dataset;
 use ilub\plugin\SelfEvaluation\Identity\Identity;
 use ilub\plugin\SelfEvaluation\Dataset\Data;
-use ilub\plugin\SelfEvaluation\Question\Question;
 use ilub\plugin\SelfEvaluation\Question\Matrix\Question as MatrixQuestion;
 use ilub\plugin\SelfEvaluation\Block\BlockFactory;
 use ilub\plugin\SelfEvaluation\Block\Virtual\VirtualQuestionBlock;
@@ -241,7 +240,7 @@ class PlayerGUI
                 }
             } else {
                 $meta_block_beginning = false;
-                foreach (Question::_getAllInstancesForParentId($this->db, $block->getId()) as $question) {
+                foreach (MatrixQuestion::_getAllInstancesForParentId($this->db, $block->getId()) as $question) {
                     $questions[] = $question;
                 }
             }
@@ -306,6 +305,7 @@ class PlayerGUI
     protected function addBlockHtmlToForm($block)
     {
         $gui_class = "";
+
         switch (get_class($block)) {
             case QuestionBlock::class:
             case VirtualQuestionBlock::class:

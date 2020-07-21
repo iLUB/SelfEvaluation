@@ -8,6 +8,7 @@ use ilub\plugin\SelfEvaluation\UIHelper\FormSectionHeaderGUIFixed;
 use ilub\plugin\SelfEvaluation\Player\PlayerFormContainer;
 use ilDBInterface;
 use ilSelfEvaluationPlugin;
+use ilub\plugin\SelfEvaluation\Block\BlockType;
 
 abstract class BlockPlayerGUI
 {
@@ -31,7 +32,7 @@ abstract class BlockPlayerGUI
      */
     protected $plugin;
 
-    function __construct(ilDBInterface $db,ilSelfEvaluationPlugin $plugin, ilObjSelfEvaluationGUI $parent, Block $block)
+    function __construct(ilDBInterface $db,ilSelfEvaluationPlugin $plugin, ilObjSelfEvaluationGUI $parent, BlockType $block)
     {
         $this->db = $db;
         $this->block = $block;
