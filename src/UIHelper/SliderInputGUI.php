@@ -120,7 +120,7 @@ class SliderInputGUI extends ilSubEnabledFormPropertyGUI
              */
             $item->setValueByArray($array);
         }
-        $this->setValues($array[$this->getPostVar()]);
+        $this->setValues((array)$array[$this->getPostVar()]);
     }
 
     public function setValues(array $values)
