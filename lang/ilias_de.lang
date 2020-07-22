@@ -91,7 +91,7 @@ sort_type#:#Sortierung
 
 field_added#:#Eine neues Datenfeld wurde angelegt.
 confirm_delete#:#'Sind Sie sicher, dass Sie dieses Datenfeld löschen möchten?'
-add_question#:#Neues Datenfeld anlegen
+add_question#:#Frage hinzufügen
 sorting_saved#:#Reihenfolge gespeichert
 required_field#:#Erforderliche Angabe
 matrix_scale#:#Skala
