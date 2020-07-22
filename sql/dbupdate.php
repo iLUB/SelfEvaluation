@@ -69,6 +69,11 @@ $id->initDB();
 $id = new \ilub\plugin\SelfEvaluation\Feedback\Feedback($this->db);
 $id->initDB();
 
+$mq = new \ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion($this->db);
+$mq->initDB();
+
+$q = new \ilub\plugin\SelfEvaluation\Question\Matrix\Question($this->db);
+$q->initDB();
 ?>
 <#4>
 <?php
@@ -210,18 +215,18 @@ if ($this->db->tableExists(\ilub\plugin\SelfEvaluation\Dataset\Data::TABLE_NAME)
 <?php
 
 
-if ($this->db->tableExists(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME)) {
 
-    if (!$this->db->tableColumnExists(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME,
-        'short_title')) {
-        $field = [
-            'type' => 'text',
-            'length' => 1024,
-            'notnull' => true
-        ];
-        $this->db->addTableColumn(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME, 'short_title', $field);
-    }
+
+if (!$this->db->tableColumnExists(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME,
+    'short_title')) {
+    $field = [
+        'type' => 'text',
+        'length' => 1024,
+        'notnull' => true
+    ];
+    $this->db->addTableColumn(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME, 'short_title', $field);
 }
+
 ?>
 <#14>
 <?php
@@ -382,7 +387,7 @@ foreach ($overall_feedbacks as $overall_feedback) {
 <#24>
 <?php
 if (!$this->db->indexExistsByFields('rep_robj_xsev_d', ['i2'])) {
-    $this->db->addIndex('rep_robj_xsev_d', ['dataset_id', 'question_id', 'question_type'], 'i2');
+    //$this->db->addIndex('rep_robj_xsev_d', ['dataset_id', 'question_id', 'question_type'], 'i2');
 }
 ?>
 <#25>
