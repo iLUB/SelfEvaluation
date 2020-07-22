@@ -160,7 +160,7 @@ class MetaQuestion extends BaseQuestion
             $question->setName($rec->name);
             $question->setShortTitle($rec->short_title);
             $question->setTypeId((int)$rec->type_id);
-            $question->setValues(unserialize($rec->values));
+            $question->setValues((array)unserialize($rec->values));
             $question->enableRequired((bool)$rec->required);
             $question->setPosition((int)$rec->position);
             $questions[$question->getId()] = $question;
