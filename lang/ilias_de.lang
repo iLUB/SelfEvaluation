@@ -143,6 +143,7 @@ not_active#:#Die Selbstevaluation kann nicht gestartet werden, da sie noch keine
 count_questions#:#Anzahl Fragen
 is_inverted#:#Umgekehrte Skala
 outro_header#:#Selbstevaluation beendet
+save_sorting#:#Sortierung speichern
 
 scale_cannot_be_edited#:#Diese Selbstevaluation enthält bereits Datensätze von Nutzern, daher kann die Skalierung nicht mehr verändert werden. Änderungen an der Selbstevaluation können unerwartete Auswirkungen auf vorhandene Resultate haben.
 msg_has_datasets#:#Diese Selbstevaluation enthält bereits Datensätze von Nutzern. Fragen sollten daher nicht mehr verändert werden.
