@@ -194,10 +194,10 @@ abstract class BaseQuestionGUI
 
     protected function createQuestion()
     {
-        $this->updateQuestion("msg_question_added");
+        $this->updateQuestion();
     }
 
-    protected function updateQuestion(string $message = "msg_question_updated")
+    protected function updateQuestion()
     {
         $this->initQuestionForm();
         $this->form->setValuesByPost();

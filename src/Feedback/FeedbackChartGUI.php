@@ -197,6 +197,9 @@ class FeedbackChartGUI
         if ($this->showAnyFeedback()) {
             $percentage = $dataset->getPercentageForBlock($block->getId());
             $feedback = Feedback::_getFeedbackForPercentage($this->db,$block->getId(),$percentage);
+            if(!$feedback){
+                return;
+            }
             $tpl->setCurrentBlock('feedback');
             $tpl->setVariable('FEEDBACK_ID', 'xsev_fb_id_' . $feedback->getId());
 

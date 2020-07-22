@@ -17,7 +17,7 @@ trait ArrayForDB
                     $attributes['length'] = 4;
                     break;
                 case 'text':
-                    $attributes['length'] = 1024;
+                    $attributes['length'] = 4096;
                     break;
             }
             if ($property == 'id') {

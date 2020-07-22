@@ -879,7 +879,7 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         $xml->addAttribute("showFeedbacks", $this->isShowFeedbacks());
         $xml->addAttribute("showFeedbacksCharts", $this->isShowFeedbacksCharts());
         $xml->addAttribute("showFeedbacksOverview", $this->isShowFeedbacksOverview());
-        $xml->addAttribute("showFbsOverviewStatistics", $this->isShowFeedbacksOverview());
+        $xml->addAttribute("showFbsOverviewStatistics", $this->isShowFbsOverviewStatistics());
         $xml->addAttribute("showBlockTitlesDuringEvaluation", $this->isShowBlockTitlesDuringEvaluation());
         $xml->addAttribute("showBlockDescriptionsDuringEvaluation", $this->isShowBlockDescriptionsDuringEvaluation());
         $xml->addAttribute("showBlockTitlesDuringFeedback", $this->isShowBlockTitlesDuringFeedback());
@@ -942,8 +942,8 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         $this->setShowFbsOverviewStatistics( $xml_attributes["showFbsOverviewStatistics"] == "1");
         $this->setShowBlockTitlesDuringEvaluation( $xml_attributes["showBlockTitlesDuringEvaluation"] == "1");
         $this->setShowBlockDescriptionsDuringEvaluation( $xml_attributes["showBlockDescriptionsDuringEvaluation"] == "1");
-        $this->setShowBlockTitlesDuringFeedback( $xml_attributes["showBlockTitlesDuringEvaluation"] == "1");
-        $this->setShowBlockDescriptionsDuringFeedback((bool) $xml_attributes["online"] == "1");
+        $this->setShowBlockTitlesDuringFeedback( $xml_attributes["showBlockTitlesDuringFeedback"] == "1");
+        $this->setShowBlockDescriptionsDuringFeedback((bool) $xml_attributes["showBlockDescriptionsDuringFeedback"] == "1");
         $this->setSortRandomNrItemBlock($xml_attributes["sortRandomNrItemBlock"] == "1");
         $this->setBlockOptionRandomDesc( $xml_attributes["blockOptionRandomDesc"] == "1");
         $this->setShowFbsOverviewBar($xml_attributes["showFbsOverviewBar"] == "1");

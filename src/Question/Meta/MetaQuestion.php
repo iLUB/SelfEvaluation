@@ -24,12 +24,12 @@ class MetaQuestion extends BaseQuestion
     /**
      * @var string
      */
-    protected $name;
+    protected $name = "";
 
     /**
      * @var string
      */
-    protected $short_title;
+    protected $short_title = "";
 
     /**
      * @var int
@@ -39,7 +39,7 @@ class MetaQuestion extends BaseQuestion
     /**
      * @var array
      */
-    protected $values;
+    protected $values = [];
 
     /**
      * @var bool
