@@ -177,15 +177,15 @@ class FeedbackChartGUI
         $this->toolbar->addButtonInstance($btn);
 
         $tpl = $this->plugin->getTemplate('default/Feedback/tpl.feedback.html');
-        $this->tpl->addCss($this->plugin->getDirectory() . "templates/css/feedback.css");
-        $this->tpl->addJavaScript($this->plugin->getDirectory() . "templates/js/bar_spider_chart_toggle.js");
-        $this->tpl->addJavaScript($this->plugin->getDirectory() . "templates/js/print.js");
+        $this->tpl->addCss($this->plugin->getDirectory() . "/templates/css/feedback.css");
+        $this->tpl->addJavaScript($this->plugin->getDirectory() . "/templates/js/bar_spider_chart_toggle.js");
+        $this->tpl->addJavaScript($this->plugin->getDirectory() . "/templates/js/print.js");
         return $tpl;
     }
 
     protected function getBlockLabel(QuestionBlock $block)
     {
-        return $this->plugin->txt('block') . ' ' . ($block->getId() + 1);
+        return $this->plugin->txt('block') . ' ' . ($block->getPosition() + 1);
     }
 
     protected function parseBlockFeedback(
