@@ -194,12 +194,15 @@ abstract class BaseQuestionGUI
 
     protected function createQuestion()
     {
-        $this->updateQuestion();
+        $this->updateQuestion("create");
     }
 
-    protected function updateQuestion()
+    protected function updateQuestion(string $mode = "update")
     {
-        $this->initQuestionForm();
+        if($mode == "update"){
+            $this->ctrl->saveParameter($this, 'question_id');
+        }
+        $this->initQuestionForm($mode);
         $this->form->setValuesByPost();
 
         if ($this->form->checkInput()) {
