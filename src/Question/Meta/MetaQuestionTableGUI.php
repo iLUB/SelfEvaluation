@@ -8,6 +8,7 @@ use ilub\plugin\SelfEvaluation\Question\Meta\Type\MetaTypeFactory;
 use ilAdvancedSelectionListGUI;
 use MetaQuestionGUI;
 use ilGlobalTemplateInterface;
+use ilub\plugin\SelfEvaluation\Block\Block;
 
 class MetaQuestionTableGUI extends ilTable2GUI
 {
@@ -34,7 +35,7 @@ class MetaQuestionTableGUI extends ilTable2GUI
      * @param array                     $types
      * @param bool                      $sortable
      */
-    public function __construct(MetaQuestionGUI $a_parent_obj,ilSelfEvaluationPlugin $plugin, ilGlobalTemplateInterface $global_template, string $a_parent_cmd, array $types, bool $sortable)
+    public function __construct(MetaQuestionGUI $a_parent_obj,ilSelfEvaluationPlugin $plugin, ilGlobalTemplateInterface $global_template, string $a_parent_cmd, array $types, bool $sortable, Block $block)
     {
         $this->types = $types;
         $this->sortable = $sortable;
@@ -45,6 +46,8 @@ class MetaQuestionTableGUI extends ilTable2GUI
         $this->sortable = $sortable;
         $this->types = $types;
         $this->sortable = $sortable;
+
+        $this->setTitle($block->getTitle() . ': ' . $this->plugin->txt('question_table_title'));
 
         $this->setFormAction($this->ctrl->getFormAction($this->getParentObject(), $this->getParentCmd()));
 

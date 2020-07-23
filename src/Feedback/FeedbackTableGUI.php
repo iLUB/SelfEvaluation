@@ -36,6 +36,7 @@ class FeedbackTableGUI extends ilTable2GUI
 
         parent::__construct($a_parent_obj, $a_parent_cmd);
 
+        $this->setTitle($block->getTitle() . ': ' . $this->plugin->txt('feedback_table_title'));
         $this->addColumn("", "", "1");
         $this->addColumn($this->plugin->txt('fb_title'), 'title', 'auto');
         $this->addColumn($this->plugin->txt('fb_body'), 'body', 'auto');

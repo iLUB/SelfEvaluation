@@ -35,7 +35,7 @@ class MetaQuestionGUI extends BaseQuestionGUI
 
     protected function createTableGUI() : ilTable2GUI
     {
-        return new MetaQuestionTableGUI($this, $this->plugin, $this->tpl,'showContent', $this->getTypes(), $this->hasSorting());
+        return new MetaQuestionTableGUI($this, $this->plugin, $this->tpl,'showContent', $this->getTypes(), $this->hasSorting(),$this->block);
     }
 
     protected function initQuestionForm(string $mode = 'create')

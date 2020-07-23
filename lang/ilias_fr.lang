@@ -126,6 +126,7 @@ cont_save_positions#:#Reihenfolge speichern
 msg_block_updated#:#Änderungen gespeichert
 msg_question_updated#:#Änderungen gespeichert
 question_table_title#:#Fragen bearbeiten
+feedback_table_title#:#Feedback bearbeiten
 update_question_button#:#Speichern
 qst_delete_question#:#Sind Sie sicher, dass folgende Frage aus der Selbstevaluation entfernt werden soll?
 msg_question_deleted#:#Frage wurde gelöscht
@@ -248,7 +249,6 @@ export_csv#:#Als csv exportieren
 starting_date#:#Startdatum
 ending_date#:#Enddatum
 duration#:#Bearbeitungsdauer (s)
-
 print_pdf#:#Drucken (PDF)
 
 MetaTypeSelect#:#Auswahlliste (feste Werte)
