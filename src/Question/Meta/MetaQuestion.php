@@ -50,11 +50,11 @@ class MetaQuestion extends BaseQuestion
     public function cloneTo(int $parent_id): BaseQuestion
     {
         $clone = new self($this->db, $parent_id);
-        $clone->setName((string)$this->getName());
-        $clone->setShortTitle((string)$this->getShortTitle());
+        $clone->setName($this->getName());
+        $clone->setShortTitle($this->getShortTitle());
         $clone->setTypeId($this->getTypeId());
-        $clone->setValues((array)$this->getValues());
-        $clone->enableRequired((bool)$this->isRequired());
+        $clone->setValues($this->getValues());
+        $clone->enableRequired($this->isRequired());
         $clone->setPosition($this->getPosition());
         $clone->setParentId($parent_id);
         $clone->update();
@@ -157,8 +157,8 @@ class MetaQuestion extends BaseQuestion
             $question = new self($db);
             $question->setId($rec->id);
             $question->setParentId($rec->parent_id);
-            $question->setName($rec->name);
-            $question->setShortTitle($rec->short_title);
+            $question->setName((string)$rec->name);
+            $question->setShortTitle((string)$rec->short_title);
             $question->setTypeId((int)$rec->type_id);
             $question->setValues((array)unserialize($rec->values));
             $question->enableRequired((bool)$rec->required);
