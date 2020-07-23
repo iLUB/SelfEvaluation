@@ -63,11 +63,11 @@ class Feedback implements hasDBFields
     {
         $clone = new self($this->db);
         $clone->setParentId($parent_id);
-        $clone->setTitle($this->getTitle());
-        $clone->setDescription($this->getDescription());
+        $clone->setTitle((string)$this->getTitle());
+        $clone->setDescription((string)$this->getDescription());
         $clone->setStartValue($this->getStartValue());
         $clone->setEndValue($this->getEndValue());
-        $clone->setFeedbackText($this->getFeedbackText());
+        $clone->setFeedbackText((string)$this->getFeedbackText());
         $clone->setParentTypeOverall($this->isParentTypeOverall());
         $clone->update();
         return $clone;

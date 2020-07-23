@@ -48,8 +48,8 @@ class Question extends BaseQuestion implements \Serializable
     {
         $clone = new self($this->db);
         $clone->setParentId($parent_id);
-        $clone->setTitle($this->getTitle());
-        $clone->setQuestionBody($this->getQuestionBody());
+        $clone->setTitle((string)$this->getTitle());
+        $clone->setQuestionBody((string)$this->getQuestionBody());
         $clone->setPosition($this->getPosition());
         $clone->setIsInverse($this->getIsInverse());
         $clone->update();
