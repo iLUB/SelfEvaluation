@@ -257,7 +257,7 @@ MetaTypeSingleChoice#:#Single Choice Frage
 MatrixQuestion#:#Matrixfrage
 name#:#Name
 value#:#Wert
-matrix_question#:#Question
+matrix_question#:#Fragen
 select_one#:#Bitte treffen Sie eine Auswahl
 msg_invalid_post_input#:#Dieses Feld muss ausgefüllt werden. Bitte geben Sie etwas ein.
 msg_input_is_required#:#Dieses Feld muss ausgefüllt werden. Bitte geben Sie etwas ein.
