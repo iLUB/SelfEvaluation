@@ -37,10 +37,7 @@ class DatasetGUI
      * @var ilSelfEvaluationPlugin
      */
     protected $plugin;
-    /**
-     * @var string
-     */
-    protected $identifier;
+
     /**
      * @var Dataset
      */
@@ -53,8 +50,7 @@ class DatasetGUI
         ilCtrl $ilCtrl,
         ilToolbarGUI $ilToolbar,
         ilAccessHandler $access,
-        ilSelfEvaluationPlugin $plugin,
-        string $identifier = ""
+        ilSelfEvaluationPlugin $plugin
     ) {
         $this->db = $db;
         $this->tpl = $tpl;
@@ -63,7 +59,6 @@ class DatasetGUI
         $this->toolbar = $ilToolbar;
         $this->plugin = $plugin;
         $this->access = $access;
-        $this->identifier = $identifier;
 
         $this->dataset = new Dataset($this->db,$_GET['dataset_id'] ? $_GET['dataset_id'] : 0);
     }
@@ -100,6 +95,8 @@ class DatasetGUI
 
     public function index()
     {
+        global $DIC;
+
         if ($this->access->checkAccess("write", "index", $this->parent->object->getRefId(), $this->plugin->getId())) {
             $this->toolbar->addButton($this->plugin->txt('delete_all_datasets'),
                 $this->ctrl->getLinkTargetByClass('DatasetGUI', 'confirmDeleteAll'));
@@ -107,7 +104,11 @@ class DatasetGUI
                 $this->ctrl->getLinkTargetByClass('DatasetGUI', 'exportCSV'));
             $table = new DatasetTableGUI($this->db, $this->ctrl, $this, 'index', $this->plugin, $this->parent->object->getId());
         } else {
-            $table = new DatasetTableGUI($this->db, $this->ctrl, $this, 'index', $this->plugin, $this->parent->object->getId(),$this->identifier);
+            $id = Identity::_getInstanceForObjIdAndIdentifier($this->db, (int)$this->plugin->getId(), $DIC->user()->getId());
+            if (!$id) {
+                $id = Identity::_getNewInstanceForObjIdAndUserId($this->db, (int)$this->plugin->getId(), $DIC->user()->getId());
+            }
+            $table = new DatasetTableGUI($this->db, $this->ctrl, $this, 'index', $this->plugin, $this->parent->object->getId(),$id->getIdentifier());
         }
 
         $this->tpl->setContent($table->getHTML());
