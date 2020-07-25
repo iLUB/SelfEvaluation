@@ -136,13 +136,18 @@ class DatasetGUI
 
     public function deleteDatasets()
     {
+        if(!is_array($_POST["id"])){
+            ilUtil::sendFailure($this->plugin->txt('no_dataset_selected'));
+            $this->index();
+            return;
+        }
         $this->confirmDelete($_POST["id"]);
     }
 
     /**
      * @param array $ids
      */
-    public function confirmDelete($ids = [])
+    public function confirmDelete(array $ids = [])
     {
         $conf = new ilConfirmationGUI();
         ilUtil::sendQuestion($this->plugin->txt('qst_delete_dataset'));

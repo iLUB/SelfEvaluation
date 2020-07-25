@@ -200,6 +200,7 @@ msg_already_filled#:#Sie haben diese Selbstevaluation bereits ausgefüllt. Es ka
 msg_not_allowd_view_results#:#Sie sind nicht berechtigt, diese Seite zu sehen.
 show_results#:#Resultate
 select_result_button#:#Datensatz auswählen
+no_dataset_selected#:#Es wurde kein Datensatz ausgewählt.
 dataset_from#:#Datensatz vom
 
 block#:#Block
