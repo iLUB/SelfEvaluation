@@ -184,7 +184,7 @@ abstract class BlockGUI
      */
     protected function updateObject()
     {
-        $this->initForm();
+        $this->initForm('update');
         $this->form->setValuesByPost();
         if ($this->form->checkInput()) {
             $this->setObjectValuesByPost();
