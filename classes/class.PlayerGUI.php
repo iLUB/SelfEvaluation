@@ -232,7 +232,7 @@ class PlayerGUI
         $meta_block_beginning = true;
 
         foreach ($blocks as $block) {
-            if (get_class($block) == 'MetaBlock') {
+            if ($block instanceof MetaBlock) {
                 if ($meta_block_beginning) {
                     $return_blocks[] = $block;
                 } else {

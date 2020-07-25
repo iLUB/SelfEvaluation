@@ -2,7 +2,7 @@
 
 namespace ilub\plugin\SelfEvaluation\DatabaseHelper;
 
-interface hasDBFields
+interface hasDBFields extends \Serializable
 {
     public function getArrayForDb(): array;
 }

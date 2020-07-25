@@ -111,4 +111,12 @@ trait ArrayForDB
                 return gettype($var);
         }
     }
+
+    public function serialize(){
+        return serialize($this->getArray());
+    }
+
+    public function unserialize($serialized){
+        return $this->fromArray(unserialize($serialized));
+    }
 }

@@ -215,4 +215,11 @@ abstract class Block implements hasDBFields, BlockType
     }
 
     abstract function getBlockTableRow(ilDBInterface $db, ilCtrl $ilCtrl, ilSelfEvaluationPlugin $plugin) : BlockTableRow;
+
+    public function unserialize($serialized){
+        global $DIC;
+
+        $this->db = $DIC->database();
+        return $this->fromArray(unserialize($serialized));
+    }
 }
