@@ -59,7 +59,13 @@ class FeedbackTableGUI extends ilTable2GUI
         $this->tpl->setVariable("ID", $obj->getId());
         $this->tpl->setVariable('TITLE', $obj->getTitle());
         $this->tpl->setVariable('BODY', strip_tags($obj->getFeedbackText()));
-        $this->tpl->setVariable('START', ($obj->getStartValue() == 0 ? '>= ' : '> ') . $obj->getStartValue() . '%');
+        $start_sign = "> ";
+        if($obj->getStartValue() == "0"){
+            $start_sign = "> ";
+        }else if($obj->getStartValue() == "100"){
+            $start_sign = "= ";
+        }
+        $this->tpl->setVariable('START', $start_sign . $obj->getStartValue() . '%');
         $this->tpl->setVariable('END', '<= ' . $obj->getEndValue() . '%');
         // Actions
         $ac = new ilAdvancedSelectionListGUI();
