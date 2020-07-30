@@ -361,14 +361,14 @@ class FeedbackGUI
         }
 
         foreach ($feedbacks as $fb) {
-            if ($min !== false AND $min <= $fb->getStartValue() &&  !($min = 100) ) {
+            if ($min !== false AND $min <= $fb->getStartValue() &&  !($min == 100) && ($fb->getStartValue()-$min != 0)) {
                 $this->parseOverviewBlock('blank', $fb->getStartValue() - $min, $min);
             }
             $this->parseOverviewBlock('fb', $fb->getEndValue() - $fb->getStartValue(), $fb->getId(), $fb->getTitle());
             $min = Feedback::_getNextMinValueForParentId($this->db,$this->block->getId(), $fb->getEndValue(), 0,
                 $this->feedback->isParentTypeOverall());
         }
-        if ( !($min = 100) AND is_object($fb)) {
+        if ( !($min == 100) AND is_object($fb)) {
             $this->parseOverviewBlock('blank', 100 - $min, $min);
         }
 
