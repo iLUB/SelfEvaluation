@@ -3,6 +3,8 @@ objs_xsev#:#Selbstevaluationen
 obj_xsev_duplicate#:#Kopieren
 objs_xsev_duplicate#:#Selbstevaluation kopieren
 obj_xsev_select#:#Selbstevaluation auswählen
+obj_xsev_copy#:#Selbstevaluation kopieren
+xsev_copy#:#Selbstevaluation kopieren
 xsev_add#:#Selbstevaluation hinzufügen
 xsev_new#:#Neue Selbstevaluation hinzufügen
 xsev_read#:#Lesezugriff zu Selbstevaluation
