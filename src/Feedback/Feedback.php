@@ -418,7 +418,7 @@ class Feedback implements hasDBFields
 
     public function isParentTypeOverall() : bool
     {
-        return $this->parent_type_overall;
+        return (bool)$this->parent_type_overall;
     }
 
     public function setParentTypeOverall(bool $parent_type_overall)
