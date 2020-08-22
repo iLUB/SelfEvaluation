@@ -9,6 +9,7 @@ class SessionHelper
     const SESSION_KEY = "xsev_data";
     const SESSION_KEY_CREATION_DATE = "creation_date";
     const SESSION_KEY_SHUFFLE = "shuffled_blocks";
+    const SESSION_KEY_DATA = "question_post_data";
     /**
      * @var string
      */
@@ -48,6 +49,8 @@ class SessionHelper
 
     public function getSessionCreationDate() : int
     {
+        $this->logger->warning('Self Evaluation, get Session create time for '. $this->ref_id . " time is: ".$_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE]);
+
         return $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE];
     }
 
@@ -70,13 +73,20 @@ class SessionHelper
         return unserialize($_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_SHUFFLE]);
     }
 
+    /**
+     * @param array $data
+     */
     public function addSessionData( array $data)
     {
-        $_SESSION[self::SESSION_KEY][$this->ref_id] = $_SESSION[self::SESSION_KEY][$this->ref_id] + $data;
+        if(!array_key_exists(self::SESSION_KEY_DATA, $_SESSION[self::SESSION_KEY][$this->ref_id])){
+            $this->logger->warning('Self Evaluation, No data exists for ref id '.$this->ref_id);
+            $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_DATA] = [];
+        }
+        $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_DATA] = $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_DATA] + $data;
     }
 
     public function getSessionData() : array
     {
-        return $_SESSION[self::SESSION_KEY][$this->ref_id];
+        return $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_DATA];
     }
 }
