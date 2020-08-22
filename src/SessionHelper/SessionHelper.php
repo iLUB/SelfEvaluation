@@ -16,12 +16,17 @@ class SessionHelper
 
     function __construct($ref_id)
     {
+        global $DIC;
+        $this->logger = $DIC->logger()->root();
+
         if(!is_array($_SESSION[self::SESSION_KEY])){
+            $this->logger->warning('Self Evaluation, generating new Session for all objects');
             $_SESSION[self::SESSION_KEY] = [];
         }
         $this->ref_id = $ref_id;
         if(!is_array($_SESSION[self::SESSION_KEY][$this->ref_id]))
         {
+            $this->logger->warning('Self Evaluation, generating new Session for'. $this->ref_id);
             $_SESSION[self::SESSION_KEY][$this->ref_id] = [];
         }
 
@@ -29,13 +34,14 @@ class SessionHelper
 
     public function resetSession()
     {
-
+        $this->logger->warning('Self Evaluation, reset Session for'. $this->ref_id);
         $_SESSION[self::SESSION_KEY][$this->ref_id] = [];
     }
 
     public function initSessionCreationDate()
     {
         if (!array_key_exists(self::SESSION_KEY_CREATION_DATE, $_SESSION[self::SESSION_KEY][$this->ref_id])) {
+            $this->logger->warning('Self Evaluation, init Session creation time for'. $this->ref_id);
             $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE] = time();
         }
     }
