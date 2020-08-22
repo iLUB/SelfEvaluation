@@ -14,7 +14,7 @@ use ilub\plugin\SelfEvaluation\Player\Block\QuestionBlockPlayerGUI;
 use ilub\plugin\SelfEvaluation\Player\Block\MetaBlockPlayerGUI;
 use ilub\plugin\SelfEvaluation\Block\Matrix\QuestionBlock;
 use ilub\plugin\SelfEvaluation\Block\Meta\MetaBlock;
-use ilub\plugin\SelfEvaluation\SessionHelper\SessionHelper;
+use ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion;
 
 class PlayerGUI
 {
@@ -59,9 +59,9 @@ class PlayerGUI
     protected $identity;
 
     /**
-     * @var SessionHelper
+     * @var Dataset
      */
-    protected $session;
+    protected $dataset;
 
     function __construct(
         ilDBInterface $db,
@@ -77,8 +77,6 @@ class PlayerGUI
         $this->plugin = $plugin;
 
         $this->ref_id = $this->parent->object->getRefId();
-        $this->session = new SessionHelper($this->ref_id);
-
     }
 
     public function executeCommand()
@@ -88,6 +86,13 @@ class PlayerGUI
             $this->ctrl->redirect($this->parent);
         } else {
             $this->identity = new Identity($this->db, $_GET['uid']);
+        }
+
+        if($_GET['dataset_id']){
+            $this->dataset = new Dataset($this->db,$_GET['dataset_id']);
+            $this->ctrl->setParameter($this,"dataset_id",$this->dataset->getId());
+        }else{
+            $this->dataset = new Dataset($this->db);
         }
 
         $this->ctrl->saveParameter($this, 'uid');
@@ -108,19 +113,14 @@ class PlayerGUI
         $cmd = ($this->ctrl->getCmd()) ? $this->ctrl->getCmd() : $this->getStandardCommand();
 
         switch ($cmd) {
-            case 'editProperties':
-                //				$this->checkPermission('write'); FSX
-                $this->$cmd();
-                break;
             case 'startScreen':
-            case 'startEvaluation':
+            case 'doEvaluationStep':
             case 'resumeEvaluation':
-            case 'newData':
-            case 'updateData':
+            case 'finishEvaluation':
             case 'cancel':
             case 'endScreen':
             case 'startNewEvaluation':
-            case 'newNextPage':
+            case 'nextPage':
                 //				$this->checkPermission('read'); FSX
                 $this->$cmd();
                 break;
@@ -140,28 +140,14 @@ class PlayerGUI
         $content->setVariable('INTRO_BODY', $this->parent->object->getIntro());
         if ($this->parent->object->isActive()) {
             $content->setCurrentBlock('button');
-            if (Dataset::_datasetExists($this->db, $this->identity->getId())) {
-                if ($this->parent->object->isAllowMultipleDatasets()) {
-                    $content->setVariable('START_BUTTON', $this->plugin->txt('start_new_button'));
-                    $content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'startNewEvaluation'));
-                    $content->parseCurrentBlock();
-                    $content->setCurrentBlock('button');
-                }
-                if ($this->parent->object->isAllowDatasetEditing()) {
-                    $content->setVariable('START_BUTTON', $this->plugin->txt('resume_button'));
-                    $content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'resumeEvaluation'));
-                    $content->parseCurrentBlock();
-                    $content->setCurrentBlock('button');
-                }
-                if (!$this->parent->object->isAllowMultipleDatasets()
-                    AND !$this->parent->object->isAllowDatasetEditing()
-                ) {
-                    ilUtil::sendInfo($this->plugin->txt('msg_already_filled'));
-                }
+            $this->dataset = Dataset::_getInstanceByIdentifierId($this->db, $this->identity->getId());
+            if ($this->dataset && !$this->dataset->isComplete()) {
+                $this->ctrl->setParameter($this,"dataset_id",$this->dataset->getId());
+                $content->setVariable('START_BUTTON', $this->plugin->txt('resume_button'));
+                $content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'resumeEvaluation'));
             } else {
                 $content->setVariable('START_BUTTON', $this->plugin->txt('start_button'));
-                $content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'startEvaluation'));
-
+                $content->setVariable('START_HREF', $this->ctrl->getLinkTarget($this, 'startNewEvaluation'));
             }
             $content->parseCurrentBlock();
         } else {
@@ -172,25 +158,60 @@ class PlayerGUI
 
     public function startNewEvaluation()
     {
-        $this->session->resetSession();
-        $this->startEvaluation();
-    }
-
-    public function startEvaluation()
-    {
-        $this->initPresentationForm();
-        $this->session->initSessionCreationDate();
-        $this->tpl->setContent($this->form->getHTML());
+        $this->dataset->setIdentifierId($this->identity->getId());
+        $this->dataset->setCreationDate(time());
+        $this->dataset->update();
+        $this->ctrl->setParameter($this,"dataset_id",$this->dataset->getId());
+        $this->ctrl->redirect($this, 'doEvaluationStep');
     }
 
     public function resumeEvaluation()
     {
-        $this->initPresentationForm('update');
+        $this->doEvaluationStep();
+    }
+
+    public function doEvaluationStep()
+    {
+        $this->initPresentationForm();
         $this->fillForm();
         $this->tpl->setContent($this->form->getHTML());
     }
 
-    public function initPresentationForm($mode = 'new')
+    public function nextPage()
+    {
+        $this->initPresentationForm();
+
+        if ($this->form->checkinput()) {
+            $this->dataset->updateValuesByPost($_POST);
+            $this->ctrl->setParameter($this, 'page', $_GET['page'] + 1);
+            $this->ctrl->redirect($this, 'doEvaluationStep');
+        }
+
+        $this->form->setValuesByPost();
+        $this->tpl->setContent($this->form->getHTML());
+    }
+
+    public function finishEvaluation()
+    {
+        $this->initPresentationForm();
+
+        if ($this->form->checkinput()) {
+            $this->dataset->updateValuesByPost($_POST);
+            $this->dataset->setComplete(true);
+            $this->dataset->update();
+            $this->redirectToResults( $this->dataset );
+        }
+        $this->form->setValuesByPost();
+        $this->tpl->setContent($this->form->getHTML());
+    }
+
+    private function redirectToResults(Dataset $dataset)
+    {
+        $this->ctrl->setParameterByClass('DatasetGUI', 'dataset_id', $dataset->getId());
+        $this->ctrl->redirectByClass('DatasetGUI', 'show');
+    }
+
+    protected function initPresentationForm($mode = 'new')
     {
         $this->form = new PlayerFormContainer($this->tpl, $this->plugin);
         $this->form->setId('evaluation_form');
@@ -199,10 +220,7 @@ class PlayerGUI
         $blocks = $factory->getAllBlocks();
 
         if ($this->parent->object->getSortType() == ilObjSelfEvaluation::SHUFFLE_ACROSS_BLOCKS) {
-            if (!$this->session->hasShuffledBlocks()) {
-                $this->session->setShuffledBlocks($this->orderMixedBlocks($blocks));
-            }
-            $blocks = $this->session->getShuffledeBlocks();
+            $blocks = $this->orderMixedBlocks($blocks);
         }
 
         if ($this->parent->object->getDisplayType() == ilObjSelfEvaluation::DISPLAY_TYPE_SINGLE_PAGE) {
@@ -245,7 +263,11 @@ class PlayerGUI
                 }
             }
         }
-        shuffle($questions);
+
+        //Order is just a completely random array same length as question. $val*123%13 is completely random, but will
+        //alway return the same order.
+        $order = array_map(function($val){return $val*123%13;}, range(1, count($questions)));
+        array_multisort($order, $questions);
 
         $questions_in_block = 0;
         $block_nr = 0;
@@ -286,9 +308,9 @@ class PlayerGUI
         }
         $this->ctrl->setParameter($this, 'page', $page);
         if ($page < $last_page) {
-            $this->form->addCommandButton($mode . 'NextPage', $this->plugin->txt('next_' . $mode));
+            $this->form->addCommandButton('nextPage', $this->plugin->txt('next_' . $mode));
         } else {
-            $this->form->addCommandButton($mode . 'Data', $this->plugin->txt('send_' . $mode));
+            $this->form->addCommandButton("finishEvaluation", $this->plugin->txt('send_' . $mode));
         }
         $this->addBlockHtmlToForm($blocks[$page - 1]);
 
@@ -299,7 +321,7 @@ class PlayerGUI
         foreach ($blocks as $block) {
             $this->addBlockHtmlToForm($block);
         }
-        $this->form->addCommandButton($mode . 'Data', $this->plugin->txt('send_' . $mode));
+        $this->form->addCommandButton( 'finishEvaluation', $this->plugin->txt('send_' . $mode));
     }
 
     protected function addBlockHtmlToForm($block)
@@ -322,67 +344,19 @@ class PlayerGUI
         $this->form = $block_gui->getBlockForm($this->form);
     }
 
-    public function fillForm()
+    protected function fillForm()
     {
-        $dataset = Dataset::_getInstanceByIdentifierId($this->db, $this->identity->getId());
-        $data = Data::_getAllInstancesByDatasetId($this->db, $dataset->getId());
-        $array = [];
-        foreach ($data as $d) {
-            $array[MatrixQuestion::POSTVAR_PREFIX . $d->getQuestionId()] = $d->getValue();
-        }
-        $this->form->setValuesByArray($array);
-    }
-
-    public function newNextPage()
-    {
-        $this->initPresentationForm();
-
-        if ($this->form->checkinput()) {
-            $this->session->addSessionData($_POST);
-            $this->ctrl->setParameter($this, 'page', $_GET['page'] + 1);
-            $this->ctrl->redirect($this, 'startEvaluation');
+        $data = Data::_getAllInstancesByDatasetId($this->db, $this->dataset->getId());
+        $values = [];
+        foreach ($data as $question_data) {
+            if($question_data->getQuestionType() == DATA::QUESTION_TYPE){
+                $values[MatrixQuestion::POSTVAR_PREFIX . $question_data->getQuestionId()] = $question_data->getValue();
+            }else{
+                $values[MetaQuestion::POSTVAR_PREFIX . $question_data->getQuestionId()] = $question_data->getValue();
+            }
         }
 
-        $this->form->setValuesByPost();
-        $this->tpl->setContent($this->form->getHTML());
-    }
-
-    public function newData()
-    {
-        $this->initPresentationForm();
-
-        if ($this->form->checkinput()) {
-            $dataset = Dataset::_getNewInstanceForIdentifierId($this->db, $this->identity->getId());
-            $dataset->setCreationDate($this->session->getSessionCreationDate());
-            $this->session->addSessionData($_POST);
-            $dataset->updateValuesByPost($this->session->getSessionData());
-            $this->session->resetSession();
-            $this->redirectToResults($dataset);
-        }
-        $this->form->setValuesByPost();
-        $this->tpl->setContent($this->form->getHTML());
-    }
-
-    public function updateData()
-    {
-        $this->initPresentationForm();
-
-        if ($this->form->checkinput()) {
-            $dataset = Dataset::_getInstanceByIdentifierId($this->db, $this->identity->getId());
-
-            $dataset->updateValuesByPost($_POST);
-            //See #1017
-            //ilUtil::sendSuccess($this->plugin->txt('data_saved'), true);
-            $this->redirectToResults($dataset);
-        }
-        $this->form->setValuesByPost();
-        $this->tpl->setContent($this->form->getHTML());
-    }
-
-    private function redirectToResults(Dataset $dataset)
-    {
-        $this->ctrl->setParameterByClass('DatasetGUI', 'dataset_id', $dataset->getId());
-        $this->ctrl->redirectByClass('DatasetGUI', 'show');
+        $this->form->setValuesByArray($values);
     }
 }
 

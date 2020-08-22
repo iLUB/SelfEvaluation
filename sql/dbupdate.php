@@ -414,3 +414,14 @@ if ($this->db->tableColumnExists(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQ
     $this->db->renameTableColumn(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME, 'type', 'type_id');
 }
 ?>
+<#26>
+<?php
+if (!$this->db->tableColumnExists(\ilub\plugin\SelfEvaluation\Dataset\Dataset::TABLE_NAME, 'complete')) {
+    $field = [
+        'type' => 'integer',
+        'length' => 4
+    ];
+    $this->db->addTableColumn(\ilub\plugin\SelfEvaluation\Dataset\Dataset::TABLE_NAME, 'complete', $field);
+}
+$this->db->query("UPDATE ".\ilub\plugin\SelfEvaluation\Dataset\Dataset::TABLE_NAME." SET complete = 1 ");
+?>

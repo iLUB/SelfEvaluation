@@ -166,6 +166,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
                     break;
                 case 'identitygui':
                     $gui = new IdentityGUI($this->db, $this, $this->tpl, $this->ctrl, $this->plugin);
+                    $this->tabs->activateTab('content');
                     $this->ctrl->forwardCommand($gui);
                     break;
                 case 'ilexportgui':
@@ -595,6 +596,7 @@ class ilObjSelfEvaluationGUI extends ilObjectPluginGUI
     {
         global $DIC;
         if ($DIC->user()->isAnonymous()) {
+            $this->tabs->activateTab('content');
             $this->ctrl->redirectByClass('IdentityGUI', 'show');
         } else {
             $id = Identity::_getInstanceForObjIdAndIdentifier($this->db, $this->object->getId(),

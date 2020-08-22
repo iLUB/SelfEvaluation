@@ -49,6 +49,7 @@ class DatasetTableGUI extends ilTable2GUI
         $this->addColumn($this->plugin->txt('identity_type'), false, '100px');
         $this->addColumn($this->plugin->txt('date'), false, 'auto');
         $this->addColumn($this->plugin->txt('identity'), false, 'auto');
+        $this->addColumn($this->plugin->txt('complete'), false, 'auto');
         $this->addColumn($this->plugin->txt('average_all'), false, 'auto');
         $this->addColumn($this->plugin->txt('actions'), false, 'auto');
         $this->ctrl->setParameterByClass('DatasetGUI', 'dataset_id', null);
@@ -73,6 +74,8 @@ class DatasetTableGUI extends ilTable2GUI
         $this->ctrl->setParameterByClass('DatasetGUI', 'dataset_id', $obj->getId());
         // Row
         $this->tpl->setVariable("ID", $obj->getId());
+        $this->tpl->setVariable('COMPLETE',
+            $obj->isComplete() ? $this->plugin->getDirectory().'/templates/images/icon_ok.svg' : $this->plugin->getDirectory().'/templates/images/empty.png');
         $this->tpl->setVariable('DATE', date('d.m.Y - H:i:s', $obj->getCreationDate()));
         $this->tpl->setVariable('EDIT_LINK', $this->ctrl->getLinkTargetByClass('DatasetGUI', 'show'));
         switch ($identifier->getType()) {

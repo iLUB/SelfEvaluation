@@ -91,6 +91,7 @@ class DatasetCsvExport extends csvExport
     {
         $position = 0;
         $this->getTable()->addColumn(new csvExportColumn("identity", $this->pl->txt("identity"), -100));
+        $this->getTable()->addColumn(new csvExportColumn("complete", $this->pl->txt("complete"), -95));
         $this->getTable()->addColumn(new csvExportColumn("starting_date", $this->pl->txt("starting_date"), -90));
         $this->getTable()->addColumn(new csvExportColumn("ending_date", $this->pl->txt("ending_date"), -80));
         $this->getTable()->addColumn(new csvExportColumn("duration", $this->pl->txt("duration"), -70));
@@ -173,6 +174,7 @@ class DatasetCsvExport extends csvExport
         foreach ($this->getDatasets() as $dataset) {
             $row = new csvExportRow();
             $row->addValue($this->getIdentity($dataset));
+            $row->addValue(new csvExportValue("complete", $dataset->isComplete()?"1":"0"));
             $values = $this->getDateValues($dataset);
             foreach ($values as $value) {
                 $row->addValue($value);

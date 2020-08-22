@@ -11,6 +11,7 @@ use ilub\plugin\SelfEvaluation\Block\Matrix\QuestionBlock;
 use ilDBInterface;
 use Exception;
 use ilub\plugin\SelfEvaluation\UIHelper\Scale\Scale;
+use ilub\plugin\SelfEvaluation\Block\Block;
 
 /**
  * Class Dataset
@@ -40,6 +41,11 @@ class Dataset implements hasDBFields
      * @var int
      */
     protected $highest_scale = 0;
+
+    /**
+     * @var bool
+     */
+    protected $complete = false;
 
     /**
      * @var bool
@@ -160,16 +166,14 @@ class Dataset implements hasDBFields
         $data = [];
         foreach ($post as $k => $v) {
             $type = $this->determineQuestionType($k);
-            if ($type === false) {
-                continue;
+            if ($type !== "") {
+                $qid = $this->getQuestionId($type, $k);
+                if ($qid !== 0) {
+                    $data[] = ['qid' => $qid, 'value' => $v, 'type' => $type];
+                }
             }
-            $qid = $this->getQuestionId($type, $k);
-            if ($qid === false) {
-                continue;
-            }
-            $data[] = ['qid' => $qid, 'value' => $v, 'type' => $type];
-        }
 
+        }
         return $data;
     }
 
@@ -178,7 +182,10 @@ class Dataset implements hasDBFields
         if (strpos($postvar_key, Question::POSTVAR_PREFIX) === 0) {
             return Data::QUESTION_TYPE;
         }
-        return Data::META_QUESTION_TYPE;
+        if (strpos($postvar_key, MetaQuestion::POSTVAR_PREFIX) === 0) {
+            return Data::META_QUESTION_TYPE;
+        }
+        return "";
 
     }
 
@@ -187,7 +194,10 @@ class Dataset implements hasDBFields
         if ($question_type == Data::QUESTION_TYPE) {
             return (int) str_replace(Question::POSTVAR_PREFIX, '', $postvar_key);
         }
-        return (int) str_replace(MetaQuestion::POSTVAR_PREFIX, '', $postvar_key);
+        if ($question_type == Data::META_QUESTION_TYPE) {
+            return (int) str_replace(MetaQuestion::POSTVAR_PREFIX, '', $postvar_key);
+        }
+        return 0;
     }
 
     public function getPercentagePerBlock() : array
@@ -298,6 +308,22 @@ class Dataset implements hasDBFields
     public function setQuestionBlocks(array $blocks)
     {
         $this->question_blocks = $blocks;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isComplete() : bool
+    {
+        return $this->complete;
+    }
+
+    /**
+     * @param bool $complete
+     */
+    public function setComplete(bool $complete) : void
+    {
+        $this->complete = $complete;
     }
 
     /**
@@ -447,7 +473,7 @@ class Dataset implements hasDBFields
     public static function _getInstanceByIdentifierId(ilDBInterface $db, int $identifier_id)
     {
         $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE identifier_id = '
-            . $db->quote($identifier_id, 'integer'));
+            . $db->quote($identifier_id, 'integer'). " ORDER BY id DESC");
         while ($rec = $db->fetchObject($set)) {
             $data_set = new Dataset($db);
             $data_set->setObjectValuesFromRecord($data_set, $rec);

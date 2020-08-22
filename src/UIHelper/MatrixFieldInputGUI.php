@@ -66,33 +66,24 @@ class MatrixFieldInputGUI extends ilSubEnabledFormPropertyGUI
         $a_tpl->parseCurrentBlock();
     }
 
-    /**
-     * @param $value array form $value[$postvar] = array(id, array(name, value))
-     */
-    public function setValueByArray($value)
+    public function setValueByArray($values)
     {
-        foreach ($this->getSubItems() as $item) {
-            /**
-             * @var MatrixFieldInputGUI $item
-             */
-            $item->setValueByArray($value);
+        if(array_key_exists($this->getPostVar(),$values)){
+            $this->setValue($values[$this->getPostVar()]);
+            return;
         }
+        list($matrix_key,$question_key) = explode("[", str_replace("]", "", $this->getPostVar()));
 
-        $post_var_parts = explode("[", str_replace("]", "", $this->getPostVar()));
-
-        $value = $_POST;
-        foreach ($post_var_parts as $part) {
-            if (is_array($value) && array_key_exists($part, $value)) {
-                $value = $value[$part];
-            } else {
-                return;
-            }
+        if(array_key_exists($matrix_key,$values)){
+            $meta_question_values = $values[$matrix_key];
+            $this->setValue($meta_question_values[$question_key]);
         }
-
-        $this->setValue($value);
     }
 
+    public function setValueByArray2($values)
+    {
 
+    }
 
     public function setScale(array $scale)
     {
