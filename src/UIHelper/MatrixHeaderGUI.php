@@ -30,7 +30,7 @@ class MatrixHeaderGUI extends ilSubEnabledFormPropertyGUI
     {
         parent::__construct($a_title, $a_postvar);
         $this->setType('matrix_header');
-
+        $this->setPostvar('matrix_header');
         $this->plugin = $plugin;
     }
 
@@ -76,17 +76,7 @@ class MatrixHeaderGUI extends ilSubEnabledFormPropertyGUI
 
     public function checkInput() : bool
     {
-        if (!is_array($_POST[$this->getPostVar()])) {
-            $_POST[$this->getPostVar()] = ilUtil::stripSlashes($_POST[$this->getPostVar()]);
-            if ($this->getRequired() && trim($_POST[$this->getPostVar()]) == '') {
-                $this->setAlert($this->plugin->txt('msg_input_is_required'));
-
-                return false;
-            }
-        }
-
         return $this->checkSubItemsInput();
-
     }
 
     /**

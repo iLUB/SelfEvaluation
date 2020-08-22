@@ -26,7 +26,7 @@ class SessionHelper
         $this->ref_id = $ref_id;
         if(!is_array($_SESSION[self::SESSION_KEY][$this->ref_id]))
         {
-            $this->logger->warning('Self Evaluation, generating new Session for'. $this->ref_id);
+            $this->logger->warning('Self Evaluation, generating new Session for '. $this->ref_id);
             $_SESSION[self::SESSION_KEY][$this->ref_id] = [];
         }
 
@@ -34,14 +34,14 @@ class SessionHelper
 
     public function resetSession()
     {
-        $this->logger->warning('Self Evaluation, reset Session for'. $this->ref_id);
+        $this->logger->warning('Self Evaluation, reset Session for '. $this->ref_id);
         $_SESSION[self::SESSION_KEY][$this->ref_id] = [];
     }
 
     public function initSessionCreationDate()
     {
         if (!array_key_exists(self::SESSION_KEY_CREATION_DATE, $_SESSION[self::SESSION_KEY][$this->ref_id])) {
-            $this->logger->warning('Self Evaluation, init Session creation time for'. $this->ref_id);
+            $this->logger->warning('Self Evaluation, init Session creation time for '. $this->ref_id);
             $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE] = time();
         }
     }
@@ -72,7 +72,7 @@ class SessionHelper
 
     public function addSessionData( array $data)
     {
-        $_SESSION[self::SESSION_KEY][$this->ref_id] = array_merge($_SESSION[self::SESSION_KEY][$this->ref_id], $data);
+        $_SESSION[self::SESSION_KEY][$this->ref_id] = $_SESSION[self::SESSION_KEY][$this->ref_id] + $data;
     }
 
     public function getSessionData() : array
