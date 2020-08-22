@@ -77,7 +77,7 @@ class PlayerGUI
         $this->plugin = $plugin;
 
         $this->ref_id = $this->parent->object->getRefId();
-        $this->session = new SessionHelper($_SESSION, $this->ref_id);
+        $this->session = new SessionHelper($this->ref_id);
 
     }
 

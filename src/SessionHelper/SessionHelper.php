@@ -10,43 +10,43 @@ class SessionHelper
     const SESSION_KEY_CREATION_DATE = "creation_date";
     const SESSION_KEY_SHUFFLE = "shuffled_blocks";
     /**
-     * @var array
+     * @var string
      */
-    protected $session;
+    protected $ref_id;
 
-    function __construct(array &$global_session, $ref_id)
+    function __construct($ref_id)
     {
-        if(!is_array($global_session[self::SESSION_KEY])){
-            $global_session[self::SESSION_KEY] = [];
+        if(!is_array($_SESSION[self::SESSION_KEY])){
+            $_SESSION[self::SESSION_KEY] = [];
+        }
+        $this->ref_id = $ref_id;
+        if(!is_array($_SESSION[self::SESSION_KEY][$this->ref_id]))
+        {
+            $_SESSION[self::SESSION_KEY][$this->ref_id] = [];
         }
 
-        if(!is_array($global_session[self::SESSION_KEY][$ref_id]))
-        {
-            $global_session[self::SESSION_KEY][$ref_id] = [];
-        }
-        $this->session = &$global_session[self::SESSION_KEY][$ref_id];
     }
 
     public function resetSession()
     {
 
-        $this->session = [];
+        $_SESSION[self::SESSION_KEY][$this->ref_id] = [];
     }
 
     public function initSessionCreationDate()
     {
-        if (!array_key_exists(self::SESSION_KEY_CREATION_DATE, $this->session)) {
-            $this->session[self::SESSION_KEY_CREATION_DATE] = time();
+        if (!array_key_exists(self::SESSION_KEY_CREATION_DATE, $_SESSION[self::SESSION_KEY][$this->ref_id])) {
+            $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE] = time();
         }
     }
 
     public function getSessionCreationDate() : int
     {
-        return $this->session[self::SESSION_KEY_CREATION_DATE];
+        return $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_CREATION_DATE];
     }
 
     public function hasShuffledBlocks(){
-        return array_key_exists(self::SESSION_KEY_SHUFFLE, $this->session);
+        return array_key_exists(self::SESSION_KEY_SHUFFLE, $_SESSION[self::SESSION_KEY][$this->ref_id]);
     }
 
     /**
@@ -54,23 +54,23 @@ class SessionHelper
      */
     public function setShuffledBlocks(array $blocks)
     {
-        $this->session[self::SESSION_KEY_SHUFFLE] = serialize($blocks);
+        $_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_SHUFFLE] = serialize($blocks);
     }
 
     /**
      * @return Block[]
      */
     public function getShuffledeBlocks() : array{
-        return unserialize($this->session[self::SESSION_KEY_SHUFFLE]);
+        return unserialize($_SESSION[self::SESSION_KEY][$this->ref_id][self::SESSION_KEY_SHUFFLE]);
     }
 
     public function addSessionData( array $data)
     {
-        $this->session = array_merge($this->session, $data);
+        $_SESSION[self::SESSION_KEY][$this->ref_id] = array_merge($_SESSION[self::SESSION_KEY][$this->ref_id], $data);
     }
 
     public function getSessionData() : array
     {
-        return $this->session;
+        return $_SESSION[self::SESSION_KEY][$this->ref_id];
     }
 }
