@@ -393,7 +393,7 @@ if (!$this->db->indexExistsByFields('rep_robj_xsev_d', ['i2'])) {
 <#25>
 <?php
 if ($this->db->tableColumnExists(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME, 'field_id')) {
-    $this->db->renameTableColumn(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME, 'field_id', 'id');
+    $this->db->addTableColumn(ilObjSelfEvaluation::TABLE_NAME, 'identity_selection', $field);
 }
 if ($this->db->tableColumnExists(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME, 'container_id')) {
     $this->db->renameTableColumn(\ilub\plugin\SelfEvaluation\Question\Meta\MetaQuestion::TABLE_NAME, 'container_id', 'parent_id');
