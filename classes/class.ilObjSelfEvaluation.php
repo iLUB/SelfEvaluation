@@ -943,9 +943,9 @@ class ilObjSelfEvaluation extends ilObjectPlugin implements hasDBFields
         $this->setShowBlockTitlesDuringEvaluation( $xml_attributes["showBlockTitlesDuringEvaluation"] == "1");
         $this->setShowBlockDescriptionsDuringEvaluation( $xml_attributes["showBlockDescriptionsDuringEvaluation"] == "1");
         $this->setShowBlockTitlesDuringFeedback( $xml_attributes["showBlockTitlesDuringFeedback"] == "1");
-        $this->setShowBlockDescriptionsDuringFeedback((bool) $xml_attributes["showBlockDescriptionsDuringFeedback"] == "1");
-        $this->setSortRandomNrItemBlock($xml_attributes["sortRandomNrItemBlock"] == "1");
-        $this->setBlockOptionRandomDesc( $xml_attributes["blockOptionRandomDesc"] == "1");
+        $this->setShowBlockDescriptionsDuringFeedback($xml_attributes["showBlockDescriptionsDuringFeedback"] == "1");
+        $this->setSortRandomNrItemBlock((int)$xml_attributes["sortRandomNrItemBlock"] );
+        $this->setBlockOptionRandomDesc( (string)$xml_attributes["blockOptionRandomDesc"]);
         $this->setShowFbsOverviewBar($xml_attributes["showFbsOverviewBar"] == "1");
         $this->setShowFbsOverviewText($xml_attributes["showFbsOverviewText"] == "1");
         $this->setOverviewBarShowLabelAsPercentage( $xml_attributes["overviewBarShowLabelAsPercentage"] == "1");
