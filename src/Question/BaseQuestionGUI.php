@@ -209,6 +209,7 @@ abstract class BaseQuestionGUI
             $this->createQuestionSetFields();
             $this->question->setParentId($this->block->getId());
             $this->question->update();
+            ilUtil::sendSuccess($this->plugin->txt('msg_question_updated'), true);
             $this->cancel();
         }
 

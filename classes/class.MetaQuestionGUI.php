@@ -153,7 +153,7 @@ class MetaQuestionGUI extends BaseQuestionGUI
             $question->update();
         }
 
-        ilUtil::sendSuccess($this->plugin->txt('saved_successfully'), true);
+        ilUtil::sendSuccess($this->plugin->txt('msg_question_updated'), true);
         $this->cancel();
     }
 
