@@ -49,7 +49,7 @@ class MetaQuestion extends BaseQuestion
 
     public function cloneTo(int $parent_id): BaseQuestion
     {
-        $clone = new self($this->db, $parent_id);
+        $clone = new self($this->db);
         $clone->setName($this->getName());
         $clone->setShortTitle($this->getShortTitle());
         $clone->setTypeId($this->getTypeId());
