@@ -50,7 +50,7 @@ class DatasetTableGUI extends ilTable2GUI
         $this->addColumn($this->plugin->txt('date'), false, 'auto');
         $this->addColumn($this->plugin->txt('identity'), false, 'auto');
         $this->addColumn($this->plugin->txt('complete'), false, 'auto');
-        $this->addColumn($this->plugin->txt('average_all'), false, 'auto');
+        //$this->addColumn($this->plugin->txt('average_all'), false, 'auto');
         $this->addColumn($this->plugin->txt('actions'), false, 'auto');
         $this->ctrl->setParameterByClass('DatasetGUI', 'dataset_id', null);
         $this->setFormAction($this->ctrl->getFormActionByClass('DatasetGUI'));
@@ -91,7 +91,7 @@ class DatasetTableGUI extends ilTable2GUI
                 $this->tpl->setVariable('IDENTITY', $username['login']);
                 break;
         }
-        $this->tpl->setVariable('PERCENTAGE', $obj->getOverallPercentage());
+        //$this->tpl->setVariable('PERCENTAGE', $obj->getOverallPercentage());
         $this->tpl->setVariable('ID', $obj->getId());
         // Actions
         $ac = new ilAdvancedSelectionListGUI();
