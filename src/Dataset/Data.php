@@ -131,7 +131,7 @@ class Data implements hasDBFields
      */
     public static function _getLatestInstanceByDatasetId(ilDBInterface $db, int $dataset_id)
     {
-        $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = '.$dataset_id. ' ORDER BY creation_date LIMIT 1');
+        $set = $db->query('SELECT * FROM ' . self::TABLE_NAME . ' ' . ' WHERE dataset_id = '.$dataset_id. ' ORDER BY creation_date DESC LIMIT 1');
         while ($rec = $db->fetchObject($set)) {
             $data = new Data($db);
             return $data->setObjectValuesFromRecord($data, $rec);
