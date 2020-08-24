@@ -133,7 +133,7 @@ class ScaleFormGUI extends ilPropertyFormGUI
                     $obj = new ScaleUnit($this->db);
                     $obj->setParentId($this->scale->getId());
                     $obj->setTitle($_POST['scale_new']['title'][$k]);
-                    $obj->setValue($v);
+                    $obj->setValue((int)$v);
                     $obj->create();
                     $units[] = $obj;
                 }
