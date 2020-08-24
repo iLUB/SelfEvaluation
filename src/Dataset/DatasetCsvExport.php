@@ -226,14 +226,14 @@ class DatasetCsvExport extends csvExport
                 $invalid = true;
                 $meta_csv_values[] = new csvExportValue("starting_date", "Invalid");
             }
-            if ($dataset->getSubmitDate()) {
+            if ($dataset->isComplete() && $dataset->getSubmitDate()) {
                 $meta_csv_values[] = new csvExportValue("ending_date",
                     date($this->getDateFormat(), $dataset->getSubmitDate()));
             } else {
                 $invalid = true;
                 $meta_csv_values[] = new csvExportValue("ending_date", "Invalid");
             }
-            if ($invalid) {
+            if ($invalid || !$dataset->isComplete()) {
                 $meta_csv_values[] = new csvExportValue("duration", "Invalid");
             } else {
                 $meta_csv_values[] = new csvExportValue("duration", $dataset->getDuration());
