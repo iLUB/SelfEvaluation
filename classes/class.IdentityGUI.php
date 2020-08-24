@@ -88,7 +88,6 @@ class IdentityGUI
     {
         $this->initExistingForm();
         $this->initNewForm();
-        $this->plugin->updateLanguages();
         $template = $this->plugin->getTemplate('default/Identity/tpl.identity_selection.html');
         $template->setVariable('IDENTITY_INFO_TEXT', $this->parent->object->getIdentitySelectionInfoText());
         $acc = new ilAccordionGUI();
