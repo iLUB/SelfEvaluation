@@ -76,7 +76,9 @@ class MatrixFieldInputGUI extends ilSubEnabledFormPropertyGUI
 
         if(array_key_exists($matrix_key,$values)){
             $meta_question_values = $values[$matrix_key];
-            $this->setValue($meta_question_values[$question_key]);
+            if($meta_question_values[$question_key]){
+                $this->setValue($meta_question_values[$question_key]);
+            }
         }
     }
 
