@@ -50,9 +50,9 @@ class QuestionTableGUI extends ilTable2GUI
             $this->addColumn('', 'position', '20px');
             $this->addMultiCommand('saveSorting', $this->plugin->txt('save_sorting'));
         }
-
-        $this->addColumn($this->plugin->txt('title'), $this->sortable ? 'title' : false, 'auto');
-        $this->addColumn($this->plugin->txt('question_body'), $this->sortable ? 'question_body' : false, 'auto');
+			
+	$this->addColumn($this->plugin->txt('question_body'), $this->sortable ? 'question_body' : false, 'auto');
+        $this->addColumn($this->plugin->txt('short_title'), $this->sortable ? 'short_title' : false, 'auto');
         $this->addColumn($this->plugin->txt('is_inverted'), $this->sortable ? 'is_inverted' : false, 'auto');
         $this->addColumn($this->plugin->txt('actions'), $this->sortable ? 'actions' : false, 'auto');
     }
@@ -70,13 +70,11 @@ class QuestionTableGUI extends ilTable2GUI
             $this->tpl->setVariable('ID', $a_set['id']);
             $this->tpl->parseCurrentBlock();
         }
-
-        $this->tpl->setVariable('TITLE', $a_set['title'] ? $a_set['title'] :
-            $this->plugin->txt('question') . ' ' . $this->block->getPosition() . '.' . $a_set['position']);
+	$this->tpl->setVariable('TITLE', strip_tags($a_set['question_body']));
         $this->tpl->setVariable('EDIT_LINK',
             $this->ctrl->getLinkTargetByClass('QuestionGUI', 'editQuestion'));
-        $this->tpl->setVariable('BODY', strip_tags($a_set['question_body']));
-
+	$this->tpl->setVariable('BODY',  $a_set['title'] ? $a_set['title'] :
+		$this->plugin->txt('question') . ' ' . $this->block->getPosition() . '.' . $a_set['position']);
         $this->tpl->setVariable('IS_INVERTED',
             $a_set['is_inverse'] ? $this->plugin->getDirectory().'/templates/images/icon_ok.svg' : $this->plugin->getDirectory().'/templates/images/empty.png');
         // Actions
