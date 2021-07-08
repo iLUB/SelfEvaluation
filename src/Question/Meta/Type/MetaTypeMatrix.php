@@ -40,7 +40,7 @@ class MetaTypeMatrix extends MetaQuestionType
         $ty_se_mu->setSize(64);
         $ty_se_mu->setMaxLength(4096);
         $ty_se_mu->setValues(['']);
-        $ty_se_mu->setInfo($plugin->txt("matrix_scale_description"));
+        $ty_se_mu->setInfo($plugin->txt("matrix_scale_question_description"));
         $option->addSubItem($ty_se_mu);
 
         return $option;
