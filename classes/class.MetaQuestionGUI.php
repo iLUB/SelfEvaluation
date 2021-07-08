@@ -42,7 +42,7 @@ class MetaQuestionGUI extends BaseQuestionGUI
     {
         parent::initQuestionForm($mode);
 
-        $na = new ilTextInputGUI($this->plugin->txt('name'), 'name');
+        $na = new ilTextInputGUI($this->plugin->txt('question'), 'question');
         $na->setSize(32);
         $na->setMaxLength(255);
         $na->setRequired(true);
@@ -75,7 +75,7 @@ class MetaQuestionGUI extends BaseQuestionGUI
 
     protected function setQuestionFormValues()
     {
-        $item = $this->form->getItemByPostVar('name');
+        $item = $this->form->getItemByPostVar('question');
         /**
          * @var ilTextInputGUI $item
          */
@@ -112,7 +112,7 @@ class MetaQuestionGUI extends BaseQuestionGUI
     }
 
     protected function createQuestionSetFields(){
-        $this->question->setName($this->form->getInput('name'));
+        $this->question->setName($this->form->getInput('question'));
         $this->question->setShortTitle($this->form->getInput('short_title'));
         $this->question->setTypeId($this->form->getInput('type'));
         $this->question->setValues($this->getFormValuesByTypeId($this->form->getInput('type')));
